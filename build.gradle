@@ -67,6 +67,11 @@ dependencies {
     nativeRelease wpi.java.vendor.jniRelease(wpi.platforms.desktop)
     simulationRelease wpi.sim.enableRelease()
 
+        //Logging
+    implementation "ch.qos.logback:logback-classic:${logbackVersion}"
+    implementation 'io.github.microutils:kotlin-logging:1.6.10'
+
+
     testImplementation 'junit:junit:4.12'
 }
 
