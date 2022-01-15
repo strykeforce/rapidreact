@@ -5,6 +5,8 @@ import org.strykeforce.swerve.SwerveDrive;
 import org.strykeforce.swerve.TalonSwerveModule;
 import org.strykeforce.telemetry.Registrable;
 import org.strykeforce.telemetry.TelemetryService;
+import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
+import org.strykeforce.telemetry.measurable.Measure;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -12,11 +14,13 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
 import static frc.robot.Constants.kTalonConfigTimeout;
 
+import java.util.Set;
+
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
-public class DriveSubsystem extends SubsystemBase implements Registrable {
+public class DriveSubsystem extends MeasurableSubsystem {
 
     private SwerveDrive swerveDrive;
     public DriveSubsystem()
@@ -72,7 +76,6 @@ public class DriveSubsystem extends SubsystemBase implements Registrable {
 
     @Override
     public void periodic() {
-        // TODO Auto-generated method stub
         swerveDrive.periodic();
     }
 
@@ -83,6 +86,12 @@ public class DriveSubsystem extends SubsystemBase implements Registrable {
 
   @Override
   public void registerWith(@NotNull TelemetryService telemetryService) {
-   swerveDrive.registerWith(telemetryService);
+      super.registerWith(telemetryService);
+      swerveDrive.registerWith(telemetryService);
+  }
+
+  @Override
+  public Set<Measure> getMeasures() {
+      return Set.of();
   }
 }

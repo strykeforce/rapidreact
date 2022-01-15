@@ -25,7 +25,7 @@ public class DriveTeleopCommand extends CommandBase
        driveSubsystem.drive(
             deadband(joystick.getRawAxis(Axis.LEFT_X.id)),
             deadband(joystick.getRawAxis(Axis.LEFT_Y.id)),
-            deadband(joystick.getRawAxis(Axis.RIGHT_Y.id)));
+            -deadband(joystick.getRawAxis(Axis.RIGHT_Y.id)));
        
     }
     @Override
