@@ -1,11 +1,11 @@
 package frc.robot.commands.drive;
 
-import org.ejml.dense.row.factory.LinearSolverFactory_MT_DDRM;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.Constants;
+import frc.robot.Constants.DriveConstants;
 
 
 public class DriveTeleopCommand extends CommandBase
@@ -21,11 +21,14 @@ public class DriveTeleopCommand extends CommandBase
     }
 
     @Override
+    public void initialize() {}
+
+    @Override
     public void execute() {
        driveSubsystem.drive(
-            deadband(joystick.getRawAxis(Axis.LEFT_X.id)),
-            deadband(joystick.getRawAxis(Axis.LEFT_Y.id)),
-            -deadband(joystick.getRawAxis(Axis.RIGHT_Y.id)));
+           getStick(Axis.LEFT_X.id) * DriveConstants.kMaxSpeedMetersPerSecond,
+           getStick(Axis.LEFT_Y.id) * DriveConstants.kMaxSpeedMetersPerSecond,
+           -getStick(Axis.RIGHT_Y.id) * DriveConstants.kMaxOmega);
        
     }
     @Override
@@ -36,6 +39,12 @@ public class DriveTeleopCommand extends CommandBase
     @Override
     public void end(boolean interrupted) {
         driveSubsystem.drive(0, 0, 0);
+    }
+
+    private double getStick(int axisNum){
+        double rawAxis = joystick.getRawAxis(axisNum);
+        double deadbanded = deadband(rawAxis);
+        return deadbanded;
     }
 
     private double deadband(double stickValue)
