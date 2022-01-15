@@ -4,18 +4,15 @@
 
 package frc.robot;
 
-import org.strykeforce.telemetry.TelemetryController;
-import org.strykeforce.telemetry.TelemetryService;
-
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.ZeroGyroCommand;
 import frc.robot.subsystems.DriveSubsystem;
+import org.strykeforce.telemetry.TelemetryController;
+import org.strykeforce.telemetry.TelemetryService;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -28,7 +25,6 @@ public class RobotContainer {
   private DriveSubsystem driveSubsystem = new DriveSubsystem();
   private TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
   private Joystick driveJoystick = new Joystick(0);
-
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -48,8 +44,10 @@ public class RobotContainer {
   private void configureDriverButtonBindings() {
 
     driveSubsystem.setDefaultCommand(new DriveTeleopCommand(driveJoystick, driveSubsystem));
-    new JoystickButton(driveJoystick, Button.RESET.id).whenPressed(new ZeroGyroCommand(driveSubsystem));
-}
+    new JoystickButton(driveJoystick, Button.RESET.id)
+        .whenPressed(new ZeroGyroCommand(driveSubsystem));
+  }
+
   public enum Axis {
     RIGHT_X(1),
     RIGHT_Y(0),

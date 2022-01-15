@@ -3,6 +3,8 @@ import edu.wpi.first.gradlerio.deploy.roborio.RoboRIO
 plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2022.1.1"
+    id "com.diffplug.spotless" version "6.2.0"
+    id "idea"
 }
 
 sourceCompatibility = JavaVersion.VERSION_11
@@ -92,3 +94,18 @@ jar {
 deployArtifact.jarTask = jar
 wpi.java.configureExecutableTasks(jar)
 wpi.java.configureTestTasks(test)
+
+idea{
+    module{
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
+
+spotless{
+    java{
+        googleJavaFormat()
+        removeUnusedImports()
+        lineEndings = 'GIT_ATTRIBUTES'
+    }
+}

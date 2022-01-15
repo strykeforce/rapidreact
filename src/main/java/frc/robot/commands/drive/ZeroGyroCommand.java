@@ -4,19 +4,17 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.DriveSubsystem;
 
 public class ZeroGyroCommand extends InstantCommand {
-    DriveSubsystem driveSubsystem;
-    
-    public ZeroGyroCommand (DriveSubsystem driveSubsystem)
+  DriveSubsystem driveSubsystem;
 
-    {
-        addRequirements(driveSubsystem);
+  public ZeroGyroCommand(DriveSubsystem driveSubsystem) {
 
-        this.driveSubsystem = driveSubsystem;
-    }
+    addRequirements(driveSubsystem);
 
-    @Override
-    public void initialize() {
-        driveSubsystem.resetGyro();
-    }
-    
+    this.driveSubsystem = driveSubsystem;
+  }
+
+  @Override
+  public void initialize() {
+    driveSubsystem.resetGyro();
+  }
 }
