@@ -28,6 +28,11 @@ public final class Constants {
     public static final double kDeadbandXLock = 0.2;
     public static final double kDeadbandAllStick = 0.05;
 
+    // Contents for Sanity
+    // Wheel math
+    // Gear values
+    //
+
     // TODO: verify diameter and run calibration
     // 500 cm calibration = actual / odometry
     public static final double kWheelDiameterInches = 3.0 * (584.0 / 501.0);
@@ -107,5 +112,15 @@ public final class Constants {
       driveConfig.voltageCompSaturation = 12;
       return driveConfig;
     }
+
+    // Holonomic Controller Constants
+    public static final double kPHolonomic = 6.0;
+    public static final double kIHoonomic = 0.0;
+    public static final double kDHolonomic = kPHolonomic / 100.0;
+    public static final double kPOmega = 2.5;
+    public static final double kIOmega = 0.0;
+    public static final double kDOmega = 0.0;
+    public static final double kMaxVelOmega = kMaxOmega / 2.0;
+    public static final double kMaxAccelOmega = 3.14;
   }
 }

@@ -21,9 +21,11 @@ import org.strykeforce.telemetry.TelemetryService;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+
   // The robot's subsystems and commands are defined here...
-  private DriveSubsystem driveSubsystem = new DriveSubsystem();
-  private TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
+
+  private final TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
+  private DriveSubsystem driveSubsystem = new DriveSubsystem(telemetryService);
   private Joystick driveJoystick = new Joystick(0);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
