@@ -201,6 +201,12 @@ public class DriveSubsystem extends MeasurableSubsystem {
         false);
   }
 
+  // Make whether a trajectory is currently active obvious on grapher
+  public void grapherTrajectoryActive(Boolean active) {
+    if (active) trajectoryActive = 1.0;
+    else trajectoryActive = 0.0;
+  }
+
   @Override
   public void registerWith(@NotNull TelemetryService telemetryService) {
     super.registerWith(telemetryService);

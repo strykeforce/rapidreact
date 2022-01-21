@@ -31,7 +31,7 @@ public class DriveAutonCommand extends CommandBase {
   public void initialize() {
     Pose2d initialPose = trajectory.getInitialPose();
     driveSubsystem.resetOdometry(new Pose2d(initialPose.getTranslation(), robotHeading));
-    // driveSubsystem.grapherTrajectoryActive(true);
+    driveSubsystem.grapherTrajectoryActive(true);
     timer.reset();
     logger.info("Begin Trajectory");
   }
