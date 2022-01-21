@@ -108,4 +108,33 @@ public final class Constants {
       return driveConfig;
     }
   }
+
+  public static final class MagazineConstants {
+    public static final int MagazineTalonID = 30;
+    public static TalonSRXConfiguration getMagazineTalonConfig() {
+      TalonSRXConfiguration magazineConfig = new TalonSRXConfiguration();
+
+      magazineConfig.primaryPID.selectedFeedbackCoefficient = 1.0;
+      magazineConfig.auxiliaryPID.selectedFeedbackSensor = FeedbackDevice.None;
+
+      magazineConfig.forwardLimitSwitchSource = LimitSwitchSource.Deactivated;
+      magazineConfig.reverseLimitSwitchSource = LimitSwitchSource.Deactivated;
+
+      magazineConfig.continuousCurrentLimit = 10;
+      magazineConfig.peakCurrentDuration = 10;
+      magazineConfig.peakCurrentLimit = 15;
+      magazineConfig.slot0.kP = 0.0;
+      magazineConfig.slot0.kI = 0.0;
+      magazineConfig.slot0.kD = 0.0;
+      magazineConfig.slot0.kF = 0.0;
+      magazineConfig.slot0.integralZone = 0;
+      magazineConfig.slot0.allowableClosedloopError = 0;
+      magazineConfig.slot0.maxIntegralAccumulator = 0;
+      magazineConfig.motionCruiseVelocity = 0;
+      magazineConfig.motionAcceleration = 0;
+      magazineConfig.velocityMeasurementWindow = 64;
+      magazineConfig.voltageCompSaturation = 12;
+      return magazineConfig;
+    }
+  }
 }

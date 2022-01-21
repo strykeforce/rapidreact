@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.ZeroGyroCommand;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.MagazineSubsystem;
+
 import org.strykeforce.telemetry.TelemetryController;
 import org.strykeforce.telemetry.TelemetryService;
 
@@ -23,6 +25,7 @@ import org.strykeforce.telemetry.TelemetryService;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private DriveSubsystem driveSubsystem = new DriveSubsystem();
+  private final MagazineSubsystem magazineSubsystem = new MagazineSubsystem();
   private TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
   private Joystick driveJoystick = new Joystick(0);
 
@@ -30,6 +33,7 @@ public class RobotContainer {
   public RobotContainer() {
 
     driveSubsystem.registerWith(telemetryService);
+    magazineSubsystem.registerWith(telemetryService);
     telemetryService.start();
     // Configure the button bindings
     configureDriverButtonBindings();
