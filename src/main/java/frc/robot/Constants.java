@@ -10,6 +10,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.util.Color;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -111,6 +112,11 @@ public final class Constants {
 
   public static final class MagazineConstants {
     public static final int MagazineTalonID = 30;
+    public static final Color kBlueCargo =
+        new Color(0.25, 0.25, 0.5); // FIXME need to get real color
+    public static final Color kRedCargo =
+        new Color(0.5, 0.25, 0.25); // FIXME need to get real color
+
     public static TalonSRXConfiguration getMagazineTalonConfig() {
       TalonSRXConfiguration magazineConfig = new TalonSRXConfiguration();
 
