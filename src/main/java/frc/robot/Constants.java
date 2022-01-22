@@ -10,6 +10,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.util.Color;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -106,6 +107,40 @@ public final class Constants {
       driveConfig.velocityMeasurementWindow = 64;
       driveConfig.voltageCompSaturation = 12;
       return driveConfig;
+    }
+  }
+
+  public static final class MagazineConstants {
+    public static final int MagazineTalonID = 30;
+    public static final Color kBlueCargo =
+        new Color(0.25, 0.25, 0.5); // FIXME need to get real color
+    public static final Color kRedCargo =
+        new Color(0.5, 0.25, 0.25); // FIXME need to get real color
+
+    public static TalonSRXConfiguration getMagazineTalonConfig() {
+      TalonSRXConfiguration magazineConfig = new TalonSRXConfiguration();
+
+      magazineConfig.primaryPID.selectedFeedbackCoefficient = 1.0;
+      magazineConfig.auxiliaryPID.selectedFeedbackSensor = FeedbackDevice.None;
+
+      magazineConfig.forwardLimitSwitchSource = LimitSwitchSource.Deactivated;
+      magazineConfig.reverseLimitSwitchSource = LimitSwitchSource.Deactivated;
+
+      magazineConfig.continuousCurrentLimit = 10;
+      magazineConfig.peakCurrentDuration = 10;
+      magazineConfig.peakCurrentLimit = 15;
+      magazineConfig.slot0.kP = 0.0;
+      magazineConfig.slot0.kI = 0.0;
+      magazineConfig.slot0.kD = 0.0;
+      magazineConfig.slot0.kF = 0.0;
+      magazineConfig.slot0.integralZone = 0;
+      magazineConfig.slot0.allowableClosedloopError = 0;
+      magazineConfig.slot0.maxIntegralAccumulator = 0;
+      magazineConfig.motionCruiseVelocity = 0;
+      magazineConfig.motionAcceleration = 0;
+      magazineConfig.velocityMeasurementWindow = 64;
+      magazineConfig.voltageCompSaturation = 12;
+      return magazineConfig;
     }
   }
 }
