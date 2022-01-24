@@ -1,14 +1,9 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.ColorMatch;
 import com.revrobotics.ColorMatchResult;
 import com.revrobotics.ColorSensorV3;
-import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.util.Color;
-import frc.robot.Constants;
 import frc.robot.Constants.MagazineConstants;
 import java.util.Set;
 import org.slf4j.Logger;
@@ -21,30 +16,32 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   private static final Logger logger = LoggerFactory.getLogger(MeasurableSubsystem.class);
   private ColorSensorV3 colorSensor;
   private Color lastColor = new Color(0, 0, 0);
-  private TalonSRX magazineTalon;
+  // private TalonSRX magazineTalon;
   private CargoColor[] storedCargoColors = new CargoColor[] {CargoColor.NONE, CargoColor.NONE};
   private ColorMatch colorMatch = new ColorMatch();
 
   public MagazineSubsystem() {
-    colorSensor = new ColorSensorV3(Port.kMXP);
-    magazineTalon = new TalonSRX(MagazineConstants.MagazineTalonID);
-    magazineTalon.configFactoryDefault(Constants.kTalonConfigTimeout);
-    magazineTalon.configAllSettings(
-        MagazineConstants.getMagazineTalonConfig(), Constants.kTalonConfigTimeout);
-    magazineTalon.enableCurrentLimit(true);
-    magazineTalon.enableVoltageCompensation(true);
-    magazineTalon.setNeutralMode(NeutralMode.Coast);
+    // colorSensor = new ColorSensorV3(Port.kMXP);
+    // magazineTalon = new TalonSRX(MagazineConstants.MagazineTalonID);
+    // magazineTalon.configFactoryDefault(Constants.kTalonConfigTimeout);
+    // magazineTalon.configAllSettings(
+    //     MagazineConstants.getMagazineTalonConfig(), Constants.kTalonConfigTimeout);
+    // magazineTalon.enableCurrentLimit(true);
+    // magazineTalon.enableVoltageCompensation(true);
+    // magazineTalon.setNeutralMode(NeutralMode.Coast);
 
     colorMatch.addColorMatch(MagazineConstants.kBlueCargo);
     colorMatch.addColorMatch(MagazineConstants.kRedCargo);
   }
 
   public void openLoopRotate(double percentOutput) {
-    magazineTalon.set(ControlMode.PercentOutput, percentOutput);
+    // magazineTalon.set(ControlMode.PercentOutput, percentOutput);
+    logger.info("Magazine motor turned on {}", percentOutput);
   }
 
   public Color getColor() {
-    lastColor = colorSensor.getColor();
+    // lastColor = colorSensor.getColor();
+    lastColor = new Color(0, 0, 0);
     return lastColor;
   }
 
@@ -59,10 +56,10 @@ public class MagazineSubsystem extends MeasurableSubsystem {
       currentCargoColor = CargoColor.RED;
     }
 
-    if (storedCargoColors[0] != CargoColor.NONE) {
+    if (storedCargoColors[0] == CargoColor.NONE) {
       storedCargoColors[0] = currentCargoColor;
       logger.info("Added first cargo {}", currentCargoColor);
-    } else if (storedCargoColors[1] != CargoColor.NONE) {
+    } else if (storedCargoColors[1] == CargoColor.NONE) {
       storedCargoColors[1] = currentCargoColor;
       logger.info("Added second cargo {}", currentCargoColor);
     } else {
@@ -84,10 +81,15 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     return storedCargoColors;
   }
 
+  public void clearCargoColors() {
+    storedCargoColors[0] = CargoColor.NONE;
+    storedCargoColors[1] = CargoColor.NONE;
+  }
+
   @Override
   public void registerWith(TelemetryService telemetryService) {
     super.registerWith(telemetryService);
-    telemetryService.register(magazineTalon);
+    // telemetryService.register(magazineTalon);
   }
 
   @Override

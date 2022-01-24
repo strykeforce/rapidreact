@@ -7,9 +7,14 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.ZeroGyroCommand;
+import frc.robot.commands.magazine.MagazineOpenLoopCommand;
+import frc.robot.commands.magazine.PitClearCargoColor;
+import frc.robot.commands.magazine.PitMagazineOpenLoopCommand;
+import frc.robot.commands.magazine.PitReadCargoColor;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
 import org.strykeforce.telemetry.TelemetryController;
@@ -36,6 +41,7 @@ public class RobotContainer {
     telemetryService.start();
     // Configure the button bindings
     configureDriverButtonBindings();
+    configurePitDashboard();
   }
 
   /**
@@ -49,6 +55,18 @@ public class RobotContainer {
     driveSubsystem.setDefaultCommand(new DriveTeleopCommand(driveJoystick, driveSubsystem));
     new JoystickButton(driveJoystick, Button.RESET.id)
         .whenPressed(new ZeroGyroCommand(driveSubsystem));
+  }
+
+  private void configurePitDashboard() {
+    SmartDashboard.putNumber("Pit/Magazine/Speed", 0.0);
+    SmartDashboard.putData("Pit/Magazine/Start", new PitMagazineOpenLoopCommand(magazineSubsystem));
+    SmartDashboard.putData(
+        "Pit/Magazine/Stop", new MagazineOpenLoopCommand(magazineSubsystem, 0.0));
+    SmartDashboard.putString("Pit/Magazine/First Cargo Color", "");
+    SmartDashboard.putString("Pit/Magazine/Second Cargo Color", "");
+    SmartDashboard.putData("Pit/Magazine/ReadCargoColor", new PitReadCargoColor(magazineSubsystem));
+    SmartDashboard.putData(
+        "Pit/Magazine/ClearCargoColor", new PitClearCargoColor(magazineSubsystem));
   }
 
   public enum Axis {
