@@ -36,7 +36,7 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
-    // driveSubsystem.registerWith(telemetryService);
+    driveSubsystem.registerWith(telemetryService);
     magazineSubsystem.registerWith(telemetryService);
     telemetryService.start();
     // Configure the button bindings
