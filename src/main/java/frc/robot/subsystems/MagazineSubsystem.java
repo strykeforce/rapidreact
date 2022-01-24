@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 import com.revrobotics.ColorMatch;
 import com.revrobotics.ColorMatchResult;
 import com.revrobotics.ColorSensorV3;
-import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Constants.MagazineConstants;
 import java.util.Set;
@@ -22,7 +21,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   private ColorMatch colorMatch = new ColorMatch();
 
   public MagazineSubsystem() {
-    colorSensor = new ColorSensorV3(Port.kMXP);
+    // colorSensor = new ColorSensorV3(Port.kMXP);
     // magazineTalon = new TalonSRX(MagazineConstants.MagazineTalonID);
     // magazineTalon.configFactoryDefault(Constants.kTalonConfigTimeout);
     // magazineTalon.configAllSettings(
@@ -41,7 +40,8 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   }
 
   public Color getColor() {
-    lastColor = colorSensor.getColor();
+    // lastColor = colorSensor.getColor();
+    lastColor = new Color(0, 0, 0);
     return lastColor;
   }
 

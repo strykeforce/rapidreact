@@ -8,10 +8,14 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.commands.drive.DriveTeleopCommand;
+import frc.robot.commands.drive.ZeroGyroCommand;
 import frc.robot.commands.magazine.MagazineOpenLoopCommand;
 import frc.robot.commands.magazine.PitClearCargoColor;
 import frc.robot.commands.magazine.PitMagazineOpenLoopCommand;
 import frc.robot.commands.magazine.PitReadCargoColor;
+import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
 import org.strykeforce.telemetry.TelemetryController;
 import org.strykeforce.telemetry.TelemetryService;
@@ -24,7 +28,7 @@ import org.strykeforce.telemetry.TelemetryService;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  // private DriveSubsystem driveSubsystem = new DriveSubsystem();
+  private DriveSubsystem driveSubsystem = new DriveSubsystem();
   private final MagazineSubsystem magazineSubsystem = new MagazineSubsystem();
   private TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
   private Joystick driveJoystick = new Joystick(0);
@@ -48,9 +52,9 @@ public class RobotContainer {
    */
   private void configureDriverButtonBindings() {
 
-    // driveSubsystem.setDefaultCommand(new DriveTeleopCommand(driveJoystick, driveSubsystem));
-    // new JoystickButton(driveJoystick, Button.RESET.id)
-    // .whenPressed(new ZeroGyroCommand(driveSubsystem));
+    driveSubsystem.setDefaultCommand(new DriveTeleopCommand(driveJoystick, driveSubsystem));
+    new JoystickButton(driveJoystick, Button.RESET.id)
+        .whenPressed(new ZeroGyroCommand(driveSubsystem));
   }
 
   private void configurePitDashboard() {
