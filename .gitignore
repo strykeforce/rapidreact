@@ -163,3 +163,7 @@ bin/
 
 .idea
 outlineviewer.json
+
+networktables.ini
+simgui-ds.json
+simgui.json
