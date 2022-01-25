@@ -1,4 +1,6 @@
-2022 FIRST RAPID REACT
+# 2022 FIRST RAPID REACT
+
+[![CI](https://github.com/strykeforce/rapidreact/actions/workflows/main.yml/badge.svg)](https://github.com/strykeforce/rapidreact/actions/workflows/main.yml)
 
 ## Talons
 
