@@ -11,11 +11,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.ZeroGyroCommand;
+import frc.robot.commands.intake.IntakeOpenLoopCommand;
+import frc.robot.commands.intake.PitIntakeOpenLoopCommand;
 import frc.robot.commands.magazine.MagazineOpenLoopCommand;
 import frc.robot.commands.magazine.PitClearCargoColor;
 import frc.robot.commands.magazine.PitMagazineOpenLoopCommand;
 import frc.robot.commands.magazine.PitReadCargoColor;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
 import org.strykeforce.telemetry.TelemetryController;
 import org.strykeforce.telemetry.TelemetryService;
@@ -30,6 +33,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private DriveSubsystem driveSubsystem = new DriveSubsystem();
   private final MagazineSubsystem magazineSubsystem = new MagazineSubsystem();
+  private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   private TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
   private Joystick driveJoystick = new Joystick(0);
 
@@ -38,6 +42,7 @@ public class RobotContainer {
 
     driveSubsystem.registerWith(telemetryService);
     magazineSubsystem.registerWith(telemetryService);
+    intakeSubsystem.registerWith(telemetryService);
     telemetryService.start();
     // Configure the button bindings
     configureDriverButtonBindings();
@@ -58,6 +63,7 @@ public class RobotContainer {
   }
 
   private void configurePitDashboard() {
+    // magazine pit commands
     SmartDashboard.putNumber("Pit/Magazine/Speed", 0.0);
     SmartDashboard.putData("Pit/Magazine/Start", new PitMagazineOpenLoopCommand(magazineSubsystem));
     SmartDashboard.putData(
@@ -67,6 +73,11 @@ public class RobotContainer {
     SmartDashboard.putData("Pit/Magazine/ReadCargoColor", new PitReadCargoColor(magazineSubsystem));
     SmartDashboard.putData(
         "Pit/Magazine/ClearCargoColor", new PitClearCargoColor(magazineSubsystem));
+
+    // intake pit commands
+    SmartDashboard.putNumber("Pit/Intake/Speed", 0.0);
+    SmartDashboard.putData("Pit/Intake/Start", new PitIntakeOpenLoopCommand(intakeSubsystem));
+    SmartDashboard.putData("Pit/Intake/Stop", new IntakeOpenLoopCommand(intakeSubsystem, 0.0));
   }
 
   public enum Axis {
