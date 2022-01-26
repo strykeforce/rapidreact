@@ -113,9 +113,10 @@ public final class Constants {
   public static final class MagazineConstants {
     public static final int MagazineTalonID = 30;
     public static final Color kBlueCargo =
-        new Color(0.25, 0.25, 0.5); // FIXME need to get real color
+        new Color(0.15, 0.35, 0.5); // FIXME need to get real color
     public static final Color kRedCargo =
         new Color(0.5, 0.25, 0.25); // FIXME need to get real color
+    public static final Color kNoCargo = new Color(0.25, 0.5, 0.25); // FIXME need to get real color
 
     public static TalonSRXConfiguration getMagazineTalonConfig() {
       TalonSRXConfiguration magazineConfig = new TalonSRXConfiguration();
