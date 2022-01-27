@@ -15,8 +15,11 @@ import frc.robot.commands.magazine.MagazineOpenLoopCommand;
 import frc.robot.commands.magazine.PitClearCargoColor;
 import frc.robot.commands.magazine.PitMagazineOpenLoopCommand;
 import frc.robot.commands.magazine.PitReadCargoColor;
+import frc.robot.commands.turret.OpenLoopTurretCommand;
+import frc.robot.commands.turret.PitTurretCloseLoopPositionCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
+import frc.robot.subsystems.TurretSubsystem;
 import org.strykeforce.telemetry.TelemetryController;
 import org.strykeforce.telemetry.TelemetryService;
 
@@ -30,18 +33,22 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private DriveSubsystem driveSubsystem = new DriveSubsystem();
   private final MagazineSubsystem magazineSubsystem = new MagazineSubsystem();
+  public static TurretSubsystem turretSubsystem = new TurretSubsystem();
+  // public static VisionSubsystem visionSubsystem = new VisionSubsystem();
   private TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
   private Joystick driveJoystick = new Joystick(0);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-
     driveSubsystem.registerWith(telemetryService);
     magazineSubsystem.registerWith(telemetryService);
+    turretSubsystem.registerWith(telemetryService);
     telemetryService.start();
     // Configure the button bindings
     configureDriverButtonBindings();
     configurePitDashboard();
+    configureTestButtonBindings();
+    turretSubsystem.zeroTurret();
   }
 
   /**
@@ -57,6 +64,11 @@ public class RobotContainer {
         .whenPressed(new ZeroGyroCommand(driveSubsystem));
   }
 
+  private void configureTestButtonBindings() {
+    // Joystick joystick = new Joystick(0);
+    // new JoystickButton(joystick, 1).whenPressed(new TurretAimCommand());
+  }
+
   private void configurePitDashboard() {
     SmartDashboard.putNumber("Pit/Magazine/Speed", 0.0);
     SmartDashboard.putData("Pit/Magazine/Start", new PitMagazineOpenLoopCommand(magazineSubsystem));
@@ -67,6 +79,14 @@ public class RobotContainer {
     SmartDashboard.putData("Pit/Magazine/ReadCargoColor", new PitReadCargoColor(magazineSubsystem));
     SmartDashboard.putData(
         "Pit/Magazine/ClearCargoColor", new PitClearCargoColor(magazineSubsystem));
+
+    // Turret Pit Commands
+    SmartDashboard.putNumber("Pit/Turret/SetPointTicks", Constants.TurretConstants.kTurretMidpoint);
+    SmartDashboard.putData(
+        "Pit/Turret/CloseLoopPosition", new PitTurretCloseLoopPositionCommand(turretSubsystem));
+    SmartDashboard.putData("Pit/Turret/Forward", new OpenLoopTurretCommand(turretSubsystem, 0.2));
+    SmartDashboard.putData("Pit/Turret/Reverse", new OpenLoopTurretCommand(turretSubsystem, -0.2));
+    SmartDashboard.putData("Pit/Turret/Stop", new OpenLoopTurretCommand(turretSubsystem, 0.0));
   }
 
   public enum Axis {

@@ -10,6 +10,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.util.Color;
 
 /**
@@ -22,7 +23,13 @@ import edu.wpi.first.wpilibj.util.Color;
  */
 public final class Constants {
 
+  private static final DigitalInput digitalInput = new DigitalInput(9);
   public static final int kTalonConfigTimeout = 10; // ms
+  public static boolean isCompBot;
+
+  public Constants() {
+    isCompBot = digitalInput.get();
+  }
 
   public static final class DriveConstants {
 
@@ -108,6 +115,57 @@ public final class Constants {
       driveConfig.voltageCompSaturation = 12;
       return driveConfig;
     }
+  }
+
+  public static final class VisionConstants {
+
+    public static final double minContourAreaSize = 100;
+    public static final double VERTICAL_FOV = 48.8;
+    public static final double HORIZ_FOV = 57.999; // 50.8 //146
+    public static final double HORIZ_RES = 640; // 1280
+    public static final double TARGET_WIDTH_IN = 39.5; // 34.6
+    public static final double CAMERA_HEIGHT = 20.75;
+    public static final double TARGET_HEIGHT = 98.5;
+    public static final double SIZE_THRESHOLD = 400;
+    public static final double DISTANCE_THRESHOLD = 200;
+    public static final int kStableRange = 20;
+    public static final int kStableCounts = 5;
+    public static final double kCenteredRange = 2;
+    public static final double kLostLimit = 30;
+    public static final String kTablePath = "/home/lvuser/deploy/Lookup_Table.csv";
+    public static final int kTableMin = 96;
+    public static final int kTableMax = 360;
+    public static final int kTableRes = 1;
+    public static final int kShooterIndex = 2;
+    public static final int kHoodIndex = 3;
+    // + is left
+    public static final double kHorizAngleCorrection = 2.5;
+    // + is further along track and lower
+    public static final int kHoodInchesCorrectionR1 = 13; // 8-15 feet (was 20)
+    public static final int kHoodInchesCorrectionR2 = 13; // 15-19 feet (old 10)
+    public static final int kHoodInchesCorrectionR3 = 10; // 19-25 feet
+    public static final int kHoodInchesCorrectionR4 = 20; // 25+ feet
+    public static final int kHoodTicksPerInchR1 = 40; // 8-15 feet
+    public static final int kHoodTicksPerInchR2 = 75; // 15-19 feet
+    public static final int kHoodTicksPerInchR3 = 75; // 19-25 feet
+    public static final int kHoodTicksPerInchR4 = 40; // 25+ feet
+    public static String kCameraID = "A0";
+  }
+
+  public static final class TurretConstants {
+    public static final double kWrapRange = 1;
+    public static final double TURRET_TICKS_PER_DEGREE = 72.404;
+    public static final double kTurretMidpoint = 13_000;
+    public static int kTurretZeroTicks = 1931;
+    public static final int kForwardLimit = 26095; // 26000
+    public static final int kReverseLimit = -100;
+    public static final int kCloseEnoughTurret = 40;
+    public static final double kMaxStringPotZero = 100;
+    public static final double kMinStringPotZero = 0;
+  }
+
+  public static final class ShooterConstants {
+    public static final int kStableCounts = 5;
   }
 
   public static final class MagazineConstants {
