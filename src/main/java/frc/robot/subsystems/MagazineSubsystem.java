@@ -1,9 +1,12 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.ColorMatch;
 import com.revrobotics.ColorMatchResult;
 import com.revrobotics.ColorSensorV3;
 import edu.wpi.first.wpilibj.util.Color;
+import frc.robot.Constants;
 import frc.robot.Constants.MagazineConstants;
 import java.util.Set;
 import org.slf4j.Logger;
@@ -17,28 +20,53 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   private ColorSensorV3 colorSensor;
   private Color lastColor = new Color(0, 0, 0);
   private int lastProximity = 0;
-  // private TalonSRX magazineTalon;
+  private TalonSRX lowerMagazineTalon;
+  private TalonSRX upperMagazineTalon;
   private CargoColor[] storedCargoColors = new CargoColor[] {CargoColor.NONE, CargoColor.NONE};
   private ColorMatch colorMatch = new ColorMatch();
 
   public MagazineSubsystem() {
     // colorSensor = new ColorSensorV3(Port.kMXP);
-    // magazineTalon = new TalonSRX(MagazineConstants.MagazineTalonID);
-    // magazineTalon.configFactoryDefault(Constants.kTalonConfigTimeout);
-    // magazineTalon.configAllSettings(
-    //     MagazineConstants.getMagazineTalonConfig(), Constants.kTalonConfigTimeout);
-    // magazineTalon.enableCurrentLimit(true);
-    // magazineTalon.enableVoltageCompensation(true);
-    // magazineTalon.setNeutralMode(NeutralMode.Coast);
+
+    lowerMagazineTalon = new TalonSRX(MagazineConstants.LowerMagazineTalonID);
+    lowerMagazineTalon.configFactoryDefault(Constants.kTalonConfigTimeout);
+    lowerMagazineTalon.configAllSettings(
+        MagazineConstants.getMagazineTalonConfig(), Constants.kTalonConfigTimeout);
+    lowerMagazineTalon.enableCurrentLimit(true);
+    lowerMagazineTalon.enableVoltageCompensation(true);
+    lowerMagazineTalon.setNeutralMode(NeutralMode.Coast);
+
+    upperMagazineTalon = new TalonSRX(MagazineConstants.UpperMagazineTalonID);
+    upperMagazineTalon.configFactoryDefault(Constants.kTalonConfigTimeout);
+    upperMagazineTalon.configAllSettings(
+        MagazineConstants.getMagazineTalonConfig(), Constants.kTalonConfigTimeout);
+    upperMagazineTalon.enableCurrentLimit(true);
+    upperMagazineTalon.enableVoltageCompensation(true);
+    upperMagazineTalon.setNeutralMode(NeutralMode.Coast);
 
     colorMatch.addColorMatch(MagazineConstants.kBlueCargo);
     colorMatch.addColorMatch(MagazineConstants.kRedCargo);
     colorMatch.addColorMatch(MagazineConstants.kNoCargo);
   }
 
-  public void openLoopRotate(double percentOutput) {
-    // magazineTalon.set(ControlMode.PercentOutput, percentOutput);
-    logger.info("Magazine motor turned on {}", percentOutput);
+  public void lowerOpenLoopRotate(double percentOutput) {
+    // lowerMagazineTalon.set(ControlMode.PercentOutput, percentOutput);
+    logger.info("Lower magazine motor turned on {}", percentOutput);
+  }
+
+  public void upperOpenLoopRotate(double percentOutput) {
+    // upperMagazineTalon.set(ControlMode.PercentOutput, percentOutput);
+    logger.info("Upper magazine motor turned on {}", percentOutput);
+  }
+
+  public boolean isLowerBeamBroken() {
+    boolean lowerBeam = lowerMagazineTalon.getSensorCollection().isFwdLimitSwitchClosed();
+    return lowerBeam;
+  }
+
+  public boolean isUpperBeamBroken() {
+    boolean upperBeam = upperMagazineTalon.getSensorCollection().isFwdLimitSwitchClosed();
+    return upperBeam;
   }
 
   public Color getColor() {
@@ -52,7 +80,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     return lastProximity;
   }
 
-  public void readCargoColor() {
+  public CargoColor readCargoColor() {
     Color readColor = getColor();
     ColorMatchResult matchResult = colorMatch.matchClosestColor(readColor);
 
@@ -72,6 +100,8 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     } else {
       logger.error("Picked up third cargo {}, not recording", currentCargoColor);
     }
+
+    return currentCargoColor;
   }
 
   public void shotOneCargo() {
@@ -99,7 +129,8 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   @Override
   public void registerWith(TelemetryService telemetryService) {
     super.registerWith(telemetryService);
-    // telemetryService.register(magazineTalon);
+    // telemetryService.register(lowerMagazineTalon);
+    // telemetryService.register(upperMagazineTalon);
   }
 
   @Override

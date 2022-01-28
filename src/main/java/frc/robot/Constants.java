@@ -111,7 +111,8 @@ public final class Constants {
   }
 
   public static final class MagazineConstants {
-    public static final int MagazineTalonID = 30;
+    public static final int LowerMagazineTalonID = 30;
+    public static final int UpperMagazineTalonID = 31;
     public static final Color kBlueCargo =
         new Color(0.15, 0.35, 0.5); // FIXME need to get real color
     public static final Color kRedCargo =

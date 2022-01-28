@@ -3,11 +3,11 @@ package frc.robot.commands.magazine;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.MagazineSubsystem;
 
-public class MagazineOpenLoopCommand extends InstantCommand {
+public class LowerMagazineOpenLoopCommand extends InstantCommand {
   private MagazineSubsystem magazineSubsystem;
   private double speed;
 
-  public MagazineOpenLoopCommand(MagazineSubsystem magazineSubsystem, double speed) {
+  public LowerMagazineOpenLoopCommand(MagazineSubsystem magazineSubsystem, double speed) {
     addRequirements(magazineSubsystem);
     this.magazineSubsystem = magazineSubsystem;
     this.speed = speed;
@@ -15,6 +15,6 @@ public class MagazineOpenLoopCommand extends InstantCommand {
 
   @Override
   public void initialize() {
-    magazineSubsystem.openLoopRotate(speed);
+    magazineSubsystem.lowerOpenLoopRotate(speed);
   }
 }
