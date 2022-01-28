@@ -36,7 +36,7 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-    // RobotContainer.visionSubsystem.ShooterCamera.setEnabled(false);
+    // RobotContainer.visionSubsystem.shooterCamera.setEnabled(false);
     didCamStartup = false;
     // deadeyeC0 = new DeadeyeC0(deadeyeNetworkTableInstance);
     // m_robotContainer.deadeyeC0 = deadeyeC0;
@@ -61,9 +61,9 @@ public class Robot extends TimedRobot {
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
-    // RobotContainer.visionSubsystem.ShooterCamera.setEnabled(false);
+    RobotContainer.visionSubsystem.shooterCamera.setEnabled(false);
     if (!didCamStartup) {
-      // RobotContainer.visionSubsystem.ShooterCamera.setEnabled(true);
+      // RobotContainer.visionSubsystem.shooterCamera.setEnabled(true);
     }
   }
 
@@ -79,7 +79,9 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {}
 
   @Override
-  public void teleopInit() {}
+  public void teleopInit() {
+    RobotContainer.visionSubsystem.shooterCamera.setEnabled(true);
+  }
 
   /** This function is called periodically during operator control. */
   @Override

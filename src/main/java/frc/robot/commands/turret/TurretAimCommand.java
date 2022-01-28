@@ -1,12 +1,12 @@
 package frc.robot.commands.turret;
 
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TurretAimCommand extends InstantCommand {
+public class TurretAimCommand extends CommandBase {
   private VisionSubsystem visionSubsystem;
   private TurretSubsystem turretSubsystem;
   public Logger logger = LoggerFactory.getLogger("Aim Shooter Command");
@@ -20,18 +20,23 @@ public class TurretAimCommand extends InstantCommand {
   @Override
   public void initialize() {
     if (visionSubsystem.isTargetValid()) {
-      // VISION.ShooterCamera.setEnabled(true);
       // double offset = VISION.getOffsetAngle();
       // TURRET.setTurret(VISION.getAzmithError());
       // TURRET.rotateTurret(VISION.getAzmithError() /*offset + VISION.getHorizAngleAdjustment()*/);
-      System.out.println("TurretAimCommand: " + visionSubsystem.getAzmithError());
-      // VISION.getSortedTargets();
+      turretSubsystem.rotateTurret(visionSubsystem.getOffsetAngle());
+      // System.out.println("TurretAimCommand: " + visionSubsystem.getOffsetAngle());
     }
   }
 
-  /*@Override
+  @Override
   public boolean isFinished() {
-    SmartDashboard.putBoolean("Match/Locked On", true);
-    return TURRET.turretAtTarget() && VISION.isStable() && VISION.isTargetValid();
-  }*/
+    // SmartDashboard.putBoolean("Match/Locked On", true);
+    // return TURRET.turretAtTarget() && VISION.isStable() && VISION.isTargetValid();
+    return true;
+  }
+
+  @Override
+  public void end(boolean interrupted) {
+    visionSubsystem.shooterCamera.setEnabled(false);
+  }
 }

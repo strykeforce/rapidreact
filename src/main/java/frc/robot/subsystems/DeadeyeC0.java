@@ -5,24 +5,27 @@ import frc.robot.Constants;
 import java.util.ArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.strykeforce.deadeye.Deadeye;
+import org.strykeforce.deadeye.Rect;
 import org.strykeforce.deadeye.TargetDataListener;
 import org.strykeforce.deadeye.TargetListTargetData;
-import org.strykeforce.deadeye.TargetListTargetData.Target;
 
 public class DeadeyeC0 implements TargetDataListener<TargetListTargetData> {
   private final Deadeye<TargetListTargetData> deadeye;
   public TargetListTargetData lastData;
-  public double minContourAreaSize;
+  public final double minContourAreaSize;
+  public final int frameCenter;
 
   public DeadeyeC0() {
-    deadeye = new Deadeye<>("I2", TargetListTargetData.class);
+    deadeye = new Deadeye<>("C0", TargetListTargetData.class);
     deadeye.setTargetDataListener(this);
+    frameCenter = deadeye.getCapture().width / 2;
     minContourAreaSize = Constants.VisionConstants.minContourAreaSize;
   }
 
   public DeadeyeC0(NetworkTableInstance nti) {
-    deadeye = new Deadeye<>("I2", TargetListTargetData.class, nti);
+    deadeye = new Deadeye<>("C0", TargetListTargetData.class, nti);
     deadeye.setTargetDataListener(this);
+    frameCenter = deadeye.getCapture().width / 2;
     minContourAreaSize = Constants.VisionConstants.minContourAreaSize;
   }
 
@@ -35,8 +38,8 @@ public class DeadeyeC0 implements TargetDataListener<TargetListTargetData> {
     lastData = data;
   }
 
-  public ArrayList<Target> getTargetListData() {
-    ArrayList<TargetListTargetData.Target> listdata = new ArrayList<>();
+  public ArrayList<Rect> getTargetListData() {
+    ArrayList<Rect> listdata = new ArrayList<>();
     for (int i = 0; i < lastData.targets.size(); i++) {
       if (lastData.targets.get(i).contourArea > minContourAreaSize) {
         listdata.add(lastData.targets.get(i));

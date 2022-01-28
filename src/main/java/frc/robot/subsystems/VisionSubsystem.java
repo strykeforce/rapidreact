@@ -1,25 +1,23 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants;
 import java.util.ArrayList;
-import org.strykeforce.deadeye.TargetListTargetData;
-import org.strykeforce.deadeye.TargetListTargetData.Target;
+import org.strykeforce.deadeye.Rect;
 
 public class VisionSubsystem implements Subsystem {
-  public DeadeyeC0 ShooterCamera;
-  private NetworkTableInstance deadeyeNetworkTableInstance;
+  public DeadeyeC0 shooterCamera;
+  // private NetworkTableInstance deadeyeNetworkTableInstance;
 
   public VisionSubsystem() {
-    deadeyeNetworkTableInstance = NetworkTableInstance.create();
-    deadeyeNetworkTableInstance.startClient("192.168.3.3", 1736); // TEST Deadeye
-    // deadeyeNetworkTableInstance.startClient("192.168.3.3", 1735); //real Deadeye
-    ShooterCamera = new DeadeyeC0(deadeyeNetworkTableInstance);
+    // deadeyeNetworkTableInstance = NetworkTableInstance.create();
+    // deadeyeNetworkTableInstance.startClient("192.168.3.3", 1736); // TEST Deadeye
+    // deadeyeNetworkTableInstance.startClient("192.168.3.3", 1735); // real Deadeye
+    shooterCamera = new DeadeyeC0(); // deadeyeNetworkTableInstance);
   }
 
   public boolean isTargetValid() {
-    return ShooterCamera.getValid();
+    return shooterCamera.getValid();
   }
 
   public double getHorizAngleAdjustment() {
@@ -30,38 +28,33 @@ public class VisionSubsystem implements Subsystem {
     return true;
   }
 
-  public ArrayList<TargetListTargetData.Target> getSortedTargets() {
-    ArrayList<TargetListTargetData.Target> sortedlist =
-        new ArrayList<TargetListTargetData.Target>();
+  public ArrayList<Rect> getSortedRects() {
+    ArrayList<Rect> sortedlist = new ArrayList<Rect>();
     int i;
-    for (Target target : ShooterCamera.getTargetListData()) {
+    for (Rect Rect : shooterCamera.getTargetListData()) {
       i = 0;
-      for (Target sortedTarget : sortedlist) {
-        if (target.center.x > sortedTarget.center.x) {
+      for (Rect sortedRect : sortedlist) {
+        if (Rect.center().x > sortedRect.center().x) {
           i += 1;
         }
       }
-      sortedlist.add(i, target);
+      sortedlist.add(i, Rect);
     }
     System.out.print(
         "SortedList: 1:"
-            + sortedlist.get(0).center.x
+            + sortedlist.get(0).center().x
             + " 2: "
-            + sortedlist.get(1).center.x
+            + sortedlist.get(1).center().x
             + " 3: "
-            + sortedlist.get(2).center.x /*+ " 4: " + sortedlist.get(3).center.x*/);
+            + sortedlist.get(2).center().x /*+ " 4: " + sortedlist.get(3).center().x*/);
     return sortedlist;
   }
 
-  public double getAzmithError() {
-    ArrayList<TargetListTargetData.Target> listData = getSortedTargets();
-    int minX =
-        listData.get(0)
-            .topLeft
-            .x; // need to sort listdata(left to right) and use that data instead, GET ISAAC's SORT
-    // CODE
+  public double getPixelError() {
+    ArrayList<Rect> listData = getSortedRects();
+    int minX = listData.get(0).topLeft.x;
     int maxX = listData.get(0).bottomRight.x;
-    double targetcenter;
+    double center;
     for (int i = 0; i < listData.size(); i++) {
       if (listData.get(i).topLeft.x < minX) {
         minX = listData.get(i).topLeft.x;
@@ -70,7 +63,15 @@ public class VisionSubsystem implements Subsystem {
         maxX = listData.get(i).bottomRight.x;
       }
     }
-    targetcenter = (maxX + minX) / 2;
-    return targetcenter;
+    center = (maxX + minX) / 2;
+    System.out.println("getPixelError: " + (center - shooterCamera.frameCenter));
+    return center - shooterCamera.frameCenter;
+  }
+
+  public double getOffsetAngle() {
+    if (shooterCamera.getValid()) {
+      return Constants.VisionConstants.HORIZ_FOV * getPixelError() / shooterCamera.frameCenter;
+    }
+    return 2767;
   }
 }
