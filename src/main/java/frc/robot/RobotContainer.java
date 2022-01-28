@@ -15,14 +15,13 @@ import frc.robot.commands.magazine.MagazineOpenLoopCommand;
 import frc.robot.commands.magazine.PitClearCargoColor;
 import frc.robot.commands.magazine.PitMagazineOpenLoopCommand;
 import frc.robot.commands.magazine.PitReadCargoColor;
-import frc.robot.commands.shooter.PitHoodOpenLoopCommand;
 import frc.robot.commands.shooter.HoodOpenLoopCommand;
+import frc.robot.commands.shooter.PitHoodOpenLoopCommand;
 import frc.robot.commands.shooter.PitShooterOpenLoopCommand;
 import frc.robot.commands.shooter.ShooterOpenLoopCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
-
 import org.strykeforce.telemetry.TelemetryController;
 import org.strykeforce.telemetry.TelemetryService;
 
@@ -66,7 +65,7 @@ public class RobotContainer {
   }
 
   private void configurePitDashboard() {
-    //Magazine Commands
+    // Magazine Commands
     SmartDashboard.putNumber("Pit/Magazine/Speed", 0.0);
     SmartDashboard.putData("Pit/Magazine/Start", new PitMagazineOpenLoopCommand(magazineSubsystem));
     SmartDashboard.putData(
@@ -76,18 +75,19 @@ public class RobotContainer {
     SmartDashboard.putData("Pit/Magazine/ReadCargoColor", new PitReadCargoColor(magazineSubsystem));
     SmartDashboard.putData(
         "Pit/Magazine/ClearCargoColor", new PitClearCargoColor(magazineSubsystem));
-  
-    //Shooter Commands
+
+    // Shooter Commands
     SmartDashboard.putNumber("Pit/Shooter/shooterSpeed", 0.0);
-    SmartDashboard.putData("Pit/Shooter/shooterStart", new PitShooterOpenLoopCommand(shooterSubsystem));
-    SmartDashboard.putData("Pit/Shooter/shooterStop", new ShooterOpenLoopCommand(shooterSubsystem, 0.0));
-    
-    //Hood Commands
+    SmartDashboard.putData(
+        "Pit/Shooter/shooterStart", new PitShooterOpenLoopCommand(shooterSubsystem));
+    SmartDashboard.putData(
+        "Pit/Shooter/shooterStop", new ShooterOpenLoopCommand(shooterSubsystem, 0.0));
+
+    // Hood Commands
     SmartDashboard.putNumber("Pit/Hood/hoodSpeed", 0.0);
     SmartDashboard.putData("Pit/Hood/hoodStart", new PitHoodOpenLoopCommand(shooterSubsystem));
     SmartDashboard.putData("Pit/Hood/hoodStop", new HoodOpenLoopCommand(shooterSubsystem, 0.0));
-    
-  }       
+  }
 
   public enum Axis {
     RIGHT_X(1),
