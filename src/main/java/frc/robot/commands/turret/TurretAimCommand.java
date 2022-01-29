@@ -21,10 +21,9 @@ public class TurretAimCommand extends CommandBase {
   public void initialize() {
     if (visionSubsystem.isTargetValid()) {
       // double offset = VISION.getOffsetAngle();
-      // TURRET.setTurret(VISION.getAzmithError());
       // TURRET.rotateTurret(VISION.getAzmithError() /*offset + VISION.getHorizAngleAdjustment()*/);
       turretSubsystem.rotateTurret(visionSubsystem.getOffsetAngle());
-      // System.out.println("TurretAimCommand: " + visionSubsystem.getOffsetAngle());
+      System.out.println("TurretAimCommand: " + visionSubsystem.getOffsetAngle());
     }
   }
 
@@ -32,11 +31,12 @@ public class TurretAimCommand extends CommandBase {
   public boolean isFinished() {
     // SmartDashboard.putBoolean("Match/Locked On", true);
     // return TURRET.turretAtTarget() && VISION.isStable() && VISION.isTargetValid();
-    return true;
+    return turretSubsystem.turretAtTarget();
   }
 
   @Override
   public void end(boolean interrupted) {
+    System.out.println("TurretAtTarget: " + turretSubsystem.turretAtTarget());
     visionSubsystem.shooterCamera.setEnabled(false);
   }
 }

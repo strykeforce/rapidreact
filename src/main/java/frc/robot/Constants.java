@@ -139,7 +139,7 @@ public final class Constants {
     public static final int kShooterIndex = 2;
     public static final int kHoodIndex = 3;
     // + is left
-    public static final double kHorizAngleCorrection = 2.5;
+    public static final double kHorizAngleCorrection = 2.5; // 2.5
     // + is further along track and lower
     public static final int kHoodInchesCorrectionR1 = 13; // 8-15 feet (was 20)
     public static final int kHoodInchesCorrectionR2 = 13; // 15-19 feet (old 10)

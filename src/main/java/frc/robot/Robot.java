@@ -4,10 +4,8 @@
 
 package frc.robot;
 
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.subsystems.DeadeyeC0;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -18,9 +16,6 @@ import frc.robot.subsystems.DeadeyeC0;
 public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
-  private DeadeyeC0 deadeyeC0;
-  private NetworkTableInstance deadeyeNetworkTableInstance;
-  public boolean didCamStartup;
 
   public Robot() {
     // deadeyeNetworkTableInstance = NetworkTableInstance.create();
@@ -36,10 +31,6 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-    // RobotContainer.visionSubsystem.shooterCamera.setEnabled(false);
-    didCamStartup = false;
-    // deadeyeC0 = new DeadeyeC0(deadeyeNetworkTableInstance);
-    // m_robotContainer.deadeyeC0 = deadeyeC0;
   }
 
   /**
@@ -62,9 +53,6 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
     RobotContainer.visionSubsystem.shooterCamera.setEnabled(false);
-    if (!didCamStartup) {
-      // RobotContainer.visionSubsystem.shooterCamera.setEnabled(true);
-    }
   }
 
   @Override

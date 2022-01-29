@@ -113,7 +113,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
   @Override
   public Set<Measure> getMeasures() {
 
-    return Set.of();
+    return Set.of(new Measure("TurretAtTarget", () -> turretAtTarget() ? 1.0 : 0.0));
   }
 
   @Override

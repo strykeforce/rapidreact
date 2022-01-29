@@ -16,6 +16,7 @@ import frc.robot.commands.magazine.PitReadCargoColor;
 import frc.robot.commands.turret.OpenLoopTurretCommand;
 import frc.robot.commands.turret.PitTurretCloseLoopPositionCommand;
 import frc.robot.commands.turret.TurretAimCommand;
+import frc.robot.commands.turret.ZeroTurretCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
@@ -43,6 +44,7 @@ public class RobotContainer {
     driveSubsystem.registerWith(telemetryService);
     magazineSubsystem.registerWith(telemetryService);
     turretSubsystem.registerWith(telemetryService);
+    visionSubsystem.registerWith(telemetryService);
     telemetryService.start();
     // Configure the button bindings
     configureDriverButtonBindings();
@@ -68,6 +70,7 @@ public class RobotContainer {
     Joystick joystick = new Joystick(0);
     new JoystickButton(joystick, 1)
         .whenPressed(new TurretAimCommand(visionSubsystem, turretSubsystem));
+    new JoystickButton(joystick, 2).whenPressed(new ZeroTurretCommand(turretSubsystem));
   }
 
   private void configurePitDashboard() {

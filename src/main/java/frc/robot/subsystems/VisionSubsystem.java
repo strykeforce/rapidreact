@@ -1,12 +1,15 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants;
 import java.util.ArrayList;
+import java.util.Set;
 import org.strykeforce.deadeye.Rect;
+import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
+import org.strykeforce.telemetry.measurable.Measure;
 
-public class VisionSubsystem implements Subsystem {
+public class VisionSubsystem extends MeasurableSubsystem {
   public DeadeyeC0 shooterCamera;
+  public double HORIZ_FOV = Constants.VisionConstants.HORIZ_FOV;
   // private NetworkTableInstance deadeyeNetworkTableInstance;
 
   public VisionSubsystem() {
@@ -40,18 +43,14 @@ public class VisionSubsystem implements Subsystem {
       }
       sortedlist.add(i, Rect);
     }
-    System.out.print(
-        "SortedList: 1:"
-            + sortedlist.get(0).center().x
-            + " 2: "
-            + sortedlist.get(1).center().x
-            + " 3: "
-            + sortedlist.get(2).center().x /*+ " 4: " + sortedlist.get(3).center().x*/);
     return sortedlist;
   }
 
   public double getPixelError() {
-    ArrayList<Rect> listData = getSortedRects();
+    ArrayList<Rect> listData = shooterCamera.getTargetListData();
+    if (listData.isEmpty()) {
+      return 2767;
+    }
     int minX = listData.get(0).topLeft.x;
     int maxX = listData.get(0).bottomRight.x;
     double center;
@@ -64,14 +63,22 @@ public class VisionSubsystem implements Subsystem {
       }
     }
     center = (maxX + minX) / 2;
-    System.out.println("getPixelError: " + (center - shooterCamera.frameCenter));
     return center - shooterCamera.frameCenter;
   }
 
   public double getOffsetAngle() {
     if (shooterCamera.getValid()) {
-      return Constants.VisionConstants.HORIZ_FOV * getPixelError() / shooterCamera.frameCenter;
+      // 57.999 * Math.max(width, height) / 640
+      return HORIZ_FOV * getPixelError() / (shooterCamera.frameCenter * 2) * -1;
     }
     return 2767;
+  }
+
+  @Override
+  public Set<Measure> getMeasures() {
+
+    return Set.of(
+        new Measure("PixelOffset", () -> getPixelError()),
+        new Measure("OffsetAngle", () -> getOffsetAngle()));
   }
 }
