@@ -4,8 +4,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.MagazineSubsystem;
 
 public class LowerMagazineOpenLoopCommand extends InstantCommand {
-  private MagazineSubsystem magazineSubsystem;
-  private double speed;
+  private final MagazineSubsystem magazineSubsystem;
+  private final double speed;
 
   public LowerMagazineOpenLoopCommand(MagazineSubsystem magazineSubsystem, double speed) {
     addRequirements(magazineSubsystem);

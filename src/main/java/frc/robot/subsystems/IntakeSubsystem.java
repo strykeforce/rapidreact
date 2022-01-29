@@ -12,7 +12,7 @@ public class IntakeSubsystem extends MeasurableSubsystem {
   // private TalonFX intakeFalcon;
 
   public IntakeSubsystem() {
-    // intakeFalcon = new TalonFX(IntakeConstants.IntakeFalconID);
+    // intakeFalcon = new TalonFX(IntakeConstants.kIntakeFalconID);
     // intakeFalcon.configFactoryDefault(Constants.kTalonConfigTimeout);
     // intakeFalcon.configAllSettings(
     //     IntakeConstants.getIntakeFalconConfig(), Constants.kTalonConfigTimeout);

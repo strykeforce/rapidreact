@@ -6,7 +6,7 @@ import frc.robot.subsystems.MagazineSubsystem;
 import frc.robot.subsystems.MagazineSubsystem.CargoColor;
 
 public class PitClearCargoColor extends InstantCommand {
-  private MagazineSubsystem magazineSubsystem;
+  private final MagazineSubsystem magazineSubsystem;
 
   public PitClearCargoColor(MagazineSubsystem magazineSubsystem) {
     addRequirements(magazineSubsystem);
