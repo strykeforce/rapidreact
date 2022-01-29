@@ -9,6 +9,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.Constants;
+import frc.robot.Constants.TurretConstants;
 import java.util.List;
 import java.util.Set;
 import org.slf4j.Logger;
@@ -18,6 +19,7 @@ import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 
 public class TurretSubsystem extends MeasurableSubsystem {
+
   private static final int TURRET_ID = 42; // move to constants file
   private static final double TURRET_TICKS_PER_DEGREE =
       Constants.TurretConstants.TURRET_TICKS_PER_DEGREE;
@@ -106,6 +108,14 @@ public class TurretSubsystem extends MeasurableSubsystem {
   }
 
   public void rotateTo(double setPointTicks) {
+    if (setPointTicks < TurretConstants.kReverseLimit) {
+      setPointTicks = TurretConstants.kReverseLimit;
+    }
+
+    if (setPointTicks > TurretConstants.kForwardLimit) {
+      setPointTicks = TurretConstants.kForwardLimit;
+    }
+
     if (turret.hasResetOccurred()) {
       talonReset = true;
     } else {
