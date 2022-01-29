@@ -202,4 +202,8 @@ public final class Constants {
       return magazineConfig;
     }
   }
+
+  public static final class SmartDashboardConstants {
+    public static final String kTurretSetpointRadians = "Pit/Turret/SetpointRadians";
+  }
 }
