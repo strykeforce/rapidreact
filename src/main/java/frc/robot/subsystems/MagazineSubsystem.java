@@ -1,10 +1,12 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.ColorMatch;
 import com.revrobotics.ColorMatchResult;
 import com.revrobotics.ColorSensorV3;
+import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Constants;
 import frc.robot.Constants.MagazineConstants;
@@ -27,9 +29,9 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   private MagazineState currMagazineState = MagazineState.STOP;
 
   public MagazineSubsystem() {
-    // colorSensor = new ColorSensorV3(Port.kMXP);
+    colorSensor = new ColorSensorV3(Port.kMXP);
 
-    lowerMagazineTalon = new TalonSRX(MagazineConstants.LowerMagazineTalonID);
+    lowerMagazineTalon = new TalonSRX(MagazineConstants.kLowerMagazineTalonID);
     lowerMagazineTalon.configFactoryDefault(Constants.kTalonConfigTimeout);
     lowerMagazineTalon.configAllSettings(
         MagazineConstants.getMagazineTalonConfig(), Constants.kTalonConfigTimeout);
@@ -37,7 +39,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     lowerMagazineTalon.enableVoltageCompensation(true);
     lowerMagazineTalon.setNeutralMode(NeutralMode.Coast);
 
-    upperMagazineTalon = new TalonSRX(MagazineConstants.UpperMagazineTalonID);
+    upperMagazineTalon = new TalonSRX(MagazineConstants.kUpperMagazineTalonID);
     upperMagazineTalon.configFactoryDefault(Constants.kTalonConfigTimeout);
     upperMagazineTalon.configAllSettings(
         MagazineConstants.getMagazineTalonConfig(), Constants.kTalonConfigTimeout);
@@ -51,27 +53,33 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   }
 
   public void lowerOpenLoopRotate(double percentOutput) {
-    // lowerMagazineTalon.set(ControlMode.PercentOutput, percentOutput);
-    logger.info("Lower magazine motor turned on {}", percentOutput);
+    lowerMagazineTalon.set(ControlMode.PercentOutput, percentOutput);
+    // logger.info("Lower magazine motor turned on {}", percentOutput);
   }
 
   public void upperOpenLoopRotate(double percentOutput) {
-    // upperMagazineTalon.set(ControlMode.PercentOutput, percentOutput);
-    logger.info("Upper magazine motor turned on {}", percentOutput);
+    upperMagazineTalon.set(ControlMode.PercentOutput, percentOutput);
+    // logger.info("Upper magazine motor turned on {}", percentOutput);
+  }
+
+  public void stopMagazine() {
+    // lowerMagazineTalon.set(ControlMode.PercentOutput, 0.0);
+    // upperMagazineTalon.set(ControlMode.PercentOutput, 0.0);
   }
 
   public boolean isLowerBeamBroken() {
-    boolean lowerBeam = lowerMagazineTalon.getSensorCollection().isFwdLimitSwitchClosed();
+    boolean lowerBeam = lowerMagazineTalon.getSensorCollection().isRevLimitSwitchClosed();
     return lowerBeam;
   }
 
   public boolean isUpperBeamBroken() {
-    boolean upperBeam = upperMagazineTalon.getSensorCollection().isFwdLimitSwitchClosed();
+    // boolean upperBeam = upperMagazineTalon.getSensorCollection().isFwdLimitSwitchClosed();
+    boolean upperBeam = lowerMagazineTalon.getSensorCollection().isFwdLimitSwitchClosed();
     return upperBeam;
   }
 
   public Color getColor() {
-    // lastColor = colorSensor.getColor();
+    lastColor = colorSensor.getColor();
     lastColor = new Color(0, 0, 0);
     return lastColor;
   }
@@ -124,44 +132,73 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     storedCargoColors[1] = CargoColor.NONE;
   }
 
-  public void indexCargo()
-  {
+  public void indexCargo() {
     logger.info("Start indexing cargo");
     currMagazineState = MagazineState.WAIT_CARGO;
   }
 
+  public boolean isMagazineFull() {
+    return currMagazineState == MagazineState.STOP;
+  }
+
+  public void magazineInterrupted() {
+    currMagazineState = MagazineState.STOP;
+    logger.info("Magazine interrupted, switching state to stop");
+  }
+
   @Override
-  public void periodic() 
-  {
+  public void periodic() {
     switch (currMagazineState) {
-      case WAIT_CARGO: 
+      case WAIT_CARGO:
         // check number of cargo
-        if(storedCargoColors[0] != CargoColor.NONE && storedCargoColors[1] != CargoColor.NONE)
-        {
-          logger.info("Magazine already full");
+        if (storedCargoColors[0] != CargoColor.NONE && storedCargoColors[1] != CargoColor.NONE) {
+          logger.info("Magazine already full, switching to stop state");
           currMagazineState = MagazineState.STOP;
-        }
-        else if(storedCargoColors[0] != CargoColor.NONE)
-        {
+          break;
+        } else if (storedCargoColors[0] != CargoColor.NONE) {
           lowerOpenLoopRotate(MagazineConstants.kMagazineIntakeSpeed);
-          if(isUpperBeamBroken() && upperMagazineTalon.getMotorOutputPercent() != 0.0)
-          {
+          // Checking if ball is in the top of the upper magazine
+          if (isUpperBeamBroken() && upperMagazineTalon.getMotorOutputPercent() != 0.0) {
             upperOpenLoopRotate(0.0);
             logger.info("Stopping upper magazine, upper beam broken");
-          }
-          else
-          {
+          } else if (!isUpperBeamBroken()
+              && upperMagazineTalon.getMotorOutputPercent()
+                  != MagazineConstants.kMagazineIntakeSpeed) {
             upperOpenLoopRotate(MagazineConstants.kMagazineIntakeSpeed);
+            logger.info("Upper beam not broken, upper magazine running");
           }
         }
+        // Knowing when to read cargo color
+        if (isLowerBeamBroken()) {
+          currMagazineState = MagazineState.READ_CARGO;
+          lowerOpenLoopRotate(0.0);
+          logger.info("Switching state to read cargo color");
+        } else if (lowerMagazineTalon.getMotorOutputPercent()
+            != MagazineConstants.kMagazineIntakeSpeed) {
+          lowerOpenLoopRotate(MagazineConstants.kMagazineIntakeSpeed);
+        }
+
         break;
 
       case READ_CARGO:
+        // Read cargo color, switch states depending on amount of cargo
+        CargoColor cargoColor = readCargoColor();
+        if (cargoColor != CargoColor.NONE) {
+          if (storedCargoColors[1] != CargoColor.NONE) {
+            currMagazineState = MagazineState.STOP;
+            logger.info("Now have two cargo, switching to stop state");
+          } else {
+            lowerOpenLoopRotate(MagazineConstants.kMagazineIntakeSpeed);
+            upperOpenLoopRotate(MagazineConstants.kMagazineIntakeSpeed);
+            currMagazineState = MagazineState.WAIT_CARGO;
+            logger.info("Has one cargo, turning on magazine, switching to wait state");
+          }
+        }
 
-      break;
+        break;
 
       case STOP:
-
+        stopMagazine();
         break;
     }
   }
@@ -188,11 +225,9 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     NONE;
   }
 
-  public enum MagazineState
-  {
+  public enum MagazineState {
     WAIT_CARGO,
     READ_CARGO,
     STOP;
   }
 }
-

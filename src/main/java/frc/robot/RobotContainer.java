@@ -10,10 +10,11 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.intake.IntakeOpenLoopCommand;
 import frc.robot.commands.intake.PitIntakeOpenLoopCommand;
-import frc.robot.commands.magazine.UpperMagazineOpenLoopCommand;
 import frc.robot.commands.magazine.PitClearCargoColor;
 import frc.robot.commands.magazine.PitMagazineOpenLoopCommand;
 import frc.robot.commands.magazine.PitReadCargoColor;
+import frc.robot.commands.magazine.UpperMagazineOpenLoopCommand;
+import frc.robot.commands.sequences.AutoIntakeCommand;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
 import org.strykeforce.telemetry.TelemetryController;
@@ -74,6 +75,9 @@ public class RobotContainer {
     SmartDashboard.putNumber("Pit/Intake/Speed", 0.0);
     SmartDashboard.putData("Pit/Intake/Start", new PitIntakeOpenLoopCommand(intakeSubsystem));
     SmartDashboard.putData("Pit/Intake/Stop", new IntakeOpenLoopCommand(intakeSubsystem, 0.0));
+
+    SmartDashboard.putData(
+        "Temp/AutoIntake", new AutoIntakeCommand(magazineSubsystem, intakeSubsystem));
   }
 
   public enum Axis {
