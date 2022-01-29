@@ -119,6 +119,8 @@ public final class Constants {
         new Color(0.5, 0.25, 0.25); // FIXME need to get real color
     public static final Color kNoCargo = new Color(0.25, 0.5, 0.25); // FIXME need to get real color
 
+    public static final double kMagazineIntakeSpeed = 0.5; // FIXME need an actual percentage
+
     public static TalonSRXConfiguration getMagazineTalonConfig() {
       TalonSRXConfiguration magazineConfig = new TalonSRXConfiguration();
 

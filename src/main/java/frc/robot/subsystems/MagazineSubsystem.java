@@ -24,6 +24,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   private TalonSRX upperMagazineTalon;
   private CargoColor[] storedCargoColors = new CargoColor[] {CargoColor.NONE, CargoColor.NONE};
   private ColorMatch colorMatch = new ColorMatch();
+  private MagazineState currMagazineState = MagazineState.STOP;
 
   public MagazineSubsystem() {
     // colorSensor = new ColorSensorV3(Port.kMXP);
@@ -123,8 +124,47 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     storedCargoColors[1] = CargoColor.NONE;
   }
 
+  public void indexCargo()
+  {
+    logger.info("Start indexing cargo");
+    currMagazineState = MagazineState.WAIT_CARGO;
+  }
+
   @Override
-  public void periodic() {}
+  public void periodic() 
+  {
+    switch (currMagazineState) {
+      case WAIT_CARGO: 
+        // check number of cargo
+        if(storedCargoColors[0] != CargoColor.NONE && storedCargoColors[1] != CargoColor.NONE)
+        {
+          logger.info("Magazine already full");
+          currMagazineState = MagazineState.STOP;
+        }
+        else if(storedCargoColors[0] != CargoColor.NONE)
+        {
+          lowerOpenLoopRotate(MagazineConstants.kMagazineIntakeSpeed);
+          if(isUpperBeamBroken() && upperMagazineTalon.getMotorOutputPercent() != 0.0)
+          {
+            upperOpenLoopRotate(0.0);
+            logger.info("Stopping upper magazine, upper beam broken");
+          }
+          else
+          {
+            upperOpenLoopRotate(MagazineConstants.kMagazineIntakeSpeed);
+          }
+        }
+        break;
+
+      case READ_CARGO:
+
+      break;
+
+      case STOP:
+
+        break;
+    }
+  }
 
   @Override
   public void registerWith(TelemetryService telemetryService) {
@@ -147,4 +187,12 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     BLUE,
     NONE;
   }
+
+  public enum MagazineState
+  {
+    WAIT_CARGO,
+    READ_CARGO,
+    STOP;
+  }
 }
+
