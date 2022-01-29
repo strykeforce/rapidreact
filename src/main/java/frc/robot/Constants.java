@@ -121,7 +121,7 @@ public final class Constants {
 
     public static final double minContourAreaSize = 100;
     public static final double VERTICAL_FOV = 48.8;
-    public static final double HORIZ_FOV = 57.999; // 50.8 //146
+    public static final double HORIZ_FOV = 1.012; // 50.8 //146 //radians 1.012 // deg 57.999
     public static final double HORIZ_RES = 640; // 1280
     public static final double TARGET_WIDTH_IN = 39.5; // 34.6
     public static final double CAMERA_HEIGHT = 20.75;
@@ -154,7 +154,8 @@ public final class Constants {
 
   public static final class TurretConstants {
     public static final double kWrapRange = 1;
-    public static final double TURRET_TICKS_PER_DEGREE = 72.404;
+    public static final double TURRET_TICKS_PER_DEGREE = 72.404; // 0.01745329 57.2957877856
+    public static final double TURRET_TICKS_PER_RADIAN = 4148.444; // 4148.44421883
     public static final double kTurretMidpoint = 13_000;
     public static int kTurretZeroTicks = 1931;
     public static final int kForwardLimit = 26095; // 26000

@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.Constants;
 import java.util.ArrayList;
 import java.util.Set;
@@ -46,7 +47,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
     return sortedlist;
   }
 
-  public double getPixelError() {
+  public double getErrorPixels() {
     ArrayList<Rect> listData = shooterCamera.getTargetListData();
     if (listData.isEmpty()) {
       return 2767;
@@ -66,19 +67,24 @@ public class VisionSubsystem extends MeasurableSubsystem {
     return center - shooterCamera.frameCenter;
   }
 
-  public double getOffsetAngle() {
+  public double getErrorRadians() {
     if (shooterCamera.getValid()) {
-      // 57.999 * Math.max(width, height) / 640
-      return HORIZ_FOV * getPixelError() / (shooterCamera.frameCenter * 2) * -1;
+      // 57.999 * Math.max(width, height) / 1280 deg
+      // 1.012 * Math.max(width, height) / 1280 rad
+      return HORIZ_FOV * getErrorPixels() / (shooterCamera.frameCenter * 2) * -1;
     }
     return 2767;
+  }
+
+  public Rotation2d getErrorRotation2d() {
+    return new Rotation2d(getErrorRadians());
   }
 
   @Override
   public Set<Measure> getMeasures() {
 
     return Set.of(
-        new Measure("PixelOffset", () -> getPixelError()),
-        new Measure("OffsetAngle", () -> getOffsetAngle()));
+        new Measure("PixelOffset", () -> getErrorPixels()),
+        new Measure("OffsetAngle", () -> getErrorRadians()));
   }
 }

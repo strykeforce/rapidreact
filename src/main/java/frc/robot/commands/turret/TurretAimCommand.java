@@ -22,8 +22,9 @@ public class TurretAimCommand extends CommandBase {
     if (visionSubsystem.isTargetValid()) {
       // double offset = VISION.getOffsetAngle();
       // TURRET.rotateTurret(VISION.getAzmithError() /*offset + VISION.getHorizAngleAdjustment()*/);
-      turretSubsystem.rotateTurret(visionSubsystem.getOffsetAngle());
-      System.out.println("TurretAimCommand: " + visionSubsystem.getOffsetAngle());
+      turretSubsystem.rotateTurret(visionSubsystem.getErrorRotation2d());
+      System.out.println(
+          "TurretAimCommand (deg): " + visionSubsystem.getErrorRotation2d().getDegrees());
     }
   }
 

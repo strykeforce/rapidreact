@@ -1,8 +1,8 @@
 package frc.robot.commands.turret;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
 import frc.robot.subsystems.TurretSubsystem;
 
 public class PitTurretCloseLoopPositionCommand extends CommandBase {
@@ -15,9 +15,11 @@ public class PitTurretCloseLoopPositionCommand extends CommandBase {
 
   @Override
   public void initialize() {
-    turretSubsystem.setTurret(
-        SmartDashboard.getNumber(
-            "Pit/Turret/SetPointTicks", Constants.TurretConstants.kTurretMidpoint));
+    Rotation2d desired =
+        new Rotation2d(
+            SmartDashboard.getNumber(
+                "Pit/Turret/SetPointRadians", turretSubsystem.getRotation2d().getRadians()));
+    turretSubsystem.rotateTo(desired);
   }
 
   @Override

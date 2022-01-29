@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -15,6 +16,7 @@ import frc.robot.commands.magazine.PitMagazineOpenLoopCommand;
 import frc.robot.commands.magazine.PitReadCargoColor;
 import frc.robot.commands.turret.OpenLoopTurretCommand;
 import frc.robot.commands.turret.PitTurretCloseLoopPositionCommand;
+import frc.robot.commands.turret.RotateToCommand;
 import frc.robot.commands.turret.TurretAimCommand;
 import frc.robot.commands.turret.ZeroTurretCommand;
 import frc.robot.subsystems.DriveSubsystem;
@@ -85,12 +87,21 @@ public class RobotContainer {
         "Pit/Magazine/ClearCargoColor", new PitClearCargoColor(magazineSubsystem));
 
     // Turret Pit Commands
-    SmartDashboard.putNumber("Pit/Turret/SetPointTicks", Constants.TurretConstants.kTurretMidpoint);
+    SmartDashboard.putNumber(
+        "Pit/Turret/SetpointRadians", turretSubsystem.getRotation2d().getRadians());
     SmartDashboard.putData(
         "Pit/Turret/CloseLoopPosition", new PitTurretCloseLoopPositionCommand(turretSubsystem));
     SmartDashboard.putData("Pit/Turret/Forward", new OpenLoopTurretCommand(turretSubsystem, 0.2));
     SmartDashboard.putData("Pit/Turret/Reverse", new OpenLoopTurretCommand(turretSubsystem, -0.2));
     SmartDashboard.putData("Pit/Turret/Stop", new OpenLoopTurretCommand(turretSubsystem, 0.0));
+
+    SmartDashboard.putData(
+        "Pit/Turret/RotateTo0", new RotateToCommand(turretSubsystem, new Rotation2d()));
+    SmartDashboard.putData(
+        "Pit/Turret/RotateTo90", new RotateToCommand(turretSubsystem, Rotation2d.fromDegrees(90)));
+    SmartDashboard.putData(
+        "Pit/Turret/RotateTo180",
+        new RotateToCommand(turretSubsystem, Rotation2d.fromDegrees(180)));
   }
 
   public enum Axis {

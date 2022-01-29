@@ -13,7 +13,7 @@ public class ZeroTurretCommand extends CommandBase {
 
   @Override
   public void initialize() {
-    turretSubsystem.setTurret(0);
+    turretSubsystem.rotateTo(0);
   }
 
   @Override
