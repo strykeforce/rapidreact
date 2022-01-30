@@ -1,10 +1,10 @@
 package frc.robot.commands.turret;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.TurretSubsystem;
 
-public class RotateToCommand extends InstantCommand {
+public class RotateToCommand extends CommandBase {
 
   private final TurretSubsystem turretSubsystem;
   private final Rotation2d position;
@@ -18,5 +18,10 @@ public class RotateToCommand extends InstantCommand {
   @Override
   public void initialize() {
     turretSubsystem.rotateTo(position);
+  }
+
+  @Override
+  public boolean isFinished() {
+    return turretSubsystem.turretAtTarget();
   }
 }
