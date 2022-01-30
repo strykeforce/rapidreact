@@ -16,6 +16,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   private static final Logger logger = LoggerFactory.getLogger(MeasurableSubsystem.class);
   private ColorSensorV3 colorSensor;
   private Color lastColor = new Color(0, 0, 0);
+  private int lastProximity = 0;
   // private TalonSRX magazineTalon;
   private CargoColor[] storedCargoColors = new CargoColor[] {CargoColor.NONE, CargoColor.NONE};
   private ColorMatch colorMatch = new ColorMatch();
@@ -32,6 +33,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
 
     colorMatch.addColorMatch(MagazineConstants.kBlueCargo);
     colorMatch.addColorMatch(MagazineConstants.kRedCargo);
+    colorMatch.addColorMatch(MagazineConstants.kNoCargo);
   }
 
   public void openLoopRotate(double percentOutput) {
@@ -43,6 +45,11 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     // lastColor = colorSensor.getColor();
     lastColor = new Color(0, 0, 0);
     return lastColor;
+  }
+
+  public int getProximity() {
+    lastProximity = colorSensor.getProximity();
+    return lastProximity;
   }
 
   public void readCargoColor() {
@@ -87,6 +94,9 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   }
 
   @Override
+  public void periodic() {}
+
+  @Override
   public void registerWith(TelemetryService telemetryService) {
     super.registerWith(telemetryService);
     // telemetryService.register(magazineTalon);
@@ -97,7 +107,8 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     return Set.of(
         new Measure("red", () -> lastColor.red),
         new Measure("blue", () -> lastColor.blue),
-        new Measure("green", () -> lastColor.green));
+        new Measure("green", () -> lastColor.green),
+        new Measure("Proximity", () -> lastProximity));
   }
 
   public enum CargoColor {

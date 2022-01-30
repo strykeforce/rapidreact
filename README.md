@@ -1,4 +1,6 @@
-2022 FIRST RAPID REACT
+# 2022 FIRST RAPID REACT
+
+[![CI](https://github.com/strykeforce/rapidreact/actions/workflows/main.yml/badge.svg)](https://github.com/strykeforce/rapidreact/actions/workflows/main.yml)
 
 ## Talons
 
@@ -12,7 +14,7 @@
 | Drive     | FX   | drive      | 11  |    | Falcon |
 | Drive     | FX   | drive      | 12  |    | Falcon |
 | Drive     | FX   | drive      | 13  |    | Falcon |
-| Intake    | FX   | squids     | 20  |    | Falcon |
+| Intake    | FX   | intake     | 20  |    | Falcon |
 | Magazine  | SRX  | magazine   | 30  |    | ??     |
 | Shooter   | FX   | shooter    | 40  |    | Falcon |
 | Shooter   | SRX  | hood       | 41  |    | ??     |

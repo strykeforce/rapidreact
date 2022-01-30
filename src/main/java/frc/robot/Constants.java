@@ -99,9 +99,9 @@ public final class Constants {
 
     public static TalonFXConfiguration getDriveTalonConfig() {
       TalonFXConfiguration driveConfig = new TalonFXConfiguration();
-      driveConfig.supplyCurrLimit.currentLimit = 0.04;
+      driveConfig.supplyCurrLimit.currentLimit = 40;
       driveConfig.supplyCurrLimit.triggerThresholdCurrent = 45;
-      driveConfig.supplyCurrLimit.triggerThresholdTime = 40;
+      driveConfig.supplyCurrLimit.triggerThresholdTime = .04;
       driveConfig.supplyCurrLimit.enable = true;
       driveConfig.slot0.kP = 0.045;
       driveConfig.slot0.kI = 0.0005;
@@ -172,9 +172,10 @@ public final class Constants {
   public static final class MagazineConstants {
     public static final int MagazineTalonID = 30;
     public static final Color kBlueCargo =
-        new Color(0.25, 0.25, 0.5); // FIXME need to get real color
+        new Color(0.15, 0.35, 0.5); // FIXME need to get real color
     public static final Color kRedCargo =
         new Color(0.5, 0.25, 0.25); // FIXME need to get real color
+    public static final Color kNoCargo = new Color(0.25, 0.5, 0.25); // FIXME need to get real color
 
     public static TalonSRXConfiguration getMagazineTalonConfig() {
       TalonSRXConfiguration magazineConfig = new TalonSRXConfiguration();
@@ -205,5 +206,28 @@ public final class Constants {
 
   public static final class SmartDashboardConstants {
     public static final String kTurretSetpointRadians = "Pit/Turret/SetpointRadians";
+  }
+
+  public static final class IntakeConstants {
+    public static final int IntakeFalconID = 20;
+
+    public static TalonFXConfiguration getIntakeFalconConfig() {
+      TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
+      intakeConfig.supplyCurrLimit.currentLimit = 10;
+      intakeConfig.supplyCurrLimit.triggerThresholdCurrent = 15;
+      intakeConfig.supplyCurrLimit.triggerThresholdTime = .02;
+      intakeConfig.supplyCurrLimit.enable = true;
+      intakeConfig.slot0.kP = 0.0;
+      intakeConfig.slot0.kI = 0.0;
+      intakeConfig.slot0.kD = 0.0;
+      intakeConfig.slot0.kF = 0.0;
+      intakeConfig.slot0.integralZone = 0;
+      intakeConfig.slot0.maxIntegralAccumulator = 0;
+      intakeConfig.slot0.allowableClosedloopError = 0;
+      intakeConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
+      intakeConfig.velocityMeasurementWindow = 64;
+      intakeConfig.voltageCompSaturation = 12;
+      return intakeConfig;
+    }
   }
 }

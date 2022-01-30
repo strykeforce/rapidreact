@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.SmartDashboardConstants;
+import frc.robot.commands.intake.IntakeOpenLoopCommand;
+import frc.robot.commands.intake.PitIntakeOpenLoopCommand;
 import frc.robot.commands.magazine.MagazineOpenLoopCommand;
 import frc.robot.commands.magazine.PitClearCargoColor;
 import frc.robot.commands.magazine.PitMagazineOpenLoopCommand;
@@ -18,7 +20,7 @@ import frc.robot.commands.turret.OpenLoopTurretCommand;
 import frc.robot.commands.turret.PitTurretCloseLoopPositionCommand;
 import frc.robot.commands.turret.TurretAimCommand;
 import frc.robot.commands.turret.ZeroTurretCommand;
-import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
@@ -33,8 +35,9 @@ import org.strykeforce.telemetry.TelemetryService;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private DriveSubsystem driveSubsystem = new DriveSubsystem();
+  // private DriveSubsystem driveSubsystem = new DriveSubsystem();
   private final MagazineSubsystem magazineSubsystem = new MagazineSubsystem();
+  private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   public static TurretSubsystem turretSubsystem = new TurretSubsystem();
   public static VisionSubsystem visionSubsystem = new VisionSubsystem();
   private TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
@@ -42,9 +45,10 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    driveSubsystem.registerWith(telemetryService);
+    // driveSubsystem.registerWith(telemetryService);
     magazineSubsystem.registerWith(telemetryService);
     turretSubsystem.registerWith(telemetryService);
+    intakeSubsystem.registerWith(telemetryService);
     visionSubsystem.registerWith(telemetryService);
     telemetryService.start();
     // Configure the button bindings
@@ -75,6 +79,7 @@ public class RobotContainer {
   }
 
   private void configurePitDashboard() {
+    // magazine pit commands
     SmartDashboard.putNumber("Pit/Magazine/Speed", 0.0);
     SmartDashboard.putData("Pit/Magazine/Start", new PitMagazineOpenLoopCommand(magazineSubsystem));
     SmartDashboard.putData(
@@ -85,12 +90,16 @@ public class RobotContainer {
     SmartDashboard.putData(
         "Pit/Magazine/ClearCargoColor", new PitClearCargoColor(magazineSubsystem));
 
+    // intake pit commands
+    SmartDashboard.putNumber("Pit/Intake/Speed", 0.0);
     // Turret Pit Commands
     SmartDashboard.putNumber(
         SmartDashboardConstants.kTurretSetpointRadians,
         turretSubsystem.getRotation2d().getRadians());
     SmartDashboard.putData(
         "Pit/Turret/CloseLoopPosition", new PitTurretCloseLoopPositionCommand(turretSubsystem));
+    SmartDashboard.putData("Pit/Intake/Start", new PitIntakeOpenLoopCommand(intakeSubsystem));
+    SmartDashboard.putData("Pit/Intake/Stop", new IntakeOpenLoopCommand(intakeSubsystem, 0.0));
     SmartDashboard.putData("Pit/Turret/Forward", new OpenLoopTurretCommand(turretSubsystem, 0.2));
     SmartDashboard.putData("Pit/Turret/Reverse", new OpenLoopTurretCommand(turretSubsystem, -0.2));
     SmartDashboard.putData("Pit/Turret/Stop", new OpenLoopTurretCommand(turretSubsystem, 0.0));
