@@ -19,11 +19,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
   private final TalonFX kickerFalcon;
   private final TalonSRX hoodTalon;
 
-<<<<<<< Updated upstream
-  public final ShooterSubsystem() {
-=======
   public ShooterSubsystem() {
->>>>>>> Stashed changes
     shooterFalcon = new TalonFX(ShooterConstants.shooterFalconID);
     shooterFalcon.configFactoryDefault(Constants.kTalonConfigTimeout);
     shooterFalcon.configAllSettings(
