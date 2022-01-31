@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.ShooterSubsystem;
 
 public class PitShooterOpenLoopCommand extends InstantCommand {
-  private ShooterSubsystem shooterSubsystem;
+  private final ShooterSubsystem shooterSubsystem;
 
   public PitShooterOpenLoopCommand(ShooterSubsystem shooterSubsystem) {
     addRequirements(shooterSubsystem);
