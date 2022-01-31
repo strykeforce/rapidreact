@@ -4,8 +4,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.ShooterSubsystem;
 
 public class ShooterOpenLoopCommand extends InstantCommand {
-  private ShooterSubsystem shooterSubsystem;
-  private double speed;
+  private final ShooterSubsystem shooterSubsystem;
+  private final double speed;
 
   public ShooterOpenLoopCommand(ShooterSubsystem shooterSubsystem, double speed) {
     addRequirements(shooterSubsystem);
