@@ -11,11 +11,10 @@ import org.slf4j.LoggerFactory;
 
 public class DriveAutonCommand extends CommandBase {
   private DriveSubsystem driveSubsystem;
-  private Trajectory trajectory;
-  private Timer timer = new Timer();
-  private final Logger logger = LoggerFactory.getLogger(this.getClass());
-  private Trajectory.State desiredState = new Trajectory.State();
-  private Rotation2d robotHeading;
+  private static Trajectory trajectory;
+  private static Timer timer = new Timer();
+  private static final Logger logger = LoggerFactory.getLogger(DriveSubsystem.class);
+  private static Rotation2d robotHeading;
 
   public DriveAutonCommand(
       DriveSubsystem driveSubsystem, String trajectoryName, Double targetAngle) {
@@ -38,6 +37,7 @@ public class DriveAutonCommand extends CommandBase {
 
   @Override
   public void execute() {
+    Trajectory.State desiredState = new Trajectory.State();
     desiredState = trajectory.sample(timer.get());
     driveSubsystem.calculateController(desiredState, robotHeading);
   }

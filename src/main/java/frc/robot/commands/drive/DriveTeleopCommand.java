@@ -8,8 +8,8 @@ import frc.robot.RobotContainer;
 import frc.robot.subsystems.DriveSubsystem;
 
 public class DriveTeleopCommand extends CommandBase {
-  private Joystick joystick;
-  private DriveSubsystem driveSubsystem;
+  private final Joystick joystick;
+  private final DriveSubsystem driveSubsystem;
 
   public DriveTeleopCommand(Joystick driver, DriveSubsystem driveSubsystem) {
     addRequirements(driveSubsystem);
@@ -38,6 +38,7 @@ public class DriveTeleopCommand extends CommandBase {
   private double deadband(double stickValue) {
     if (Math.abs(stickValue) <= Constants.DriveConstants.kDeadbandAllStick) {
       return 0;
-    } else return stickValue * DriveConstants.kMaxSpeedMetersPerSecond;
+    }
+    return stickValue * DriveConstants.kMaxSpeedMetersPerSecond;
   }
 }

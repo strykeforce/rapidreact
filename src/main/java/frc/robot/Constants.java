@@ -116,7 +116,8 @@ public final class Constants {
 
     // Holonomic Controller Constants
     public static final double kPHolonomic = 6.0;
-    public static final double kIHoonomic = 0.0;
+    public static final double kIHolonomic = 0.0;
+
     public static final double kDHolonomic = kPHolonomic / 100.0;
     public static final double kPOmega = 2.5;
     public static final double kIOmega = 0.0;

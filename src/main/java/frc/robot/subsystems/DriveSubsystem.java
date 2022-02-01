@@ -98,9 +98,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
     holonomicController =
         new HolonomicDriveController(
             new PIDController(
-                DriveConstants.kPHolonomic, DriveConstants.kIHoonomic, DriveConstants.kDHolonomic),
+                DriveConstants.kPHolonomic, DriveConstants.kIHolonomic, DriveConstants.kDHolonomic),
             new PIDController(
-                DriveConstants.kPHolonomic, DriveConstants.kIHoonomic, DriveConstants.kDHolonomic),
+                DriveConstants.kPHolonomic, DriveConstants.kIHolonomic, DriveConstants.kDHolonomic),
             omegaCont);
     // Disabling the holonomic controller makes the robot directly follow the trajectory output (no
     // closing the loop on x,y,theta errors)
