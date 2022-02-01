@@ -167,4 +167,85 @@ public final class Constants {
       return intakeConfig;
     }
   }
+
+  public static final class ShooterConstants {
+
+    public static final int kShooterFalconID = 40;
+    public static final int kKickerFalconID = 41;
+    public static final int kHoodTalonID = 42;
+
+    public static int kHoodZeroTicks;
+    public static final int kForwardSoftLimts = 1000;
+    public static final int kReverseSoftLimits = 0;
+    // FIX ME
+
+    public static TalonFXConfiguration getShooterFalconConfig() {
+      TalonFXConfiguration shooterConfig = new TalonFXConfiguration();
+      shooterConfig.supplyCurrLimit.currentLimit = 10;
+      shooterConfig.supplyCurrLimit.triggerThresholdCurrent = 15;
+      shooterConfig.supplyCurrLimit.triggerThresholdTime = .02;
+      shooterConfig.supplyCurrLimit.enable = true;
+      shooterConfig.slot0.kP = 0.0;
+      shooterConfig.slot0.kI = 0.0;
+      shooterConfig.slot0.kD = 0.0;
+      shooterConfig.slot0.kF = 0.0;
+      shooterConfig.slot0.integralZone = 0;
+      shooterConfig.slot0.maxIntegralAccumulator = 0;
+      shooterConfig.slot0.allowableClosedloopError = 0;
+      shooterConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
+      shooterConfig.velocityMeasurementWindow = 64;
+      shooterConfig.voltageCompSaturation = 12;
+      return shooterConfig;
+    }
+
+    public static TalonFXConfiguration getKickerFalconConfig() {
+      TalonFXConfiguration kickerConfig = new TalonFXConfiguration();
+      kickerConfig.supplyCurrLimit.currentLimit = 10;
+      kickerConfig.supplyCurrLimit.triggerThresholdCurrent = 15;
+      kickerConfig.supplyCurrLimit.triggerThresholdTime = .02;
+      kickerConfig.supplyCurrLimit.enable = true;
+      kickerConfig.slot0.kP = 0.0;
+      kickerConfig.slot0.kI = 0.0;
+      kickerConfig.slot0.kD = 0.0;
+      kickerConfig.slot0.kF = 0.0;
+      kickerConfig.slot0.integralZone = 0;
+      kickerConfig.slot0.maxIntegralAccumulator = 0;
+      kickerConfig.slot0.allowableClosedloopError = 0;
+      kickerConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
+      kickerConfig.velocityMeasurementWindow = 64;
+      kickerConfig.voltageCompSaturation = 12;
+      return kickerConfig;
+    }
+
+    public static TalonSRXConfiguration getHoodTalonConfig() {
+      TalonSRXConfiguration HoodConfig = new TalonSRXConfiguration();
+
+      HoodConfig.primaryPID.selectedFeedbackCoefficient = 1.0;
+      HoodConfig.auxiliaryPID.selectedFeedbackSensor = FeedbackDevice.None;
+
+      HoodConfig.forwardLimitSwitchSource = LimitSwitchSource.Deactivated;
+      HoodConfig.reverseLimitSwitchSource = LimitSwitchSource.Deactivated;
+
+      HoodConfig.continuousCurrentLimit = 10;
+      HoodConfig.peakCurrentDuration = 10;
+      HoodConfig.peakCurrentLimit = 15;
+      HoodConfig.slot0.kP = 0.0;
+      HoodConfig.slot0.kI = 0.0;
+      HoodConfig.slot0.kD = 0.0;
+      HoodConfig.slot0.kF = 0.0;
+      HoodConfig.slot0.integralZone = 0;
+      HoodConfig.slot0.allowableClosedloopError = 0;
+      HoodConfig.slot0.maxIntegralAccumulator = 0;
+      HoodConfig.motionCruiseVelocity = 0;
+      HoodConfig.motionAcceleration = 0;
+      HoodConfig.velocityMeasurementWindow = 64;
+      HoodConfig.voltageCompSaturation = 12;
+      return HoodConfig;
+    }
+  }
+
+  public static final class SmartDashboardConstants {
+    public static final String kPitHoodOpenLoop = "Pit/Hood/hoodSpeed";
+    public static final String kPitShooterOpenLoop = "Pit/Shooter/shooterSpeed";
+  }
 }
