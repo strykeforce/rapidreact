@@ -38,8 +38,7 @@ import org.strykeforce.telemetry.measurable.Measure;
 public class DriveSubsystem extends MeasurableSubsystem {
 
   private static final Logger logger = LoggerFactory.getLogger(DriveSubsystem.class);
-
-  private SwerveDrive swerveDrive;
+  private final SwerveDrive swerveDrive;
   private final HolonomicDriveController holonomicController;
 
   // Grapher Variables
@@ -48,7 +47,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private Rotation2d holoContAngle = new Rotation2d();
   private Double trajectoryActive = 0.0;
 
-  public DriveSubsystem(TelemetryService telemetryService) {
+  public DriveSubsystem() {
 
     var moduleBuilder =
         new TalonSwerveModule.Builder()

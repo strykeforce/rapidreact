@@ -50,7 +50,7 @@ public class DriveAutonCommand extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     driveSubsystem.drive(0, 0, 0);
-    // driveSubsystem.grapherTrajectoryActive(false);
+    driveSubsystem.grapherTrajectoryActive(false);
     logger.info("End Trajectory: {}", timer.get());
   }
 }

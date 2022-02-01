@@ -27,7 +27,7 @@ public final class Constants {
   public static final class DriveConstants {
 
     public static final double kDeadbandXLock = 0.2;
-    public static final double kDeadbandAllStick = 0.05;
+    public static final double kDeadbandAllStick = 0.10;
 
     // Contents for Sanity
     // Wheel math
@@ -36,7 +36,7 @@ public final class Constants {
 
     // TODO: verify diameter and run calibration
     // 500 cm calibration = actual / odometry
-    public static final double kWheelDiameterInches = 3.0 * (584.0 / 501.0);
+    public static final double kWheelDiameterInches = 3.0 * (554.0 / 500.0);
 
     // From: https://github.com/strykeforce/axis-config/
     public static final double kMaxSpeedMetersPerSecond = 3.889;

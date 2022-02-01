@@ -7,12 +7,12 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.Constants.SmartDashboardConstants;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.ZeroGyroCommand;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants.SmartDashboardConstants;
 import frc.robot.commands.intake.IntakeOpenLoopCommand;
 import frc.robot.commands.intake.PitIntakeOpenLoopCommand;
 import frc.robot.commands.magazine.MagazineOpenLoopCommand;
@@ -72,9 +72,6 @@ public class RobotContainer {
         .whenPressed(new ZeroGyroCommand(driveSubsystem));
     new JoystickButton(driveJoystick, Button.HAMBURGER.id)
         .whenPressed(new DriveAutonCommand(driveSubsystem, "straightPath", 0.0));
-    // driveSubsystem.setDefaultCommand(new DriveTeleopCommand(driveJoystick, driveSubsystem));
-    // new JoystickButton(driveJoystick, Button.RESET.id)
-    // .whenPressed(new ZeroGyroCommand(driveSubsystem));
   }
 
   private void configurePitDashboard() {
@@ -115,7 +112,7 @@ public class RobotContainer {
     LEFT_BACK(4),
     RIGHT_BACK(3);
 
-    private final int id;
+    public final int id;
 
     Axis(int id) {
       this.id = id;
