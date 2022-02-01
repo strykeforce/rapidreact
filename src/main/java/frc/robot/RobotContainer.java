@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants.SmartDashboardConstants;
 import frc.robot.commands.intake.IntakeOpenLoopCommand;
 import frc.robot.commands.intake.PitIntakeOpenLoopCommand;
 import frc.robot.commands.magazine.MagazineOpenLoopCommand;
@@ -79,14 +80,14 @@ public class RobotContainer {
         "Pit/Magazine/ClearCargoColor", new PitClearCargoColor(magazineSubsystem));
 
     // Shooter Commands
-    SmartDashboard.putNumber("Pit/Shooter/shooterSpeed", 0.0);
+    SmartDashboard.putNumber(SmartDashboardConstants.kPitShooterOpenLoop, 0.0);
     SmartDashboard.putData(
         "Pit/Shooter/shooterStart", new PitShooterOpenLoopCommand(shooterSubsystem));
     SmartDashboard.putData(
         "Pit/Shooter/shooterStop", new ShooterOpenLoopCommand(shooterSubsystem, 0.0));
 
     // Hood Commands
-    SmartDashboard.putNumber("Pit/Hood/hoodSpeed", 0.0);
+    SmartDashboard.putNumber(SmartDashboardConstants.kPitHoodOpenLoop, 0.0);
     SmartDashboard.putData("Pit/Hood/hoodStart", new PitHoodOpenLoopCommand(shooterSubsystem));
     SmartDashboard.putData("Pit/Hood/hoodStop", new HoodOpenLoopCommand(shooterSubsystem, 0.0));
     // intake pit commands

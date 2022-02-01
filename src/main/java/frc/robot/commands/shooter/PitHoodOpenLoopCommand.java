@@ -2,6 +2,7 @@ package frc.robot.commands.shooter;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.Constants.SmartDashboardConstants;
 import frc.robot.subsystems.ShooterSubsystem;
 
 public class PitHoodOpenLoopCommand extends InstantCommand {
@@ -14,6 +15,7 @@ public class PitHoodOpenLoopCommand extends InstantCommand {
 
   @Override
   public void initialize() {
-    shooterSubsystem.hoodOpenLoop(SmartDashboard.getNumber("Pit/Hood/hoodSpeed", 0.0));
+    shooterSubsystem.hoodOpenLoop(
+        SmartDashboard.getNumber(SmartDashboardConstants.kPitHoodOpenLoop, 0.0));
   }
 }
