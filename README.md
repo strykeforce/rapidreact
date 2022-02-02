@@ -17,7 +17,8 @@
 | Intake    | FX   | intake     | 20  |    | Falcon |
 | Magazine  | SRX  | magazine   | 30  |    | ??     |
 | Shooter   | FX   | shooter    | 40  |    | Falcon |
-| Shooter   | SRX  | hood       | 41  |    | ??     |
+| Kicker    | FX   | kicker     | 41  |    | Falcon |
+| Shooter   | SRX  | hood       | 42  |    | ??     |
 
 
 ## Roborio

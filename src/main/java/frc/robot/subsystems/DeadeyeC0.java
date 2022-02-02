@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.robot.Constants;
-
 import org.jetbrains.annotations.NotNull;
 import org.strykeforce.deadeye.Deadeye;
 import org.strykeforce.deadeye.TargetDataListener;

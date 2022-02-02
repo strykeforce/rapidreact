@@ -1,5 +1,11 @@
 package frc.robot.subsystems;
 
+import static frc.robot.Constants.TurretConstants.kTurretId;
+import static frc.robot.Constants.TurretConstants.kTurretMidpoint;
+import static frc.robot.Constants.TurretConstants.kTurretTicksPerRadian;
+import static frc.robot.Constants.TurretConstants.kTurretZeroTicks;
+import static frc.robot.Constants.TurretConstants.kWrapRange;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
@@ -15,11 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
-import static frc.robot.Constants.TurretConstants.kTurretTicksPerRadian;
-import static frc.robot.Constants.TurretConstants.kWrapRange;
-import static frc.robot.Constants.TurretConstants.kTurretMidpoint;
-import static frc.robot.Constants.TurretConstants.kTurretZeroTicks;
-import static frc.robot.Constants.TurretConstants.kTurretId;
 
 public class TurretSubsystem extends MeasurableSubsystem {
 
@@ -51,7 +52,11 @@ public class TurretSubsystem extends MeasurableSubsystem {
   public void rotateTurret(Rotation2d errorRotation2d) {
     Rotation2d targetAngle =
         new Rotation2d(turret.getSelectedSensorPosition() / kTurretTicksPerRadian); // current angle
-    targetAngle.plus(errorRotation2d).plus(Rotation2d.fromDegrees(Constants.VisionConstants.kHorizAngleCorrection)); // target angle
+    targetAngle
+        .plus(errorRotation2d)
+        .plus(
+            Rotation2d.fromDegrees(
+                Constants.VisionConstants.kHorizAngleCorrection)); // target angle
     if (targetAngle.getDegrees() <= kWrapRange
             && turret.getSelectedSensorPosition() > kTurretMidpoint
         || targetAngle.getDegrees() < 0) {
@@ -96,7 +101,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
   public boolean isRotationFinished() {
     double currentTurretPosition = turret.getSelectedSensorPosition();
     if (Math.abs(targetTurretPosition - currentTurretPosition)
-            > Constants.TurretConstants.kCloseEnoughTurret) {
+        > Constants.TurretConstants.kCloseEnoughTurret) {
       turretStableCounts = 0;
     } else {
       turretStableCounts++;

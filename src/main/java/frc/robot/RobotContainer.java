@@ -16,12 +16,18 @@ import frc.robot.commands.magazine.MagazineOpenLoopCommand;
 import frc.robot.commands.magazine.PitClearCargoColor;
 import frc.robot.commands.magazine.PitMagazineOpenLoopCommand;
 import frc.robot.commands.magazine.PitReadCargoColor;
+import frc.robot.commands.shooter.HoodOpenLoopCommand;
+import frc.robot.commands.shooter.PitHoodOpenLoopCommand;
+import frc.robot.commands.shooter.PitShooterOpenLoopCommand;
+import frc.robot.commands.shooter.ShooterOpenLoopCommand;
 import frc.robot.commands.turret.OpenLoopTurretCommand;
 import frc.robot.commands.turret.PitTurretCloseLoopPositionCommand;
 import frc.robot.commands.turret.TurretAimCommand;
 import frc.robot.commands.turret.ZeroTurretCommand;
+import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import org.strykeforce.telemetry.TelemetryController;
@@ -35,7 +41,8 @@ import org.strykeforce.telemetry.TelemetryService;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  // private DriveSubsystem driveSubsystem = new DriveSubsystem();
+  private final DriveSubsystem driveSubsystem = new DriveSubsystem();
+  private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
   private final MagazineSubsystem magazineSubsystem = new MagazineSubsystem();
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   public static TurretSubsystem turretSubsystem = new TurretSubsystem();
@@ -45,6 +52,9 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+
+    driveSubsystem.registerWith(telemetryService);
+    shooterSubsystem.registerWith(telemetryService);
     magazineSubsystem.registerWith(telemetryService);
     turretSubsystem.registerWith(telemetryService);
     intakeSubsystem.registerWith(telemetryService);
@@ -63,8 +73,7 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
-  private void configureDriverButtonBindings() {
-  }
+  private void configureDriverButtonBindings() {}
 
   private void configureTestButtonBindings() {
     Joystick joystick = new Joystick(0);
@@ -74,7 +83,7 @@ public class RobotContainer {
   }
 
   private void configurePitDashboard() {
-    // magazine pit commands
+    // Magazine Commands
     SmartDashboard.putNumber("Pit/Magazine/Speed", 0.0);
     SmartDashboard.putData("Pit/Magazine/Start", new PitMagazineOpenLoopCommand(magazineSubsystem));
     SmartDashboard.putData(
@@ -85,6 +94,17 @@ public class RobotContainer {
     SmartDashboard.putData(
         "Pit/Magazine/ClearCargoColor", new PitClearCargoColor(magazineSubsystem));
 
+    // Shooter Commands
+    SmartDashboard.putNumber(SmartDashboardConstants.kPitShooterOpenLoop, 0.0);
+    SmartDashboard.putData(
+        "Pit/Shooter/shooterStart", new PitShooterOpenLoopCommand(shooterSubsystem));
+    SmartDashboard.putData(
+        "Pit/Shooter/shooterStop", new ShooterOpenLoopCommand(shooterSubsystem, 0.0));
+
+    // Hood Commands
+    SmartDashboard.putNumber(SmartDashboardConstants.kPitHoodOpenLoop, 0.0);
+    SmartDashboard.putData("Pit/Hood/hoodStart", new PitHoodOpenLoopCommand(shooterSubsystem));
+    SmartDashboard.putData("Pit/Hood/hoodStop", new HoodOpenLoopCommand(shooterSubsystem, 0.0));
     // intake pit commands
     SmartDashboard.putNumber("Pit/Intake/Speed", 0.0);
     // Turret Pit Commands

@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import static frc.robot.Constants.VisionConstants.kHorizonFov;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.Constants;
 import java.util.List;
@@ -7,7 +9,6 @@ import java.util.Set;
 import org.strykeforce.deadeye.Rect;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
-import static frc.robot.Constants.VisionConstants.kHorizonFov;
 
 public class VisionSubsystem extends MeasurableSubsystem {
   public DeadeyeC0 shooterCamera;
@@ -33,9 +34,13 @@ public class VisionSubsystem extends MeasurableSubsystem {
   }
 
   public double getErrorPixels() {
-    if (shooterCamera.getTargetListData() == null) { return 2767; }
+    if (shooterCamera.getTargetListData() == null) {
+      return 2767;
+    }
     List<Rect> listData = shooterCamera.getTargetListData().targetsOrderedByCenterX();
-    if (listData.isEmpty()) { return 2767; }
+    if (listData.isEmpty()) {
+      return 2767;
+    }
 
     int minX = listData.get(0).topLeft.x;
     int maxX = listData.get(listData.size() - 1).bottomRight.x;
