@@ -54,17 +54,17 @@ public class MagazineSubsystem extends MeasurableSubsystem {
 
   public void lowerOpenLoopRotate(double percentOutput) {
     lowerMagazineTalon.set(ControlMode.PercentOutput, percentOutput);
-    // logger.info("Lower magazine motor turned on {}", percentOutput);
+    logger.info("Lower magazine motor turned on {}", percentOutput);
   }
 
   public void upperOpenLoopRotate(double percentOutput) {
     upperMagazineTalon.set(ControlMode.PercentOutput, percentOutput);
-    // logger.info("Upper magazine motor turned on {}", percentOutput);
+    logger.info("Upper magazine motor turned on {}", percentOutput);
   }
 
   public void stopMagazine() {
-    // lowerMagazineTalon.set(ControlMode.PercentOutput, 0.0);
-    // upperMagazineTalon.set(ControlMode.PercentOutput, 0.0);
+    lowerMagazineTalon.set(ControlMode.PercentOutput, 0.0);
+    upperMagazineTalon.set(ControlMode.PercentOutput, 0.0);
   }
 
   public boolean isLowerBeamBroken() {
@@ -148,6 +148,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
 
   @Override
   public void periodic() {
+    getColor();
     switch (currMagazineState) {
       case WAIT_CARGO:
         // check number of cargo
@@ -156,14 +157,14 @@ public class MagazineSubsystem extends MeasurableSubsystem {
           currMagazineState = MagazineState.STOP;
           break;
         } else if (storedCargoColors[0] != CargoColor.NONE) {
-          lowerOpenLoopRotate(MagazineConstants.kMagazineIntakeSpeed);
+          if (lowerMagazineTalon.getMotorOutputPercent() == 0.0) {
+            lowerOpenLoopRotate(MagazineConstants.kMagazineIntakeSpeed);
+          }
           // Checking if ball is in the top of the upper magazine
           if (isUpperBeamBroken() && upperMagazineTalon.getMotorOutputPercent() != 0.0) {
             upperOpenLoopRotate(0.0);
             logger.info("Stopping upper magazine, upper beam broken");
-          } else if (!isUpperBeamBroken()
-              && upperMagazineTalon.getMotorOutputPercent()
-                  != MagazineConstants.kMagazineIntakeSpeed) {
+          } else if (!isUpperBeamBroken() && upperMagazineTalon.getMotorOutputPercent() == 0.0) {
             upperOpenLoopRotate(MagazineConstants.kMagazineIntakeSpeed);
             logger.info("Upper beam not broken, upper magazine running");
           }
@@ -173,8 +174,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
           currMagazineState = MagazineState.READ_CARGO;
           lowerOpenLoopRotate(0.0);
           logger.info("Switching state to read cargo color");
-        } else if (lowerMagazineTalon.getMotorOutputPercent()
-            != MagazineConstants.kMagazineIntakeSpeed) {
+        } else if (lowerMagazineTalon.getMotorOutputPercent() == 0.0) {
           lowerOpenLoopRotate(MagazineConstants.kMagazineIntakeSpeed);
         }
 
@@ -190,9 +190,17 @@ public class MagazineSubsystem extends MeasurableSubsystem {
           } else {
             lowerOpenLoopRotate(MagazineConstants.kMagazineIntakeSpeed);
             upperOpenLoopRotate(MagazineConstants.kMagazineIntakeSpeed);
-            currMagazineState = MagazineState.WAIT_CARGO;
-            logger.info("Has one cargo, turning on magazine, switching to wait state");
+            currMagazineState = MagazineState.INDEX_CARGO;
+            logger.info("Has one cargo, turning on magazine, switching to index state");
           }
+        }
+
+        break;
+
+      case INDEX_CARGO:
+        if (!isLowerBeamBroken()) {
+          currMagazineState = MagazineState.WAIT_CARGO;
+          logger.info("Switching to wait state");
         }
 
         break;
@@ -206,8 +214,8 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   @Override
   public void registerWith(TelemetryService telemetryService) {
     super.registerWith(telemetryService);
-    // telemetryService.register(lowerMagazineTalon);
-    // telemetryService.register(upperMagazineTalon);
+    telemetryService.register(lowerMagazineTalon);
+    telemetryService.register(upperMagazineTalon);
   }
 
   @Override
@@ -228,6 +236,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   public enum MagazineState {
     WAIT_CARGO,
     READ_CARGO,
+    INDEX_CARGO,
     STOP;
   }
 }
