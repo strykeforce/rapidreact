@@ -2,15 +2,15 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.Constants;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import org.strykeforce.deadeye.Rect;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
+import static frc.robot.Constants.VisionConstants.kHorizonFov;
 
 public class VisionSubsystem extends MeasurableSubsystem {
   public DeadeyeC0 shooterCamera;
-  public double HORIZ_FOV = Constants.VisionConstants.HORIZ_FOV;
   // private NetworkTableInstance deadeyeNetworkTableInstance;
 
   public VisionSubsystem() {
@@ -21,7 +21,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
   }
 
   public boolean isTargetValid() {
-    return shooterCamera.getValid();
+    return shooterCamera.isValid();
   }
 
   public double getHorizAngleAdjustment() {
@@ -32,46 +32,21 @@ public class VisionSubsystem extends MeasurableSubsystem {
     return true;
   }
 
-  public ArrayList<Rect> getSortedRects() {
-    ArrayList<Rect> sortedlist = new ArrayList<Rect>();
-    int i;
-    for (Rect Rect : shooterCamera.getTargetListData()) {
-      i = 0;
-      for (Rect sortedRect : sortedlist) {
-        if (Rect.center().x > sortedRect.center().x) {
-          i += 1;
-        }
-      }
-      sortedlist.add(i, Rect);
-    }
-    return sortedlist;
-  }
-
   public double getErrorPixels() {
-    ArrayList<Rect> listData = shooterCamera.getTargetListData();
-    if (listData.isEmpty()) {
-      return 2767;
-    }
+    if (shooterCamera.getTargetListData() == null) { return 2767; }
+    List<Rect> listData = shooterCamera.getTargetListData().targetsOrderedByCenterX();
+    if (listData.isEmpty()) { return 2767; }
+
     int minX = listData.get(0).topLeft.x;
-    int maxX = listData.get(0).bottomRight.x;
-    double center;
-    for (int i = 0; i < listData.size(); i++) {
-      if (listData.get(i).topLeft.x < minX) {
-        minX = listData.get(i).topLeft.x;
-      }
-      if (listData.get(i).bottomRight.x > maxX) {
-        maxX = listData.get(i).bottomRight.x;
-      }
-    }
-    center = (maxX + minX) / 2;
-    return center - shooterCamera.frameCenter;
+    int maxX = listData.get(listData.size() - 1).bottomRight.x;
+    return (maxX + minX) / 2 - shooterCamera.frameCenter;
   }
 
   public double getErrorRadians() {
-    if (shooterCamera.getValid()) {
+    if (shooterCamera.isValid()) {
       // 57.999 * Math.max(width, height) / 1280 deg
       // 1.012 * Math.max(width, height) / 1280 rad
-      return HORIZ_FOV * getErrorPixels() / (shooterCamera.frameCenter * 2) * -1;
+      return kHorizonFov * getErrorPixels() / (shooterCamera.frameCenter * 2) * -1;
     }
     return 2767;
   }

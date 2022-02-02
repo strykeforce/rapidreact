@@ -7,7 +7,7 @@ import frc.robot.Constants.SmartDashboardConstants;
 import frc.robot.subsystems.TurretSubsystem;
 
 public class PitTurretCloseLoopPositionCommand extends CommandBase {
-  public TurretSubsystem turretSubsystem;
+  public final TurretSubsystem turretSubsystem;
 
   public PitTurretCloseLoopPositionCommand(TurretSubsystem turretSubsystem) {
     addRequirements(turretSubsystem);
@@ -26,6 +26,6 @@ public class PitTurretCloseLoopPositionCommand extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return turretSubsystem.turretAtTarget();
+    return turretSubsystem.isRotationFinished();
   }
 }

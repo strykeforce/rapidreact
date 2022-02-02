@@ -22,6 +22,6 @@ public class RotateToCommand extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return turretSubsystem.turretAtTarget();
+    return turretSubsystem.isRotationFinished();
   }
 }

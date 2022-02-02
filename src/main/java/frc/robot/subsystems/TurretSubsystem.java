@@ -1,12 +1,10 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.BaseTalon;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.Constants;
 import frc.robot.Constants.TurretConstants;
@@ -17,51 +15,29 @@ import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
+import static frc.robot.Constants.TurretConstants.kTurretTicksPerRadian;
+import static frc.robot.Constants.TurretConstants.kWrapRange;
+import static frc.robot.Constants.TurretConstants.kTurretMidpoint;
+import static frc.robot.Constants.TurretConstants.kTurretZeroTicks;
+import static frc.robot.Constants.TurretConstants.kTurretId;
 
 public class TurretSubsystem extends MeasurableSubsystem {
 
-  private static final int TURRET_ID = 42; // move to constants file
-  private static final double TURRET_TICKS_PER_DEGREE =
-      Constants.TurretConstants.TURRET_TICKS_PER_DEGREE;
-  private static final double TURRET_TICKS_PER_RADIAN =
-      Constants.TurretConstants.TURRET_TICKS_PER_RADIAN;
-  private static final double kWrapRange = Constants.TurretConstants.kWrapRange;
-  private static final double kTurretMidpoint = Constants.TurretConstants.kTurretMidpoint;
-  public static boolean talonReset;
-  private static TalonSRX turret;
-  private static double targetTurretPosition = 0;
-  private static int turretStableCounts = 0;
-  private static int kTurretZeroTicks;
+  public boolean talonReset;
+  private TalonSRX turret;
+  private double targetTurretPosition = 0;
+  private int turretStableCounts = 0;
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
   private TurretState currentState = TurretState.IDLE;
 
   public TurretSubsystem() {
-    kTurretZeroTicks = Constants.TurretConstants.kTurretZeroTicks;
     configTalons();
   }
 
   private void configTalons() {
-    TalonSRXConfiguration turretConfig = new TalonSRXConfiguration();
-
     // turret setup
-    turret = new TalonSRX(TURRET_ID);
-    turretConfig.forwardSoftLimitThreshold = Constants.TurretConstants.kForwardLimit;
-    turretConfig.reverseSoftLimitThreshold = Constants.TurretConstants.kReverseLimit;
-    turretConfig.forwardSoftLimitEnable = true;
-    turretConfig.reverseSoftLimitEnable = true;
-    turretConfig.slot0.kP = 2;
-    turretConfig.slot0.kI = 0.01;
-    turretConfig.slot0.kD = 80;
-    turretConfig.slot0.kF = 0.21;
-    turretConfig.slot0.integralZone = 40;
-    turretConfig.slot0.maxIntegralAccumulator = 4500;
-    turretConfig.voltageMeasurementFilter = 32;
-    turretConfig.voltageCompSaturation = 12;
-    turretConfig.motionCruiseVelocity = 4_000;
-    turretConfig.motionAcceleration = 30_000;
-    turretConfig.forwardLimitSwitchNormal = LimitSwitchNormal.Disabled;
-    turretConfig.reverseLimitSwitchNormal = LimitSwitchNormal.Disabled;
-    turret.configAllSettings(turretConfig);
+    turret = new TalonSRX(kTurretId);
+    turret.configAllSettings(Constants.TurretConstants.getTurretTalonConfig());
     turret.setNeutralMode(NeutralMode.Brake);
     turret.enableCurrentLimit(false);
     turret.enableVoltageCompensation(true);
@@ -72,39 +48,21 @@ public class TurretSubsystem extends MeasurableSubsystem {
     return List.of(turret);
   }
 
-  // -----------OLD-----------
-  // public void rotateTurret(double offsetDegrees) {
-  //   double currentAngle = turret.getSelectedSensorPosition() / TURRET_TICKS_PER_DEGREE;
-  //   double targetAngle = currentAngle + offsetDegrees +
-  // Constants.VisionConstants.kHorizAngleCorrection;
-  //   if (targetAngle <= kWrapRange && turret.getSelectedSensorPosition() > kTurretMidpoint ||
-  // targetAngle < 0) {
-  //     targetAngle += 360;
-  //   }
-  //   double setPoint = targetAngle * TURRET_TICKS_PER_DEGREE;
-  //   setTurret(setPoint);
-  // }
-
   public void rotateTurret(Rotation2d errorRotation2d) {
     Rotation2d targetAngle =
-        new Rotation2d(
-            turret.getSelectedSensorPosition() / TURRET_TICKS_PER_RADIAN); // current angle
-    targetAngle
-        .plus(errorRotation2d)
-        .plus(
-            Rotation2d.fromDegrees(
-                Constants.VisionConstants.kHorizAngleCorrection)); // target angle
+        new Rotation2d(turret.getSelectedSensorPosition() / kTurretTicksPerRadian); // current angle
+    targetAngle.plus(errorRotation2d).plus(Rotation2d.fromDegrees(Constants.VisionConstants.kHorizAngleCorrection)); // target angle
     if (targetAngle.getDegrees() <= kWrapRange
             && turret.getSelectedSensorPosition() > kTurretMidpoint
         || targetAngle.getDegrees() < 0) {
       targetAngle.plus(Rotation2d.fromDegrees(360)); // add 360 deg
     }
-    targetAngle.times(TURRET_TICKS_PER_RADIAN); // setpoint
-    rotateTo(targetAngle); // setTurret takes in degrees
+    targetAngle.times(kTurretTicksPerRadian); // setpoint
+    rotateTo(targetAngle);
   }
 
   public Rotation2d getRotation2d() {
-    return new Rotation2d(turret.getSelectedSensorPosition() / TURRET_TICKS_PER_RADIAN);
+    return new Rotation2d(turret.getSelectedSensorPosition() / kTurretTicksPerRadian);
   }
 
   public void rotateTo(double setPointTicks) {
@@ -126,7 +84,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
   }
 
   public void rotateTo(Rotation2d position) {
-    double positionTicks = position.getRadians() * TURRET_TICKS_PER_RADIAN;
+    double positionTicks = position.getRadians() * kTurretTicksPerRadian;
     logger.info("Rotating Turret to {}", position);
     rotateTo(positionTicks);
   }
@@ -135,26 +93,20 @@ public class TurretSubsystem extends MeasurableSubsystem {
     turret.set(ControlMode.PercentOutput, percentOutput);
   }
 
-  public boolean turretAtTarget() {
+  public boolean isRotationFinished() {
     double currentTurretPosition = turret.getSelectedSensorPosition();
-    if (!Constants.isCompBot
-        || Math.abs(targetTurretPosition - currentTurretPosition)
+    if (Math.abs(targetTurretPosition - currentTurretPosition)
             > Constants.TurretConstants.kCloseEnoughTurret) {
       turretStableCounts = 0;
     } else {
       turretStableCounts++;
     }
-    if (turretStableCounts >= Constants.ShooterConstants.kStableCounts) {
-      return true;
-    } else {
-      return false;
-    }
+    return turretStableCounts >= Constants.ShooterConstants.kStableCounts;
   }
 
   @Override
   public Set<Measure> getMeasures() {
-
-    return Set.of(new Measure("TurretAtTarget", () -> turretAtTarget() ? 1.0 : 0.0));
+    return Set.of(new Measure("TurretAtTarget", () -> isRotationFinished() ? 1.0 : 0.0));
   }
 
   @Override

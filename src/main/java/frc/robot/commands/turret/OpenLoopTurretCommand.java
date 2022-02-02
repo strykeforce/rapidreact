@@ -4,8 +4,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.TurretSubsystem;
 
 public class OpenLoopTurretCommand extends InstantCommand {
-  public TurretSubsystem turretSubsystem;
-  public double speed;
+  public final TurretSubsystem turretSubsystem;
+  public final double speed;
 
   public OpenLoopTurretCommand(TurretSubsystem turretSubsystem, double speed) {
     addRequirements(turretSubsystem);

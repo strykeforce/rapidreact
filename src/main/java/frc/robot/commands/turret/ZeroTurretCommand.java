@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.TurretSubsystem;
 
 public class ZeroTurretCommand extends CommandBase {
-  public TurretSubsystem turretSubsystem;
+  public final TurretSubsystem turretSubsystem;
 
   public ZeroTurretCommand(TurretSubsystem turretSubsystem) {
     addRequirements(turretSubsystem);
@@ -18,6 +18,6 @@ public class ZeroTurretCommand extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return turretSubsystem.turretAtTarget();
+    return turretSubsystem.isRotationFinished();
   }
 }

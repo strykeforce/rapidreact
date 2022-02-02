@@ -45,7 +45,6 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    // driveSubsystem.registerWith(telemetryService);
     magazineSubsystem.registerWith(telemetryService);
     turretSubsystem.registerWith(telemetryService);
     intakeSubsystem.registerWith(telemetryService);
@@ -65,10 +64,6 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureDriverButtonBindings() {
-
-    // driveSubsystem.setDefaultCommand(new DriveTeleopCommand(driveJoystick, driveSubsystem));
-    // new JoystickButton(driveJoystick, Button.RESET.id)
-    // .whenPressed(new ZeroGyroCommand(driveSubsystem));
   }
 
   private void configureTestButtonBindings() {

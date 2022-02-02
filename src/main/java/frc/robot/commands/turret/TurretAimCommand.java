@@ -7,9 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TurretAimCommand extends CommandBase {
-  private VisionSubsystem visionSubsystem;
-  private TurretSubsystem turretSubsystem;
-  public Logger logger = LoggerFactory.getLogger("Aim Shooter Command");
+  private final VisionSubsystem visionSubsystem;
+  private final TurretSubsystem turretSubsystem;
+  public final Logger logger = LoggerFactory.getLogger("Aim Shooter Command");
 
   public TurretAimCommand(VisionSubsystem visionSubsystem, TurretSubsystem turretSubsystem) {
     addRequirements(turretSubsystem, visionSubsystem);
@@ -32,12 +32,12 @@ public class TurretAimCommand extends CommandBase {
   public boolean isFinished() {
     // SmartDashboard.putBoolean("Match/Locked On", true);
     // return TURRET.turretAtTarget() && VISION.isStable() && VISION.isTargetValid();
-    return turretSubsystem.turretAtTarget();
+    return turretSubsystem.isRotationFinished();
   }
 
   @Override
   public void end(boolean interrupted) {
-    System.out.println("TurretAtTarget: " + turretSubsystem.turretAtTarget());
+    System.out.println("TurretAtTarget: " + turretSubsystem.isRotationFinished());
     visionSubsystem.shooterCamera.setEnabled(false);
   }
 }

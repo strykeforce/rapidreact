@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
@@ -23,13 +24,9 @@ import edu.wpi.first.wpilibj.util.Color;
  */
 public final class Constants {
 
-  private static final DigitalInput digitalInput = new DigitalInput(9);
   public static final int kTalonConfigTimeout = 10; // ms
-  public static boolean isCompBot;
 
-  public Constants() {
-    isCompBot = digitalInput.get();
-  }
+  public Constants() {}
 
   public static final class DriveConstants {
 
@@ -119,15 +116,15 @@ public final class Constants {
 
   public static final class VisionConstants {
 
-    public static final double minContourAreaSize = 100;
-    public static final double VERTICAL_FOV = 48.8;
-    public static final double HORIZ_FOV = 1.012; // 50.8 //146 //radians 1.012 // deg 57.999
-    public static final double HORIZ_RES = 640; // 1280
-    public static final double TARGET_WIDTH_IN = 39.5; // 34.6
-    public static final double CAMERA_HEIGHT = 20.75;
-    public static final double TARGET_HEIGHT = 98.5;
-    public static final double SIZE_THRESHOLD = 400;
-    public static final double DISTANCE_THRESHOLD = 200;
+    public static final double kMinContourAreaSize = 100;
+    public static final double kVerticalFov = 48.8;
+    public static final double kHorizonFov = 1.012; // 50.8 //146 //radians 1.012 // deg 57.999
+    public static final double kHorizonRes = 640; // 1280
+    public static final double kTargetWidthIn = 39.5; // 34.6
+    public static final double kCameraHeight = 20.75;
+    public static final double kTargetHeight = 98.5;
+    public static final double kSizeThreshold = 400;
+    public static final double kDistanceThreshold = 200;
     public static final int kStableRange = 20;
     public static final int kStableCounts = 5;
     public static final double kCenteredRange = 2;
@@ -154,8 +151,8 @@ public final class Constants {
 
   public static final class TurretConstants {
     public static final double kWrapRange = 1;
-    public static final double TURRET_TICKS_PER_DEGREE = 72.404; // 0.01745329 57.2957877856
-    public static final double TURRET_TICKS_PER_RADIAN = 4148.444; // 4148.44421883
+    public static final double kTurretTicksPerDegree = 72.404; // 0.01745329 57.2957877856
+    public static final double kTurretTicksPerRadian = 4148.444; // 4148.44421883
     public static final double kTurretMidpoint = 13_000;
     public static int kTurretZeroTicks = 1931;
     public static final int kForwardLimit = 26095; // 26000
@@ -163,6 +160,28 @@ public final class Constants {
     public static final int kCloseEnoughTurret = 40;
     public static final double kMaxStringPotZero = 100;
     public static final double kMinStringPotZero = 0;
+    public static final int kTurretId = 42;
+
+    public static TalonSRXConfiguration getTurretTalonConfig() {
+      TalonSRXConfiguration turretConfig = new TalonSRXConfiguration();
+      turretConfig.forwardSoftLimitThreshold = Constants.TurretConstants.kForwardLimit;
+      turretConfig.reverseSoftLimitThreshold = Constants.TurretConstants.kReverseLimit;
+      turretConfig.forwardSoftLimitEnable = true;
+      turretConfig.reverseSoftLimitEnable = true;
+      turretConfig.slot0.kP = 2;
+      turretConfig.slot0.kI = 0.01;
+      turretConfig.slot0.kD = 80;
+      turretConfig.slot0.kF = 0.21;
+      turretConfig.slot0.integralZone = 40;
+      turretConfig.slot0.maxIntegralAccumulator = 4500;
+      turretConfig.voltageMeasurementFilter = 32;
+      turretConfig.voltageCompSaturation = 12;
+      turretConfig.motionCruiseVelocity = 4_000;
+      turretConfig.motionAcceleration = 30_000;
+      turretConfig.forwardLimitSwitchNormal = LimitSwitchNormal.Disabled;
+      turretConfig.reverseLimitSwitchNormal = LimitSwitchNormal.Disabled;
+      return turretConfig;
+    }
   }
 
   public static final class ShooterConstants {

@@ -2,10 +2,9 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.robot.Constants;
-import java.util.ArrayList;
+
 import org.jetbrains.annotations.NotNull;
 import org.strykeforce.deadeye.Deadeye;
-import org.strykeforce.deadeye.Rect;
 import org.strykeforce.deadeye.TargetDataListener;
 import org.strykeforce.deadeye.TargetListTargetData;
 
@@ -16,17 +15,14 @@ public class DeadeyeC0 implements TargetDataListener<TargetListTargetData> {
   public final int frameCenter;
 
   public DeadeyeC0() {
-    deadeye = new Deadeye<>("C0", TargetListTargetData.class);
-    deadeye.setTargetDataListener(this);
-    frameCenter = deadeye.getCapture().width / 2;
-    minContourAreaSize = Constants.VisionConstants.minContourAreaSize;
+    this(NetworkTableInstance.getDefault());
   }
 
   public DeadeyeC0(NetworkTableInstance nti) {
     deadeye = new Deadeye<>("C0", TargetListTargetData.class, nti);
     deadeye.setTargetDataListener(this);
     frameCenter = deadeye.getCapture().width / 2;
-    minContourAreaSize = Constants.VisionConstants.minContourAreaSize;
+    minContourAreaSize = Constants.VisionConstants.kMinContourAreaSize;
   }
 
   public void setEnabled(boolean enabled) {
@@ -38,20 +34,11 @@ public class DeadeyeC0 implements TargetDataListener<TargetListTargetData> {
     lastData = data;
   }
 
-  public ArrayList<Rect> getTargetListData() {
-    ArrayList<Rect> listdata = new ArrayList<>();
-    for (int i = 0; i < lastData.targets.size(); i++) {
-      if (lastData.targets.get(i).contourArea > minContourAreaSize) {
-        listdata.add(lastData.targets.get(i));
-      }
-    }
-    if (lastData == null) {
-      System.out.println("lastData is null");
-    }
-    return listdata;
+  public TargetListTargetData getTargetListData() {
+    return lastData;
   }
 
-  public boolean getValid() {
+  public boolean isValid() {
     if (lastData != null) {
       return lastData.valid;
     }
