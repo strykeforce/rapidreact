@@ -10,6 +10,9 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.SmartDashboardConstants;
+import frc.robot.commands.drive.DriveAutonCommand;
+import frc.robot.commands.drive.DriveTeleopCommand;
+import frc.robot.commands.drive.ZeroGyroCommand;
 import frc.robot.commands.intake.IntakeOpenLoopCommand;
 import frc.robot.commands.intake.PitIntakeOpenLoopCommand;
 import frc.robot.commands.magazine.MagazineOpenLoopCommand;
@@ -22,8 +25,6 @@ import frc.robot.commands.shooter.PitShooterOpenLoopCommand;
 import frc.robot.commands.shooter.ShooterOpenLoopCommand;
 import frc.robot.commands.turret.OpenLoopTurretCommand;
 import frc.robot.commands.turret.PitTurretCloseLoopPositionCommand;
-import frc.robot.commands.turret.TurretAimCommand;
-import frc.robot.commands.turret.ZeroTurretCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
@@ -40,6 +41,7 @@ import org.strykeforce.telemetry.TelemetryService;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+
   // The robot's subsystems and commands are defined here...
   private final DriveSubsystem driveSubsystem = new DriveSubsystem();
   private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
@@ -73,13 +75,20 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
-  private void configureDriverButtonBindings() {}
+  private void configureDriverButtonBindings() {
+    driveSubsystem.setDefaultCommand(new DriveTeleopCommand(driveJoystick, driveSubsystem));
+    new JoystickButton(driveJoystick, Button.RESET.id)
+        .whenPressed(new ZeroGyroCommand(driveSubsystem));
+    new JoystickButton(driveJoystick, Button.HAMBURGER.id)
+        .whenPressed(new DriveAutonCommand(driveSubsystem, "straightPath", 0.0));
+  }
 
   private void configureTestButtonBindings() {
-    Joystick joystick = new Joystick(0);
-    new JoystickButton(joystick, 1)
-        .whenPressed(new TurretAimCommand(visionSubsystem, turretSubsystem));
-    new JoystickButton(joystick, 2).whenPressed(new ZeroTurretCommand(turretSubsystem));
+    // FIXME: use driveJoystick and Button enum, seeconfigureDriverButtonBindings above
+    //    Joystick joystick = new Joystick(0);
+    //    new JoystickButton(joystick, 1)
+    //        .whenPressed(new TurretAimCommand(visionSubsystem, turretSubsystem));
+    //    new JoystickButton(joystick, 2).whenPressed(new ZeroTurretCommand(turretSubsystem));
   }
 
   private void configurePitDashboard() {
@@ -129,7 +138,7 @@ public class RobotContainer {
     LEFT_BACK(4),
     RIGHT_BACK(3);
 
-    private final int id;
+    public final int id;
 
     Axis(int id) {
       this.id = id;
