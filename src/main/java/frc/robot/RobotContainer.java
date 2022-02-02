@@ -8,7 +8,11 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.SmartDashboardConstants;
+import frc.robot.commands.drive.DriveAutonCommand;
+import frc.robot.commands.drive.DriveTeleopCommand;
+import frc.robot.commands.drive.ZeroGyroCommand;
 import frc.robot.commands.intake.IntakeOpenLoopCommand;
 import frc.robot.commands.intake.PitIntakeOpenLoopCommand;
 import frc.robot.commands.magazine.MagazineOpenLoopCommand;
@@ -33,6 +37,7 @@ import org.strykeforce.telemetry.TelemetryService;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+
   // The robot's subsystems and commands are defined here...
   private final DriveSubsystem driveSubsystem = new DriveSubsystem();
   private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
@@ -62,9 +67,11 @@ public class RobotContainer {
    */
   private void configureDriverButtonBindings() {
 
-    // driveSubsystem.setDefaultCommand(new DriveTeleopCommand(driveJoystick, driveSubsystem));
-    // new JoystickButton(driveJoystick, Button.RESET.id)
-    // .whenPressed(new ZeroGyroCommand(driveSubsystem));
+    driveSubsystem.setDefaultCommand(new DriveTeleopCommand(driveJoystick, driveSubsystem));
+    new JoystickButton(driveJoystick, Button.RESET.id)
+        .whenPressed(new ZeroGyroCommand(driveSubsystem));
+    new JoystickButton(driveJoystick, Button.HAMBURGER.id)
+        .whenPressed(new DriveAutonCommand(driveSubsystem, "straightPath", 0.0));
   }
 
   private void configurePitDashboard() {
@@ -105,7 +112,7 @@ public class RobotContainer {
     LEFT_BACK(4),
     RIGHT_BACK(3);
 
-    private final int id;
+    public final int id;
 
     Axis(int id) {
       this.id = id;
