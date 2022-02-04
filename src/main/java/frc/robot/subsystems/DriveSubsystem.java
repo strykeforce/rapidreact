@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
@@ -30,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.swerve.SwerveDrive;
+import org.strykeforce.swerve.SwerveModule;
 import org.strykeforce.swerve.TalonSwerveModule;
 import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
@@ -132,6 +134,16 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public void setGyroOffset(Rotation2d rotation) {
     swerveDrive.setGyroOffset(rotation);
+  }
+
+  public void lockZero() {
+    SwerveModuleState[] zeroState = new SwerveModuleState[4];
+    for (int i = 0; i < 4; i++) {
+      zeroState[i] = new SwerveModuleState(0.0, Rotation2d.fromDegrees(0.0));
+    }
+
+    swerveDrive.setModuleStates(zeroState);
+    logger.info("Locking wheels to zero");
   }
 
   public void resetOdometry(Pose2d pose) {

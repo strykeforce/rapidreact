@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.SmartDashboardConstants;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
+import frc.robot.commands.drive.LockZeroCommand;
 import frc.robot.commands.drive.ZeroGyroCommand;
 import frc.robot.commands.intake.IntakeOpenLoopCommand;
 import frc.robot.commands.intake.PitIntakeOpenLoopCommand;
@@ -101,6 +102,9 @@ public class RobotContainer {
     SmartDashboard.putNumber("Pit/Intake/Speed", 0.0);
     SmartDashboard.putData("Pit/Intake/Start", new PitIntakeOpenLoopCommand(intakeSubsystem));
     SmartDashboard.putData("Pit/Intake/Stop", new IntakeOpenLoopCommand(intakeSubsystem, 0.0));
+
+    // Drive commands
+    SmartDashboard.putData("Pit/Drive/LockZero", new LockZeroCommand(driveSubsystem));
   }
 
   public enum Axis {
