@@ -8,6 +8,11 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.Constants.SmartDashboardConstants;
+import frc.robot.commands.drive.DriveAutonCommand;
+import frc.robot.commands.drive.DriveTeleopCommand;
+import frc.robot.commands.drive.ZeroGyroCommand;
 import frc.robot.commands.intake.IntakeOpenLoopCommand;
 import frc.robot.commands.intake.PitIntakeOpenLoopCommand;
 import frc.robot.commands.magazine.PitClearCargoColor;
@@ -15,8 +20,14 @@ import frc.robot.commands.magazine.PitMagazineOpenLoopCommand;
 import frc.robot.commands.magazine.PitReadCargoColor;
 import frc.robot.commands.magazine.UpperMagazineOpenLoopCommand;
 import frc.robot.commands.sequences.AutoIntakeCommand;
+import frc.robot.commands.shooter.HoodOpenLoopCommand;
+import frc.robot.commands.shooter.PitHoodOpenLoopCommand;
+import frc.robot.commands.shooter.PitShooterOpenLoopCommand;
+import frc.robot.commands.shooter.ShooterOpenLoopCommand;
+import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 import org.strykeforce.telemetry.TelemetryController;
 import org.strykeforce.telemetry.TelemetryService;
 
@@ -27,8 +38,10 @@ import org.strykeforce.telemetry.TelemetryService;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+
   // The robot's subsystems and commands are defined here...
-  // private DriveSubsystem driveSubsystem = new DriveSubsystem();
+  private final DriveSubsystem driveSubsystem = new DriveSubsystem();
+  private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
   private final MagazineSubsystem magazineSubsystem = new MagazineSubsystem();
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   private TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
@@ -37,7 +50,8 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
-    // driveSubsystem.registerWith(telemetryService);
+    driveSubsystem.registerWith(telemetryService);
+    shooterSubsystem.registerWith(telemetryService);
     magazineSubsystem.registerWith(telemetryService);
     intakeSubsystem.registerWith(telemetryService);
     telemetryService.start();
@@ -54,13 +68,15 @@ public class RobotContainer {
    */
   private void configureDriverButtonBindings() {
 
-    // driveSubsystem.setDefaultCommand(new DriveTeleopCommand(driveJoystick, driveSubsystem));
-    // new JoystickButton(driveJoystick, Button.RESET.id)
-    // .whenPressed(new ZeroGyroCommand(driveSubsystem));
+    driveSubsystem.setDefaultCommand(new DriveTeleopCommand(driveJoystick, driveSubsystem));
+    new JoystickButton(driveJoystick, Button.RESET.id)
+        .whenPressed(new ZeroGyroCommand(driveSubsystem));
+    new JoystickButton(driveJoystick, Button.HAMBURGER.id)
+        .whenPressed(new DriveAutonCommand(driveSubsystem, "straightPath", 0.0));
   }
 
   private void configurePitDashboard() {
-    // magazine pit commands
+    // Magazine Commands
     SmartDashboard.putNumber("Pit/Magazine/Speed", 0.0);
     SmartDashboard.putData("Pit/Magazine/Start", new PitMagazineOpenLoopCommand(magazineSubsystem));
     SmartDashboard.putData(
@@ -71,6 +87,17 @@ public class RobotContainer {
     SmartDashboard.putData(
         "Pit/Magazine/ClearCargoColor", new PitClearCargoColor(magazineSubsystem));
 
+    // Shooter Commands
+    SmartDashboard.putNumber(SmartDashboardConstants.kPitShooterOpenLoop, 0.0);
+    SmartDashboard.putData(
+        "Pit/Shooter/shooterStart", new PitShooterOpenLoopCommand(shooterSubsystem));
+    SmartDashboard.putData(
+        "Pit/Shooter/shooterStop", new ShooterOpenLoopCommand(shooterSubsystem, 0.0));
+
+    // Hood Commands
+    SmartDashboard.putNumber(SmartDashboardConstants.kPitHoodOpenLoop, 0.0);
+    SmartDashboard.putData("Pit/Hood/hoodStart", new PitHoodOpenLoopCommand(shooterSubsystem));
+    SmartDashboard.putData("Pit/Hood/hoodStop", new HoodOpenLoopCommand(shooterSubsystem, 0.0));
     // intake pit commands
     SmartDashboard.putNumber("Pit/Intake/Speed", 0.0);
     SmartDashboard.putData("Pit/Intake/Start", new PitIntakeOpenLoopCommand(intakeSubsystem));
@@ -89,7 +116,7 @@ public class RobotContainer {
     LEFT_BACK(4),
     RIGHT_BACK(3);
 
-    private final int id;
+    public final int id;
 
     Axis(int id) {
       this.id = id;
