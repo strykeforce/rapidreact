@@ -18,26 +18,11 @@
 | Magazine  | SRX  | lowerMagazine   | 30  |     | ??     |
 | Magazine  | SRX  | upperMagazine   | 31  |     | ??     |
 | Shooter   | FX   | shooter         | 40  |     | Falcon |
-| Shooter   | SRX  | hood            | 41  |     | ??     |
+| Shooter   | FX   | kicker          | 41  |     | Falcon |
+| Shooter   | SRX  | hood            | 42  |     | ??     |
 
 * Lower beam break: lower magazine forward limit
 * Upper beam break: upper magazine forward limit
-| Subsystem | Type | Talon      | ID  | PDP | Motor |
-| --------- | ---- | ---------- | --- | --- | ----- |
-| Drive     | SRX  | azimuth    | 0   |    | 9015   |
-| Drive     | SRX  | azimuth    | 1   |    | 9015   |
-| Drive     | SRX  | azimuth    | 2   |    | 9015   |
-| Drive     | SRX  | azimuth    | 3   |    | 9015   |
-| Drive     | FX   | drive      | 10  |    | Falcon |
-| Drive     | FX   | drive      | 11  |    | Falcon |
-| Drive     | FX   | drive      | 12  |    | Falcon |
-| Drive     | FX   | drive      | 13  |    | Falcon |
-| Intake    | FX   | intake     | 20  |    | Falcon |
-| Magazine  | SRX  | magazine   | 30  |    | ??     |
-| Shooter   | FX   | shooter    | 40  |    | Falcon |
-| Kicker    | FX   | kicker     | 41  |    | Falcon |
-| Shooter   | SRX  | hood       | 42  |    | ??     |
-
 
 ## Roborio
 
