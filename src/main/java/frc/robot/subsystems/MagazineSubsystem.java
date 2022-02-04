@@ -80,7 +80,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
 
   public Color getColor() {
     lastColor = colorSensor.getColor();
-    lastColor = new Color(0, 0, 0);
+    // lastColor = new Color(0, 0, 0);
     return lastColor;
   }
 
@@ -148,7 +148,6 @@ public class MagazineSubsystem extends MeasurableSubsystem {
 
   @Override
   public void periodic() {
-    getColor();
     switch (currMagazineState) {
       case WAIT_CARGO:
         // check number of cargo
