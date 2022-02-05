@@ -6,6 +6,8 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.PathData;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,12 +19,12 @@ public class DriveAutonCommand extends CommandBase {
   private final Rotation2d robotHeading;
 
   public DriveAutonCommand(
-      DriveSubsystem driveSubsystem, String trajectoryName, Double targetAngle) {
+      DriveSubsystem driveSubsystem, String trajectoryName) {
     addRequirements(driveSubsystem);
     this.driveSubsystem = driveSubsystem;
-    robotHeading =
-        Rotation2d.fromDegrees(targetAngle); // Desired swerve heading through full trajectory
-    trajectory = driveSubsystem.generateTrajectory(trajectoryName);
+    PathData pathdata = driveSubsystem.generateTrajectory(trajectoryName);
+    trajectory = pathdata.trajectory;
+    robotHeading = pathdata.targetYaw;
     timer.start();
   }
 

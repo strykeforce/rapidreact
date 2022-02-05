@@ -144,8 +144,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
   }
 
   // Trajectory TOML Parsing
-  public Trajectory generateTrajectory(String trajectoryName) {
+  public PathData generateTrajectory(String trajectoryName) {
     Trajectory trajectoryGenerated = new Trajectory();
+    Rotation2d targetYaw = Rotation2d.fromDegrees(0.0);
     try {
       TomlParseResult parseResult =
           Toml.parse(Paths.get("/home/lvuser/deploy/paths/" + trajectoryName + ".toml"));
@@ -178,6 +179,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
       trajectoryConfig.setReversed(parseResult.getBoolean("is_reversed"));
       trajectoryConfig.setStartVelocity(parseResult.getDouble("start_velocity"));
       trajectoryConfig.setEndVelocity(parseResult.getDouble("end_velocity"));
+      
+      double yawDegrees = parseResult.getDouble("target_yaw");
+      targetYaw = Rotation2d.fromDegrees(yawDegrees);
+      logger.info("Radian Yaw is {}, parsed yaw is {}", targetYaw, yawDegrees);
 
       trajectoryGenerated =
           TrajectoryGenerator.generateTrajectory(startPose, path, endPose, trajectoryConfig);
@@ -185,7 +190,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
       logger.error(error.toString());
       logger.error("Path {} not found", trajectoryName);
     }
-    return trajectoryGenerated;
+    return new PathData(targetYaw, trajectoryGenerated);
   }
 
   // Holonomic Controller

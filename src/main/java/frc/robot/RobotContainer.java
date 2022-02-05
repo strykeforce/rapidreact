@@ -71,7 +71,7 @@ public class RobotContainer {
     new JoystickButton(driveJoystick, Button.RESET.id)
         .whenPressed(new ZeroGyroCommand(driveSubsystem));
     new JoystickButton(driveJoystick, Button.HAMBURGER.id)
-        .whenPressed(new DriveAutonCommand(driveSubsystem, "straightPath", 0.0));
+        .whenPressed(new DriveAutonCommand(driveSubsystem, "straightPath"));
   }
 
   private void configurePitDashboard() {
