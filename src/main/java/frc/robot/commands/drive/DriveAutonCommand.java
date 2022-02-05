@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.PathData;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,8 +17,7 @@ public class DriveAutonCommand extends CommandBase {
   private static final Logger logger = LoggerFactory.getLogger(DriveSubsystem.class);
   private final Rotation2d robotHeading;
 
-  public DriveAutonCommand(
-      DriveSubsystem driveSubsystem, String trajectoryName) {
+  public DriveAutonCommand(DriveSubsystem driveSubsystem, String trajectoryName) {
     addRequirements(driveSubsystem);
     this.driveSubsystem = driveSubsystem;
     PathData pathdata = driveSubsystem.generateTrajectory(trajectoryName);

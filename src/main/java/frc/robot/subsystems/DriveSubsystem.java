@@ -179,7 +179,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
       trajectoryConfig.setReversed(parseResult.getBoolean("is_reversed"));
       trajectoryConfig.setStartVelocity(parseResult.getDouble("start_velocity"));
       trajectoryConfig.setEndVelocity(parseResult.getDouble("end_velocity"));
-      
+
       double yawDegrees = parseResult.getDouble("target_yaw");
       targetYaw = Rotation2d.fromDegrees(yawDegrees);
       logger.info("Radian Yaw is {}, parsed yaw is {}", targetYaw, yawDegrees);
