@@ -127,12 +127,15 @@ public final class Constants {
   }
 
   public static final class MagazineConstants {
-    public static final int MagazineTalonID = 30;
+    public static final int kLowerMagazineTalonID = 30;
+    public static final int kUpperMagazineTalonID = 31;
     public static final Color kBlueCargo =
         new Color(0.15, 0.35, 0.5); // FIXME need to get real color
     public static final Color kRedCargo =
         new Color(0.5, 0.25, 0.25); // FIXME need to get real color
     public static final Color kNoCargo = new Color(0.25, 0.5, 0.25); // FIXME need to get real color
+
+    public static final double kMagazineIntakeSpeed = 0.5; // FIXME need an actual percentage
 
     public static TalonSRXConfiguration getMagazineTalonConfig() {
       TalonSRXConfiguration magazineConfig = new TalonSRXConfiguration();
@@ -162,7 +165,8 @@ public final class Constants {
   }
 
   public static final class IntakeConstants {
-    public static final int IntakeFalconID = 20;
+    public static final int kIntakeFalconID = 20;
+    public static final double kIntakeSpeed = 0.5; // FIXME need an actual percentage
 
     public static TalonFXConfiguration getIntakeFalconConfig() {
       TalonFXConfiguration intakeConfig = new TalonFXConfiguration();

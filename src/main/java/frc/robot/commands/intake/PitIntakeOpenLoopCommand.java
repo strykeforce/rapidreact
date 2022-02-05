@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.IntakeSubsystem;
 
 public class PitIntakeOpenLoopCommand extends InstantCommand {
-  private IntakeSubsystem intakeSubsystem;
+  private final IntakeSubsystem intakeSubsystem;
 
   public PitIntakeOpenLoopCommand(IntakeSubsystem intakeSubsystem) {
     addRequirements(intakeSubsystem);

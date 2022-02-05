@@ -15,10 +15,10 @@ import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.ZeroGyroCommand;
 import frc.robot.commands.intake.IntakeOpenLoopCommand;
 import frc.robot.commands.intake.PitIntakeOpenLoopCommand;
-import frc.robot.commands.magazine.MagazineOpenLoopCommand;
 import frc.robot.commands.magazine.PitClearCargoColor;
 import frc.robot.commands.magazine.PitMagazineOpenLoopCommand;
 import frc.robot.commands.magazine.PitReadCargoColor;
+import frc.robot.commands.magazine.UpperMagazineOpenLoopCommand;
 import frc.robot.commands.shooter.HoodOpenLoopCommand;
 import frc.robot.commands.shooter.PitHoodOpenLoopCommand;
 import frc.robot.commands.shooter.PitShooterOpenLoopCommand;
@@ -79,7 +79,7 @@ public class RobotContainer {
     SmartDashboard.putNumber("Pit/Magazine/Speed", 0.0);
     SmartDashboard.putData("Pit/Magazine/Start", new PitMagazineOpenLoopCommand(magazineSubsystem));
     SmartDashboard.putData(
-        "Pit/Magazine/Stop", new MagazineOpenLoopCommand(magazineSubsystem, 0.0));
+        "Pit/Magazine/Stop", new UpperMagazineOpenLoopCommand(magazineSubsystem, 0.0));
     SmartDashboard.putString("Pit/Magazine/First Cargo Color", "");
     SmartDashboard.putString("Pit/Magazine/Second Cargo Color", "");
     SmartDashboard.putData("Pit/Magazine/ReadCargoColor", new PitReadCargoColor(magazineSubsystem));

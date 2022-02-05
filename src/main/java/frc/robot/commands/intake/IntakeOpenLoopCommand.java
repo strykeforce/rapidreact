@@ -4,8 +4,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.IntakeSubsystem;
 
 public class IntakeOpenLoopCommand extends InstantCommand {
-  private IntakeSubsystem intakeSubsystem;
-  private double speed;
+  private final IntakeSubsystem intakeSubsystem;
+  private final double speed;
 
   public IntakeOpenLoopCommand(IntakeSubsystem intakeSubsystem, double speed) {
     addRequirements(intakeSubsystem);
