@@ -47,8 +47,8 @@ public class RobotContainer {
   private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
   private final MagazineSubsystem magazineSubsystem = new MagazineSubsystem();
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
-  public static TurretSubsystem turretSubsystem = new TurretSubsystem();
-  public static VisionSubsystem visionSubsystem = new VisionSubsystem();
+  private final TurretSubsystem turretSubsystem = new TurretSubsystem();
+  private final VisionSubsystem visionSubsystem = new VisionSubsystem();
   private TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
   private Joystick driveJoystick = new Joystick(0);
 
@@ -65,7 +65,6 @@ public class RobotContainer {
     // Configure the button bindings
     configureDriverButtonBindings();
     configurePitDashboard();
-    configureTestButtonBindings();
     turretSubsystem.zeroTurret();
   }
 
@@ -81,14 +80,6 @@ public class RobotContainer {
         .whenPressed(new ZeroGyroCommand(driveSubsystem));
     new JoystickButton(driveJoystick, Button.HAMBURGER.id)
         .whenPressed(new DriveAutonCommand(driveSubsystem, "straightPath", 0.0));
-  }
-
-  private void configureTestButtonBindings() {
-    // FIXME: use driveJoystick and Button enum, seeconfigureDriverButtonBindings above
-    //    Joystick joystick = new Joystick(0);
-    //    new JoystickButton(joystick, 1)
-    //        .whenPressed(new TurretAimCommand(visionSubsystem, turretSubsystem));
-    //    new JoystickButton(joystick, 2).whenPressed(new ZeroTurretCommand(turretSubsystem));
   }
 
   private void configurePitDashboard() {

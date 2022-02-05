@@ -8,7 +8,6 @@ import static frc.robot.Constants.TurretConstants.kWrapRange;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.BaseTalon;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -42,7 +41,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
     turret.setNeutralMode(NeutralMode.Brake);
     turret.enableCurrentLimit(false);
     turret.enableVoltageCompensation(true);
-    turret.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 5, 30, 500));
+    turret.configSupplyCurrentLimit(Constants.TurretConstants.getSupplyCurrentLimitConfig());
   }
 
   public List<BaseTalon> getTalons() {

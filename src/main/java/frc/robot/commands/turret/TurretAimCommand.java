@@ -1,5 +1,6 @@
 package frc.robot.commands.turret;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
@@ -19,13 +20,13 @@ public class TurretAimCommand extends CommandBase {
 
   @Override
   public void initialize() {
-    if (visionSubsystem.isTargetValid()) {
-      // double offset = VISION.getOffsetAngle();
-      // TURRET.rotateTurret(VISION.getAzmithError() /*offset + VISION.getHorizAngleAdjustment()*/);
-      turretSubsystem.rotateTurret(visionSubsystem.getErrorRotation2d());
-      System.out.println(
-          "TurretAimCommand (deg): " + visionSubsystem.getErrorRotation2d().getDegrees());
-    }
+    Rotation2d rotationError = visionSubsystem.getErrorRotation2d();
+    if (rotationError == null) return;
+
+    // double offset = VISION.getOffsetAngle();
+    // TURRET.rotateTurret(VISION.getAzmithError() /*offset + VISION.getHorizAngleAdjustment()*/);
+    turretSubsystem.rotateTurret(rotationError);
+    logger.info("TurretAimCommand (deg): {}", rotationError.getDegrees());
   }
 
   @Override
@@ -37,7 +38,7 @@ public class TurretAimCommand extends CommandBase {
 
   @Override
   public void end(boolean interrupted) {
-    System.out.println("TurretAtTarget: " + turretSubsystem.isRotationFinished());
+    logger.info("TurretAtTarget: {}", turretSubsystem.isRotationFinished());
     visionSubsystem.shooterCamera.setEnabled(false);
   }
 }

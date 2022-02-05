@@ -7,6 +7,7 @@ package frc.robot;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
@@ -176,6 +177,10 @@ public final class Constants {
     public static final double kMaxStringPotZero = 100;
     public static final double kMinStringPotZero = 0;
     public static final int kTurretId = 42;
+
+    public static SupplyCurrentLimitConfiguration getSupplyCurrentLimitConfig() {
+      return new SupplyCurrentLimitConfiguration(true, 5, 30, 500);
+    }
 
     public static TalonSRXConfiguration getTurretTalonConfig() {
       TalonSRXConfiguration turretConfig = new TalonSRXConfiguration();

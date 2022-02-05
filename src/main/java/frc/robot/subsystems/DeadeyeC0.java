@@ -2,14 +2,13 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.robot.Constants;
-import org.jetbrains.annotations.NotNull;
 import org.strykeforce.deadeye.Deadeye;
 import org.strykeforce.deadeye.TargetDataListener;
 import org.strykeforce.deadeye.TargetListTargetData;
 
 public class DeadeyeC0 implements TargetDataListener<TargetListTargetData> {
   private final Deadeye<TargetListTargetData> deadeye;
-  public TargetListTargetData lastData;
+  public TargetListTargetData lastData = new TargetListTargetData();
   public final double minContourAreaSize;
   public final int frameCenter;
 
@@ -35,21 +34,6 @@ public class DeadeyeC0 implements TargetDataListener<TargetListTargetData> {
 
   public TargetListTargetData getTargetListData() {
     return lastData;
-  }
-
-  public boolean isValid() {
-    if (lastData != null) {
-      return lastData.valid;
-    }
-    return false;
-  }
-
-  public @NotNull String getId() {
-    return lastData.id;
-  }
-
-  public int getSerial() {
-    return lastData.serial;
   }
 
   public void setLightsEnabled(boolean enabled) {

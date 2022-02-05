@@ -51,9 +51,7 @@ public class Robot extends TimedRobot {
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {
-    RobotContainer.visionSubsystem.shooterCamera.setEnabled(false);
-  }
+  public void disabledInit() {}
 
   @Override
   public void disabledPeriodic() {}
@@ -67,9 +65,7 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {}
 
   @Override
-  public void teleopInit() {
-    RobotContainer.visionSubsystem.shooterCamera.setEnabled(true);
-  }
+  public void teleopInit() {}
 
   /** This function is called periodically during operator control. */
   @Override
