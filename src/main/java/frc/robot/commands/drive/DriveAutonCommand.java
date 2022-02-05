@@ -14,7 +14,7 @@ public class DriveAutonCommand extends CommandBase {
   private final DriveSubsystem driveSubsystem;
   private final Trajectory trajectory;
   private final Timer timer = new Timer();
-  private static final Logger logger = LoggerFactory.getLogger(DriveSubsystem.class);
+  private static final Logger logger = LoggerFactory.getLogger(DriveAutonCommand.class);
   private final Rotation2d robotHeading;
 
   public DriveAutonCommand(DriveSubsystem driveSubsystem, String trajectoryName) {
@@ -29,7 +29,8 @@ public class DriveAutonCommand extends CommandBase {
   @Override
   public void initialize() {
     Pose2d initialPose = trajectory.getInitialPose();
-    driveSubsystem.resetOdometry(new Pose2d(initialPose.getTranslation(), robotHeading));
+    driveSubsystem.resetOdometry(
+        new Pose2d(initialPose.getTranslation(), driveSubsystem.getGyroRotation2d()));
     driveSubsystem.grapherTrajectoryActive(true);
     timer.reset();
     logger.info("Begin Trajectory");
@@ -37,8 +38,7 @@ public class DriveAutonCommand extends CommandBase {
 
   @Override
   public void execute() {
-    Trajectory.State desiredState = new Trajectory.State();
-    desiredState = trajectory.sample(timer.get());
+    Trajectory.State desiredState = trajectory.sample(timer.get());
     driveSubsystem.calculateController(desiredState, robotHeading);
   }
 

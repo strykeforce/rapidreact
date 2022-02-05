@@ -18,7 +18,6 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import frc.robot.Constants.DriveConstants;
-import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Set;
@@ -134,6 +133,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
     swerveDrive.setGyroOffset(rotation);
   }
 
+  public Rotation2d getGyroRotation2d() {
+    return swerveDrive.getHeading();
+  }
+
   public void resetOdometry(Pose2d pose) {
     swerveDrive.resetOdometry(pose);
     logger.info("reset odometry with: {}", pose);
@@ -145,22 +148,13 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   // Trajectory TOML Parsing
   public PathData generateTrajectory(String trajectoryName) {
-    Trajectory trajectoryGenerated = new Trajectory();
-    Rotation2d targetYaw = Rotation2d.fromDegrees(0.0);
+
     try {
       TomlParseResult parseResult =
           Toml.parse(Paths.get("/home/lvuser/deploy/paths/" + trajectoryName + ".toml"));
       logger.info("Generating Trajectory: {}", trajectoryName);
-      Pose2d startPose =
-          new Pose2d(
-              parseResult.getTable("start_pose").getDouble("x"),
-              parseResult.getTable("start_pose").getDouble("y"),
-              Rotation2d.fromDegrees(parseResult.getTable("start_pose").getDouble("angle")));
-      Pose2d endPose =
-          new Pose2d(
-              parseResult.getTable("end_pose").getDouble("x"),
-              parseResult.getTable("end_pose").getDouble("y"),
-              Rotation2d.fromDegrees(parseResult.getTable("end_pose").getDouble("angle")));
+      Pose2d startPose = parsePose2d(parseResult, "start_pose");
+      Pose2d endPose = parsePose2d(parseResult, "end_pose");
       TomlArray internalPointsToml = parseResult.getArray("internal_points");
       ArrayList<Translation2d> path = new ArrayList<>();
       logger.info("Toml Internal Points Array Size: {}", internalPointsToml.size());
@@ -181,16 +175,24 @@ public class DriveSubsystem extends MeasurableSubsystem {
       trajectoryConfig.setEndVelocity(parseResult.getDouble("end_velocity"));
 
       double yawDegrees = parseResult.getDouble("target_yaw");
-      targetYaw = Rotation2d.fromDegrees(yawDegrees);
-      logger.info("Radian Yaw is {}, parsed yaw is {}", targetYaw, yawDegrees);
+      Rotation2d targetYaw = Rotation2d.fromDegrees(yawDegrees);
+      logger.info("Yaw is {}", targetYaw);
 
-      trajectoryGenerated =
+      Trajectory trajectoryGenerated =
           TrajectoryGenerator.generateTrajectory(startPose, path, endPose, trajectoryConfig);
-    } catch (IOException error) {
+      return new PathData(targetYaw, trajectoryGenerated);
+    } catch (Exception error) {
       logger.error(error.toString());
       logger.error("Path {} not found", trajectoryName);
+      throw new RuntimeException(error);
     }
-    return new PathData(targetYaw, trajectoryGenerated);
+  }
+
+  private Pose2d parsePose2d(TomlParseResult parseResult, String pose) {
+    return new Pose2d(
+        parseResult.getTable(pose).getDouble("x"),
+        parseResult.getTable(pose).getDouble("y"),
+        Rotation2d.fromDegrees(parseResult.getTable(pose).getDouble("angle")));
   }
 
   // Holonomic Controller

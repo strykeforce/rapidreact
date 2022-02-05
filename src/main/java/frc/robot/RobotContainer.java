@@ -101,6 +101,10 @@ public class RobotContainer {
     SmartDashboard.putNumber("Pit/Intake/Speed", 0.0);
     SmartDashboard.putData("Pit/Intake/Start", new PitIntakeOpenLoopCommand(intakeSubsystem));
     SmartDashboard.putData("Pit/Intake/Stop", new IntakeOpenLoopCommand(intakeSubsystem, 0.0));
+
+    // drive commands
+    SmartDashboard.putData(
+        "Pit/Drive/pathDrive", new DriveAutonCommand(driveSubsystem, "straightPath"));
   }
 
   public enum Axis {
