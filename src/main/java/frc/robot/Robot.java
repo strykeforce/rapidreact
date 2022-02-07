@@ -17,6 +17,11 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
+  public Robot() {
+    // deadeyeNetworkTableInstance = NetworkTableInstance.create();
+    // deadeyeNetworkTableInstance.startClient("192.168.3.3", 1736); //TEST DEADEYE
+    // deadeyeNetworkTableInstance.startClient("192.168.3.3", 1735); //real one
+  }
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
