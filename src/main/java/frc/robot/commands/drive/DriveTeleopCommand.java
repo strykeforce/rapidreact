@@ -20,9 +20,11 @@ public class DriveTeleopCommand extends CommandBase {
   @Override
   public void execute() {
     driveSubsystem.drive(
-        deadband(joystick.getRawAxis(RobotContainer.Axis.LEFT_X.id)),
-        deadband(joystick.getRawAxis(RobotContainer.Axis.LEFT_Y.id)),
-        -deadband(joystick.getRawAxis(RobotContainer.Axis.RIGHT_Y.id)));
+        DriveConstants.kMaxSpeedMetersPerSecond
+            * deadband(joystick.getRawAxis(RobotContainer.Axis.LEFT_X.id)),
+        DriveConstants.kMaxSpeedMetersPerSecond
+            * deadband(joystick.getRawAxis(RobotContainer.Axis.LEFT_Y.id)),
+        DriveConstants.kMaxOmega * -deadband(joystick.getRawAxis(RobotContainer.Axis.RIGHT_Y.id)));
   }
 
   @Override
@@ -39,6 +41,6 @@ public class DriveTeleopCommand extends CommandBase {
     if (Math.abs(stickValue) <= Constants.DriveConstants.kDeadbandAllStick) {
       return 0;
     }
-    return stickValue * DriveConstants.kMaxSpeedMetersPerSecond;
+    return stickValue;
   }
 }
