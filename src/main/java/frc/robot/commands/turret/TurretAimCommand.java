@@ -2,15 +2,17 @@ package frc.robot.commands.turret;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.HubTargetData;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TurretAimCommand extends CommandBase {
+
   private final VisionSubsystem visionSubsystem;
   private final TurretSubsystem turretSubsystem;
-  public final Logger logger = LoggerFactory.getLogger("Aim Shooter Command");
+  public static final Logger logger = LoggerFactory.getLogger(TurretAimCommand.class);
 
   public TurretAimCommand(VisionSubsystem visionSubsystem, TurretSubsystem turretSubsystem) {
     addRequirements(turretSubsystem, visionSubsystem);
@@ -20,25 +22,26 @@ public class TurretAimCommand extends CommandBase {
 
   @Override
   public void initialize() {
-    Rotation2d rotationError = visionSubsystem.getErrorRotation2d();
-    if (rotationError == null) return;
+    HubTargetData targetData = visionSubsystem.getTargetData();
+    if (!targetData.isValid()) {
+      logger.warn("target data invalid: {}", targetData);
+      cancel();
+      return;
+    }
 
-    // double offset = VISION.getOffsetAngle();
-    // TURRET.rotateTurret(VISION.getAzmithError() /*offset + VISION.getHorizAngleAdjustment()*/);
+    Rotation2d rotationError = targetData.getErrorRotation2d();
     turretSubsystem.rotateTurret(rotationError);
-    logger.info("TurretAimCommand (deg): {}", rotationError.getDegrees());
+    logger.info("rotating turret by {} deg.", rotationError.getDegrees());
   }
 
   @Override
   public boolean isFinished() {
-    // SmartDashboard.putBoolean("Match/Locked On", true);
-    // return TURRET.turretAtTarget() && VISION.isStable() && VISION.isTargetValid();
     return turretSubsystem.isRotationFinished();
   }
 
   @Override
   public void end(boolean interrupted) {
-    logger.info("TurretAtTarget: {}", turretSubsystem.isRotationFinished());
-    visionSubsystem.shooterCamera.setEnabled(false);
+    logger.info("rotation finished");
+    visionSubsystem.disable();
   }
 }
