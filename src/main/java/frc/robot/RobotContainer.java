@@ -79,7 +79,7 @@ public class RobotContainer {
     new JoystickButton(driveJoystick, Button.RESET.id)
         .whenPressed(new ZeroGyroCommand(driveSubsystem));
     new JoystickButton(driveJoystick, Button.HAMBURGER.id)
-        .whenPressed(new DriveAutonCommand(driveSubsystem, "straightPath", 0.0));
+        .whenPressed(new DriveAutonCommand(driveSubsystem, "straightPath"));
   }
 
   private void configurePitDashboard() {
@@ -115,6 +115,12 @@ public class RobotContainer {
         "Pit/Turret/CloseLoopPosition", new PitTurretCloseLoopPositionCommand(turretSubsystem));
     SmartDashboard.putData("Pit/Intake/Start", new PitIntakeOpenLoopCommand(intakeSubsystem));
     SmartDashboard.putData("Pit/Intake/Stop", new IntakeOpenLoopCommand(intakeSubsystem, 0.0));
+
+    // drive commands
+    SmartDashboard.putData(
+        "Pit/Drive/pathDrive", new DriveAutonCommand(driveSubsystem, "straightPath"));
+
+    // turret commands
     SmartDashboard.putData("Pit/Turret/Forward", new OpenLoopTurretCommand(turretSubsystem, 0.2));
     SmartDashboard.putData("Pit/Turret/Reverse", new OpenLoopTurretCommand(turretSubsystem, -0.2));
     SmartDashboard.putData("Pit/Turret/Stop", new OpenLoopTurretCommand(turretSubsystem, 0.0));
