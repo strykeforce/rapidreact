@@ -28,6 +28,7 @@ public class DriveAutonCommand extends CommandBase {
 
   @Override
   public void initialize() {
+    driveSubsystem.setEnableHolo(true);
     Pose2d initialPose = trajectory.getInitialPose();
     driveSubsystem.resetOdometry(
         new Pose2d(initialPose.getTranslation(), driveSubsystem.getGyroRotation2d()));
@@ -49,7 +50,9 @@ public class DriveAutonCommand extends CommandBase {
 
   @Override
   public void end(boolean interrupted) {
-    driveSubsystem.drive(0, 0, 0);
+    driveSubsystem.setEnableHolo(false);
+    driveSubsystem.calculateController(
+        trajectory.sample(trajectory.getTotalTimeSeconds()), robotHeading);
     driveSubsystem.grapherTrajectoryActive(false);
     logger.info("End Trajectory: {}", timer.get());
   }

@@ -39,6 +39,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private static final Logger logger = LoggerFactory.getLogger(DriveSubsystem.class);
   private final SwerveDrive swerveDrive;
   private final HolonomicDriveController holonomicController;
+  private final ProfiledPIDController omegaController;
+  private final PIDController xController;
+  private final PIDController yController;
 
   // Grapher Variables
   private ChassisSpeeds holoContOutput = new ChassisSpeeds();
@@ -86,21 +89,21 @@ public class DriveSubsystem extends MeasurableSubsystem {
     swerveDrive.setGyroOffset(Rotation2d.fromDegrees(180));
 
     // Setup Holonomic Controller
-    ProfiledPIDController omegaCont =
+    omegaController =
         new ProfiledPIDController(
             DriveConstants.kPOmega,
             DriveConstants.kIOmega,
             DriveConstants.kDOmega,
             new TrapezoidProfile.Constraints(
                 DriveConstants.kMaxOmega, DriveConstants.kMaxAccelOmega));
-    omegaCont.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
-    holonomicController =
-        new HolonomicDriveController(
-            new PIDController(
-                DriveConstants.kPHolonomic, DriveConstants.kIHolonomic, DriveConstants.kDHolonomic),
-            new PIDController(
-                DriveConstants.kPHolonomic, DriveConstants.kIHolonomic, DriveConstants.kDHolonomic),
-            omegaCont);
+    omegaController.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
+    xController =
+        new PIDController(
+            DriveConstants.kPHolonomic, DriveConstants.kIHolonomic, DriveConstants.kDHolonomic);
+    yController =
+        new PIDController(
+            DriveConstants.kPHolonomic, DriveConstants.kIHolonomic, DriveConstants.kDHolonomic);
+    holonomicController = new HolonomicDriveController(xController, yController, omegaController);
     // Disabling the holonomic controller makes the robot directly follow the trajectory output (no
     // closing the loop on x,y,theta errors)
     holonomicController.setEnabled(true);
@@ -139,6 +142,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public void resetOdometry(Pose2d pose) {
     swerveDrive.resetOdometry(pose);
+    xController.reset();
+    yController.reset();
+    omegaController.reset(pose.getRotation().getRadians());
     logger.info("reset odometry with: {}", pose);
   }
 
@@ -205,6 +211,11 @@ public class DriveSubsystem extends MeasurableSubsystem {
         holoContOutput.vyMetersPerSecond,
         holoContOutput.omegaRadiansPerSecond,
         false);
+  }
+
+  public void setEnableHolo(boolean enabled) {
+    holonomicController.setEnabled(enabled);
+    logger.info("Holonomic Controller Enabled: {}", enabled);
   }
 
   // Make whether a trajectory is currently active obvious on grapher
