@@ -7,16 +7,13 @@ import frc.robot.commands.vision.EnableVisionCommand;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
-public class TurretAimCommandGroup extends SequentialCommandGroup{
-    public TurretAimCommandGroup (VisionSubsystem visionSubsystem, TurretSubsystem turretSubsystem) {
-        addRequirements(visionSubsystem, turretSubsystem);
-        addCommands(
-            new EnableVisionCommand(visionSubsystem),
-            new WaitCommand(1.0),
-            new TurretAimCommand(visionSubsystem, turretSubsystem),
-            new DisableVisionCommand(visionSubsystem)
-        );
-
-    }
-    
+public class TurretAimCommandGroup extends SequentialCommandGroup {
+  public TurretAimCommandGroup(VisionSubsystem visionSubsystem, TurretSubsystem turretSubsystem) {
+    addRequirements(visionSubsystem, turretSubsystem);
+    addCommands(
+        new EnableVisionCommand(visionSubsystem),
+        new WaitCommand(1.0),
+        new TurretAimCommand(visionSubsystem, turretSubsystem),
+        new DisableVisionCommand(visionSubsystem));
+  }
 }
