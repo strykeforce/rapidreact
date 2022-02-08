@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.strykeforce.deadeye.Deadeye;
 import org.strykeforce.deadeye.TargetDataListener;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
@@ -12,6 +14,7 @@ public class VisionSubsystem extends MeasurableSubsystem
 
   private final Deadeye<HubTargetData> deadeye;
   private volatile HubTargetData targetData = new HubTargetData();
+  private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   public VisionSubsystem() {
     deadeye = new Deadeye<>("C0", HubTargetData.class);
@@ -22,6 +25,7 @@ public class VisionSubsystem extends MeasurableSubsystem
   @Override
   public void onTargetData(HubTargetData targetData) {
     this.targetData = targetData;
+    logger.debug("{}", targetData);
   }
 
   public HubTargetData getTargetData() {

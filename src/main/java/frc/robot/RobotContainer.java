@@ -25,6 +25,8 @@ import frc.robot.commands.shooter.PitShooterOpenLoopCommand;
 import frc.robot.commands.shooter.ShooterOpenLoopCommand;
 import frc.robot.commands.turret.OpenLoopTurretCommand;
 import frc.robot.commands.turret.PitTurretCloseLoopPositionCommand;
+import frc.robot.commands.turret.TurretAimCommand;
+import frc.robot.commands.turret.TurretAimCommandGroup;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
@@ -80,6 +82,8 @@ public class RobotContainer {
         .whenPressed(new ZeroGyroCommand(driveSubsystem));
     new JoystickButton(driveJoystick, Button.HAMBURGER.id)
         .whenPressed(new DriveAutonCommand(driveSubsystem, "straightPath", 0.0));
+    new JoystickButton(driveJoystick, Button.DOWN.id)
+        .whenPressed(new TurretAimCommandGroup(visionSubsystem, turretSubsystem));
   }
 
   private void configurePitDashboard() {
@@ -118,6 +122,7 @@ public class RobotContainer {
     SmartDashboard.putData("Pit/Turret/Forward", new OpenLoopTurretCommand(turretSubsystem, 0.2));
     SmartDashboard.putData("Pit/Turret/Reverse", new OpenLoopTurretCommand(turretSubsystem, -0.2));
     SmartDashboard.putData("Pit/Turret/Stop", new OpenLoopTurretCommand(turretSubsystem, 0.0));
+    //SmartDashboard.putData("Pit/Turret/AimTurret", new TurretAimCommand(visionSubsystem, turretSubsystem));
   }
 
   public enum Axis {

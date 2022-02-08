@@ -10,9 +10,10 @@ import org.slf4j.LoggerFactory;
 
 public class TurretAimCommand extends CommandBase {
 
+  public static final Logger logger = LoggerFactory.getLogger(TurretAimCommand.class);
   private final VisionSubsystem visionSubsystem;
   private final TurretSubsystem turretSubsystem;
-  public static final Logger logger = LoggerFactory.getLogger(TurretAimCommand.class);
+  private boolean valid;
 
   public TurretAimCommand(VisionSubsystem visionSubsystem, TurretSubsystem turretSubsystem) {
     addRequirements(turretSubsystem, visionSubsystem);
@@ -25,9 +26,10 @@ public class TurretAimCommand extends CommandBase {
     HubTargetData targetData = visionSubsystem.getTargetData();
     if (!targetData.isValid()) {
       logger.warn("target data invalid: {}", targetData);
-      cancel();
+      valid = false;
       return;
     }
+    valid = true;
 
     Rotation2d rotationError = targetData.getErrorRotation2d();
     turretSubsystem.rotateTurret(rotationError);
@@ -36,7 +38,7 @@ public class TurretAimCommand extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return turretSubsystem.isRotationFinished();
+    return turretSubsystem.isRotationFinished() || !valid;
   }
 
   @Override
