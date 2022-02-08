@@ -62,8 +62,8 @@ public final class Constants {
     }
 
     public static Translation2d[] getWheelLocationMeters() {
-      final double x = 0.5461 / 2.0; // front-back, was ROBOT_LENGTH
-      final double y = 0.6477 / 2.0; // left-right, was ROBOT_WIDTH
+      final double x = 0.6477 / 2.0; // front-back, was ROBOT_LENGTH
+      final double y = 0.5461 / 2.0; // left-right, was ROBOT_WIDTH
       Translation2d[] locs = new Translation2d[4];
       locs[0] = new Translation2d(x, y); // left front
       locs[1] = new Translation2d(x, -y); // right front
@@ -121,8 +121,8 @@ public final class Constants {
     // Holonomic Controller Constants
     public static final double kPHolonomic = 6.0;
     public static final double kIHolonomic = 0.0;
-
     public static final double kDHolonomic = kPHolonomic / 100.0;
+
     public static final double kPOmega = 2.5;
     public static final double kIOmega = 0.0;
     public static final double kDOmega = 0.0;
