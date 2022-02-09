@@ -25,7 +25,6 @@ public class VisionSubsystem extends MeasurableSubsystem
   @Override
   public void onTargetData(HubTargetData targetData) {
     this.targetData = targetData;
-    logger.debug("{}", targetData);
   }
 
   public HubTargetData getTargetData() {

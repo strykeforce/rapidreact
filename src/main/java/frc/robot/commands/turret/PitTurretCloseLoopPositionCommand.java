@@ -21,7 +21,7 @@ public class PitTurretCloseLoopPositionCommand extends CommandBase {
             SmartDashboard.getNumber(
                 SmartDashboardConstants.kTurretSetpointRadians,
                 turretSubsystem.getRotation2d().getRadians()));
-    turretSubsystem.rotateTo(desired);
+    turretSubsystem.rotateTurret(desired);
   }
 
   @Override

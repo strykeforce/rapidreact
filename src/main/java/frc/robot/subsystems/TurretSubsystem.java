@@ -50,12 +50,20 @@ public class TurretSubsystem extends MeasurableSubsystem {
 
   public void rotateTurret(Rotation2d errorRotation2d) {
     Rotation2d targetAngle =
-        new Rotation2d(turret.getSelectedSensorPosition() / kTurretTicksPerRadian); // current angle
-    targetAngle
-        .plus(errorRotation2d)
-        .plus(
-            Rotation2d.fromDegrees(
-                Constants.VisionConstants.kHorizAngleCorrection)); // target angle
+        new Rotation2d(
+            turret.getSelectedSensorPosition() / kTurretTicksPerRadian
+                + errorRotation2d.getRadians()
+                + 0.0436332); // TEMPORARY Rotation2d.plus() was not working correctly
+
+    // Rotation2d targetAngle =
+    //     new Rotation2d(turret.getSelectedSensorPosition() / kTurretTicksPerRadian); // current
+    // angle
+    // double temp = targetAngle.getRadians() + errorRotation2d.getRadians() + 0.0436332;
+    // targetAngle.plus(errorRotation2d);
+    // targetAngle.plus(
+    //     Rotation2d.fromDegrees(
+    //         Constants.VisionConstants.kHorizAngleCorrection)); // target angle
+
     if (targetAngle.getDegrees() <= kWrapRange
             && turret.getSelectedSensorPosition() > kTurretMidpoint
         || targetAngle.getDegrees() < 0) {
