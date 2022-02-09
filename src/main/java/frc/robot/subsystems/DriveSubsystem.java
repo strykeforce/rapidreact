@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import static frc.robot.Constants.kTalonConfigTimeout;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -12,7 +13,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
@@ -44,7 +44,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private final ProfiledPIDController omegaController;
   private final PIDController xController;
   private final PIDController yController;
-
+  private double[] desiredAzimuthPositions = new double[4];
   // Grapher Variables
   private ChassisSpeeds holoContOutput = new ChassisSpeeds();
   private State holoContInput = new State();
@@ -139,13 +139,28 @@ public class DriveSubsystem extends MeasurableSubsystem {
   }
 
   public void lockZero() {
-    SwerveModuleState[] zeroState = new SwerveModuleState[4];
+    SwerveModule[] swerveModules = swerveDrive.getSwerveModules();
     for (int i = 0; i < 4; i++) {
-      zeroState[i] = new SwerveModuleState(0.0, Rotation2d.fromDegrees(0.0));
+      TalonSwerveModule module = (TalonSwerveModule) swerveModules[i];
+      TalonSRX azimuth = module.getAzimuthTalon();
+      azimuth.set(ControlMode.MotionMagic, 0.0);
+      desiredAzimuthPositions[i] = 0.0;
     }
 
-    swerveDrive.setModuleStates(zeroState);
     logger.info("Locking wheels to zero");
+  }
+
+  public boolean isAzimuthAtTarget() {
+    SwerveModule[] swerveModules = swerveDrive.getSwerveModules();
+    for (int i = 0; i < 4; i++) {
+      TalonSwerveModule module = (TalonSwerveModule) swerveModules[i];
+      TalonSRX azimuth = module.getAzimuthTalon();
+      if (Math.abs(azimuth.getSelectedSensorPosition() - desiredAzimuthPositions[i])
+          > DriveConstants.kCloseEnoughTicks) {
+        return false;
+      }
+    }
+    return true;
   }
 
   public Rotation2d getGyroRotation2d() {
