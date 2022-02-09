@@ -32,6 +32,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
 
   public TurretSubsystem() {
     configTalons();
+    zeroTurret();
   }
 
   private void configTalons() {

@@ -58,7 +58,6 @@ public class RobotContainer {
     configureTelemetry();
     configureDriverButtonBindings();
     configurePitDashboard();
-    turretSubsystem.zeroTurret();
   }
 
   private void configureTelemetry() {
