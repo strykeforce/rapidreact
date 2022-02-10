@@ -35,3 +35,5 @@ target_link_libraries(Deadeye_daemon
         Deadeye::library
         )
 
+include(GNUInstallDirs)
+install(TARGETS Deadeye_daemon DESTINATION ${CMAKE_INSTALL_BINDIR})
