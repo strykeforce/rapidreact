@@ -10,7 +10,7 @@ all:
       ansible_host: 10.27.67.12
       deadeye_unit: C
       deadeye_build_type: Release
-      camera_0_pipeline: deadeye::TargetListPipeline
+      camera_0_pipeline: rr::HubPipeline
       deadeye_spdlog_level: debug
     deadeye-f:
       ansible_host: 100.68.77.59
