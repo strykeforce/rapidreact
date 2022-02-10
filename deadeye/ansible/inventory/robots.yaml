@@ -1,0 +1,9 @@
+---
+all:
+  hosts:
+    deadeye-f:
+      ansible_host: 100.68.77.59
+      deadeye_unit: F
+  vars:
+    ansible_user: deadeye
+    ansible_become: true

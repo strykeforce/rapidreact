@@ -1,0 +1,41 @@
+---
+- name: Deploy Deadeye
+  hosts: all
+  tasks:
+    - name: Disable default Deadeye daemon
+      ansible.builtin.systemd:
+        name: deadeye-daemon.service
+        state: stopped
+        enabled: false
+    - name: Ensure .ssh directory exists
+      ansible.builtin.file:
+        dest: "{{ github_key_dest | dirname }}"
+        mode: 0700
+        owner: root
+        state: directory
+    - name: Install ssh key
+      ansible.builtin.copy:
+        src: "{{ github_key_src }}"
+        dest: "{{ github_key_dest }}"
+        mode: 0600
+        owner: root
+    - name: Clone Rapid React repo
+      ansible.builtin.git:
+        repo: "{{ deadeye_repo }}"
+        dest: "{{ deadeye_src }}"
+        version: "{{ deadeye_version }}"
+        accept_newhostkey: true
+        key_file: "{{ github_key_dest }}"
+      register: deadeye_repo
+    - name: Create build directory
+      ansible.builtin.file:
+        path: "{{ deadeye_src }}/deadeye/build"
+        state: directory
+        mode: 0775
+  vars:
+    deadeye_src: /opt/deadeye_rapid_react/src
+    deadeye_repo: git@github.com:strykeforce/rapidreact.git
+    deadeye_version: HEAD
+    github_key_src: ../files/rapid_react_id_ed25519
+    github_key_dest: /home/root/.ssh/rapid_react_id_ed25519
+
