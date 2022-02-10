@@ -50,12 +50,14 @@
           - -DDEADEYE_CAMERA3_PIPELINE={{ camera_3_pipeline }}
           - -DDEADEYE_CAMERA4_PIPELINE={{ camera_4_pipeline }}
           - "{{ deadeye_dir }}/src/deadeye"
+      when: deadeye_repo is changed
     - name: Build and Install
       ansible.builtin.command:
         chdir: "{{ deadeye_build }}"
         argv:
           - /usr/bin/ninja
           - install
+      when: deadeye_repo is changed
     - name: Install systemd unit
       ansible.builtin.template:
         src: ../files/{{ deadeye_service }}.j2
