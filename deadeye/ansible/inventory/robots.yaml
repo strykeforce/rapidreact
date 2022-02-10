@@ -4,6 +4,18 @@ all:
     deadeye-f:
       ansible_host: 100.68.77.59
       deadeye_unit: F
+      deadeye_build_type: Debug
+      camera_0_pipeline: rr::HubPipeline
+      deadeye_nt_server: 192.168.1.30
+      deadeye_spdlog_level: debug
   vars:
     ansible_user: deadeye
     ansible_become: true
+    camera_0_pipeline:
+    camera_1_pipeline:
+    camera_2_pipeline:
+    camera_3_pipeline:
+    camera_4_pipeline:
+    deadeye_build_type: Release
+    deadeye_nt_server: 10.27.67.2
+    deadeye_spdlog_level: info
