@@ -1,9 +1,9 @@
 package frc.robot.commands.drive;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.DriveSubsystem;
 
-public class LockZeroCommand extends CommandBase {
+public class LockZeroCommand extends InstantCommand {
   private final DriveSubsystem driveSubsystem;
 
   public LockZeroCommand(DriveSubsystem driveSubsystem) {
@@ -14,10 +14,5 @@ public class LockZeroCommand extends CommandBase {
   @Override
   public void initialize() {
     driveSubsystem.lockZero();
-  }
-
-  @Override
-  public boolean isFinished() {
-    return driveSubsystem.isAzimuthAtTarget();
   }
 }

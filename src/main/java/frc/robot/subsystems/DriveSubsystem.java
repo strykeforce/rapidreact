@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import static frc.robot.Constants.kTalonConfigTimeout;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -13,6 +12,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
@@ -139,12 +139,17 @@ public class DriveSubsystem extends MeasurableSubsystem {
   }
 
   public void lockZero() {
-    SwerveModule[] swerveModules = swerveDrive.getSwerveModules();
+    // SwerveModule[] swerveModules = swerveDrive.getSwerveModules();
+    // for (int i = 0; i < 4; i++) {
+    //   TalonSwerveModule module = (TalonSwerveModule) swerveModules[i];
+    //   TalonSRX azimuth = module.getAzimuthTalon();
+    //   azimuth.set(ControlMode.MotionMagic, 0.0);
+    //   desiredAzimuthPositions[i] = 0.0;
+    // }
+
+    TalonSwerveModule[] swerveModules = (TalonSwerveModule[]) swerveDrive.getSwerveModules();
     for (int i = 0; i < 4; i++) {
-      TalonSwerveModule module = (TalonSwerveModule) swerveModules[i];
-      TalonSRX azimuth = module.getAzimuthTalon();
-      azimuth.set(ControlMode.MotionMagic, 0.0);
-      desiredAzimuthPositions[i] = 0.0;
+      swerveModules[i].setDesiredState(new SwerveModuleState(0.05, Rotation2d.fromDegrees(0.0)));
     }
 
     logger.info("Locking wheels to zero");
@@ -161,6 +166,16 @@ public class DriveSubsystem extends MeasurableSubsystem {
       }
     }
     return true;
+  }
+
+  private SwerveModuleState[] getSwerveModuleStates() {
+    TalonSwerveModule[] swerveModules = (TalonSwerveModule[]) swerveDrive.getSwerveModules();
+    SwerveModuleState[] swerveModuleStates = new SwerveModuleState[4];
+    for (int i = 0; i < 4; i++) {
+      swerveModuleStates[i] = swerveModules[i].getState();
+    }
+
+    return swerveModuleStates;
   }
 
   public Rotation2d getGyroRotation2d() {
@@ -277,6 +292,14 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure("Holonomic Cont Vx", () -> holoContOutput.vxMetersPerSecond),
         new Measure("Holonomic Cont Vy", () -> holoContOutput.vyMetersPerSecond),
         new Measure("Holonomic Cont Vomega", () -> holoContOutput.omegaRadiansPerSecond),
-        new Measure("Trajectory Active", () -> trajectoryActive));
+        new Measure("Trajectory Active", () -> trajectoryActive),
+        new Measure("Wheel 0 Angle", () -> getSwerveModuleStates()[0].angle.getDegrees()),
+        new Measure("Wheel 0 Speed", () -> getSwerveModuleStates()[0].speedMetersPerSecond),
+        new Measure("Wheel 1 Angle", () -> getSwerveModuleStates()[1].angle.getDegrees()),
+        new Measure("Wheel 1 Speed", () -> getSwerveModuleStates()[1].speedMetersPerSecond),
+        new Measure("Wheel 2 Angle", () -> getSwerveModuleStates()[2].angle.getDegrees()),
+        new Measure("Wheel 2 Speed", () -> getSwerveModuleStates()[2].speedMetersPerSecond),
+        new Measure("Wheel 3 Angle", () -> getSwerveModuleStates()[3].angle.getDegrees()),
+        new Measure("Wheel 3 Speed", () -> getSwerveModuleStates()[3].speedMetersPerSecond));
   }
 }
