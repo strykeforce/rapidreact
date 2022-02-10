@@ -5,7 +5,7 @@ namespace rr {
 
 class HubPipeline : public deadeye::AbstractPipeline {
  public:
-  HubPipeline(int inum, std::string name);
+  [[maybe_unused]] HubPipeline(int inum, std::string name);
 
   void Configure(const deadeye::CaptureConfig& config) override;
 

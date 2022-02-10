@@ -7,10 +7,11 @@
 using json = nlohmann::json;
 
 namespace rr {
+using TargetList = std::vector<std::array<int, 5>>;
 struct HubTargetData : public deadeye::TargetData {
-  cv::Rect bb;
-  cv::Point center;
-  HubTargetData(std::string id, int sn, bool valid, cv::Rect bb);
+  TargetList targets;
+
+  HubTargetData(std::string id, int sn, bool valid, TargetList targets);
 
   void DrawMarkers(cv::Mat& preview) const override;
   [[nodiscard]] std::string Dump() const override;
