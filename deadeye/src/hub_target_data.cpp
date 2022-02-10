@@ -13,7 +13,8 @@ using json = nlohmann::json;
 namespace {
 // minimum datagram size: IPv4 = 576 IPv6 = 1280
 constexpr int MAX_SERIALIZED_SIZE = 1000;
-const cv::Scalar BB_COLOR{20, 255, 20};  // NOLINT
+const cv::Scalar BB_COLOR{20, 255, 20};            // NOLINT
+const cv::Scalar CROSS_HAIR_COLOR{200, 200, 200};  // NOLINT
 }  // namespace
 
 HubTargetData::HubTargetData(std::string id, int sn, bool valid,
@@ -25,6 +26,9 @@ void HubTargetData::DrawMarkers(cv::Mat& preview) const {
     cv::Rect bb{t[0], t[1], t[2], t[3]};
     cv::rectangle(preview, bb, BB_COLOR, 2);
   }
+  int center = preview.cols / 2;
+  cv::line(preview, cv::Point{center, 0}, cv::Point{center, preview.rows},
+           CROSS_HAIR_COLOR);
 }
 
 #pragma clang diagnostic push
