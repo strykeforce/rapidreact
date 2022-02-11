@@ -177,29 +177,26 @@ public class TurretSubsystem extends MeasurableSubsystem {
       case SEEKING:
         // FIXME implement seek state
       case AIMING:
-        targetData = visionSubsystem.getTargetData();
-        if (!targetData.isValid()) {
-          currentState = TurretState.SEEKING;
-          logger.info("AIMING -> SEEKING: {}", targetData);
-          break;
-        }
-        errorRotation2d = targetData.getErrorRotation2d();
-        rotateBy(errorRotation2d);
-        if (Math.abs(errorRotation2d.getRadians())
-            < TurretConstants.kCloseEnoughTarget.getRadians()) {
-          currentState = TurretState.TRACKING;
-          logger.info("AIMING -> TRACKING");
-        }
-        break;
       case TRACKING:
         targetData = visionSubsystem.getTargetData();
         if (!targetData.isValid()) {
+          logger.info("{} -> SEEKING: {}", currentState, targetData);
           currentState = TurretState.SEEKING;
-          logger.info("TRACKING -> SEEKING: {}", targetData);
           break;
         }
+
         errorRotation2d = targetData.getErrorRotation2d();
         rotateBy(errorRotation2d);
+
+        // TRACKING, fine... stay in TRACKING
+        if (currentState == TurretState.TRACKING) break;
+
+        // AIMING, lets go to TRACKING! (we can just have a TRACKING state ¯\_(ツ)_/¯ )
+        if (Math.abs(errorRotation2d.getRadians())
+            < TurretConstants.kCloseEnoughTarget.getRadians()) {
+          logger.info("{} -> TRACKING", currentState);
+          currentState = TurretState.TRACKING;
+        }
         break;
       case IDLE:
         // do nothing
