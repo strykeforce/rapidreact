@@ -64,11 +64,10 @@
         dest: /etc/systemd/system/{{ deadeye_service }}
         mode: 0664
         owner: root
-    - name: Start systemd unit
+    - name: Enable systemd unit
       ansible.builtin.systemd:
         name: "{{ deadeye_service }}"
         enabled: true
-        state: restarted
   vars:
     deadeye_dir: /opt/rapid_react
     deadeye_src: "{{ deadeye_dir }}/src"
