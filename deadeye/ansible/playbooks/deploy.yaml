@@ -57,6 +57,7 @@
       ansible.builtin.systemd:
         name: "{{ deadeye_service }}"
         enabled: true
+        state: restarted
   vars:
     deadeye_dir: /opt/rapid_react
     deadeye_repo: git@github.com:strykeforce/rapidreact.git
