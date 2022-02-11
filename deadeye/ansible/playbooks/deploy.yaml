@@ -11,6 +11,8 @@
       ansible.posix.synchronize:
         src: ../../../../deadeye
         dest: "{{ deadeye_dir }}/src"
+        times: false
+        checksum: true
         delete: true
         rsync_opts:
           - "--exclude ansible/"
