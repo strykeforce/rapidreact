@@ -139,33 +139,26 @@ public class DriveSubsystem extends MeasurableSubsystem {
   }
 
   public void lockZero() {
-    // SwerveModule[] swerveModules = swerveDrive.getSwerveModules();
-    // for (int i = 0; i < 4; i++) {
-    //   TalonSwerveModule module = (TalonSwerveModule) swerveModules[i];
-    //   TalonSRX azimuth = module.getAzimuthTalon();
-    //   azimuth.set(ControlMode.MotionMagic, 0.0);
-    //   desiredAzimuthPositions[i] = 0.0;
-    // }
-
-    TalonSwerveModule[] swerveModules = (TalonSwerveModule[]) swerveDrive.getSwerveModules();
+    SwerveModule[] swerveModules = swerveDrive.getSwerveModules();
     for (int i = 0; i < 4; i++) {
-      swerveModules[i].setDesiredState(new SwerveModuleState(0.05, Rotation2d.fromDegrees(0.0)));
+      swerveModules[i].setAzimuthRotation2d(Rotation2d.fromDegrees(0.0));
     }
 
     logger.info("Locking wheels to zero");
   }
 
-  public boolean isAzimuthAtTarget() {
+  public void xLock() {
     SwerveModule[] swerveModules = swerveDrive.getSwerveModules();
     for (int i = 0; i < 4; i++) {
-      TalonSwerveModule module = (TalonSwerveModule) swerveModules[i];
-      TalonSRX azimuth = module.getAzimuthTalon();
-      if (Math.abs(azimuth.getSelectedSensorPosition() - desiredAzimuthPositions[i])
-          > DriveConstants.kCloseEnoughTicks) {
-        return false;
+      if (i == 1 || i == 2) {
+        swerveModules[i].setAzimuthRotation2d(Rotation2d.fromDegrees(-45.0));
+      }
+      if (i == 0 || i == 3) {
+        swerveModules[i].setAzimuthRotation2d(Rotation2d.fromDegrees(45.0));
       }
     }
-    return true;
+
+    logger.info("Locking wheels to X");
   }
 
   private SwerveModuleState[] getSwerveModuleStates() {
