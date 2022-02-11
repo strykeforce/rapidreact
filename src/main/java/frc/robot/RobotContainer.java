@@ -48,8 +48,8 @@ public class RobotContainer {
   private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
   private final MagazineSubsystem magazineSubsystem = new MagazineSubsystem();
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
-  private final TurretSubsystem turretSubsystem = new TurretSubsystem();
   private final VisionSubsystem visionSubsystem = new VisionSubsystem();
+  private final TurretSubsystem turretSubsystem = new TurretSubsystem(visionSubsystem);
   private TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
   private Joystick driveJoystick = new Joystick(0);
 

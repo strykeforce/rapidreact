@@ -12,8 +12,8 @@ public class TurretAimCommandGroup extends SequentialCommandGroup {
     addRequirements(visionSubsystem, turretSubsystem);
     addCommands(
         new EnableVisionCommand(visionSubsystem),
-        new WaitCommand(1.0),
-        new TurretAimCommand(visionSubsystem, turretSubsystem),
+        new WaitCommand(0.5),
+        new TurretAimCommand(turretSubsystem),
         new DisableVisionCommand(visionSubsystem));
   }
 }

@@ -29,8 +29,10 @@ public class TurretSubsystem extends MeasurableSubsystem {
   private int turretStableCounts = 0;
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
   private TurretState currentState = TurretState.IDLE;
+  private final VisionSubsystem visionSubsystem;
 
-  public TurretSubsystem() {
+  public TurretSubsystem(VisionSubsystem visionSubsystem) {
+    this.visionSubsystem = visionSubsystem;
     configTalons();
   }
 
@@ -48,28 +50,26 @@ public class TurretSubsystem extends MeasurableSubsystem {
     return List.of(turret);
   }
 
-  public void rotateTurret(Rotation2d errorRotation2d) {
-    Rotation2d targetAngle =
-        new Rotation2d(
-            turret.getSelectedSensorPosition() / kTurretTicksPerRadian
-                + errorRotation2d.getRadians()
-                + 0.0436332); // TEMPORARY Rotation2d.plus() was not working correctly
-
+  public void rotateBy(Rotation2d errorRotation2d) {
     // Rotation2d targetAngle =
-    //     new Rotation2d(turret.getSelectedSensorPosition() / kTurretTicksPerRadian); // current
-    // angle
-    // double temp = targetAngle.getRadians() + errorRotation2d.getRadians() + 0.0436332;
-    // targetAngle.plus(errorRotation2d);
-    // targetAngle.plus(
-    //     Rotation2d.fromDegrees(
-    //         Constants.VisionConstants.kHorizAngleCorrection)); // target angle
+    //     new Rotation2d(
+    //         turret.getSelectedSensorPosition() / kTurretTicksPerRadian
+    //             + errorRotation2d.getRadians()
+    //             + 0.0436332); // TEMPORARY Rotation2d.plus() was not working correctly
 
+    Rotation2d targetAngle =
+        new Rotation2d(turret.getSelectedSensorPosition() / kTurretTicksPerRadian); // current angle
+    targetAngle = targetAngle.plus(errorRotation2d);
+    targetAngle = targetAngle.plus(
+        Rotation2d.fromDegrees(
+            Constants.VisionConstants.kHorizAngleCorrectionDegrees)); // target angle
+
+    // FIXME wraprange caluclation
     if (targetAngle.getDegrees() <= kWrapRange
             && turret.getSelectedSensorPosition() > kTurretMidpoint
         || targetAngle.getDegrees() < 0) {
-      targetAngle.plus(Rotation2d.fromDegrees(360)); // add 360 deg
+          targetAngle = targetAngle.plus(Rotation2d.fromDegrees(360)); // add 360 deg
     }
-    targetAngle.times(kTurretTicksPerRadian); // setpoint
     rotateTo(targetAngle);
   }
 
@@ -108,7 +108,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
   public boolean isRotationFinished() {
     double currentTurretPosition = turret.getSelectedSensorPosition();
     if (Math.abs(targetTurretPosition - currentTurretPosition)
-        > Constants.TurretConstants.kCloseEnoughTurret) {
+        > Constants.TurretConstants.kCloseEnoughTicks) {
       turretStableCounts = 0;
     } else {
       turretStableCounts++;
@@ -153,14 +153,53 @@ public class TurretSubsystem extends MeasurableSubsystem {
     return didZero;
   }
 
+  public TurretState getState() {
+    return currentState;
+  }
+
+  public void trackTarget() {
+    logger.info("Started tracking target");
+    currentState = TurretState.SEEKING;
+  }
+
+  public void stopTrackingTarget() {
+    logger.info("switching to IDLE state");
+    currentState = TurretState.IDLE;
+  }
+
   @Override
   public void periodic() {
+    HubTargetData targetData;
+    Rotation2d errorRotation2d;
     switch (currentState) {
+      case SEEKING:
+        // FIXME implement seek state
       case AIMING:
+        targetData = visionSubsystem.getTargetData();
+        if (!targetData.isValid()) {
+          currentState = TurretState.SEEKING;
+          logger.info("AIMING -> SEEKING: {}", targetData);
+          break;
+        }
+        errorRotation2d = targetData.getErrorRotation2d();
+        rotateBy(errorRotation2d);
+        if (Math.abs(errorRotation2d.getRadians()) < TurretConstants.kCloseEnoughTarget.getRadians()) {
+          currentState = TurretState.TRACKING;
+          logger.info("AIMING -> TRACKING");
+        }
         break;
-      case AIMING_DONE:
+      case TRACKING:
+        targetData = visionSubsystem.getTargetData();
+        if (!targetData.isValid()) {
+          currentState = TurretState.SEEKING;
+          logger.info("TRACKING -> SEEKING: {}", targetData);
+          break;
+        }
+        errorRotation2d = targetData.getErrorRotation2d();
+        rotateBy(errorRotation2d);
         break;
       case IDLE:
+        // do nothing
         break;
       default:
         break;
@@ -168,8 +207,9 @@ public class TurretSubsystem extends MeasurableSubsystem {
   }
 
   public enum TurretState {
+    SEEKING,
     AIMING,
-    AIMING_DONE,
+    TRACKING,
     IDLE
   }
 }

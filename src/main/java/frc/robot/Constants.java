@@ -11,6 +11,8 @@ import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
+
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.util.Color;
 
@@ -152,7 +154,7 @@ public final class Constants {
     public static final int kShooterIndex = 2;
     public static final int kHoodIndex = 3;
     // + is left
-    public static final double kHorizAngleCorrection = 2.5; // 2.5
+    public static final double kHorizAngleCorrectionDegrees = 2.5; // 2.5 degrees
     // + is further along track and lower
     public static final int kHoodInchesCorrectionR1 = 13; // 8-15 feet (was 20)
     public static final int kHoodInchesCorrectionR2 = 13; // 15-19 feet (old 10)
@@ -173,7 +175,8 @@ public final class Constants {
     public static int kTurretZeroTicks = 1931;
     public static final int kForwardLimit = 26095; // 26000
     public static final int kReverseLimit = -100;
-    public static final int kCloseEnoughTurret = 40;
+    public static final int kCloseEnoughTicks = 40;
+    public static final Rotation2d kCloseEnoughTarget = Rotation2d.fromDegrees(1);
     public static final double kMaxStringPotZero = 100;
     public static final double kMinStringPotZero = 0;
     public static final int kTurretId = 42;
