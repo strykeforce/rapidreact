@@ -61,15 +61,16 @@ public class TurretSubsystem extends MeasurableSubsystem {
     Rotation2d targetAngle =
         new Rotation2d(turret.getSelectedSensorPosition() / kTurretTicksPerRadian); // current angle
     targetAngle = targetAngle.plus(errorRotation2d);
-    targetAngle = targetAngle.plus(
-        Rotation2d.fromDegrees(
-            Constants.VisionConstants.kHorizAngleCorrectionDegrees)); // target angle
+    targetAngle =
+        targetAngle.plus(
+            Rotation2d.fromDegrees(
+                Constants.VisionConstants.kHorizAngleCorrectionDegrees)); // target angle
 
     // FIXME wraprange caluclation
     if (targetAngle.getDegrees() <= kWrapRange
             && turret.getSelectedSensorPosition() > kTurretMidpoint
         || targetAngle.getDegrees() < 0) {
-          targetAngle = targetAngle.plus(Rotation2d.fromDegrees(360)); // add 360 deg
+      targetAngle = targetAngle.plus(Rotation2d.fromDegrees(360)); // add 360 deg
     }
     rotateTo(targetAngle);
   }
@@ -184,7 +185,8 @@ public class TurretSubsystem extends MeasurableSubsystem {
         }
         errorRotation2d = targetData.getErrorRotation2d();
         rotateBy(errorRotation2d);
-        if (Math.abs(errorRotation2d.getRadians()) < TurretConstants.kCloseEnoughTarget.getRadians()) {
+        if (Math.abs(errorRotation2d.getRadians())
+            < TurretConstants.kCloseEnoughTarget.getRadians()) {
           currentState = TurretState.TRACKING;
           logger.info("AIMING -> TRACKING");
         }

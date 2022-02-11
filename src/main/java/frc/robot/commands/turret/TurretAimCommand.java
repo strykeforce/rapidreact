@@ -1,12 +1,8 @@
 package frc.robot.commands.turret;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.HubTargetData;
 import frc.robot.subsystems.TurretSubsystem;
-import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.TurretSubsystem.TurretState;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
