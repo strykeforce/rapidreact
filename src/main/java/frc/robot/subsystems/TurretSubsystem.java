@@ -34,6 +34,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
   public TurretSubsystem(VisionSubsystem visionSubsystem) {
     this.visionSubsystem = visionSubsystem;
     configTalons();
+    zeroTurret();
   }
 
   private void configTalons() {

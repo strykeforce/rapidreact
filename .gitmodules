@@ -1,0 +1,3 @@
+[submodule "deadeye/deadeye"]
+	path = deadeye/deadeye
+	url = https://github.com/strykeforce/deadeye.git
