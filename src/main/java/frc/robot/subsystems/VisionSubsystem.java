@@ -44,7 +44,9 @@ public class VisionSubsystem extends MeasurableSubsystem
     return Set.of(
         new Measure("Error Pixels", this::getErrorPixels),
         new Measure("Error Radians", this::getErrorRadians),
-        new Measure("Error Degrees", this::getErrorDegrees));
+        new Measure("Error Degrees", this::getErrorDegrees),
+        new Measure("Target Data Valid", this::getValid),
+        new Measure("Target Data SN", () -> targetData.serial));
   }
 
   // these private getters are for the grapher and prevent a data race that can occur if targetData
@@ -62,5 +64,10 @@ public class VisionSubsystem extends MeasurableSubsystem
   private double getErrorDegrees() {
     var td = targetData;
     return td.isValid() ? Math.toDegrees(td.getErrorRadians()) : 2767.0;
+  }
+
+  private double getValid() {
+    var td = targetData;
+    return td.isValid() ? 1.0 : 0.0;
   }
 }

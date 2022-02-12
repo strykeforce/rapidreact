@@ -31,6 +31,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
   private TurretState currentState = TurretState.IDLE;
   private final VisionSubsystem visionSubsystem;
+  private int trackingStableCount;
 
   public TurretSubsystem(VisionSubsystem visionSubsystem) {
     this.visionSubsystem = visionSubsystem;
@@ -46,6 +47,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
     turret.enableCurrentLimit(false);
     turret.enableVoltageCompensation(true);
     turret.configSupplyCurrentLimit(Constants.TurretConstants.getSupplyCurrentLimitConfig());
+    //    turret.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 5);
   }
 
   public List<BaseTalon> getTalons() {
@@ -162,6 +164,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
   public void periodic() {
     HubTargetData targetData;
     Rotation2d errorRotation2d;
+    double rotateKp;
     switch (currentState) {
       case SEEKING:
         // FIXME implement seek state
@@ -176,16 +179,28 @@ public class TurretSubsystem extends MeasurableSubsystem {
           break;
         }
         errorRotation2d = targetData.getErrorRotation2d();
+        rotateBy(errorRotation2d.times(TurretConstants.kRotateByKp));
+
         if (Math.abs(errorRotation2d.getRadians())
-            >= TurretConstants.kCloseEnoughTarget.getRadians()) {
-          rotateBy(errorRotation2d);
+            < TurretConstants.kCloseEnoughTarget.getRadians()) {
+          trackingStableCount++;
+        } else {
+          trackingStableCount = 0;
         }
 
-        boolean isTracking =
-            Math.abs(errorRotation2d.getRadians())
-                < TurretConstants.kCloseEnoughTarget.getRadians();
-        TurretState nextState = isTracking ? TurretState.TRACKING : TurretState.AIMING;
-        if (currentState != nextState) logger.info("{} -> {}", currentState, nextState);
+        TurretState nextState;
+        if (trackingStableCount > TurretConstants.kRotateByStableCounts) {
+          nextState = TurretState.TRACKING;
+          rotateKp = 0.95;
+          //          rotateKp = TurretConstants.kRotateByKp;
+        } else {
+          nextState = TurretState.AIMING;
+          rotateKp = TurretConstants.kRotateByKp;
+        }
+
+        if (currentState != nextState) {
+          logger.info("{} -> {}", currentState, nextState);
+        }
         currentState = nextState;
         break;
       case IDLE:

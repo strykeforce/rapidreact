@@ -7,6 +7,7 @@ import com.squareup.moshi.JsonWriter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import okio.Buffer;
@@ -27,6 +28,7 @@ public class HubTargetData extends TargetListTargetData {
 
   public HubTargetData(@NotNull String id, int serial, boolean valid, @NotNull List<Rect> targets) {
     super(id, serial, valid, targets);
+    targets.sort(Comparator.comparingInt(r -> r.topLeft.x));
   }
 
   /**
@@ -60,7 +62,7 @@ public class HubTargetData extends TargetListTargetData {
    * @throws IndexOutOfBoundsException if the list of targets is empty
    */
   public double getErrorRadians() {
-    return -0.6 * kHorizonFov * getErrorPixels() / (kFrameCenter * 2);
+    return -kHorizonFov * getErrorPixels() / (kFrameCenter * 2);
   }
 
   /**

@@ -26,6 +26,7 @@ import frc.robot.commands.shooter.HoodOpenLoopCommand;
 import frc.robot.commands.shooter.PitHoodOpenLoopCommand;
 import frc.robot.commands.shooter.PitShooterOpenLoopCommand;
 import frc.robot.commands.shooter.ShooterOpenLoopCommand;
+import frc.robot.commands.turret.DeadeyeLatencyTestCommandGroup;
 import frc.robot.commands.turret.OpenLoopTurretCommand;
 import frc.robot.commands.turret.PitTurretCloseLoopPositionCommand;
 import frc.robot.commands.turret.TurretAimCommandGroup;
@@ -88,6 +89,8 @@ public class RobotContainer {
     new JoystickButton(driveJoystick, Button.DOWN.id)
         .whenPressed(new TurretAimCommandGroup(visionSubsystem, turretSubsystem));
     new JoystickButton(driveJoystick, Button.X.id).whenPressed(new XLockCommand(driveSubsystem));
+    new JoystickButton(driveJoystick, Button.UP.id)
+        .whenPressed(new DeadeyeLatencyTestCommandGroup(visionSubsystem, turretSubsystem));
   }
 
   private void configurePitDashboard() {
