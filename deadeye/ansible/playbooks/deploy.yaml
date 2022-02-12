@@ -7,34 +7,29 @@
         name: deadeye-daemon.service
         state: stopped
         enabled: false
-    - name: Ensure .ssh directory exists
+    - name: Remove default Deadeye systemd unit file
       ansible.builtin.file:
-        dest: "{{ github_key_dest | dirname }}"
-        mode: 0700
-        owner: root
-        state: directory
-    - name: Install ssh key
-      ansible.builtin.copy:
-        src: "{{ github_key_src }}"
-        dest: "{{ github_key_dest }}"
-        mode: 0600
-        owner: root
-    - name: Clone Rapid React repo
-      ansible.builtin.git:
-        repo: "{{ deadeye_repo }}"
-        dest: "{{ deadeye_src }}"
-        version: "{{ deadeye_version }}"
-        accept_hostkey: true
-        key_file: "{{ github_key_dest }}"
+        path: /etc/systemd/system/deadeye-daemon.service
+        state: absent
+    - name: Sync remote repo from local
+      ansible.posix.synchronize:
+        src: ../../../../deadeye
+        dest: "{{ deadeye_dir }}/src"
+        times: false
+        checksum: true
+        delete: true
+        rsync_opts:
+          - "--exclude ansible/"
+          - "--exclude *build*/"
       register: deadeye_repo
     - name: Create build directory
       ansible.builtin.file:
-        path: "{{ deadeye_build }}"
+        path: "{{ deadeye_dir }}/build"
         state: directory
         mode: 0775
     - name: Run cmake
       ansible.builtin.command:
-        chdir: "{{ deadeye_build }}"
+        chdir: "{{ deadeye_dir }}/build"
         argv:
           - /usr/bin/cmake
           - -GNinja
@@ -53,7 +48,7 @@
       when: deadeye_repo is changed
     - name: Build and Install
       ansible.builtin.command:
-        chdir: "{{ deadeye_build }}"
+        chdir: "{{ deadeye_dir }}/build"
         argv:
           - /usr/bin/ninja
           - install
@@ -64,15 +59,13 @@
         dest: /etc/systemd/system/{{ deadeye_service }}
         mode: 0664
         owner: root
-    - name: Start systemd unit
+    - name: Enable systemd unit
       ansible.builtin.systemd:
         name: "{{ deadeye_service }}"
         enabled: true
         state: restarted
   vars:
     deadeye_dir: /opt/rapid_react
-    deadeye_src: "{{ deadeye_dir }}/src"
-    deadeye_build: "{{ deadeye_dir }}/build"
     deadeye_repo: git@github.com:strykeforce/rapidreact.git
     deadeye_version: HEAD
     deadeye_conf_dir: /etc/opt/deadeye

@@ -12,6 +12,8 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.SmartDashboardConstants;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
+import frc.robot.commands.drive.LockZeroCommand;
+import frc.robot.commands.drive.XLockCommand;
 import frc.robot.commands.drive.ZeroGyroCommand;
 import frc.robot.commands.intake.IntakeOpenLoopCommand;
 import frc.robot.commands.intake.PitIntakeOpenLoopCommand;
@@ -85,6 +87,7 @@ public class RobotContainer {
         .whenPressed(new TwoPathCommandGroup(driveSubsystem, "straightPath", "straightPath2"));
     new JoystickButton(driveJoystick, Button.DOWN.id)
         .whenPressed(new TurretAimCommandGroup(visionSubsystem, turretSubsystem));
+    new JoystickButton(driveJoystick, Button.X.id).whenPressed(new XLockCommand(driveSubsystem));
   }
 
   private void configurePitDashboard() {
@@ -121,7 +124,8 @@ public class RobotContainer {
     SmartDashboard.putData("Pit/Intake/Start", new PitIntakeOpenLoopCommand(intakeSubsystem));
     SmartDashboard.putData("Pit/Intake/Stop", new IntakeOpenLoopCommand(intakeSubsystem, 0.0));
 
-    // drive commands
+    // Drive commands
+    SmartDashboard.putData("Pit/Drive/LockZero", new LockZeroCommand(driveSubsystem));
     SmartDashboard.putData(
         "Pit/Drive/pathDrive", new DriveAutonCommand(driveSubsystem, "straightPath"));
 

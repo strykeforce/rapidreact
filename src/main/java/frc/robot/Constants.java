@@ -33,6 +33,7 @@ public final class Constants {
 
     public static final double kDeadbandXLock = 0.2;
     public static final double kDeadbandAllStick = 0.10;
+    public static final double kCloseEnoughTicks = 10.0;
 
     // Contents for Sanity
     // Wheel math
