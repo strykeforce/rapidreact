@@ -42,12 +42,25 @@ public class VisionSubsystem extends MeasurableSubsystem
   @Override
   public @NotNull Set<Measure> getMeasures() {
     return Set.of(
-        new Measure(
-            "Error Pixels", () -> targetData.isValid() ? targetData.getErrorPixels() : 2767.0),
-        new Measure(
-            "Error Radians", () -> targetData.isValid() ? targetData.getErrorRadians() : 2767.0),
-        new Measure(
-            "Error Degrees",
-            () -> targetData.isValid() ? Math.toDegrees(targetData.getErrorRadians()) : 2767.0));
+        new Measure("Error Pixels", this::getErrorPixels),
+        new Measure("Error Radians", this::getErrorRadians),
+        new Measure("Error Degrees", this::getErrorDegrees));
+  }
+
+  // these private getters are for the grapher and prevent a data race that can occur if targetData
+  // updates after isValid() and before getErrorXXX()
+  private double getErrorPixels() {
+    var td = targetData;
+    return td.isValid() ? td.getErrorPixels() : 2767.0;
+  }
+
+  private double getErrorRadians() {
+    var td = targetData;
+    return td.isValid() ? td.getErrorRadians() : 2767.0;
+  }
+
+  private double getErrorDegrees() {
+    var td = targetData;
+    return td.isValid() ? Math.toDegrees(td.getErrorRadians()) : 2767.0;
   }
 }
