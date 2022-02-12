@@ -60,7 +60,7 @@ public class HubTargetData extends TargetListTargetData {
    * @throws IndexOutOfBoundsException if the list of targets is empty
    */
   public double getErrorRadians() {
-    return -kHorizonFov * getErrorPixels() / (kFrameCenter * 2);
+    return -0.6 * kHorizonFov * getErrorPixels() / (kFrameCenter * 2);
   }
 
   /**

@@ -52,11 +52,6 @@ public class TurretSubsystem extends MeasurableSubsystem {
   }
 
   public void rotateBy(Rotation2d errorRotation2d) {
-    // Rotation2d targetAngle =
-    //     new Rotation2d(
-    //         turret.getSelectedSensorPosition() / kTurretTicksPerRadian
-    //             + errorRotation2d.getRadians()
-    //             + 0.0436332); // TEMPORARY Rotation2d.plus() was not working correctly
 
     Rotation2d targetAngle =
         new Rotation2d(turret.getSelectedSensorPosition() / kTurretTicksPerRadian); // current angle
@@ -65,13 +60,11 @@ public class TurretSubsystem extends MeasurableSubsystem {
         targetAngle.plus(
             Rotation2d.fromDegrees(
                 Constants.VisionConstants.kHorizAngleCorrectionDegrees)); // target angle
-
-    // FIXME wraprange caluclation
     if (targetAngle.getDegrees() <= kWrapRange
             && turret.getSelectedSensorPosition() > kTurretMidpoint
         || targetAngle.getDegrees() < 0) {
       targetAngle = targetAngle.plus(Rotation2d.fromDegrees(360)); // add 360 deg
-    }
+    } 
     rotateTo(targetAngle);
   }
 
@@ -136,7 +129,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
         && stringPotPosition >= Constants.TurretConstants.kMinStringPotZero) {
       int absPos = turret.getSensorCollection().getPulseWidthPosition() & 0xFFF;
       // inverted because absolute and relative encoders are out of phase
-      int offset = (int) -(absPos - kTurretZeroTicks);
+      int offset = -(absPos - kTurretZeroTicks);
       turret.setSelectedSensorPosition(offset);
       didZero = true;
       logger.info(
@@ -186,9 +179,10 @@ public class TurretSubsystem extends MeasurableSubsystem {
           currentState = TurretState.SEEKING;
           break;
         }
-
         errorRotation2d = targetData.getErrorRotation2d();
-        rotateBy(errorRotation2d);
+        if (Math.abs(errorRotation2d.getRadians()) >= TurretConstants.kCloseEnoughTarget.getRadians()) {
+          rotateBy(errorRotation2d);
+        }
 
         boolean isTracking =
             Math.abs(errorRotation2d.getRadians())

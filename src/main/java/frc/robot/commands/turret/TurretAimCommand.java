@@ -23,7 +23,7 @@ public class TurretAimCommand extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return turretSubsystem.getState() == TurretState.TRACKING;
+    return false;//turretSubsystem.getState() == TurretState.TRACKING;
   }
 
   @Override
