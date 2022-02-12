@@ -7,6 +7,10 @@
         name: deadeye-daemon.service
         state: stopped
         enabled: false
+    - name: Remove default Deadeye systemd unit file
+      ansible.builtin.file:
+        path: /etc/systemd/system/deadeye-daemon.service
+        state: absent
     - name: Sync remote repo from local
       ansible.posix.synchronize:
         src: ../../../../deadeye
