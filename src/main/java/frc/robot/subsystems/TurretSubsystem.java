@@ -15,6 +15,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.TurretConstants;
 import java.util.List;
 import java.util.Set;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
@@ -64,7 +65,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
             && turret.getSelectedSensorPosition() > kTurretMidpoint
         || targetAngle.getDegrees() < 0) {
       targetAngle = targetAngle.plus(Rotation2d.fromDegrees(360)); // add 360 deg
-    } 
+    }
     rotateTo(targetAngle);
   }
 
@@ -112,18 +113,17 @@ public class TurretSubsystem extends MeasurableSubsystem {
   }
 
   @Override
-  public Set<Measure> getMeasures() {
+  public @NotNull Set<Measure> getMeasures() {
     return Set.of(new Measure("TurretAtTarget", () -> isRotationFinished() ? 1.0 : 0.0));
   }
 
   @Override
-  public void registerWith(TelemetryService telemetryService) {
+  public void registerWith(@NotNull TelemetryService telemetryService) {
     super.registerWith(telemetryService);
     telemetryService.register(turret);
   }
 
-  public boolean zeroTurret() {
-    boolean didZero = false;
+  public void zeroTurret() {
     double stringPotPosition = turret.getSensorCollection().getAnalogInRaw();
     if (stringPotPosition <= Constants.TurretConstants.kMaxStringPotZero
         && stringPotPosition >= Constants.TurretConstants.kMinStringPotZero) {
@@ -131,7 +131,6 @@ public class TurretSubsystem extends MeasurableSubsystem {
       // inverted because absolute and relative encoders are out of phase
       int offset = -(absPos - kTurretZeroTicks);
       turret.setSelectedSensorPosition(offset);
-      didZero = true;
       logger.info(
           "Turret zeroed; offset: {} zeroTicks: {} absPosition: {}",
           offset,
@@ -142,10 +141,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
       turret.configPeakOutputReverse(0, 0);
       logger.error("Turret zero failed. Killing turret...");
     }
-
     turret.clearStickyFaults();
-
-    return didZero;
   }
 
   public TurretState getState() {
@@ -180,7 +176,8 @@ public class TurretSubsystem extends MeasurableSubsystem {
           break;
         }
         errorRotation2d = targetData.getErrorRotation2d();
-        if (Math.abs(errorRotation2d.getRadians()) >= TurretConstants.kCloseEnoughTarget.getRadians()) {
+        if (Math.abs(errorRotation2d.getRadians())
+            >= TurretConstants.kCloseEnoughTarget.getRadians()) {
           rotateBy(errorRotation2d);
         }
 

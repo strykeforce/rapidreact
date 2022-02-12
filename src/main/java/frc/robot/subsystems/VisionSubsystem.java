@@ -42,7 +42,12 @@ public class VisionSubsystem extends MeasurableSubsystem
   @Override
   public @NotNull Set<Measure> getMeasures() {
     return Set.of(
-        new Measure("Error Pixels", () -> targetData.getErrorPixels()),
-        new Measure("Error Degrees", () -> Math.toDegrees(targetData.getErrorRadians())));
+        new Measure(
+            "Error Pixels", () -> targetData.isValid() ? targetData.getErrorPixels() : 2767.0),
+        new Measure(
+            "Error Radians", () -> targetData.isValid() ? targetData.getErrorRadians() : 2767.0),
+        new Measure(
+            "Error Degrees",
+            () -> targetData.isValid() ? Math.toDegrees(targetData.getErrorRadians()) : 2767.0));
   }
 }
