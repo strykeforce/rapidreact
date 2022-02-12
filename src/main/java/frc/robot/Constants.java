@@ -273,12 +273,19 @@ public final class Constants {
     public static final int kKickerFalconID = 41;
     public static final int kHoodTalonID = 42;
 
-    public static int kHoodZeroTicks;
+    public static int kHoodZeroTicks; // FIX ME
     public static final int kForwardSoftLimts = 1000;
     public static final int kReverseSoftLimits = 0;
 
-    public static final int kStableCounts = 5;
-    // FIX ME
+    public static final double kKickerArmSpeed = 1000;
+    public static final double kShooterArmSpeed = 1000;
+    public static final double kKickerOpSpeed = 1000;
+    public static final double kShooterOpSpeed = 1000;
+    public static final double kHoodOpPos = 5000;
+
+    public static final int kStableCounts = 5; // FIX ME
+    public static final double kCloseEnoughTicksP100ms = 100;
+    public static final double kCloseEnoughTicks = 100;
 
     public static TalonFXConfiguration getShooterFalconConfig() {
       TalonFXConfiguration shooterConfig = new TalonFXConfiguration();
