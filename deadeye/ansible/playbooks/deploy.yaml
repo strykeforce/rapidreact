@@ -7,10 +7,6 @@
         name: deadeye-daemon.service
         state: stopped
         enabled: false
-    - name: Remove default Deadeye systemd unit file
-      ansible.builtin.file:
-        path: /etc/systemd/system/deadeye-daemon.service
-        state: absent
     - name: Sync remote repo from local
       ansible.posix.synchronize:
         src: ../../../../deadeye
@@ -64,13 +60,14 @@
         name: "{{ deadeye_service }}"
         enabled: true
         state: restarted
+        daemon_reload: true
   vars:
     deadeye_dir: /opt/rapid_react
     deadeye_repo: git@github.com:strykeforce/rapidreact.git
     deadeye_version: HEAD
     deadeye_conf_dir: /etc/opt/deadeye
     deadeye_conf: "{{ deadeye_conf_dir }}/deadeye.conf"
-    deadeye_service: rapid-react.service
+    deadeye_service: deadeye-rapid-react.service
     github_key_src: ../files/rapid_react_id_ed25519
     github_key_dest: /home/root/.ssh/rapid_react_id_ed25519
 
