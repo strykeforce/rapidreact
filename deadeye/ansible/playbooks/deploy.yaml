@@ -1,0 +1,73 @@
+---
+- name: Deploy Deadeye
+  hosts: all
+  tasks:
+    - name: Disable default Deadeye daemon
+      ansible.builtin.systemd:
+        name: deadeye-daemon.service
+        state: stopped
+        enabled: false
+    - name: Sync remote repo from local
+      ansible.posix.synchronize:
+        src: ../../../../deadeye
+        dest: "{{ deadeye_dir }}/src"
+        times: false
+        checksum: true
+        delete: true
+        rsync_opts:
+          - "--exclude ansible/"
+          - "--exclude *build*/"
+      register: deadeye_repo
+    - name: Create build directory
+      ansible.builtin.file:
+        path: "{{ deadeye_dir }}/build"
+        state: directory
+        mode: 0775
+    - name: Run cmake
+      ansible.builtin.command:
+        chdir: "{{ deadeye_dir }}/build"
+        argv:
+          - /usr/bin/cmake
+          - -GNinja
+          - -DCMAKE_BUILD_TYPE={{ deadeye_build_type }}
+          - -DCMAKE_INSTALL_PREFIX={{ deadeye_dir }}
+          - -DCMAKE_CXX_FLAGS_RELEASE=-Ofast -march=native -mtune=native -flto -ffat-lto-objects -DNDEBUG
+          - -DDEADEYE_BUILD_TESTS=NO
+          - -DDEADEYE_NT_SERVER={{ deadeye_nt_server }}
+          - -DDEADEYE_UNIT_ID={{ deadeye_unit }}
+          - -DDEADEYE_CAMERA0_PIPELINE={{ camera_0_pipeline }}
+          - -DDEADEYE_CAMERA1_PIPELINE={{ camera_1_pipeline }}
+          - -DDEADEYE_CAMERA2_PIPELINE={{ camera_2_pipeline }}
+          - -DDEADEYE_CAMERA3_PIPELINE={{ camera_3_pipeline }}
+          - -DDEADEYE_CAMERA4_PIPELINE={{ camera_4_pipeline }}
+          - "{{ deadeye_dir }}/src/deadeye"
+      when: deadeye_repo is changed
+    - name: Build and Install
+      ansible.builtin.command:
+        chdir: "{{ deadeye_dir }}/build"
+        argv:
+          - /usr/bin/ninja
+          - install
+      when: deadeye_repo is changed
+    - name: Install systemd unit
+      ansible.builtin.template:
+        src: ../files/{{ deadeye_service }}.j2
+        dest: /etc/systemd/system/{{ deadeye_service }}
+        mode: 0664
+        owner: root
+    - name: Enable systemd unit
+      ansible.builtin.systemd:
+        name: "{{ deadeye_service }}"
+        enabled: true
+        state: restarted
+        daemon_reload: true
+  vars:
+    deadeye_dir: /opt/rapid_react
+    deadeye_repo: git@github.com:strykeforce/rapidreact.git
+    deadeye_version: HEAD
+    deadeye_conf_dir: /etc/opt/deadeye
+    deadeye_conf: "{{ deadeye_conf_dir }}/deadeye.conf"
+    deadeye_service: deadeye-rapid-react.service
+    github_key_src: ../files/rapid_react_id_ed25519
+    github_key_dest: /home/root/.ssh/rapid_react_id_ed25519
+

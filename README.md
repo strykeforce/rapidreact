@@ -15,11 +15,15 @@
 | Drive     | FX   | drive           | 12  |     | Falcon |
 | Drive     | FX   | drive           | 13  |     | Falcon |
 | Intake    | FX   | intake          | 20  |     | Falcon |
-| Magazine  | SRX  | lowerMagazine   | 30  |     | ??     |
-| Magazine  | SRX  | upperMagazine   | 31  |     | ??     |
+| Magazine  | SRX  | lowerMagazine   | 30  |     | 775    |
+| Magazine  | SRX  | upperMagazine   | 31  |     | 550    |
 | Shooter   | FX   | shooter         | 40  |     | Falcon |
 | Shooter   | FX   | kicker          | 41  |     | Falcon |
-| Shooter   | SRX  | hood            | 42  |     | ??     |
+| Shooter   | SRX  | hood            | 42  |     | 550    |
+| Turret    | SRX  | turret          | 50  |     | 550    |
+| Climb     | FX   | climbExtend1    | 60  |     | Falcon |
+| Climb     | FX   | climbExtend2    | 61  |     | Falcon |
+| Climb     | SRX  | climbRotate     | 62  |     | 550    |
 
 * Lower beam break: lower magazine forward limit
 * Upper beam break: upper magazine forward limit

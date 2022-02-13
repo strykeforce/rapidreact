@@ -15,6 +15,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.TurretConstants;
 import java.util.List;
 import java.util.Set;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
@@ -29,9 +30,13 @@ public class TurretSubsystem extends MeasurableSubsystem {
   private int turretStableCounts = 0;
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
   private TurretState currentState = TurretState.IDLE;
+  private final VisionSubsystem visionSubsystem;
+  private int trackingStableCount;
 
-  public TurretSubsystem() {
+  public TurretSubsystem(VisionSubsystem visionSubsystem) {
+    this.visionSubsystem = visionSubsystem;
     configTalons();
+    zeroTurret();
   }
 
   private void configTalons() {
@@ -42,26 +47,27 @@ public class TurretSubsystem extends MeasurableSubsystem {
     turret.enableCurrentLimit(false);
     turret.enableVoltageCompensation(true);
     turret.configSupplyCurrentLimit(Constants.TurretConstants.getSupplyCurrentLimitConfig());
+    //    turret.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 5);
   }
 
   public List<BaseTalon> getTalons() {
     return List.of(turret);
   }
 
-  public void rotateTurret(Rotation2d errorRotation2d) {
+  public void rotateBy(Rotation2d errorRotation2d) {
+
     Rotation2d targetAngle =
         new Rotation2d(turret.getSelectedSensorPosition() / kTurretTicksPerRadian); // current angle
-    targetAngle
-        .plus(errorRotation2d)
-        .plus(
+    targetAngle = targetAngle.plus(errorRotation2d);
+    targetAngle =
+        targetAngle.plus(
             Rotation2d.fromDegrees(
-                Constants.VisionConstants.kHorizAngleCorrection)); // target angle
+                Constants.VisionConstants.kHorizAngleCorrectionDegrees)); // target angle
     if (targetAngle.getDegrees() <= kWrapRange
             && turret.getSelectedSensorPosition() > kTurretMidpoint
         || targetAngle.getDegrees() < 0) {
-      targetAngle.plus(Rotation2d.fromDegrees(360)); // add 360 deg
+      targetAngle = targetAngle.plus(Rotation2d.fromDegrees(360)); // add 360 deg
     }
-    targetAngle.times(kTurretTicksPerRadian); // setpoint
     rotateTo(targetAngle);
   }
 
@@ -100,7 +106,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
   public boolean isRotationFinished() {
     double currentTurretPosition = turret.getSelectedSensorPosition();
     if (Math.abs(targetTurretPosition - currentTurretPosition)
-        > Constants.TurretConstants.kCloseEnoughTurret) {
+        > Constants.TurretConstants.kCloseEnoughTicks) {
       turretStableCounts = 0;
     } else {
       turretStableCounts++;
@@ -109,26 +115,24 @@ public class TurretSubsystem extends MeasurableSubsystem {
   }
 
   @Override
-  public Set<Measure> getMeasures() {
+  public @NotNull Set<Measure> getMeasures() {
     return Set.of(new Measure("TurretAtTarget", () -> isRotationFinished() ? 1.0 : 0.0));
   }
 
   @Override
-  public void registerWith(TelemetryService telemetryService) {
+  public void registerWith(@NotNull TelemetryService telemetryService) {
     super.registerWith(telemetryService);
     telemetryService.register(turret);
   }
 
-  public boolean zeroTurret() {
-    boolean didZero = false;
+  public void zeroTurret() {
     double stringPotPosition = turret.getSensorCollection().getAnalogInRaw();
     if (stringPotPosition <= Constants.TurretConstants.kMaxStringPotZero
         && stringPotPosition >= Constants.TurretConstants.kMinStringPotZero) {
       int absPos = turret.getSensorCollection().getPulseWidthPosition() & 0xFFF;
       // inverted because absolute and relative encoders are out of phase
-      int offset = (int) -(absPos - kTurretZeroTicks);
+      int offset = -(absPos - kTurretZeroTicks);
       turret.setSelectedSensorPosition(offset);
-      didZero = true;
       logger.info(
           "Turret zeroed; offset: {} zeroTicks: {} absPosition: {}",
           offset,
@@ -139,20 +143,68 @@ public class TurretSubsystem extends MeasurableSubsystem {
       turret.configPeakOutputReverse(0, 0);
       logger.error("Turret zero failed. Killing turret...");
     }
-
     turret.clearStickyFaults();
+  }
 
-    return didZero;
+  public TurretState getState() {
+    return currentState;
+  }
+
+  public void trackTarget() {
+    logger.info("Started tracking target");
+    currentState = TurretState.SEEKING;
+  }
+
+  public void stopTrackingTarget() {
+    logger.info("switching to IDLE state");
+    currentState = TurretState.IDLE;
   }
 
   @Override
   public void periodic() {
+    HubTargetData targetData;
+    Rotation2d errorRotation2d;
+    double rotateKp;
     switch (currentState) {
+      case SEEKING:
+        // FIXME implement seek state
+        // fall through
       case AIMING:
-        break;
-      case AIMING_DONE:
+        // fall through
+      case TRACKING:
+        targetData = visionSubsystem.getTargetData();
+        if (!targetData.isValid()) {
+          logger.info("{} -> SEEKING: {}", currentState, targetData);
+          currentState = TurretState.SEEKING;
+          break;
+        }
+        errorRotation2d = targetData.getErrorRotation2d();
+        rotateBy(errorRotation2d.times(TurretConstants.kRotateByKp));
+
+        if (Math.abs(errorRotation2d.getRadians())
+            < TurretConstants.kCloseEnoughTarget.getRadians()) {
+          trackingStableCount++;
+        } else {
+          trackingStableCount = 0;
+        }
+
+        TurretState nextState;
+        if (trackingStableCount > TurretConstants.kRotateByStableCounts) {
+          nextState = TurretState.TRACKING;
+          rotateKp = 0.95;
+          //          rotateKp = TurretConstants.kRotateByKp;
+        } else {
+          nextState = TurretState.AIMING;
+          rotateKp = TurretConstants.kRotateByKp;
+        }
+
+        if (currentState != nextState) {
+          logger.info("{} -> {}", currentState, nextState);
+        }
+        currentState = nextState;
         break;
       case IDLE:
+        // do nothing
         break;
       default:
         break;
@@ -160,8 +212,9 @@ public class TurretSubsystem extends MeasurableSubsystem {
   }
 
   public enum TurretState {
+    SEEKING,
     AIMING,
-    AIMING_DONE,
+    TRACKING,
     IDLE
   }
 }

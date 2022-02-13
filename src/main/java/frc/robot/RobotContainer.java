@@ -12,6 +12,8 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.SmartDashboardConstants;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
+import frc.robot.commands.drive.LockZeroCommand;
+import frc.robot.commands.drive.XLockCommand;
 import frc.robot.commands.drive.ZeroGyroCommand;
 import frc.robot.commands.intake.IntakeOpenLoopCommand;
 import frc.robot.commands.intake.PitIntakeOpenLoopCommand;
@@ -23,8 +25,10 @@ import frc.robot.commands.shooter.HoodOpenLoopCommand;
 import frc.robot.commands.shooter.PitHoodOpenLoopCommand;
 import frc.robot.commands.shooter.PitShooterOpenLoopCommand;
 import frc.robot.commands.shooter.ShooterOpenLoopCommand;
+import frc.robot.commands.turret.DeadeyeLatencyTestCommandGroup;
 import frc.robot.commands.turret.OpenLoopTurretCommand;
 import frc.robot.commands.turret.PitTurretCloseLoopPositionCommand;
+import frc.robot.commands.turret.TurretAimCommandGroup;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
@@ -42,19 +46,24 @@ import org.strykeforce.telemetry.TelemetryService;
  */
 public class RobotContainer {
 
-  // The robot's subsystems and commands are defined here...
   private final DriveSubsystem driveSubsystem = new DriveSubsystem();
   private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
   private final MagazineSubsystem magazineSubsystem = new MagazineSubsystem();
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
-  private final TurretSubsystem turretSubsystem = new TurretSubsystem();
   private final VisionSubsystem visionSubsystem = new VisionSubsystem();
-  private TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
-  private Joystick driveJoystick = new Joystick(0);
+  private final TurretSubsystem turretSubsystem = new TurretSubsystem(visionSubsystem);
+  private final TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
+
+  private final Joystick driveJoystick = new Joystick(0);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    configureTelemetry();
+    configureDriverButtonBindings();
+    configurePitDashboard();
+  }
 
+  private void configureTelemetry() {
     driveSubsystem.registerWith(telemetryService);
     shooterSubsystem.registerWith(telemetryService);
     magazineSubsystem.registerWith(telemetryService);
@@ -62,10 +71,6 @@ public class RobotContainer {
     intakeSubsystem.registerWith(telemetryService);
     visionSubsystem.registerWith(telemetryService);
     telemetryService.start();
-    // Configure the button bindings
-    configureDriverButtonBindings();
-    configurePitDashboard();
-    turretSubsystem.zeroTurret();
   }
 
   /**
@@ -80,6 +85,11 @@ public class RobotContainer {
         .whenPressed(new ZeroGyroCommand(driveSubsystem));
     new JoystickButton(driveJoystick, Button.HAMBURGER.id)
         .whenPressed(new DriveAutonCommand(driveSubsystem, "RightCargo1Collect"));
+    new JoystickButton(driveJoystick, Button.DOWN.id)
+        .whenPressed(new TurretAimCommandGroup(visionSubsystem, turretSubsystem));
+    new JoystickButton(driveJoystick, Button.X.id).whenPressed(new XLockCommand(driveSubsystem));
+    new JoystickButton(driveJoystick, Button.UP.id)
+        .whenPressed(new DeadeyeLatencyTestCommandGroup(visionSubsystem, turretSubsystem));
   }
 
   private void configurePitDashboard() {
@@ -116,7 +126,8 @@ public class RobotContainer {
     SmartDashboard.putData("Pit/Intake/Start", new PitIntakeOpenLoopCommand(intakeSubsystem));
     SmartDashboard.putData("Pit/Intake/Stop", new IntakeOpenLoopCommand(intakeSubsystem, 0.0));
 
-    // drive commands
+    // Drive commands
+    SmartDashboard.putData("Pit/Drive/LockZero", new LockZeroCommand(driveSubsystem));
     SmartDashboard.putData(
         "Pit/Drive/pathDrive", new DriveAutonCommand(driveSubsystem, "straightPath"));
 
@@ -124,6 +135,8 @@ public class RobotContainer {
     SmartDashboard.putData("Pit/Turret/Forward", new OpenLoopTurretCommand(turretSubsystem, 0.2));
     SmartDashboard.putData("Pit/Turret/Reverse", new OpenLoopTurretCommand(turretSubsystem, -0.2));
     SmartDashboard.putData("Pit/Turret/Stop", new OpenLoopTurretCommand(turretSubsystem, 0.0));
+    // SmartDashboard.putData("Pit/Turret/AimTurret", new TurretAimCommand(visionSubsystem,
+    // turretSubsystem));
   }
 
   public enum Axis {
@@ -147,7 +160,7 @@ public class RobotContainer {
     LEFT_DOWN(4),
     LEFT_UP(5);
 
-    private final int id;
+    public final int id;
 
     Shoulder(int id) {
       this.id = id;
@@ -157,7 +170,7 @@ public class RobotContainer {
   public enum Toggle {
     LEFT_TOGGLE(1);
 
-    private final int id;
+    public final int id;
 
     Toggle(int id) {
       this.id = id;
@@ -171,7 +184,7 @@ public class RobotContainer {
     UP(16),
     DOWN(17);
 
-    private final int id;
+    public final int id;
 
     Button(int id) {
       this.id = id;
@@ -188,7 +201,7 @@ public class RobotContainer {
     RIGHT_Y_POS(12),
     RIGHT_Y_NEG(13);
 
-    private final int id;
+    public final int id;
 
     Trim(int id) {
       this.id = id;
