@@ -1,10 +1,14 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.ColorMatch;
 import com.revrobotics.ColorMatchResult;
 import com.revrobotics.ColorSensorV3;
+import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.util.Color;
+import frc.robot.Constants;
 import frc.robot.Constants.MagazineConstants;
 import java.util.Set;
 import org.slf4j.Logger;
@@ -25,15 +29,15 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   private MagazineState currMagazineState = MagazineState.STOP;
 
   public MagazineSubsystem() {
-    // colorSensor = new ColorSensorV3(Port.kMXP);
+    colorSensor = new ColorSensorV3(Port.kMXP);
 
-    // lowerMagazineTalon = new TalonSRX(MagazineConstants.kLowerMagazineTalonID);
-    // lowerMagazineTalon.configFactoryDefault(Constants.kTalonConfigTimeout);
-    // lowerMagazineTalon.configAllSettings(
-    //     MagazineConstants.getMagazineTalonConfig(), Constants.kTalonConfigTimeout);
-    // lowerMagazineTalon.enableCurrentLimit(true);
-    // lowerMagazineTalon.enableVoltageCompensation(true);
-    // lowerMagazineTalon.setNeutralMode(NeutralMode.Coast);
+    lowerMagazineTalon = new TalonSRX(MagazineConstants.kLowerMagazineTalonID);
+    lowerMagazineTalon.configFactoryDefault(Constants.kTalonConfigTimeout);
+    lowerMagazineTalon.configAllSettings(
+        MagazineConstants.getMagazineTalonConfig(), Constants.kTalonConfigTimeout);
+    lowerMagazineTalon.enableCurrentLimit(true);
+    lowerMagazineTalon.enableVoltageCompensation(true);
+    lowerMagazineTalon.setNeutralMode(NeutralMode.Coast);
 
     // upperMagazineTalon = new TalonSRX(MagazineConstants.kUpperMagazineTalonID);
     // upperMagazineTalon.configFactoryDefault(Constants.kTalonConfigTimeout);
@@ -49,7 +53,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   }
 
   public void lowerOpenLoopRotate(double percentOutput) {
-    // lowerMagazineTalon.set(ControlMode.PercentOutput, percentOutput);
+    lowerMagazineTalon.set(ControlMode.PercentOutput, percentOutput);
     logger.info("Lower magazine motor turned on {}", percentOutput);
   }
 
@@ -59,7 +63,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   }
 
   public void stopMagazine() {
-    // lowerMagazineTalon.set(ControlMode.PercentOutput, 0.0);
+    lowerMagazineTalon.set(ControlMode.PercentOutput, 0.0);
     // upperMagazineTalon.set(ControlMode.PercentOutput, 0.0);
   }
 
@@ -69,8 +73,9 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   }
 
   public boolean isUpperBeamBroken() {
-    boolean upperBeam = upperMagazineTalon.getSensorCollection().isFwdLimitSwitchClosed();
-    return upperBeam;
+    // boolean upperBeam = upperMagazineTalon.getSensorCollection().isFwdLimitSwitchClosed();
+    // return upperBeam;
+    return true;
   }
 
   public Color getColor() {
@@ -208,7 +213,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   @Override
   public void registerWith(TelemetryService telemetryService) {
     super.registerWith(telemetryService);
-    // telemetryService.register(lowerMagazineTalon);
+    telemetryService.register(lowerMagazineTalon);
     // telemetryService.register(upperMagazineTalon);
   }
 

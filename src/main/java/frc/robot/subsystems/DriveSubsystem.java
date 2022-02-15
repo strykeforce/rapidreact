@@ -2,9 +2,12 @@ package frc.robot.subsystems;
 
 import static frc.robot.Constants.kTalonConfigTimeout;
 
+import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
+import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -51,44 +54,131 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private Rotation2d holoContAngle = new Rotation2d();
   private Double trajectoryActive = 0.0;
 
-  public DriveSubsystem() {
+  public DriveSubsystem(boolean isThrifty) {
 
-    var moduleBuilder =
-        new TalonSwerveModule.Builder()
-            .driveGearRatio(DriveConstants.kDriveGearRatio)
-            .wheelDiameterInches(DriveConstants.kWheelDiameterInches)
-            .driveMaximumMetersPerSecond(DriveConstants.kMaxSpeedMetersPerSecond);
+    if (!isThrifty) {
+      var moduleBuilder =
+          new TalonSwerveModule.Builder()
+              .driveGearRatio(DriveConstants.kDriveGearRatio)
+              .wheelDiameterInches(DriveConstants.kWheelDiameterInches)
+              .driveMaximumMetersPerSecond(DriveConstants.kMaxSpeedMetersPerSecond);
 
-    TalonSwerveModule[] swerveModules = new TalonSwerveModule[4];
-    Translation2d[] wheelLocations = DriveConstants.getWheelLocationMeters();
+      TalonSwerveModule[] swerveModules = new TalonSwerveModule[4];
+      Translation2d[] wheelLocations = DriveConstants.getWheelLocationMeters();
 
-    for (int i = 0; i < 4; i++) {
-      var azimuthTalon = new TalonSRX(i);
-      azimuthTalon.configFactoryDefault(kTalonConfigTimeout);
-      azimuthTalon.configAllSettings(DriveConstants.getAzimuthTalonConfig(), kTalonConfigTimeout);
-      azimuthTalon.enableCurrentLimit(true);
-      azimuthTalon.enableVoltageCompensation(true);
-      azimuthTalon.setNeutralMode(NeutralMode.Coast);
+      for (int i = 0; i < 4; i++) {
+        var azimuthTalon = new TalonSRX(i);
+        azimuthTalon.configFactoryDefault(kTalonConfigTimeout);
+        azimuthTalon.configAllSettings(DriveConstants.getAzimuthTalonConfig(), kTalonConfigTimeout);
+        azimuthTalon.enableCurrentLimit(true);
+        azimuthTalon.enableVoltageCompensation(true);
+        azimuthTalon.setNeutralMode(NeutralMode.Coast);
 
-      var driveTalon = new TalonFX(i + 10);
-      driveTalon.configFactoryDefault(kTalonConfigTimeout);
-      driveTalon.configAllSettings(DriveConstants.getDriveTalonConfig(), kTalonConfigTimeout);
-      driveTalon.enableVoltageCompensation(true);
-      driveTalon.setNeutralMode(NeutralMode.Brake);
+        var driveTalon = new TalonFX(i + 10);
+        driveTalon.configFactoryDefault(kTalonConfigTimeout);
+        driveTalon.configAllSettings(DriveConstants.getDriveTalonConfig(), kTalonConfigTimeout);
+        driveTalon.enableVoltageCompensation(true);
+        driveTalon.setNeutralMode(NeutralMode.Brake);
 
-      swerveModules[i] =
-          moduleBuilder
-              .azimuthTalon(azimuthTalon)
-              .driveTalon(driveTalon)
-              .wheelLocationMeters(wheelLocations[i])
-              .build();
+        swerveModules[i] =
+            moduleBuilder
+                .azimuthTalon(azimuthTalon)
+                .driveTalon(driveTalon)
+                .wheelLocationMeters(wheelLocations[i])
+                .build();
 
-      swerveModules[i].loadAndSetAzimuthZeroReference();
+        swerveModules[i].loadAndSetAzimuthZeroReference();
+      }
+
+      swerveDrive = new SwerveDrive(swerveModules);
+      swerveDrive.resetGyro();
+      swerveDrive.setGyroOffset(Rotation2d.fromDegrees(180));
+    } else {
+      final double kDriveMotorOutputGear = 21;
+      final double kDriveInputGear = 12;
+      final double kBevelInputGear = 45;
+      final double kBevelOutputGear = 15;
+      final double kDriveGearRatio =
+          (kDriveMotorOutputGear / kDriveInputGear) * (kBevelInputGear / kBevelOutputGear);
+
+      double robotLength = 0.6;
+      double robotWidth = 0.6;
+
+      var moduleBuilder =
+          new TalonSwerveModule.Builder()
+              .driveGearRatio(kDriveGearRatio)
+              .wheelDiameterInches(3.0)
+              .driveMaximumMetersPerSecond(3.889);
+
+      TalonSwerveModule[] swerveModules = new TalonSwerveModule[4];
+      Translation2d[] wheelLocations = new Translation2d[4];
+      wheelLocations[0] = new Translation2d(robotLength / 2.0, robotWidth / 2.0);
+      wheelLocations[1] = new Translation2d(robotLength / 2.0, -robotWidth / 2.0);
+      wheelLocations[2] = new Translation2d(-robotLength / 2.0, robotWidth / 2.0);
+      wheelLocations[3] = new Translation2d(-robotLength / 2.0, -robotWidth / 2.0);
+
+      TalonSRXConfiguration azimuthConfig = new TalonSRXConfiguration();
+      azimuthConfig.primaryPID.selectedFeedbackCoefficient = 1.0;
+      azimuthConfig.forwardLimitSwitchSource = LimitSwitchSource.Deactivated;
+      azimuthConfig.reverseLimitSwitchSource = LimitSwitchSource.Deactivated;
+      azimuthConfig.continuousCurrentLimit = 10;
+      azimuthConfig.peakCurrentLimit = 0;
+      azimuthConfig.peakCurrentDuration = 0;
+      azimuthConfig.slot0.kP = 10.0;
+      azimuthConfig.slot0.kI = 0.0;
+      azimuthConfig.slot0.kD = 100.0;
+      azimuthConfig.slot0.kF = 0.0;
+      azimuthConfig.slot0.integralZone = 0;
+      azimuthConfig.slot0.allowableClosedloopError = 0;
+      azimuthConfig.motionCruiseVelocity = 800;
+      azimuthConfig.motionAcceleration = 10_000;
+      azimuthConfig.velocityMeasurementWindow = 64;
+      azimuthConfig.voltageCompSaturation = 12;
+
+      TalonSRXConfiguration driveConfig = new TalonSRXConfiguration();
+      driveConfig.continuousCurrentLimit = 40;
+      driveConfig.peakCurrentLimit = 45;
+      driveConfig.peakCurrentDuration = 40;
+      driveConfig.slot0.kP = 0.045;
+      driveConfig.slot0.kI = 0.0005;
+      driveConfig.slot0.kD = 0.000;
+      driveConfig.slot0.kF = 0.047;
+      driveConfig.slot0.integralZone = 500;
+      driveConfig.slot0.maxIntegralAccumulator = 75_000;
+      driveConfig.slot0.allowableClosedloopError = 0;
+      driveConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
+      driveConfig.velocityMeasurementWindow = 64;
+      driveConfig.voltageCompSaturation = 12;
+
+      for (int i = 0; i < 4; i++) {
+        var azimuthTalon = new TalonSRX(i);
+        azimuthTalon.configFactoryDefault(kTalonConfigTimeout);
+        azimuthTalon.configAllSettings(azimuthConfig, kTalonConfigTimeout);
+        azimuthTalon.enableCurrentLimit(true);
+        azimuthTalon.enableVoltageCompensation(true);
+        azimuthTalon.setNeutralMode(NeutralMode.Coast);
+        azimuthTalon.setInverted(true);
+
+        var driveTalon = new TalonSRX(i + 10);
+        driveTalon.configFactoryDefault(kTalonConfigTimeout);
+        driveTalon.configAllSettings(driveConfig, kTalonConfigTimeout);
+        driveTalon.enableCurrentLimit(true);
+        driveTalon.enableVoltageCompensation(true);
+        driveTalon.setNeutralMode(NeutralMode.Brake);
+
+        swerveModules[i] =
+            moduleBuilder
+                .azimuthTalon(azimuthTalon)
+                .driveTalon(driveTalon)
+                .wheelLocationMeters(wheelLocations[i])
+                .build();
+
+        swerveModules[i].loadAndSetAzimuthZeroReference();
+      }
+      swerveDrive = new SwerveDrive(swerveModules);
+      swerveDrive.resetGyro();
+      swerveDrive.setGyroOffset(Rotation2d.fromDegrees(0.0));
     }
-
-    swerveDrive = new SwerveDrive(swerveModules);
-    swerveDrive.resetGyro();
-    swerveDrive.setGyroOffset(Rotation2d.fromDegrees(180));
 
     // Setup Holonomic Controller
     omegaController =

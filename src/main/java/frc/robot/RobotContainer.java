@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.SmartDashboardConstants;
 import frc.robot.commands.drive.DriveAutonCommand;
@@ -17,10 +18,12 @@ import frc.robot.commands.drive.XLockCommand;
 import frc.robot.commands.drive.ZeroGyroCommand;
 import frc.robot.commands.intake.IntakeOpenLoopCommand;
 import frc.robot.commands.intake.PitIntakeOpenLoopCommand;
+import frc.robot.commands.magazine.LowerMagazineOpenLoopCommand;
 import frc.robot.commands.magazine.PitClearCargoColor;
 import frc.robot.commands.magazine.PitMagazineOpenLoopCommand;
 import frc.robot.commands.magazine.PitReadCargoColor;
 import frc.robot.commands.magazine.UpperMagazineOpenLoopCommand;
+import frc.robot.commands.sequences.AutoIntakeCommand;
 import frc.robot.commands.sequences.TwoPathCommandGroup;
 import frc.robot.commands.shooter.HoodOpenLoopCommand;
 import frc.robot.commands.shooter.PitHoodOpenLoopCommand;
@@ -47,7 +50,7 @@ import org.strykeforce.telemetry.TelemetryService;
  */
 public class RobotContainer {
 
-  private final DriveSubsystem driveSubsystem = new DriveSubsystem();
+  private final DriveSubsystem driveSubsystem = new DriveSubsystem(true);
   private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
   private final MagazineSubsystem magazineSubsystem = new MagazineSubsystem();
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
@@ -91,6 +94,14 @@ public class RobotContainer {
     new JoystickButton(driveJoystick, Button.X.id).whenPressed(new XLockCommand(driveSubsystem));
     new JoystickButton(driveJoystick, Button.UP.id)
         .whenPressed(new DeadeyeLatencyTestCommandGroup(visionSubsystem, turretSubsystem));
+
+    new JoystickButton(driveJoystick, Shoulder.LEFT_DOWN.id)
+        .whenPressed(new AutoIntakeCommand(magazineSubsystem, intakeSubsystem));
+    new JoystickButton(driveJoystick, Shoulder.LEFT_DOWN.id)
+        .whenReleased(
+            new ParallelCommandGroup(
+                new IntakeOpenLoopCommand(intakeSubsystem, 0.0),
+                new LowerMagazineOpenLoopCommand(magazineSubsystem, 0.0)));
   }
 
   private void configurePitDashboard() {
