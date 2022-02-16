@@ -14,8 +14,8 @@ using namespace rr;
 [[maybe_unused]] HubPipeline::HubPipeline(int inum, std::string name)
     : AbstractPipeline{inum, std::move(name)} {}
 
-void HubPipeline::Configure(const CaptureConfig& config) {
-  capture_type_ = config.PipelineType();
+void HubPipeline::Configure(const PipelineConfig& config) {
+  AbstractPipeline::Configure(config);
 }
 
 // Target is center of contour bounding box.
