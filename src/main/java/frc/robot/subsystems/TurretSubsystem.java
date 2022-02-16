@@ -5,11 +5,14 @@ import static frc.robot.Constants.TurretConstants.kTurretMidpoint;
 import static frc.robot.Constants.TurretConstants.kTurretTicksPerRadian;
 import static frc.robot.Constants.TurretConstants.kTurretZeroTicks;
 import static frc.robot.Constants.TurretConstants.kWrapRange;
+import static frc.robot.Constants.TurretConstants.kRotateByFinalKp;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.BaseTalon;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.Constants;
 import frc.robot.Constants.TurretConstants;
@@ -32,6 +35,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
   private TurretState currentState = TurretState.IDLE;
   private final VisionSubsystem visionSubsystem;
   private int trackingStableCount;
+  private double rotateKp;
 
   public TurretSubsystem(VisionSubsystem visionSubsystem) {
     this.visionSubsystem = visionSubsystem;
@@ -99,6 +103,9 @@ public class TurretSubsystem extends MeasurableSubsystem {
     rotateTo(positionTicks);
   }
 
+  public double getRotateByKp() {
+    return rotateKp;
+  }
   public void openLoopRotate(double percentOutput) {
     turret.set(ControlMode.PercentOutput, percentOutput);
   }
@@ -116,7 +123,8 @@ public class TurretSubsystem extends MeasurableSubsystem {
 
   @Override
   public @NotNull Set<Measure> getMeasures() {
-    return Set.of(new Measure("TurretAtTarget", () -> isRotationFinished() ? 1.0 : 0.0));
+    return Set.of(new Measure("TurretAtTarget", () -> isRotationFinished() ? 1.0 : 0.0),
+    new Measure("rotateKp", this::getRotateByKp));
   }
 
   @Override
@@ -164,7 +172,6 @@ public class TurretSubsystem extends MeasurableSubsystem {
   public void periodic() {
     HubTargetData targetData;
     Rotation2d errorRotation2d;
-    double rotateKp;
     switch (currentState) {
       case SEEKING:
         // FIXME implement seek state
@@ -178,8 +185,9 @@ public class TurretSubsystem extends MeasurableSubsystem {
           currentState = TurretState.SEEKING;
           break;
         }
+        rotateKp = MathUtil.interpolate(TurretConstants.kRotateByInitialKp, kRotateByFinalKp,targetData.getInterpolateT());
         errorRotation2d = targetData.getErrorRotation2d();
-        rotateBy(errorRotation2d.times(TurretConstants.kRotateByKp));
+        rotateBy(errorRotation2d.times(rotateKp));
 
         if (Math.abs(errorRotation2d.getRadians())
             < TurretConstants.kCloseEnoughTarget.getRadians()) {
@@ -191,11 +199,11 @@ public class TurretSubsystem extends MeasurableSubsystem {
         TurretState nextState;
         if (trackingStableCount > TurretConstants.kRotateByStableCounts) {
           nextState = TurretState.TRACKING;
-          rotateKp = 0.95;
+          rotateKp = kRotateByFinalKp;
           //          rotateKp = TurretConstants.kRotateByKp;
         } else {
           nextState = TurretState.AIMING;
-          rotateKp = TurretConstants.kRotateByKp;
+          rotateKp = TurretConstants.kRotateByInitialKp;
         }
 
         if (currentState != nextState) {

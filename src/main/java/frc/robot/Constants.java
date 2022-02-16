@@ -177,8 +177,9 @@ public final class Constants {
     public static final int kReverseLimit = -100;
     public static final int kCloseEnoughTicks = 40;
     public static final Rotation2d kCloseEnoughTarget = Rotation2d.fromDegrees(1); // 1
-    public static final double kRotateByKp = 0.4;
-    public static final int kRotateByStableCounts = 3;
+    public static final double kRotateByInitialKp = 0.1;//4
+    public static final double kRotateByFinalKp = 0.75;//0.95
+    public static final int kRotateByStableCounts = 3;//3
     public static final double kMaxStringPotZero = 100;
     public static final double kMinStringPotZero = 0;
     public static final int kTurretId = 42;

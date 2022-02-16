@@ -76,6 +76,9 @@ public class HubTargetData extends TargetListTargetData {
     return new Rotation2d(getErrorRadians());
   }
 
+  public double getInterpolateT() {
+    return (kFrameCenter - Math.abs(getErrorPixels())) / kFrameCenter;
+  }
   @SuppressWarnings("rawtypes")
   @Override
   public @NotNull DeadeyeJsonAdapter getJsonAdapter() {
