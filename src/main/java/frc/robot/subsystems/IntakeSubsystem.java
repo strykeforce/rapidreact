@@ -2,14 +2,10 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
-
 import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.MagazineConstants;
-
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +28,8 @@ public class IntakeSubsystem extends MeasurableSubsystem {
 
     intakeTalon = new TalonSRX(IntakeConstants.kIntakeFalconID);
     intakeTalon.configFactoryDefault(Constants.kTalonConfigTimeout);
-    intakeTalon.configAllSettings(MagazineConstants.getMagazineTalonConfig(), Constants.kTalonConfigTimeout);
+    intakeTalon.configAllSettings(
+        MagazineConstants.getMagazineTalonConfig(), Constants.kTalonConfigTimeout);
     intakeTalon.enableCurrentLimit(true);
     intakeTalon.enableVoltageCompensation(true);
     intakeTalon.setNeutralMode(NeutralMode.Coast);

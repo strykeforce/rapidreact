@@ -39,13 +39,13 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     lowerMagazineTalon.enableVoltageCompensation(true);
     lowerMagazineTalon.setNeutralMode(NeutralMode.Coast);
 
-    // upperMagazineTalon = new TalonSRX(MagazineConstants.kUpperMagazineTalonID);
-    // upperMagazineTalon.configFactoryDefault(Constants.kTalonConfigTimeout);
-    // upperMagazineTalon.configAllSettings(
-    //     MagazineConstants.getMagazineTalonConfig(), Constants.kTalonConfigTimeout);
-    // upperMagazineTalon.enableCurrentLimit(true);
-    // upperMagazineTalon.enableVoltageCompensation(true);
-    // upperMagazineTalon.setNeutralMode(NeutralMode.Coast);
+    upperMagazineTalon = new TalonSRX(MagazineConstants.kUpperMagazineTalonID);
+    upperMagazineTalon.configFactoryDefault(Constants.kTalonConfigTimeout);
+    upperMagazineTalon.configAllSettings(
+        MagazineConstants.getMagazineTalonConfig(), Constants.kTalonConfigTimeout);
+    upperMagazineTalon.enableCurrentLimit(true);
+    upperMagazineTalon.enableVoltageCompensation(true);
+    upperMagazineTalon.setNeutralMode(NeutralMode.Coast);
 
     colorMatch.addColorMatch(MagazineConstants.kBlueCargo);
     colorMatch.addColorMatch(MagazineConstants.kRedCargo);
@@ -63,6 +63,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   }
 
   public void stopMagazine() {
+    currMagazineState = MagazineState.STOP;
     lowerMagazineTalon.set(ControlMode.PercentOutput, 0.0);
     // upperMagazineTalon.set(ControlMode.PercentOutput, 0.0);
   }
@@ -90,8 +91,11 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   }
 
   public CargoColor readCargoColor() {
+    // if (manualMode == false) {
     Color readColor = getColor();
     ColorMatchResult matchResult = colorMatch.matchClosestColor(readColor);
+    // } else Color = defaultColor;
+    // TODO put in actual manual mode code
 
     CargoColor currentCargoColor = CargoColor.NONE;
     if (matchResult.color == MagazineConstants.kBlueCargo) {
@@ -99,6 +103,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     } else if (matchResult.color == MagazineConstants.kRedCargo) {
       currentCargoColor = CargoColor.RED;
     }
+    if (currentCargoColor == CargoColor.NONE) return CargoColor.NONE;
 
     if (storedCargoColors[0] == CargoColor.NONE) {
       storedCargoColors[0] = currentCargoColor;
@@ -137,6 +142,18 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     currMagazineState = MagazineState.WAIT_CARGO;
   }
 
+  public void manualLowerMagazine(double lowerSpeed) {
+    if (lowerSpeed == 0.0) currMagazineState = MagazineState.STOP;
+    else currMagazineState = MagazineState.MANUAL_INTAKE;
+    lowerOpenLoopRotate(lowerSpeed);
+  }
+
+  public void manualUpperMagazine(double upperSpeed) {
+    if (upperSpeed == 0.0) currMagazineState = MagazineState.STOP;
+    else currMagazineState = MagazineState.MANUAL_INTAKE;
+    lowerOpenLoopRotate(upperSpeed);
+  }
+
   public boolean isMagazineFull() {
     return currMagazineState == MagazineState.STOP;
   }
@@ -149,6 +166,9 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   @Override
   public void periodic() {
     switch (currMagazineState) {
+      case MANUAL_INTAKE:
+        break;
+
       case WAIT_CARGO:
         // check number of cargo
         if (storedCargoColors[0] != CargoColor.NONE && storedCargoColors[1] != CargoColor.NONE) {
@@ -157,24 +177,24 @@ public class MagazineSubsystem extends MeasurableSubsystem {
           break;
         } else if (storedCargoColors[0] != CargoColor.NONE) {
           if (lowerMagazineTalon.getMotorOutputPercent() == 0.0) {
-            // lowerOpenLoopRotate(MagazineConstants.kMagazineIntakeSpeed);
+            lowerOpenLoopRotate(MagazineConstants.kMagazineIntakeSpeed);
           }
           // Checking if ball is in the top of the upper magazine
           if (isUpperBeamBroken() && upperMagazineTalon.getMotorOutputPercent() != 0.0) {
             upperOpenLoopRotate(0.0);
             logger.info("Stopping upper magazine, upper beam broken");
           } else if (!isUpperBeamBroken() && upperMagazineTalon.getMotorOutputPercent() == 0.0) {
-            // upperOpenLoopRotate(MagazineConstants.kMagazineIntakeSpeed);
+            upperOpenLoopRotate(MagazineConstants.kMagazineIntakeSpeed);
             logger.info("Upper beam not broken, upper magazine running");
           }
         }
         // Knowing when to read cargo color
         if (isLowerBeamBroken()) {
           currMagazineState = MagazineState.READ_CARGO;
-          // lowerOpenLoopRotate(0.0);
-          logger.info("Switching state to read cargo color");
+          lowerOpenLoopRotate(0.0);
+          logger.info("Lower beam broken, switching state to read cargo color");
         } else if (lowerMagazineTalon.getMotorOutputPercent() == 0.0) {
-          // lowerOpenLoopRotate(MagazineConstants.kMagazineIntakeSpeed);
+          lowerOpenLoopRotate(MagazineConstants.kMagazineIntakeSpeed);
         }
 
         break;
@@ -187,8 +207,8 @@ public class MagazineSubsystem extends MeasurableSubsystem {
             currMagazineState = MagazineState.STOP;
             logger.info("Now have two cargo, switching to stop state");
           } else {
-            // lowerOpenLoopRotate(MagazineConstants.kMagazineIntakeSpeed);
-            // upperOpenLoopRotate(MagazineConstants.kMagazineIntakeSpeed);
+            lowerOpenLoopRotate(MagazineConstants.kMagazineIntakeSpeed);
+            upperOpenLoopRotate(MagazineConstants.kMagazineIntakeSpeed);
             currMagazineState = MagazineState.INDEX_CARGO;
             logger.info("Has one cargo, turning on magazine, switching to index state");
           }
@@ -227,12 +247,19 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   }
 
   public enum CargoColor {
-    RED,
-    BLUE,
-    NONE;
+    RED("red"),
+    BLUE("blue"),
+    NONE("black");
+
+    public String color;
+
+    private CargoColor(String color) {
+      this.color = color;
+    }
   }
 
   public enum MagazineState {
+    MANUAL_INTAKE,
     WAIT_CARGO,
     READ_CARGO,
     INDEX_CARGO,

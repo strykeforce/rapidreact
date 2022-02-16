@@ -14,7 +14,8 @@ public class PitMagazineOpenLoopCommand extends InstantCommand {
 
   @Override
   public void initialize() {
-    magazineSubsystem.lowerOpenLoopRotate(SmartDashboard.getNumber("Pit/Magazine/Speed", 0));
-    magazineSubsystem.upperOpenLoopRotate(SmartDashboard.getNumber("Pit/Magazine/Speed", 0));
+    double speed = SmartDashboard.getNumber("Pit/Magazine/Speed", 0.0);
+    magazineSubsystem.manualLowerMagazine(speed);
+    magazineSubsystem.manualUpperMagazine(speed);
   }
 }

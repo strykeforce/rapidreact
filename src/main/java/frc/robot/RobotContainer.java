@@ -7,6 +7,8 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.SuppliedValueWidget;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -36,9 +38,11 @@ import frc.robot.commands.turret.TurretAimCommandGroup;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
+import frc.robot.subsystems.MagazineSubsystem.CargoColor;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
+import java.util.Map;
 import org.strykeforce.telemetry.TelemetryController;
 import org.strykeforce.telemetry.TelemetryService;
 
@@ -60,11 +64,16 @@ public class RobotContainer {
 
   private final Joystick driveJoystick = new Joystick(0);
 
+  // Dashboard items
+  private SuppliedValueWidget firstCargo;
+  private SuppliedValueWidget secondCargo;
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     configureTelemetry();
     configureDriverButtonBindings();
     configurePitDashboard();
+    configureMatchDashboard();
   }
 
   private void configureTelemetry() {
@@ -104,6 +113,34 @@ public class RobotContainer {
                 new LowerMagazineOpenLoopCommand(magazineSubsystem, 0.0)));
   }
 
+  private void configureMatchDashboard() {
+    firstCargo =
+        Shuffleboard.getTab("Match")
+            .addBoolean(
+                "First Cargo", () -> magazineSubsystem.getAllCargoColors()[0] != CargoColor.NONE)
+            .withProperties(Map.of("colorWhenFalse", "black"));
+    secondCargo =
+        Shuffleboard.getTab("Match")
+            .addBoolean(
+                "Second Cargo", () -> magazineSubsystem.getAllCargoColors()[1] != CargoColor.NONE)
+            .withProperties(Map.of("colorWhenFalse", "black"));
+  }
+
+  public void updateMatchData() {
+    firstCargo.withProperties(
+        Map.of(
+            "colorWhenTrue",
+            magazineSubsystem.getAllCargoColors()[0].color,
+            "colorWhenFalse",
+            "black"));
+    secondCargo.withProperties(
+        Map.of(
+            "colorWhenTrue",
+            magazineSubsystem.getAllCargoColors()[1].color,
+            "colorWhenFalse",
+            "black"));
+  }
+
   private void configurePitDashboard() {
     // Magazine Commands
     SmartDashboard.putNumber("Pit/Magazine/Speed", 0.0);
@@ -135,6 +172,8 @@ public class RobotContainer {
         turretSubsystem.getRotation2d().getRadians());
     SmartDashboard.putData(
         "Pit/Turret/CloseLoopPosition", new PitTurretCloseLoopPositionCommand(turretSubsystem));
+
+    // Intake Pit Commands
     SmartDashboard.putData("Pit/Intake/Start", new PitIntakeOpenLoopCommand(intakeSubsystem));
     SmartDashboard.putData("Pit/Intake/Stop", new IntakeOpenLoopCommand(intakeSubsystem, 0.0));
 
