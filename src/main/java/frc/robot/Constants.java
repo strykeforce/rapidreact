@@ -247,6 +247,66 @@ public final class Constants {
     }
   }
 
+  public static final class ClimbConstants {
+    public static final int kExtend1FalconID = 60;
+    public static final int kExtend2FalconID = 61;
+    public static final int kClimbShoulderId = 62;
+
+    public static TalonFXConfiguration getExtendFalconConfig() {
+      TalonFXConfiguration extendConfig = new TalonFXConfiguration();
+      extendConfig.supplyCurrLimit.currentLimit = 10;
+      extendConfig.supplyCurrLimit.triggerThresholdCurrent = 15;
+      extendConfig.supplyCurrLimit.triggerThresholdTime = .02;
+      extendConfig.supplyCurrLimit.enable = true;
+      extendConfig.slot0.kP = 0.0;
+      extendConfig.slot0.kI = 0.0;
+      extendConfig.slot0.kD = 0.0;
+      extendConfig.slot0.kF = 0.0;
+      extendConfig.slot0.integralZone = 0;
+      extendConfig.slot0.maxIntegralAccumulator = 0;
+      extendConfig.slot0.allowableClosedloopError = 0;
+      extendConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
+      extendConfig.velocityMeasurementWindow = 64;
+      extendConfig.voltageCompSaturation = 12;
+      extendConfig.forwardSoftLimitEnable = true;
+      extendConfig.forwardSoftLimitThreshold = 2767; // FIXME: No real constant
+      extendConfig.reverseSoftLimitEnable = true;
+      extendConfig.reverseSoftLimitThreshold = 2767; // FIXME: NO REAL CONSTANTS
+      return extendConfig;
+    }
+
+    public static TalonSRXConfiguration getShoulderTalonConfig() {
+      TalonSRXConfiguration ShoulderConfig = new TalonSRXConfiguration();
+
+      ShoulderConfig.primaryPID.selectedFeedbackCoefficient = 1.0;
+      ShoulderConfig.auxiliaryPID.selectedFeedbackSensor = FeedbackDevice.None;
+
+      ShoulderConfig.forwardLimitSwitchSource = LimitSwitchSource.Deactivated;
+      ShoulderConfig.reverseLimitSwitchSource = LimitSwitchSource.Deactivated;
+
+      ShoulderConfig.continuousCurrentLimit = 10;
+      ShoulderConfig.peakCurrentDuration = 10;
+      ShoulderConfig.peakCurrentLimit = 15;
+      ShoulderConfig.slot0.kP = 0.0;
+      ShoulderConfig.slot0.kI = 0.0;
+      ShoulderConfig.slot0.kD = 0.0;
+      ShoulderConfig.slot0.kF = 0.0;
+      ShoulderConfig.slot0.integralZone = 0;
+      ShoulderConfig.slot0.allowableClosedloopError = 0;
+      ShoulderConfig.slot0.maxIntegralAccumulator = 0;
+      ShoulderConfig.motionCruiseVelocity = 0;
+      ShoulderConfig.motionAcceleration = 0;
+      ShoulderConfig.velocityMeasurementWindow = 64;
+      ShoulderConfig.voltageCompSaturation = 12;
+      ShoulderConfig.forwardSoftLimitEnable = true;
+      ShoulderConfig.forwardSoftLimitThreshold = 2767;
+      ShoulderConfig.reverseSoftLimitEnable = true;
+      ShoulderConfig.reverseSoftLimitThreshold = 2767;
+
+      return ShoulderConfig;
+    }
+  }
+
   public static final class IntakeConstants {
     public static final int kIntakeFalconID = 20;
     public static final double kIntakeSpeed = 0.5; // FIXME need an actual percentage
