@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import static frc.robot.Constants.kTalonConfigTimeout;
 
+import com.ctre.phoenix.ErrorCode;
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
@@ -21,6 +23,7 @@ import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.Preferences;
 import frc.robot.Constants.DriveConstants;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -173,7 +176,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
                 .wheelLocationMeters(wheelLocations[i])
                 .build();
 
-        swerveModules[i].loadAndSetAzimuthZeroReference();
+        loadAndSetAzimuthZeroReference(swerveModules[i], i);
       }
       swerveDrive = new SwerveDrive(swerveModules);
       swerveDrive.resetGyro();
@@ -199,6 +202,30 @@ public class DriveSubsystem extends MeasurableSubsystem {
     // Disabling the holonomic controller makes the robot directly follow the trajectory output (no
     // closing the loop on x,y,theta errors)
     holonomicController.setEnabled(true);
+  }
+
+  private void loadAndSetAzimuthZeroReference(TalonSwerveModule module, int i) {
+    int index = i;
+    String key = String.format("SwerveDrive/wheel.%d", index);
+    int reference = Preferences.getInt(key, Integer.MIN_VALUE);
+    if (reference == Integer.MIN_VALUE) {
+      logger.error("no saved azimuth zero reference for swerve module {}", index);
+    }
+    logger.info("swerve module {}: loaded azimuth zero reference = {}", index, reference);
+
+    int azimuthAbsoluteCounts =
+        module.getAzimuthTalon().getSensorCollection().getPulseWidthPosition() & 0xFFF;
+    logger.info("swerve module {}: azimuth absolute position = {}", index, azimuthAbsoluteCounts);
+
+    int azimuthSetpoint = reference - azimuthAbsoluteCounts;
+    ErrorCode errorCode =
+        module.getAzimuthTalon().setSelectedSensorPosition(azimuthSetpoint, 0, 10);
+    if (errorCode.value != 0) {
+      logger.error("Talon error code while setting azimuth zero: {}", errorCode);
+    }
+
+    module.getAzimuthTalon().set(ControlMode.MotionMagic, azimuthSetpoint);
+    logger.info("swerve module {}: set azimuth encoder = {}", index, azimuthSetpoint);
   }
 
   public void drive(

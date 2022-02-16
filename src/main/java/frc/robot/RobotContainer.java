@@ -11,7 +11,9 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.SuppliedValueWidget;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.Constants.MagazineConstants;
 import frc.robot.Constants.SmartDashboardConstants;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
@@ -111,6 +113,13 @@ public class RobotContainer {
             new ParallelCommandGroup(
                 new IntakeOpenLoopCommand(intakeSubsystem, 0.0),
                 new LowerMagazineOpenLoopCommand(magazineSubsystem, 0.0)));
+
+    new JoystickButton(driveJoystick, Shoulder.RIGHT_DOWN.id)
+        .whenPressed(
+            new SequentialCommandGroup(
+                new PitClearCargoColor(magazineSubsystem),
+                new LowerMagazineOpenLoopCommand(
+                    magazineSubsystem, MagazineConstants.kMagazineIntakeSpeed)));
   }
 
   private void configureMatchDashboard() {

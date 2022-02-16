@@ -24,7 +24,9 @@ public class DriveTeleopCommand extends CommandBase {
             * deadband(joystick.getRawAxis(RobotContainer.Axis.LEFT_X.id)),
         DriveConstants.kMaxSpeedMetersPerSecond
             * deadband(joystick.getRawAxis(RobotContainer.Axis.LEFT_Y.id)),
-        DriveConstants.kMaxOmega * -deadband(joystick.getRawAxis(RobotContainer.Axis.RIGHT_Y.id)));
+        DriveConstants.kMaxOmega
+            * deadband(
+                joystick.getRawAxis(RobotContainer.Axis.RIGHT_Y.id))); // -1 * omega for comp bot
   }
 
   @Override
