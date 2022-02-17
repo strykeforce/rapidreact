@@ -13,6 +13,18 @@ using namespace deadeye;
 using hsv_t = std::array<int, 2>;
 using filter_t = std::array<double, 2>;
 
+struct compare {
+  bool operator()(const std::array<int, 5>& a,
+                  const std::array<int, 5>& b) const {
+    return a[4] > b[4];  // contour area is index 4
+  }
+} comparator;
+
+void print_target_areas(const TargetList& targets) {
+  for (int i = 0; i < targets.size(); ++i) {
+    WARN("target " << i << " area = " << targets[i][4]);
+  }
+}
 
 TEST_CASE("HubPipeline processes test image 1-1.jpg") {
   hsv_t hue{0, 105};
@@ -26,6 +38,8 @@ TEST_CASE("HubPipeline processes test image 1-1.jpg") {
   FilterConfig filter_config{area, solidity, aspect};
   LogConfig log_config;
 
+  json j;
+
   // CaptureConfig capture_config{CaptureType::file, 1280, 720, 30, {}};
   PipelineConfig pipeline_config{0, hue, sat, val, filter_config, log_config};
 
@@ -35,12 +49,43 @@ TEST_CASE("HubPipeline processes test image 1-1.jpg") {
   REQUIRE(frame.cols == 1280);
   REQUIRE(frame.rows == 720);
 
-  SECTION("with no filters") {
+  SECTION("with no filters & maxTargets = 99") {
+    j["maxTargets"] = 99;
+    pipeline_config.config = j;
     hpl->Configure(pipeline_config);
+
     auto td = hpl->ProcessFrame(frame);
     auto htd = dynamic_cast<HubTargetData*>(td.release());
     REQUIRE(htd->valid);
     REQUIRE(htd->targets.size() == 31);
+
+    REQUIRE(
+        std::is_sorted(htd->targets.begin(), htd->targets.end(), comparator));
+
+    REQUIRE(htd->Dump().size() == 552);
+
+    //    print_target_areas(htd->targets);
+
+    delete htd;
+  }
+
+  SECTION("with no filters & maxTargets = 5") {
+    j["maxTargets"] = 5;
+    pipeline_config.config = j;
+    hpl->Configure(pipeline_config);
+
+    auto td = hpl->ProcessFrame(frame);
+    auto htd = dynamic_cast<HubTargetData*>(td.release());
+    REQUIRE(htd->valid);
+    REQUIRE(htd->targets.size() == j["maxTargets"]);
+
+    REQUIRE(
+        std::is_sorted(htd->targets.begin(), htd->targets.end(), comparator));
+
+    REQUIRE(htd->Dump().size() == 136);
+
+    //    print_target_areas(htd->targets);
+
     delete htd;
   }
 }

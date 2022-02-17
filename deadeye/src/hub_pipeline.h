@@ -5,15 +5,18 @@ namespace rr {
 
 class HubPipeline : public deadeye::AbstractPipeline {
  public:
-  [[maybe_unused]] HubPipeline(int inum, std::string name);
+  HubPipeline(int inum, std::string name);
 
-  void Configure(const deadeye::PipelineConfig& config) override;
+  void Configure(const deadeye::PipelineConfig& config) final;
 
   std::unique_ptr<deadeye::TargetData> ProcessContours(
       deadeye::Contours const& contours) final;
 
  protected:
   [[nodiscard]] std::string ToString() const final;
+
+ private:
+  int max_targets_{};
 };
 
 }  // namespace rr
