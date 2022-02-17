@@ -28,15 +28,12 @@ import frc.robot.commands.magazine.PitMagazineOpenLoopCommand;
 import frc.robot.commands.magazine.PitReadCargoColor;
 import frc.robot.commands.magazine.UpperMagazineOpenLoopCommand;
 import frc.robot.commands.sequences.AutoIntakeCommand;
-import frc.robot.commands.sequences.TwoPathCommandGroup;
 import frc.robot.commands.shooter.HoodOpenLoopCommand;
 import frc.robot.commands.shooter.PitHoodOpenLoopCommand;
 import frc.robot.commands.shooter.PitShooterOpenLoopCommand;
 import frc.robot.commands.shooter.ShooterOpenLoopCommand;
-import frc.robot.commands.turret.DeadeyeLatencyTestCommandGroup;
 import frc.robot.commands.turret.OpenLoopTurretCommand;
 import frc.robot.commands.turret.PitTurretCloseLoopPositionCommand;
-import frc.robot.commands.turret.TurretAimCommandGroup;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
@@ -98,28 +95,33 @@ public class RobotContainer {
     driveSubsystem.setDefaultCommand(new DriveTeleopCommand(driveJoystick, driveSubsystem));
     new JoystickButton(driveJoystick, Button.RESET.id)
         .whenPressed(new ZeroGyroCommand(driveSubsystem));
-    new JoystickButton(driveJoystick, Button.HAMBURGER.id)
-        .whenPressed(new TwoPathCommandGroup(driveSubsystem, "straightPath", "straightPath2"));
-    new JoystickButton(driveJoystick, Button.DOWN.id)
-        .whenPressed(new TurretAimCommandGroup(visionSubsystem, turretSubsystem));
+    // new JoystickButton(driveJoystick, Button.HAMBURGER.id)
+    //     .whenPressed(new TwoPathCommandGroup(driveSubsystem, "straightPath", "straightPath2"));
+    // new JoystickButton(driveJoystick, Button.DOWN.id)
+    //     .whenPressed(new TurretAimCommandGroup(visionSubsystem, turretSubsystem));
     new JoystickButton(driveJoystick, Button.X.id).whenPressed(new XLockCommand(driveSubsystem));
-    new JoystickButton(driveJoystick, Button.UP.id)
-        .whenPressed(new DeadeyeLatencyTestCommandGroup(visionSubsystem, turretSubsystem));
+    // new JoystickButton(driveJoystick, Button.UP.id)
+    //     .whenPressed(new DeadeyeLatencyTestCommandGroup(visionSubsystem, turretSubsystem));
 
-    new JoystickButton(driveJoystick, Shoulder.LEFT_DOWN.id)
+    new JoystickButton(driveJoystick, Shoulder.RIGHT_DOWN.id)
         .whenPressed(new AutoIntakeCommand(magazineSubsystem, intakeSubsystem));
-    new JoystickButton(driveJoystick, Shoulder.LEFT_DOWN.id)
+    new JoystickButton(driveJoystick, Shoulder.RIGHT_DOWN.id)
         .whenReleased(
             new ParallelCommandGroup(
                 new IntakeOpenLoopCommand(intakeSubsystem, 0.0),
                 new LowerMagazineOpenLoopCommand(magazineSubsystem, 0.0)));
 
-    new JoystickButton(driveJoystick, Shoulder.RIGHT_DOWN.id)
+    new JoystickButton(driveJoystick, Shoulder.LEFT_DOWN.id)
         .whenPressed(
             new SequentialCommandGroup(
                 new PitClearCargoColor(magazineSubsystem),
                 new LowerMagazineOpenLoopCommand(
                     magazineSubsystem, MagazineConstants.kMagazineIntakeSpeed)));
+    new JoystickButton(driveJoystick, Shoulder.LEFT_DOWN.id)
+        .whenReleased(
+            new ParallelCommandGroup(
+                new IntakeOpenLoopCommand(intakeSubsystem, 0.0),
+                new LowerMagazineOpenLoopCommand(magazineSubsystem, 0.0)));
   }
 
   private void configureMatchDashboard() {
