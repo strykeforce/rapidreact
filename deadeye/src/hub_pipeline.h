@@ -5,9 +5,9 @@ namespace rr {
 
 class HubPipeline : public deadeye::AbstractPipeline {
  public:
-  [[maybe_unused]] HubPipeline(int inum, std::string name);
+  HubPipeline(int inum, std::string name);
 
-  void Configure(const deadeye::CaptureConfig& config) override;
+  void Configure(const deadeye::PipelineConfig& config) final;
 
   std::unique_ptr<deadeye::TargetData> ProcessContours(
       deadeye::Contours const& contours) final;
@@ -16,7 +16,7 @@ class HubPipeline : public deadeye::AbstractPipeline {
   [[nodiscard]] std::string ToString() const final;
 
  private:
-  std::string capture_type_{"unknown"};
+  int max_targets_{};
 };
 
 }  // namespace rr
