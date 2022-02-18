@@ -40,7 +40,6 @@ TEST_CASE("HubPipeline processes test image 1-1.jpg") {
 
   json j;
 
-  // CaptureConfig capture_config{CaptureType::file, 1280, 720, 30, {}};
   PipelineConfig pipeline_config{0, hue, sat, val, filter_config, log_config};
 
   std::unique_ptr<Pipeline> hpl = std::make_unique<HubPipeline>(2767, "test");
@@ -86,6 +85,63 @@ TEST_CASE("HubPipeline processes test image 1-1.jpg") {
 
     //    print_target_areas(htd->targets);
 
+    delete htd;
+  }
+}
+
+TEST_CASE("HubTargetData doesn't exceed maximum payload size") {
+  hsv_t hue{0, 255};
+  hsv_t sat{1, 255};
+  hsv_t val{0, 255};
+
+  filter_t area{0, 1.0};
+  filter_t solidity{0, 1.0};
+  filter_t aspect{0, 20.0};
+
+  FilterConfig filter_config{area, solidity, aspect};
+  LogConfig log_config;
+
+  json j;
+
+  PipelineConfig pipeline_config{0, hue, sat, val, filter_config, log_config};
+
+  std::unique_ptr<Pipeline> hpl = std::make_unique<HubPipeline>(2767, "test");
+
+  cv::Mat frame = cv::imread(DEADEYE_TEST_DATA "many_targets.jpg");
+  REQUIRE(frame.cols == 1280);
+  REQUIRE(frame.rows == 720);
+
+  SECTION("with max targets") {
+    j["maxTargets"] = 45;
+    pipeline_config.config = j;
+    hpl->Configure(pipeline_config);
+
+    auto td = hpl->ProcessFrame(frame);
+    auto htd = dynamic_cast<HubTargetData*>(td.release());
+    REQUIRE(htd->valid);
+    REQUIRE(htd->targets.size() == j["maxTargets"]);
+
+    REQUIRE(
+        std::is_sorted(htd->targets.begin(), htd->targets.end(), comparator));
+
+    REQUIRE(htd->Dump().size() < 1000);
+    delete htd;
+  }
+
+  SECTION("with max targets exceeded") {
+    j["maxTargets"] = 99;
+    pipeline_config.config = j;
+    hpl->Configure(pipeline_config);
+
+    auto td = hpl->ProcessFrame(frame);
+    auto htd = dynamic_cast<HubTargetData*>(td.release());
+    REQUIRE(htd->valid);
+    REQUIRE(htd->targets.size() == 45); //  kMaxTargetsAllowed = 45
+
+    REQUIRE(
+        std::is_sorted(htd->targets.begin(), htd->targets.end(), comparator));
+
+    REQUIRE(htd->Dump().size() < 1000);
     delete htd;
   }
 }

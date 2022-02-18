@@ -13,7 +13,8 @@ using namespace rr;
 
 namespace {
 constexpr int kMaxTargetsDefault = 10;
-}
+constexpr int kMaxTargetsAllowed = 45;
+}  // namespace
 
 HubPipeline::HubPipeline(int inum, std::string name)
     : AbstractPipeline{inum, std::move(name)},
@@ -23,6 +24,11 @@ void HubPipeline::Configure(const PipelineConfig& config) {
   AbstractPipeline::Configure(config);
   json j = config.config;
   max_targets_ = j.value("maxTargets", kMaxTargetsDefault);
+  if (max_targets_ > kMaxTargetsAllowed) {
+    spdlog::warn("maxTargets = {}, must be less than {}", max_targets_,
+                 kMaxTargetsAllowed);
+    max_targets_ = kMaxTargetsAllowed;
+  }
   spdlog::debug("{}: max targets = {}", *this, max_targets_);
 }
 
