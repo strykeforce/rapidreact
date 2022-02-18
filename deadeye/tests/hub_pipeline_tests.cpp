@@ -4,6 +4,7 @@
 #include <opencv2/imgcodecs.hpp>
 
 #include "catch2/catch.hpp"
+#include "common.h"
 #include "config/pipeline_config.h"
 #include "hub_pipeline.h"
 #include "hub_target_data.h"
@@ -168,7 +169,7 @@ TEST_CASE("HubTargetData doesn't exceed maximum payload size") {
     REQUIRE(htd->valid);
     REQUIRE(htd->targets.size() == j["maxTargets"]);
 
-    REQUIRE(htd->Dump().size() < 1000);
+    REQUIRE(htd->Dump().size() < TD_MAX_SIZE);
     delete htd;
   }
 
@@ -182,7 +183,7 @@ TEST_CASE("HubTargetData doesn't exceed maximum payload size") {
     REQUIRE(htd->valid);
     REQUIRE(htd->targets.size() == 45);  //  kMaxTargetsAllowed = 45
 
-    REQUIRE(htd->Dump().size() < 1000);
+    REQUIRE(htd->Dump().size() < TD_MAX_SIZE);
     delete htd;
   }
 }

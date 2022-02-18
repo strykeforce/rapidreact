@@ -10,6 +10,8 @@ using namespace deadeye;
 using namespace rr;
 using json = nlohmann::json;
 
+const char* HubTargetData::kErrorPixelsKey{"ep"};
+
 namespace {
 // minimum datagram size: IPv4 = 576 IPv6 = 1280
 const cv::Scalar BB_COLOR{20, 255, 20};            // NOLINT
@@ -36,7 +38,8 @@ std::string HubTargetData::Dump() const {
   json j = json{{TargetData::kIdKey, id},
                 {TargetData::kSerialKey, serial},
                 {TargetData::kValidKey, valid},
-                {TargetData::kDataKey, targets}};
+                {TargetData::kDataKey, targets},
+                {HubTargetData::kErrorPixelsKey, 0.0}};
 
   return j.dump();
 }

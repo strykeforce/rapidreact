@@ -1,6 +1,7 @@
 add_executable(Deadeye_tests
         main.cpp
         hub_pipeline_tests.cpp
+        hub_target_data_tests.cpp
         ${CMAKE_SOURCE_DIR}/src/hub_pipeline.cpp
         ${CMAKE_SOURCE_DIR}/src/hub_target_data.cpp
         )
