@@ -32,7 +32,6 @@ void HubPipeline::Configure(const PipelineConfig& config) {
   spdlog::debug("{}: max targets = {}", *this, max_targets_);
 }
 
-// Target is center of contour bounding box.
 std::unique_ptr<TargetData> HubPipeline::ProcessContours(
     Contours const& contours) {
   TargetList targets;
@@ -45,7 +44,11 @@ std::unique_ptr<TargetData> HubPipeline::ProcessContours(
     targets.push_back({bb.x, bb.y, bb.width, bb.height, area});
   }
 
-  return std::make_unique<HubTargetData>(id_, 0, !contours.empty(), targets);
+  // sort targets by bounding box x-coordinate, left to right
+  std::sort(targets.begin(), targets.end(),
+            [](const auto& a, const auto& b) { return a[0] < b[0]; });
+
+  return std::make_unique<HubTargetData>(id_, 0, !targets.empty(), targets);
 }
 
 std::string HubPipeline::ToString() const {
