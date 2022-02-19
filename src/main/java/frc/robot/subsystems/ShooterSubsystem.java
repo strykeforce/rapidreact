@@ -19,10 +19,12 @@ public class ShooterSubsystem extends MeasurableSubsystem {
   private final TalonFX shooterFalcon;
   private final TalonFX kickerFalcon;
   private final TalonSRX hoodTalon;
-  private ShooterStates currentState = ShooterStates.STOP;
+  private final MagazineSubsystem magazineSubsystem;
+  private ShooterState currentState = ShooterState.STOP;
   private double shooterSetPointTicks, kickerSetpointTicks, hoodSetPointTicks;
 
-  public ShooterSubsystem() {
+  public ShooterSubsystem(MagazineSubsystem magazineSubsystem) {
+    this.magazineSubsystem = magazineSubsystem;
     shooterFalcon = new TalonFX(ShooterConstants.kShooterFalconID);
     shooterFalcon.configFactoryDefault(Constants.kTalonConfigTimeout);
     shooterFalcon.configAllSettings(
@@ -88,10 +90,29 @@ public class ShooterSubsystem extends MeasurableSubsystem {
         < ShooterConstants.kCloseEnoughTicks);
   }
 
-  public void Arm() {
-    currentState = ShooterStates.ARMING;
+  public ShooterState getCurrentState() {
+    return currentState;
+  }
+
+  public void arm() {
+    currentState = ShooterState.ARMING;
     shooterClosedLoop(ShooterConstants.kKickerArmSpeed, ShooterConstants.kShooterArmSpeed);
     logger.info("Arming starting");
+  }
+
+  public void shoot() {
+    currentState = ShooterState.ADJUSTING;
+    if (magazineSubsystem.isNextCargoAlliance()) {
+      //Create look up table
+    } else {
+      shooterClosedLoop(ShooterConstants.kKickerOpSpeed , ShooterConstants.kShooterOpSpeed);
+      hoodClosedLoop(ShooterConstants.kHoodOpPos);
+    }
+  }
+
+  public void stop() {
+    logger.info("{} -> STOP", currentState);
+    currentState = ShooterState.STOP;
   }
 
   @Override
@@ -104,14 +125,19 @@ public class ShooterSubsystem extends MeasurableSubsystem {
         }
         break;
       case ARMING:
-        if (isHoodAtPos() == true && isShooterAtSpeed() == true) {
-          currentState = ShooterStates.ARMED;
+        if (isShooterAtSpeed()) {
+          currentState = ShooterState.ARMED;
+          logger.info("ARMING -> ARMED");
         }
         break;
       case ARMED:
-        // Just indicates that it is ready to shoot for other classes
+        // Just indicates that it is ready to shoot for other classes       
         break;
       case ADJUSTING:
+      if (isHoodAtPos() && isShooterAtSpeed()) {
+        currentState = ShooterState.SHOOT;
+        logger.info("ADJUSTING -> SHOOT");
+      }
         break;
       case SHOOT:
         // Just a state that lets other classes it needs to shoot
@@ -132,7 +158,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
     return Set.of();
   }
 
-  enum ShooterStates {
+  enum ShooterState {
     STOP,
     ARMING,
     ARMED,

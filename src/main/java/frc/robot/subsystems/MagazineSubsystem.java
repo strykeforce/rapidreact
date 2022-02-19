@@ -4,8 +4,12 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.ColorMatch;
 import com.revrobotics.ColorMatchResult;
 import com.revrobotics.ColorSensorV3;
+
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Constants.MagazineConstants;
+import frc.robot.subsystems.ShooterSubsystem.ShooterState;
+
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +25,14 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   private TalonSRX lowerMagazineTalon;
   private TalonSRX upperMagazineTalon;
   private CargoColor[] storedCargoColors = new CargoColor[] {CargoColor.NONE, CargoColor.NONE};
+  private CargoColor allianceCargoColor = CargoColor.NONE;
   private ColorMatch colorMatch = new ColorMatch();
   private MagazineState currMagazineState = MagazineState.STOP;
+  private final TurretSubsystem turretSubsystem;
+  private ShooterSubsystem shooterSubsystem;
 
-  public MagazineSubsystem() {
+  public MagazineSubsystem(TurretSubsystem turretSubsystem) {
+    this.turretSubsystem = turretSubsystem;
     // colorSensor = new ColorSensorV3(Port.kMXP);
 
     // lowerMagazineTalon = new TalonSRX(MagazineConstants.kLowerMagazineTalonID);
@@ -46,6 +54,10 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     colorMatch.addColorMatch(MagazineConstants.kBlueCargo);
     colorMatch.addColorMatch(MagazineConstants.kRedCargo);
     colorMatch.addColorMatch(MagazineConstants.kNoCargo);
+  }
+
+  public void setShooterSubsystem (ShooterSubsystem shooterSubsystem) {
+    this.shooterSubsystem = shooterSubsystem;
   }
 
   public void lowerOpenLoopRotate(double percentOutput) {
@@ -82,6 +94,14 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   public int getProximity() {
     lastProximity = colorSensor.getProximity();
     return lastProximity;
+  }
+
+  public void setAllianceColor(Alliance alliance) {
+    allianceCargoColor = alliance == Alliance.Red ? CargoColor.RED : CargoColor.BLUE;
+  }
+
+  public boolean isNextCargoAlliance() {
+    return storedCargoColors[0] == allianceCargoColor;
   }
 
   public CargoColor readCargoColor() {
@@ -139,6 +159,11 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   public void magazineInterrupted() {
     currMagazineState = MagazineState.STOP;
     logger.info("Magazine interrupted, switching state to stop");
+  }
+
+  public void shoot() {
+    logger.info("{} -> PAUSE}", currMagazineState);
+    currMagazineState = MagazineState.PAUSE;
   }
 
   @Override
@@ -199,9 +224,22 @@ public class MagazineSubsystem extends MeasurableSubsystem {
 
         break;
 
+      case PAUSE:
+      if (shooterSubsystem.getCurrentState() == "SHOOT" && turretSubsystem.getCurr)
+      break;
+      
+      case SHOOT:
+      
+      break;
+      
+      case CARGO_SHOT:
+      
+      break;
+      
       case STOP:
         stopMagazine();
         break;
+    
     }
   }
 
@@ -231,6 +269,9 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     WAIT_CARGO,
     READ_CARGO,
     INDEX_CARGO,
+    SHOOT,
+    CARGO_SHOT,
+    PAUSE,
     STOP;
   }
 }

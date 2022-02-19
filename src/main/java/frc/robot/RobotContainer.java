@@ -7,6 +7,9 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.SuppliedValueWidget;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.SmartDashboardConstants;
@@ -34,6 +37,9 @@ import frc.robot.subsystems.MagazineSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
+
+import java.util.Map;
+
 import org.strykeforce.telemetry.TelemetryController;
 import org.strykeforce.telemetry.TelemetryService;
 
@@ -55,11 +61,16 @@ public class RobotContainer {
 
   private final Joystick driveJoystick = new Joystick(0);
 
+  //Dashboard Widgets
+  private SuppliedValueWidget allianceColor;
+  private Alliance alliance = Alliance.Invalid;
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     configureTelemetry();
     configureDriverButtonBindings();
     configurePitDashboard();
+    configureMatchDashboard();
   }
 
   private void configureTelemetry() {
@@ -85,6 +96,16 @@ public class RobotContainer {
     new JoystickButton(driveJoystick, Button.HAMBURGER.id)
         .whenPressed(new TwoPathCommandGroup(driveSubsystem, "straightPath", "straightPath2"));
     new JoystickButton(driveJoystick, Button.X.id).whenPressed(new XLockCommand(driveSubsystem));
+  }
+
+  private void configureMatchDashboard() {
+    allianceColor = Shuffleboard.getTab("Match").addBoolean("AllianceColor", () -> alliance != Alliance.Invalid). withProperties(Map.of("colorWhenFalse", "black"));
+  }
+
+  public void setAllianceColor(Alliance alliance) {
+    this.alliance = alliance;
+    allianceColor.withProperties(Map.of("colorWhenTrue", alliance == Alliance.Red ? "red" : "blue", "colorWhenFalse", "black"));
+    magazineSubsystem.setAllianceColor(alliance);
   }
 
   private void configurePitDashboard() {
