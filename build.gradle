@@ -55,6 +55,7 @@ dependencies {
     implementation wpi.java.deps.wpilib()
     implementation wpi.java.vendor.java()
     implementation 'net.consensys.cava:cava-toml:0.5.0'
+    implementation("com.squareup.moshi:moshi:1.13.0")
 
 
     roborioDebug wpi.java.deps.wpilibJniDebug(wpi.platforms.roborio)
@@ -72,8 +73,8 @@ dependencies {
     simulationRelease wpi.sim.enableRelease()
 
         //Logging
-    implementation "ch.qos.logback:logback-classic:${logbackVersion}"
-    implementation 'io.github.microutils:kotlin-logging:1.6.10'
+    implementation "ch.qos.logback:logback-classic:1.2.10"
+    implementation 'io.github.microutils:kotlin-logging:2.1.21'
 
 
     testImplementation 'junit:junit:4.12'
@@ -110,4 +111,8 @@ spotless{
         removeUnusedImports()
         lineEndings = 'GIT_ATTRIBUTES'
     }
+}
+
+repositories {
+    mavenCentral()
 }

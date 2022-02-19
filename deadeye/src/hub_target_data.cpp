@@ -10,9 +10,10 @@ using namespace deadeye;
 using namespace rr;
 using json = nlohmann::json;
 
+const char* HubTargetData::kErrorPixelsKey{"ep"};
+
 namespace {
 // minimum datagram size: IPv4 = 576 IPv6 = 1280
-constexpr int MAX_SERIALIZED_SIZE = 1000;
 const cv::Scalar BB_COLOR{20, 255, 20};            // NOLINT
 const cv::Scalar CROSS_HAIR_COLOR{200, 200, 200};  // NOLINT
 }  // namespace
@@ -37,18 +38,10 @@ std::string HubTargetData::Dump() const {
   json j = json{{TargetData::kIdKey, id},
                 {TargetData::kSerialKey, serial},
                 {TargetData::kValidKey, valid},
-                {TargetData::kDataKey, targets}};
+                {TargetData::kDataKey, targets},
+                {HubTargetData::kErrorPixelsKey, 0.0}};
 
-  auto serialized = j.dump();
-
-  if (serialized.size() > MAX_SERIALIZED_SIZE) {
-    spdlog::error("HubTargetData too big for UDP: {}", serialized.size());
-    TargetList error_targets{{{-1, -1, -1, -1, -1}}};
-    HubTargetData td{id, serial, false, error_targets};
-    return td.Dump();
-  }
-
-  return serialized;
+  return j.dump();
 }
 #pragma clang diagnostic pop
 
