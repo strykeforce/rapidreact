@@ -1,14 +1,18 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.None;
 import com.revrobotics.ColorMatch;
 import com.revrobotics.ColorMatchResult;
 import com.revrobotics.ColorSensorV3;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Constants.MagazineConstants;
+import frc.robot.commands.magazine.UpperMagazineOpenLoopCommand;
 import frc.robot.subsystems.ShooterSubsystem.ShooterState;
+import frc.robot.subsystems.TurretSubsystem.TurretState;
 
 import java.util.Set;
 import org.slf4j.Logger;
@@ -30,10 +34,11 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   private MagazineState currMagazineState = MagazineState.STOP;
   private final TurretSubsystem turretSubsystem;
   private ShooterSubsystem shooterSubsystem;
+  private Timer timer = new Timer();
 
   public MagazineSubsystem(TurretSubsystem turretSubsystem) {
     this.turretSubsystem = turretSubsystem;
-    // colorSensor = new ColorSensorV3(Port.kMXP);
+    // colorSensor  = new ColorSensorV3(Port.kMXP);
 
     // lowerMagazineTalon = new TalonSRX(MagazineConstants.kLowerMagazineTalonID);
     // lowerMagazineTalon.configFactoryDefault(Constants.kTalonConfigTimeout);
@@ -225,15 +230,39 @@ public class MagazineSubsystem extends MeasurableSubsystem {
         break;
 
       case PAUSE:
-      if (shooterSubsystem.getCurrentState() == "SHOOT" && turretSubsystem.getCurr)
+      if (shooterSubsystem.getCurrentState() == ShooterState.SHOOT && turretSubsystem.getState() == TurretState.TRACKING) {
+        logger.info("PAUSE -> SHOOT");
+        upperOpenLoopRotate(MagazineConstants.kMagazineFeedSpeed);
+        currMagazineState = MagazineState.SHOOT;
+      }
       break;
-      
       case SHOOT:
-      
+      if (!isUpperBeamBroken()) {
+        currMagazineState = MagazineState.CARGO_SHOT;
+        timer.reset();
+        timer.start();
+        lowerOpenLoopRotate(MagazineConstants.kMagazineIndexSpeed);
+        shotOneCargo();
+        logger.info("SHOOT -> CARGO_SHOT");
+      }  
       break;
-      
       case CARGO_SHOT:
-      
+      if (timer.hasElapsed(MagazineConstants.kShootDelay) && isUpperBeamBroken()) {
+        if (storedCargoColors[0] != CargoColor.NONE) {
+          logger.info("CARGO_SHOT -> PAUSE");
+          shooterSubsystem.shoot();
+          currMagazineState = MagazineState.PAUSE;
+          upperOpenLoopRotate(0.0);
+          break;
+        }
+        currMagazineState = MagazineState.STOP;
+        logger.info("CARGO_SHOT -> STOP");
+        break;
+      }
+      if (isUpperBeamBroken() && upperMagazineTalon.getMotorOutputPercent() != 0.0) {
+        logger.info("CARGO_SHOT: Second cargo at top of magazine");
+        upperOpenLoopRotate(0.0);
+      }
       break;
       
       case STOP:
