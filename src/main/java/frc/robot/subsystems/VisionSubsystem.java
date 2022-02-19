@@ -51,6 +51,8 @@ public class VisionSubsystem extends MeasurableSubsystem
         new Measure("Distance From Width", this::getDistance1),
         new Measure("Distance From Db", this::getDistance2),
         new Measure("Distance From Height", this::getDistance3),
+        new Measure("Test Pixel Distance", this::getTargetsDistancePixel),
+        new Measure("Test Ground Distance", this::getTargetsDistanceGround),
         new Measure("Target Data SN", () -> targetData.serial));
   }
 
@@ -81,6 +83,14 @@ public class VisionSubsystem extends MeasurableSubsystem
 
   private double getDistance3() {
     return targetData.getDistance3();
+  }
+
+  public double getTargetsDistancePixel() {
+    return targetData.testGetTargetsPixelWidth();
+  }
+
+  public double getTargetsDistanceGround() {
+    return targetData.getGroundDistance();
   }
 
   private double getValid() {

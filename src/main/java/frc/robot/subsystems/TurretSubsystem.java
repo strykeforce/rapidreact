@@ -11,7 +11,6 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.BaseTalon;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.Constants;
 import frc.robot.Constants.TurretConstants;
@@ -111,14 +110,15 @@ public class TurretSubsystem extends MeasurableSubsystem {
   }
 
   public boolean isRotationFinished() {
-    double currentTurretPosition = turret.getSelectedSensorPosition();
-    if (Math.abs(targetTurretPosition - currentTurretPosition)
-        > Constants.TurretConstants.kCloseEnoughTicks) {
-      turretStableCounts = 0;
-    } else {
-      turretStableCounts++;
-    }
-    return turretStableCounts >= Constants.ShooterConstants.kStableCounts;
+    // double currentTurretPosition = turret.getSelectedSensorPosition();
+    // if (Math.abs(targetTurretPosition - currentTurretPosition)
+    //     > Constants.TurretConstants.kCloseEnoughTicks) {
+    //   turretStableCounts = 0;
+    // } else {
+    //   turretStableCounts++;
+    // }
+    // return turretStableCounts >= Constants.ShooterConstants.kStableCounts;
+    return trackingStableCount > TurretConstants.kRotateByStableCounts;
   }
 
   @Override
@@ -186,11 +186,11 @@ public class TurretSubsystem extends MeasurableSubsystem {
           currentState = TurretState.SEEKING;
           break;
         }
-        rotateKp =
-            MathUtil.interpolate(
-                TurretConstants.kRotateByInitialKp, kRotateByFinalKp, targetData.getInterpolateT());
+        // rotateKp =
+        //     MathUtil.interpolate(
+        //         TurretConstants.kRotateByInitialKp, kRotateByFinalKp,
+        // targetData.getInterpolateT());
         errorRotation2d = targetData.getErrorRotation2d();
-        rotateBy(errorRotation2d.times(rotateKp));
 
         if (Math.abs(errorRotation2d.getRadians())
             < TurretConstants.kCloseEnoughTarget.getRadians()) {
@@ -208,6 +208,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
           nextState = TurretState.AIMING;
           rotateKp = TurretConstants.kRotateByInitialKp;
         }
+        rotateBy(errorRotation2d.times(rotateKp));
 
         if (currentState != nextState) {
           logger.info("{} -> {}", currentState, nextState);

@@ -152,6 +152,8 @@ public final class Constants {
     public static final int kTableRes = 1;
     public static final int kShooterIndex = 2;
     public static final int kHoodIndex = 3;
+    public static final double kTapeHeightIn = 101.625; // in
+    public static final double kUpperHubRadiusIn = 26.6875;
     // + is left
     public static final double kHorizAngleCorrectionDegrees = 0.0; // 2.5 degrees
     // + is further along track and lower
@@ -176,8 +178,8 @@ public final class Constants {
     public static final int kReverseLimit = -100;
     public static final int kCloseEnoughTicks = 40;
     public static final Rotation2d kCloseEnoughTarget = Rotation2d.fromDegrees(1); // 1
-    public static final double kRotateByInitialKp = 0.1; // 4
-    public static final double kRotateByFinalKp = 0.75; // 0.95
+    public static final double kRotateByInitialKp = 0.4; // 4
+    public static final double kRotateByFinalKp = 0.95; // 0.95
     public static final int kRotateByStableCounts = 3; // 3
     public static final double kMaxStringPotZero = 100;
     public static final double kMinStringPotZero = 0;

@@ -13,6 +13,8 @@ import java.util.Objects;
 import okio.Buffer;
 import okio.BufferedSource;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.strykeforce.deadeye.DeadeyeJsonAdapter;
 import org.strykeforce.deadeye.Point;
 import org.strykeforce.deadeye.Rect;
@@ -23,6 +25,7 @@ public class HubTargetData extends TargetListTargetData {
   static int kFrameCenter = Integer.MAX_VALUE;
   private final double errorPixels;
   private final double range;
+  private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   public HubTargetData() {
     super();
@@ -109,7 +112,11 @@ public class HubTargetData extends TargetListTargetData {
     return VisionConstants.kTargetWidthIn / 2 / Math.tan(Math.toRadians(enclosedAngle / 2));
   }
 
-  // distance between targets
+  /**
+   * Uses the distance between the two highest targets to find the distance
+   *
+   * @return distance to target in inches, 2767 if not valid
+   */
   public double getDistance2() {
     if (!isValid() && (targets.size() > 1)) {
       return 2767;
@@ -131,7 +138,11 @@ public class HubTargetData extends TargetListTargetData {
     // 5.5 distance between targets in
   }
 
-  // height
+  /**
+   * Uses the height of the highest target to find the distance
+   *
+   * @return distance to target in inches, 2767 if not valid
+   */
   public double getDistance3() {
     if (!isValid()) {
       return 2767;
@@ -143,6 +154,57 @@ public class HubTargetData extends TargetListTargetData {
     double enclosedAngle = Math.toDegrees(kHorizonFov) * height / (kFrameCenter * 2);
     return 2 / 2 / Math.tan(Math.toRadians(enclosedAngle / 2));
     // 1st 2 is target height
+  }
+
+  public double testGetTargetsPixelWidth() {
+    double pixelWidth;
+
+    if (targets.size() % 2 == 1) {
+      Rect leftTarget = targets.get((targets.size() - 1) / 2 - 1);
+      Rect rightTarget = targets.get((targets.size() - 1) / 2 + 1);
+
+      pixelWidth = rightTarget.bottomRight.x - leftTarget.topLeft.x;
+    } else {
+      Rect leftTarget = targets.get(targets.size() / 2 - 2);
+      Rect rightTarget = targets.get(targets.size() / 2 + 1);
+
+      pixelWidth = rightTarget.topLeft.x - leftTarget.bottomRight.x;
+    }
+
+    return pixelWidth;
+  }
+
+  public double testGetDistance() {
+    double pixelWidth;
+
+    if (targets.size() % 2 == 1) {
+      Rect leftTarget = targets.get((targets.size() - 1) / 2 - 1);
+      Rect rightTarget = targets.get((targets.size() - 1) / 2 + 1);
+
+      pixelWidth = rightTarget.bottomRight.x - leftTarget.topLeft.x;
+      
+      double enclosedAngle = Math.toDegrees(kHorizonFov) * pixelWidth / (kFrameCenter * 2);
+      return 25.25 / 2 / Math.tan(Math.toRadians(enclosedAngle / 2));
+    } else {
+      Rect leftTarget = targets.get(targets.size() / 2 - 2);
+      Rect rightTarget = targets.get(targets.size() / 2 + 1);
+
+      pixelWidth = rightTarget.topLeft.x - leftTarget.bottomRight.x;
+
+      double enclosedAngle = Math.toDegrees(kHorizonFov) * pixelWidth / (kFrameCenter * 2);
+      return 25.625 / 2 / Math.tan(Math.toRadians(enclosedAngle / 2));
+    }
+  }
+
+  public double getGroundDistance() {
+    if (!isValid()) {
+      return 2767;
+    }
+
+    return Math.sqrt(
+            Math.pow(testGetTargetsPixelWidth(), 2)
+                - Math.pow(VisionConstants.kTapeHeightIn - VisionConstants.kCameraHeight, 2))
+        + VisionConstants.kUpperHubRadiusIn;
   }
 
   @SuppressWarnings("rawtypes")
