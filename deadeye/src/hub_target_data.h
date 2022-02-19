@@ -8,7 +8,11 @@ using json = nlohmann::json;
 
 namespace rr {
 using TargetList = std::vector<std::array<int, 5>>;
+
 struct HubTargetData : public deadeye::TargetData {
+  static const char* kErrorPixelsKey;
+  static const char* kRangeKey;
+
   TargetList targets;
 
   HubTargetData(std::string id, int sn, bool valid, TargetList targets);

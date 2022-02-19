@@ -6,7 +6,9 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.vision.DisableVisionCommand;
+import frc.robot.commands.vision.EnableVisionCommand;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -23,6 +25,7 @@ public class Robot extends TimedRobot {
     // deadeyeNetworkTableInstance.startClient("192.168.3.3", 1736); //TEST DEADEYE
     // deadeyeNetworkTableInstance.startClient("192.168.3.3", 1735); //real one
   }
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -32,6 +35,8 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+    CommandScheduler.getInstance()
+        .schedule(new EnableVisionCommand(m_robotContainer.getVisionSubsystem()));
   }
 
   /**
@@ -53,7 +58,10 @@ public class Robot extends TimedRobot {
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
-    new DisableVisionCommand(m_robotContainer.getVisionSubsystem()); // FIXME better way to do it?
+    CommandScheduler.getInstance()
+        .schedule(
+            new DisableVisionCommand(m_robotContainer.getVisionSubsystem())
+                .beforeStarting(new WaitCommand(1.0)));
   }
 
   @Override

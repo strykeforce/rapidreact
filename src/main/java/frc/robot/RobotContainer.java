@@ -64,6 +64,10 @@ public class RobotContainer {
     configurePitDashboard();
   }
 
+  public VisionSubsystem getVisionSubsystem() {
+    return visionSubsystem;
+  }
+
   private void configureTelemetry() {
     driveSubsystem.registerWith(telemetryService);
     shooterSubsystem.registerWith(telemetryService);
@@ -72,10 +76,6 @@ public class RobotContainer {
     intakeSubsystem.registerWith(telemetryService);
     visionSubsystem.registerWith(telemetryService);
     telemetryService.start();
-  }
-
-  public VisionSubsystem getVisionSubsystem() {
-    return visionSubsystem;
   }
 
   /**
