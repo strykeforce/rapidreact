@@ -33,10 +33,12 @@ public class VisionSubsystem extends MeasurableSubsystem
 
   public void enable() {
     deadeye.setEnabled(true);
+    logger.info("enabled vision system");
   }
 
   public void disable() {
     deadeye.setEnabled(false);
+    logger.info("disabled vision system");
   }
 
   @Override

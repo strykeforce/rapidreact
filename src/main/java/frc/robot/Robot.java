@@ -6,7 +6,9 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.vision.DisableVisionCommand;
+import frc.robot.commands.vision.EnableVisionCommand;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -33,6 +35,8 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+    CommandScheduler.getInstance()
+        .schedule(new EnableVisionCommand(m_robotContainer.getVisionSubsystem()));
   }
 
   /**
@@ -55,7 +59,9 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
     CommandScheduler.getInstance()
-        .schedule(new DisableVisionCommand(m_robotContainer.getVisionSubsystem()));
+        .schedule(
+            new DisableVisionCommand(m_robotContainer.getVisionSubsystem())
+                .beforeStarting(new WaitCommand(1.0)));
   }
 
   @Override
