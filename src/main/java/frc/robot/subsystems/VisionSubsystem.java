@@ -46,6 +46,9 @@ public class VisionSubsystem extends MeasurableSubsystem
         new Measure("Error Radians", this::getErrorRadians),
         new Measure("Error Degrees", this::getErrorDegrees),
         new Measure("Target Data Valid", this::getValid),
+        new Measure("Distance From Width", this::getDistance1),
+        new Measure("Distance From Db", this::getDistance2),
+        new Measure("Distance From Height", this::getDistance3),
         new Measure("Target Data SN", () -> targetData.serial));
   }
 
@@ -64,6 +67,18 @@ public class VisionSubsystem extends MeasurableSubsystem
   private double getErrorDegrees() {
     var td = targetData;
     return td.isValid() ? Math.toDegrees(td.getErrorRadians()) : 2767.0;
+  }
+
+  private double getDistance1() {
+    return targetData.getDistance1();
+  }
+
+  private double getDistance2() {
+    return targetData.getDistance2();
+  }
+
+  private double getDistance3() {
+    return targetData.getDistance3();
   }
 
   private double getValid() {

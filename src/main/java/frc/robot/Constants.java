@@ -138,9 +138,8 @@ public final class Constants {
     public static final double kVerticalFov = 48.8;
     public static final double kHorizonFov = 1.012; // 50.8 //146 //radians 1.012 // deg 57.999
     public static final double kHorizonRes = 640; // 1280
-    public static final double kTargetWidthIn = 39.5; // 34.6
+    public static final double kTargetWidthIn = 5;
     public static final double kCameraHeight = 20.75;
-    public static final double kTargetHeight = 98.5;
     public static final double kSizeThreshold = 400;
     public static final double kDistanceThreshold = 200;
     public static final int kStableRange = 20;
@@ -177,9 +176,9 @@ public final class Constants {
     public static final int kReverseLimit = -100;
     public static final int kCloseEnoughTicks = 40;
     public static final Rotation2d kCloseEnoughTarget = Rotation2d.fromDegrees(1); // 1
-    public static final double kRotateByInitialKp = 0.1;//4
-    public static final double kRotateByFinalKp = 0.75;//0.95
-    public static final int kRotateByStableCounts = 3;//3
+    public static final double kRotateByInitialKp = 0.1; // 4
+    public static final double kRotateByFinalKp = 0.75; // 0.95
+    public static final int kRotateByStableCounts = 3; // 3
     public static final double kMaxStringPotZero = 100;
     public static final double kMinStringPotZero = 0;
     public static final int kTurretId = 42;

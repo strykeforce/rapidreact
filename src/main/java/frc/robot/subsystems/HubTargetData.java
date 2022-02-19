@@ -5,9 +5,9 @@ import static frc.robot.Constants.VisionConstants.kHorizonFov;
 import com.squareup.moshi.JsonReader;
 import com.squareup.moshi.JsonWriter;
 import edu.wpi.first.math.geometry.Rotation2d;
+import frc.robot.Constants.VisionConstants;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import okio.Buffer;
@@ -28,7 +28,7 @@ public class HubTargetData extends TargetListTargetData {
 
   public HubTargetData(@NotNull String id, int serial, boolean valid, @NotNull List<Rect> targets) {
     super(id, serial, valid, targets);
-    targets.sort(Comparator.comparingInt(r -> r.topLeft.x));
+    // targets.sort(Comparator.comparingInt(r -> r.topLeft.x));
   }
 
   /**
@@ -49,6 +49,7 @@ public class HubTargetData extends TargetListTargetData {
    * @throws IndexOutOfBoundsException if the list of targets is empty
    */
   public double getErrorPixels() {
+    // FIXME use inside edges
     int minX = targets.get(0).topLeft.x;
     int maxX = targets.get(targets.size() - 1).bottomRight.x;
     return (maxX + minX) / 2.0 - kFrameCenter;
@@ -79,6 +80,60 @@ public class HubTargetData extends TargetListTargetData {
   public double getInterpolateT() {
     return (kFrameCenter - Math.abs(getErrorPixels())) / kFrameCenter;
   }
+
+  /**
+   * Uses the width of the highest target to find the distance
+   *
+   * @return distance to target in inches, 2767 if not valid
+   */
+  public double getDistance1() {
+    if (!isValid()) {
+      return 2767;
+    }
+
+    List<Rect> targetData = targetsOrderedByTopLeftY();
+    double width = targetData.get(0).width();
+
+    double enclosedAngle = Math.toDegrees(kHorizonFov) * width / (kFrameCenter * 2);
+    return VisionConstants.kTargetWidthIn / 2 / Math.tan(Math.toRadians(enclosedAngle / 2));
+  }
+
+  // distance between targets
+  public double getDistance2() {
+    if (!isValid() && (targets.size() > 1)) {
+      return 2767;
+    }
+
+    List<Rect> targetData = targetsOrderedByTopLeftY();
+    Rect target1 = targetData.get(0);
+    Rect target2 = targetData.get(1);
+
+    double targetDistance;
+    if (target1.topLeft.x > target2.topLeft.x) {
+      targetDistance = target1.topLeft.x - target2.bottomRight.x;
+    } else {
+      targetDistance = target2.topLeft.x - target1.bottomRight.x;
+    }
+
+    double enclosedAngle = Math.toDegrees(kHorizonFov) * targetDistance / (kFrameCenter * 2);
+    return 5.5 / 2 / Math.tan(Math.toRadians(enclosedAngle / 2));
+    // 5.5 distance between targets in
+  }
+
+  // height
+  public double getDistance3() {
+    if (!isValid()) {
+      return 2767;
+    }
+
+    List<Rect> targetData = targetsOrderedByTopLeftY();
+    double height = targetData.get(0).height();
+
+    double enclosedAngle = Math.toDegrees(kHorizonFov) * height / (kFrameCenter * 2);
+    return 2 / 2 / Math.tan(Math.toRadians(enclosedAngle / 2));
+    // 1st 2 is target height
+  }
+
   @SuppressWarnings("rawtypes")
   @Override
   public @NotNull DeadeyeJsonAdapter getJsonAdapter() {

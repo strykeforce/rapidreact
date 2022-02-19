@@ -1,17 +1,16 @@
 package frc.robot.subsystems;
 
+import static frc.robot.Constants.TurretConstants.kRotateByFinalKp;
 import static frc.robot.Constants.TurretConstants.kTurretId;
 import static frc.robot.Constants.TurretConstants.kTurretMidpoint;
 import static frc.robot.Constants.TurretConstants.kTurretTicksPerRadian;
 import static frc.robot.Constants.TurretConstants.kTurretZeroTicks;
 import static frc.robot.Constants.TurretConstants.kWrapRange;
-import static frc.robot.Constants.TurretConstants.kRotateByFinalKp;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.BaseTalon;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.Constants;
@@ -106,6 +105,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
   public double getRotateByKp() {
     return rotateKp;
   }
+
   public void openLoopRotate(double percentOutput) {
     turret.set(ControlMode.PercentOutput, percentOutput);
   }
@@ -123,8 +123,9 @@ public class TurretSubsystem extends MeasurableSubsystem {
 
   @Override
   public @NotNull Set<Measure> getMeasures() {
-    return Set.of(new Measure("TurretAtTarget", () -> isRotationFinished() ? 1.0 : 0.0),
-    new Measure("rotateKp", this::getRotateByKp));
+    return Set.of(
+        new Measure("TurretAtTarget", () -> isRotationFinished() ? 1.0 : 0.0),
+        new Measure("rotateKp", this::getRotateByKp));
   }
 
   @Override
@@ -185,7 +186,9 @@ public class TurretSubsystem extends MeasurableSubsystem {
           currentState = TurretState.SEEKING;
           break;
         }
-        rotateKp = MathUtil.interpolate(TurretConstants.kRotateByInitialKp, kRotateByFinalKp,targetData.getInterpolateT());
+        rotateKp =
+            MathUtil.interpolate(
+                TurretConstants.kRotateByInitialKp, kRotateByFinalKp, targetData.getInterpolateT());
         errorRotation2d = targetData.getErrorRotation2d();
         rotateBy(errorRotation2d.times(rotateKp));
 

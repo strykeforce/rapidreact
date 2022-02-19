@@ -2,6 +2,7 @@ package frc.robot.commands.turret;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.subsystems.TurretSubsystem.TurretState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +23,7 @@ public class TurretAimCommand extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return false; // turretSubsystem.getState() == TurretState.TRACKING;
+    return turretSubsystem.getState() == TurretState.TRACKING;
   }
 
   @Override

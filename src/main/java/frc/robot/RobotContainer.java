@@ -74,6 +74,10 @@ public class RobotContainer {
     telemetryService.start();
   }
 
+  public VisionSubsystem getVisionSubsystem() {
+    return visionSubsystem;
+  }
+
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
    * instantiating a {@link GenericHID} or one of its subclasses ({@link
@@ -116,14 +120,17 @@ public class RobotContainer {
     SmartDashboard.putNumber(SmartDashboardConstants.kPitHoodOpenLoop, 0.0);
     SmartDashboard.putData("Pit/Hood/hoodStart", new PitHoodOpenLoopCommand(shooterSubsystem));
     SmartDashboard.putData("Pit/Hood/hoodStop", new HoodOpenLoopCommand(shooterSubsystem, 0.0));
+
     // intake pit commands
     SmartDashboard.putNumber("Pit/Intake/Speed", 0.0);
+
     // Turret Pit Commands
     SmartDashboard.putNumber(
         SmartDashboardConstants.kTurretSetpointRadians,
         turretSubsystem.getRotation2d().getRadians());
     SmartDashboard.putData(
         "Pit/Turret/CloseLoopPosition", new PitTurretCloseLoopPositionCommand(turretSubsystem));
+    // SmartDashboard.putData("Pit/Turret/StopTracking", new StopTrackingCommand(turretSubsystem));
     SmartDashboard.putData("Pit/Intake/Start", new PitIntakeOpenLoopCommand(intakeSubsystem));
     SmartDashboard.putData("Pit/Intake/Stop", new IntakeOpenLoopCommand(intakeSubsystem, 0.0));
 
