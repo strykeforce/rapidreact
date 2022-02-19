@@ -93,6 +93,10 @@ public class RobotContainer {
         .whenPressed(new DeadeyeLatencyTestCommandGroup(visionSubsystem, turretSubsystem));
   }
 
+  public VisionSubsystem getVisionSubsystem() {
+    return visionSubsystem;
+  }
+
   private void configurePitDashboard() {
     // Magazine Commands
     SmartDashboard.putNumber("Pit/Magazine/Speed", 0.0);
