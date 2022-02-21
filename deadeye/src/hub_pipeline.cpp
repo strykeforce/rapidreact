@@ -48,7 +48,8 @@ std::unique_ptr<TargetData> HubPipeline::ProcessContours(
   std::sort(targets.begin(), targets.end(),
             [](const auto& a, const auto& b) { return a[0] < b[0]; });
 
-  return std::make_unique<HubTargetData>(id_, 0, !targets.empty(), targets);
+  return std::make_unique<HubTargetData>(id_, 0, !targets.empty(), 0.0, 0.0,
+                                         targets);
 }
 
 std::string HubPipeline::ToString() const {

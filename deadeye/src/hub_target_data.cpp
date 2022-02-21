@@ -1,7 +1,6 @@
 #include "hub_target_data.h"
 
 #include <fmt/core.h>
-#include <spdlog/spdlog.h>
 
 #include <opencv2/imgproc.hpp>
 #include <utility>
@@ -20,8 +19,12 @@ const cv::Scalar CROSS_HAIR_COLOR{200, 200, 200};  // NOLINT
 }  // namespace
 
 HubTargetData::HubTargetData(std::string id, int sn, bool valid,
+                             double error_pixels, double range,
                              TargetList targets)
-    : TargetData{std::move(id), sn, valid}, targets{std::move(targets)} {}
+    : TargetData{std::move(id), sn, valid},
+      error_pixels{error_pixels},
+      range{range},
+      targets{std::move(targets)} {}
 
 void HubTargetData::DrawMarkers(cv::Mat& preview) const {
   for (const auto& t : targets) {
@@ -41,8 +44,8 @@ std::string HubTargetData::Dump() const {
       {TargetData::kSerialKey, serial},
       {TargetData::kValidKey, valid},
       {TargetData::kDataKey, targets},
-      {HubTargetData::kErrorPixelsKey, 0.0},
-      {HubTargetData::kRangeKey, 0.0},
+      {HubTargetData::kErrorPixelsKey, error_pixels},
+      {HubTargetData::kRangeKey, range},
   };
 
   return j.dump();

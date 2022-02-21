@@ -16,7 +16,7 @@ class HubPipeline : public deadeye::AbstractPipeline {
   [[nodiscard]] std::string ToString() const final;
 
  private:
-  int max_targets_{};
+  int max_targets_;
 };
 
 }  // namespace rr
