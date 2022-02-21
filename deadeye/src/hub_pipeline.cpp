@@ -18,7 +18,13 @@ constexpr int kMaxTargetsAllowed = 45;
 
 HubPipeline::HubPipeline(int inum, std::string name)
     : AbstractPipeline{inum, std::move(name)},
-      max_targets_{kMaxTargetsDefault} {}
+      max_targets_{kMaxTargetsDefault},
+      frame_x_center_{0} {}
+
+void HubPipeline::Configure(const CaptureConfig& config) {
+  AbstractPipeline::Configure(config);
+  frame_x_center_ = config.width / 2;
+}
 
 void HubPipeline::Configure(const PipelineConfig& config) {
   AbstractPipeline::Configure(config);
@@ -48,7 +54,8 @@ std::unique_ptr<TargetData> HubPipeline::ProcessContours(
   std::sort(targets.begin(), targets.end(),
             [](const auto& a, const auto& b) { return a[0] < b[0]; });
 
-  return std::make_unique<HubTargetData>(id_, 0, !targets.empty(), targets);
+  return std::make_unique<HubTargetData>(id_, 0, !targets.empty(), 0.0, 0.0,
+                                         targets, frame_x_center_);
 }
 
 std::string HubPipeline::ToString() const {
