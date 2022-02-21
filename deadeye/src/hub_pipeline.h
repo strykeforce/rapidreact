@@ -7,6 +7,7 @@ class HubPipeline : public deadeye::AbstractPipeline {
  public:
   HubPipeline(int inum, std::string name);
 
+  void Configure(const deadeye::CaptureConfig& config) override;
   void Configure(const deadeye::PipelineConfig& config) final;
 
   std::unique_ptr<deadeye::TargetData> ProcessContours(
@@ -17,6 +18,7 @@ class HubPipeline : public deadeye::AbstractPipeline {
 
  private:
   int max_targets_;
+  int frame_x_center_;
 };
 
 }  // namespace rr

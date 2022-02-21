@@ -18,7 +18,7 @@ TargetList GetTargetList(int count) {
 }
 
 TEST_CASE("target data JSON") {
-  HubTargetData htd{"Z0", 1, true, 0.0, 0.0, GetTargetList(1)};
+  HubTargetData htd{"Z0", 1, true, 0.0, 0.0, GetTargetList(1), 640};
 
   json actual = json::parse(htd.Dump());
 
@@ -39,7 +39,7 @@ TEST_CASE("target data JSON") {
 }
 
 TEST_CASE("maximum sized target data") {
-  HubTargetData htd{"Z0", 1, true, 0.0, 0.0, GetTargetList(43)};
+  HubTargetData htd{"Z0", 1, true, 0.0, 0.0, GetTargetList(43), 640};
   std::string htd_json = htd.Dump();
   INFO(htd_json);
   REQUIRE(htd_json.size() < TD_MAX_SIZE);
