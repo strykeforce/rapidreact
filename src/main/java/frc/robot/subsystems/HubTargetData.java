@@ -182,7 +182,7 @@ public class HubTargetData extends TargetListTargetData {
       Rect rightTarget = targets.get((targets.size() - 1) / 2 + 1);
 
       pixelWidth = rightTarget.bottomRight.x - leftTarget.topLeft.x;
-      
+
       double enclosedAngle = Math.toDegrees(kHorizonFov) * pixelWidth / (kFrameCenter * 2);
       return 25.25 / 2 / Math.tan(Math.toRadians(enclosedAngle / 2));
     } else {

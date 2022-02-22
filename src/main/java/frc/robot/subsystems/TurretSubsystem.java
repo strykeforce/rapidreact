@@ -32,6 +32,8 @@ public class TurretSubsystem extends MeasurableSubsystem {
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
   private TurretState currentState = TurretState.IDLE;
   private final VisionSubsystem visionSubsystem;
+  private MagazineSubsystem magazineSubsystem;
+
   private int trackingStableCount;
   private double rotateKp;
 
@@ -39,6 +41,10 @@ public class TurretSubsystem extends MeasurableSubsystem {
     this.visionSubsystem = visionSubsystem;
     configTalons();
     zeroTurret();
+  }
+
+  public void setMagazineSubsystem(MagazineSubsystem magazineSubsystem) {
+    this.magazineSubsystem = magazineSubsystem;
   }
 
   private void configTalons() {
@@ -169,6 +175,16 @@ public class TurretSubsystem extends MeasurableSubsystem {
     currentState = TurretState.IDLE;
   }
 
+  public void fenderShot() {
+    logger.info("{} -> FENDER_ADJUSTING}", currentState);
+    currentState = TurretState.FENDER_ADJUSTING;
+    if (magazineSubsystem.isNextCargoAlliance()) {
+      rotateTo(TurretConstants.kFenderAlliance);
+    } else {
+      rotateTo(TurretConstants.kFenderOpponent);
+    }
+  }
+
   @Override
   public void periodic() {
     HubTargetData targetData;
@@ -215,6 +231,15 @@ public class TurretSubsystem extends MeasurableSubsystem {
         }
         currentState = nextState;
         break;
+      case FENDER_ADJUSTING:
+        if (isRotationFinished()) {
+          currentState = TurretState.FENDER_AIMED;
+          logger.info("FENDER_ADJUSTING -> FENDER_AIMED");
+        }
+        break;
+      case FENDER_AIMED:
+        // indicator for other subsystems
+        break;
       case IDLE:
         // do nothing
         break;
@@ -227,6 +252,8 @@ public class TurretSubsystem extends MeasurableSubsystem {
     SEEKING,
     AIMING,
     TRACKING,
-    IDLE
+    IDLE,
+    FENDER_ADJUSTING,
+    FENDER_AIMED;
   }
 }
