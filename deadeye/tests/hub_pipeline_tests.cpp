@@ -73,7 +73,7 @@ TEST_CASE("HubPipeline processes test image 1-1.jpg") {
     REQUIRE(htd->valid);
     REQUIRE(htd->targets.size() == 31);
 
-    REQUIRE(htd->Dump().size() == 561);
+    REQUIRE(htd->Dump().size() == 569);
 
     //    print_target_areas(htd->targets);
 
@@ -90,7 +90,7 @@ TEST_CASE("HubPipeline processes test image 1-1.jpg") {
     REQUIRE(htd->valid);
     REQUIRE(htd->targets.size() == j["maxTargets"]);
 
-    REQUIRE(htd->Dump().size() == 145);
+    REQUIRE(htd->Dump().size() == 153);
 
     //    print_target_areas(htd->targets);
 

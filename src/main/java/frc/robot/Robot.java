@@ -8,6 +8,9 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.commands.vision.DisableVisionCommand;
+import frc.robot.commands.vision.EnableVisionCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +31,7 @@ public class Robot extends TimedRobot {
     // deadeyeNetworkTableInstance.startClient("192.168.3.3", 1736); //TEST DEADEYE
     // deadeyeNetworkTableInstance.startClient("192.168.3.3", 1735); //real one
   }
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -38,6 +42,8 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
     haveAlliance = false;
+    CommandScheduler.getInstance()
+        .schedule(new EnableVisionCommand(m_robotContainer.getVisionSubsystem()));
   }
 
   /**
@@ -66,7 +72,12 @@ public class Robot extends TimedRobot {
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    CommandScheduler.getInstance()
+        .schedule(
+            new DisableVisionCommand(m_robotContainer.getVisionSubsystem())
+                .beforeStarting(new WaitCommand(1.0)));
+  }
 
   @Override
   public void disabledPeriodic() {}

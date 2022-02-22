@@ -119,6 +119,10 @@ public class RobotContainer {
     magazineSubsystem.setAllianceColor(alliance);
   }
 
+  public VisionSubsystem getVisionSubsystem() {
+    return visionSubsystem;
+  }
+
   private void configurePitDashboard() {
     // Magazine Commands
     SmartDashboard.putNumber("Pit/Magazine/Speed", 0.0);
