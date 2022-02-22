@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -54,21 +55,25 @@ import org.strykeforce.telemetry.TelemetryService;
 public class RobotContainer {
 
   private final DriveSubsystem driveSubsystem = new DriveSubsystem(true);
-  private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
-  private final MagazineSubsystem magazineSubsystem = new MagazineSubsystem();
-  private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   private final VisionSubsystem visionSubsystem = new VisionSubsystem();
   private final TurretSubsystem turretSubsystem = new TurretSubsystem(visionSubsystem);
+  private final MagazineSubsystem magazineSubsystem = new MagazineSubsystem(turretSubsystem);
+  private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem(magazineSubsystem);
+  private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   private final TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
 
   private final Joystick driveJoystick = new Joystick(0);
 
-  // Dashboard items
+  // Dashboard Widgets
   private SuppliedValueWidget firstCargo;
   private SuppliedValueWidget secondCargo;
+  private SuppliedValueWidget allianceColor;
+  private Alliance alliance = Alliance.Invalid;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    turretSubsystem.setMagazineSubsystem(magazineSubsystem);
+    magazineSubsystem.setShooterSubsystem(shooterSubsystem);
     configureTelemetry();
     configureDriverButtonBindings();
     configurePitDashboard();
@@ -135,6 +140,11 @@ public class RobotContainer {
             .addBoolean(
                 "Second Cargo", () -> magazineSubsystem.getAllCargoColors()[1] != CargoColor.NONE)
             .withProperties(Map.of("colorWhenFalse", "black"));
+
+    allianceColor =
+        Shuffleboard.getTab("Match")
+            .addBoolean("AllianceColor", () -> alliance != Alliance.Invalid)
+            .withProperties(Map.of("colorWhenFalse", "black"));
   }
 
   public void updateMatchData() {
@@ -150,6 +160,18 @@ public class RobotContainer {
             magazineSubsystem.getAllCargoColors()[1].color,
             "colorWhenFalse",
             "black"));
+  }
+
+  public void setAllianceColor(Alliance alliance) {
+    this.alliance = alliance;
+    allianceColor.withProperties(
+        Map.of(
+            "colorWhenTrue", alliance == Alliance.Red ? "red" : "blue", "colorWhenFalse", "black"));
+    magazineSubsystem.setAllianceColor(alliance);
+  }
+
+  public VisionSubsystem getVisionSubsystem() {
+    return visionSubsystem;
   }
 
   private void configurePitDashboard() {
