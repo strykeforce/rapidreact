@@ -4,8 +4,11 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.opencsv.CSVReader;
 import frc.robot.Constants;
 import frc.robot.Constants.ShooterConstants;
+import java.io.FileReader;
+import java.util.List;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +25,11 @@ public class ShooterSubsystem extends MeasurableSubsystem {
   private final MagazineSubsystem magazineSubsystem;
   private ShooterState currentState = ShooterState.STOP;
   private double shooterSetPointTicks, kickerSetpointTicks, hoodSetPointTicks;
+  private String[][] lookupTable;
 
   public ShooterSubsystem(MagazineSubsystem magazineSubsystem) {
     this.magazineSubsystem = magazineSubsystem;
+    parseLookupTable();
     shooterFalcon = new TalonFX(ShooterConstants.kShooterFalconID);
     shooterFalcon.configFactoryDefault(Constants.kTalonConfigTimeout);
     shooterFalcon.configAllSettings(
@@ -51,6 +56,56 @@ public class ShooterSubsystem extends MeasurableSubsystem {
     hoodTalon.configForwardSoftLimitThreshold(ShooterConstants.kForwardSoftLimts);
     hoodTalon.configReverseSoftLimitEnable(true);
     hoodTalon.configReverseSoftLimitThreshold(ShooterConstants.kReverseSoftLimits);
+  }
+
+  private void parseLookupTable() {
+    try {
+      CSVReader csvReader = new CSVReader(new FileReader(ShooterConstants.kLookupTablePath));
+
+      List<String[]> list = csvReader.readAll();
+
+      String[][] strArr = new String[list.size()][];
+      lookupTable = list.toArray(strArr);
+    } catch (Exception exception) {
+      logger.error("Could not read table at {}", ShooterConstants.kLookupTablePath);
+    }
+  }
+
+  private double[] getShootSolution() {
+    // fix me get pixel width from vision
+    double widthPixels = 50;
+    int index = 0;
+
+    if (widthPixels < ShooterConstants.kLookupMinPixel) {
+      logger.warn(
+          "Pixel width {} is less than min pixel in table, using {}",
+          widthPixels,
+          ShooterConstants.kLookupMinPixel);
+      index = 1;
+    } else if (widthPixels > ShooterConstants.kLookupMaxPixel) {
+      logger.warn(
+          "Pixel width {} is more than max pixel in table, using {}",
+          widthPixels,
+          ShooterConstants.kLookupMaxPixel);
+      index = lookupTable.length - 1;
+    } else {
+      index =
+          (int)
+              (Math.round(widthPixels / ShooterConstants.kLookupRes)
+                  + 1
+                  - ShooterConstants.kLookupMinPixel);
+      logger.info("Selected Index: {}", index);
+    }
+    double[] shootSolution = new double[3];
+    shootSolution[0] = Double.parseDouble(lookupTable[index][2]);
+    shootSolution[1] = Double.parseDouble(lookupTable[index][3]);
+    shootSolution[2] = Double.parseDouble(lookupTable[index][4]);
+    logger.info(
+        "Kicker Speed: {} Shooter Speed: {} Hood Pos: {}",
+        shootSolution[0],
+        shootSolution[1],
+        shootSolution[2]);
+    return shootSolution;
   }
 
   public void shooterOpenLoop(double speed) {
@@ -96,17 +151,36 @@ public class ShooterSubsystem extends MeasurableSubsystem {
 
   public void arm() {
     currentState = ShooterState.ARMING;
-    shooterClosedLoop(ShooterConstants.kKickerArmSpeed, ShooterConstants.kShooterArmSpeed);
+    shooterClosedLoop(
+        ShooterConstants.kKickerArmTicksP100ms, ShooterConstants.kShooterArmTicksP100ms);
     logger.info("Arming starting");
   }
 
   public void shoot() {
+    logger.info("SHOOT: {} -> ADJUSTING}", currentState);
     currentState = ShooterState.ADJUSTING;
-    if (magazineSubsystem.isNextCargoAlliance()) {
-      //Create look up table
+    if (!magazineSubsystem.isNextCargoAlliance()) {
+      shooterClosedLoop(
+          ShooterConstants.kKickerOpTicksP100ms, ShooterConstants.kShooterOpTicksP100ms);
+      hoodClosedLoop(ShooterConstants.kHoodOpTicks);
     } else {
-      shooterClosedLoop(ShooterConstants.kKickerOpSpeed , ShooterConstants.kShooterOpSpeed);
-      hoodClosedLoop(ShooterConstants.kHoodOpPos);
+      double[] shootSolution = getShootSolution();
+      shooterClosedLoop(shootSolution[0], shootSolution[1]);
+      hoodClosedLoop(shootSolution[2]);
+    }
+  }
+
+  public void fenderShot() {
+    logger.info("FENDER_SHOT: {} -> ADJUSTING", currentState);
+    currentState = ShooterState.ADJUSTING;
+    if (!magazineSubsystem.isNextCargoAlliance()) {
+      shooterClosedLoop(
+          ShooterConstants.kKickerOpTicksP100ms, ShooterConstants.kShooterOpTicksP100ms);
+      hoodClosedLoop(ShooterConstants.kHoodOpTicks);
+    } else {
+      shooterClosedLoop(
+          ShooterConstants.kKickerFenderTicksP100ms, ShooterConstants.kShooterFenderTicksP100ms);
+      hoodClosedLoop(ShooterConstants.kHoodFenderTicks);
     }
   }
 
@@ -131,13 +205,13 @@ public class ShooterSubsystem extends MeasurableSubsystem {
         }
         break;
       case ARMED:
-        // Just indicates that it is ready to shoot for other classes       
+        // Just indicates that it is ready to shoot for other classes
         break;
       case ADJUSTING:
-      if (isHoodAtPos() && isShooterAtSpeed()) {
-        currentState = ShooterState.SHOOT;
-        logger.info("ADJUSTING -> SHOOT");
-      }
+        if (isHoodAtPos() && isShooterAtSpeed()) {
+          currentState = ShooterState.SHOOT;
+          logger.info("ADJUSTING -> SHOOT");
+        }
         break;
       case SHOOT:
         // Just a state that lets other classes it needs to shoot

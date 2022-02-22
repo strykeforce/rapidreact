@@ -182,6 +182,8 @@ public final class Constants {
     public static final double kMaxStringPotZero = 100;
     public static final double kMinStringPotZero = 0;
     public static final int kTurretId = 42;
+    public static final Rotation2d kFenderAlliance = Rotation2d.fromDegrees(0.0);
+    public static final Rotation2d kFenderOpponent = Rotation2d.fromDegrees(90.0);
 
     public static SupplyCurrentLimitConfiguration getSupplyCurrentLimitConfig() {
       return new SupplyCurrentLimitConfiguration(true, 5, 30, 500);
@@ -279,16 +281,23 @@ public final class Constants {
     public static final int kShooterFalconID = 40;
     public static final int kKickerFalconID = 41;
     public static final int kHoodTalonID = 42;
+    public static final String kLookupTablePath = "/home/lvuser/deploy/LookupTable.csv";
+    public static final double kLookupMinPixel = 50;
+    public static final double kLookupMaxPixel = 300;
+    public static final double kLookupRes = 1.0;
 
     public static int kHoodZeroTicks; // FIX ME
     public static final int kForwardSoftLimts = 1000;
     public static final int kReverseSoftLimits = 0;
 
-    public static final double kKickerArmSpeed = 1000;
-    public static final double kShooterArmSpeed = 1000;
-    public static final double kKickerOpSpeed = 1000;
-    public static final double kShooterOpSpeed = 1000;
-    public static final double kHoodOpPos = 5000;
+    public static final double kKickerArmTicksP100ms = 1000;
+    public static final double kShooterArmTicksP100ms = 1000;
+    public static final double kKickerOpTicksP100ms = 1000;
+    public static final double kShooterOpTicksP100ms = 1000;
+    public static final double kHoodOpTicks = 5000;
+    public static final double kKickerFenderTicksP100ms = 1000;
+    public static final double kShooterFenderTicksP100ms = 1000;
+    public static final double kHoodFenderTicks = 400;
 
     public static final int kStableCounts = 5; // FIX ME
     public static final double kCloseEnoughTicksP100ms = 100;

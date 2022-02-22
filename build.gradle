@@ -56,6 +56,7 @@ dependencies {
     implementation wpi.java.vendor.java()
     implementation 'net.consensys.cava:cava-toml:0.5.0'
     implementation("com.squareup.moshi:moshi:1.13.0")
+    implementation("com.opencsv:opencsv:5.6")
 
 
     roborioDebug wpi.java.deps.wpilibJniDebug(wpi.platforms.roborio)
