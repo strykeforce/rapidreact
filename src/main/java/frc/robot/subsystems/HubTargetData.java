@@ -7,7 +7,6 @@ import com.squareup.moshi.JsonWriter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import okio.Buffer;
@@ -21,14 +20,25 @@ import org.strykeforce.deadeye.TargetListTargetData;
 public class HubTargetData extends TargetListTargetData {
 
   static int kFrameCenter = Integer.MAX_VALUE;
+  private final double errorPixels;
+  private final double range;
 
   public HubTargetData() {
     super();
+    errorPixels = 0.0;
+    range = 0.0;
   }
 
-  public HubTargetData(@NotNull String id, int serial, boolean valid, @NotNull List<Rect> targets) {
+  public HubTargetData(
+      @NotNull String id,
+      int serial,
+      boolean valid,
+      double errorPixels,
+      double range,
+      @NotNull List<Rect> targets) {
     super(id, serial, valid, targets);
-    targets.sort(Comparator.comparingInt(r -> r.topLeft.x));
+    this.errorPixels = errorPixels;
+    this.range = range;
   }
 
   /**
@@ -86,8 +96,8 @@ public class HubTargetData extends TargetListTargetData {
 
     static final int DATA_LENGTH = 5;
 
-    // json d field: bb.tl().x, bb.tl().y, bb.br().x, bb.br().y, center.x, center.y
-    private static final JsonReader.Options OPTIONS = JsonReader.Options.of("id", "sn", "v", "d");
+    private static final JsonReader.Options OPTIONS =
+        JsonReader.Options.of("id", "sn", "v", "ep", "r", "d");
 
     @Override
     public HubTargetData fromJson(BufferedSource source) throws IOException {
@@ -95,6 +105,8 @@ public class HubTargetData extends TargetListTargetData {
       String id = null;
       int serial = -1;
       boolean valid = false;
+      double errorPixels = 0.0;
+      double range = 0.0;
       List<Rect> targets = new ArrayList<>();
 
       reader.beginObject();
@@ -110,6 +122,12 @@ public class HubTargetData extends TargetListTargetData {
             valid = reader.nextBoolean();
             break;
           case 3:
+            errorPixels = reader.nextDouble();
+            break;
+          case 4:
+            range = reader.nextDouble();
+            break;
+          case 5:
             reader.beginArray();
             while (reader.hasNext()) {
               int[] data = new int[DATA_LENGTH];
@@ -130,7 +148,8 @@ public class HubTargetData extends TargetListTargetData {
         }
       }
       reader.endObject();
-      return new HubTargetData(Objects.requireNonNull(id), serial, valid, targets);
+      return new HubTargetData(
+          Objects.requireNonNull(id), serial, valid, errorPixels, range, targets);
     }
 
     @Override

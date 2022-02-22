@@ -4,9 +4,12 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.SuppliedValueWidget;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.SmartDashboardConstants;
@@ -37,6 +40,7 @@ import frc.robot.subsystems.MagazineSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
+import java.util.Map;
 import org.strykeforce.telemetry.TelemetryController;
 import org.strykeforce.telemetry.TelemetryService;
 
@@ -49,21 +53,28 @@ import org.strykeforce.telemetry.TelemetryService;
 public class RobotContainer {
 
   private final DriveSubsystem driveSubsystem = new DriveSubsystem();
-  private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
-  private final MagazineSubsystem magazineSubsystem = new MagazineSubsystem();
-  private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   private final VisionSubsystem visionSubsystem = new VisionSubsystem();
   private final TurretSubsystem turretSubsystem = new TurretSubsystem(visionSubsystem);
   private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
+  private final MagazineSubsystem magazineSubsystem = new MagazineSubsystem(turretSubsystem);
+  private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem(magazineSubsystem);
+  private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   private final TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
 
   private final Joystick driveJoystick = new Joystick(0);
 
+  // Dashboard Widgets
+  private SuppliedValueWidget allianceColor;
+  private Alliance alliance = Alliance.Invalid;
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    turretSubsystem.setMagazineSubsystem(magazineSubsystem);
+    magazineSubsystem.setShooterSubsystem(shooterSubsystem);
     configureTelemetry();
     configureDriverButtonBindings();
     configurePitDashboard();
+    configureMatchDashboard();
   }
 
   private void configureTelemetry() {
@@ -93,6 +104,25 @@ public class RobotContainer {
     new JoystickButton(driveJoystick, Button.X.id).whenPressed(new XLockCommand(driveSubsystem));
     new JoystickButton(driveJoystick, Button.UP.id)
         .whenPressed(new DeadeyeLatencyTestCommandGroup(visionSubsystem, turretSubsystem));
+  }
+
+  private void configureMatchDashboard() {
+    allianceColor =
+        Shuffleboard.getTab("Match")
+            .addBoolean("AllianceColor", () -> alliance != Alliance.Invalid)
+            .withProperties(Map.of("colorWhenFalse", "black"));
+  }
+
+  public void setAllianceColor(Alliance alliance) {
+    this.alliance = alliance;
+    allianceColor.withProperties(
+        Map.of(
+            "colorWhenTrue", alliance == Alliance.Red ? "red" : "blue", "colorWhenFalse", "black"));
+    magazineSubsystem.setAllianceColor(alliance);
+  }
+
+  public VisionSubsystem getVisionSubsystem() {
+    return visionSubsystem;
   }
 
   private void configurePitDashboard() {

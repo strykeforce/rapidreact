@@ -4,8 +4,15 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.commands.vision.DisableVisionCommand;
+import frc.robot.commands.vision.EnableVisionCommand;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -15,13 +22,16 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  */
 public class Robot extends TimedRobot {
 
+  private Logger logger = LoggerFactory.getLogger(Robot.class);
   private RobotContainer m_robotContainer;
+  private boolean haveAlliance;
 
   public Robot() {
     // deadeyeNetworkTableInstance = NetworkTableInstance.create();
     // deadeyeNetworkTableInstance.startClient("192.168.3.3", 1736); //TEST DEADEYE
     // deadeyeNetworkTableInstance.startClient("192.168.3.3", 1735); //real one
   }
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -31,6 +41,9 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+    haveAlliance = false;
+    CommandScheduler.getInstance()
+        .schedule(new EnableVisionCommand(m_robotContainer.getVisionSubsystem()));
   }
 
   /**
@@ -47,11 +60,24 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
+    if (!haveAlliance) {
+      Alliance alliance = DriverStation.getAlliance();
+      if (alliance != Alliance.Invalid) {
+        haveAlliance = true;
+        m_robotContainer.setAllianceColor(alliance);
+        logger.info("Set Alliance: {}", alliance);
+      }
+    }
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    CommandScheduler.getInstance()
+        .schedule(
+            new DisableVisionCommand(m_robotContainer.getVisionSubsystem())
+                .beforeStarting(new WaitCommand(1.0)));
+  }
 
   @Override
   public void disabledPeriodic() {}

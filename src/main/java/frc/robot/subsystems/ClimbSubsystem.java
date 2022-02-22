@@ -7,8 +7,6 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import frc.robot.Constants;
 import frc.robot.Constants.ClimbConstants;
 import java.util.Set;
-import java.util.function.DoubleBinaryOperator;
-
 import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
@@ -28,27 +26,27 @@ public class ClimbSubsystem extends MeasurableSubsystem {
     shoulderFalcon = new TalonSRX(Constants.ClimbConstants.kClimbShoulderId);
     configTalons();
   }
-  
-    private void configTalons() {
-      extendFalcon1.configFactoryDefault(Constants.kTalonConfigTimeout);
-      extendFalcon1.configAllSettings(
-          ClimbConstants.getExtendFalconConfig(), Constants.kTalonConfigTimeout);
-      extendFalcon1.enableVoltageCompensation(true);
-      extendFalcon1.setNeutralMode(NeutralMode.Brake);
-  
-      extendFalcon2.configFactoryDefault(Constants.kTalonConfigTimeout);
-      extendFalcon2.configAllSettings(
-          ClimbConstants.getExtendFalconConfig(), Constants.kTalonConfigTimeout);
-      extendFalcon2.enableVoltageCompensation(true);
-      extendFalcon2.setNeutralMode(NeutralMode.Brake);
-  
-      shoulderFalcon.configFactoryDefault(Constants.kTalonConfigTimeout);
-      shoulderFalcon.configAllSettings(
-          ClimbConstants.getShoulderTalonConfig(), Constants.kTalonConfigTimeout);
-      shoulderFalcon.enableVoltageCompensation(true);
-      shoulderFalcon.setNeutralMode(NeutralMode.Coast);
-    }
-  
+
+  private void configTalons() {
+    extendFalcon1.configFactoryDefault(Constants.kTalonConfigTimeout);
+    extendFalcon1.configAllSettings(
+        ClimbConstants.getExtendFalconConfig(), Constants.kTalonConfigTimeout);
+    extendFalcon1.enableVoltageCompensation(true);
+    extendFalcon1.setNeutralMode(NeutralMode.Brake);
+
+    extendFalcon2.configFactoryDefault(Constants.kTalonConfigTimeout);
+    extendFalcon2.configAllSettings(
+        ClimbConstants.getExtendFalconConfig(), Constants.kTalonConfigTimeout);
+    extendFalcon2.enableVoltageCompensation(true);
+    extendFalcon2.setNeutralMode(NeutralMode.Brake);
+
+    shoulderFalcon.configFactoryDefault(Constants.kTalonConfigTimeout);
+    shoulderFalcon.configAllSettings(
+        ClimbConstants.getShoulderTalonConfig(), Constants.kTalonConfigTimeout);
+    shoulderFalcon.enableVoltageCompensation(true);
+    shoulderFalcon.setNeutralMode(NeutralMode.Coast);
+  }
+
   public void openLoopShoulder(double speed) {
     shoulderFalcon.set(ControlMode.PercentOutput, speed);
   }
@@ -90,7 +88,7 @@ public class ClimbSubsystem extends MeasurableSubsystem {
           shoulderFalcon.configContinuousCurrentLimit(
               Constants.ClimbConstants.getShoulderTalonConfig().continuousCurrentLimit,
               Constants.ClimbConstants.getShoulderTalonConfig().peakCurrentDuration);
-              shoulderFalcon.set(ControlMode.PercentOutput, 0);
+          shoulderFalcon.set(ControlMode.PercentOutput, 0);
         }
     }
   }
