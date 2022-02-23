@@ -20,6 +20,7 @@ import frc.robot.commands.drive.XLockCommand;
 import frc.robot.commands.drive.ZeroGyroCommand;
 import frc.robot.commands.intake.IntakeOpenLoopCommand;
 import frc.robot.commands.intake.PitIntakeOpenLoopCommand;
+import frc.robot.commands.magazine.IgnoreColorSensorCommand;
 import frc.robot.commands.magazine.PitClearCargoColor;
 import frc.robot.commands.magazine.PitMagazineOpenLoopCommand;
 import frc.robot.commands.magazine.PitReadCargoColor;
@@ -106,6 +107,8 @@ public class RobotContainer {
     new JoystickButton(driveJoystick, Button.X.id).whenPressed(new XLockCommand(driveSubsystem));
     new JoystickButton(driveJoystick, Button.UP.id)
         .whenPressed(new DeadeyeLatencyTestCommandGroup(visionSubsystem, turretSubsystem));
+    new JoystickButton(driveJoystick, Toggle.LEFT_TOGGLE.id).whenPressed(new IgnoreColorSensorCommand(magazineSubsystem, true));
+    new JoystickButton(driveJoystick, Toggle.LEFT_TOGGLE.id).whenReleased(new IgnoreColorSensorCommand(magazineSubsystem, false));
   }
 
   private void configureMatchDashboard() {

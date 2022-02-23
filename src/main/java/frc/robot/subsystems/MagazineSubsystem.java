@@ -31,6 +31,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   private final TurretSubsystem turretSubsystem;
   private ShooterSubsystem shooterSubsystem;
   private Timer timer = new Timer();
+  private boolean ignoreColorSensor = false;
 
   public MagazineSubsystem(TurretSubsystem turretSubsystem) {
     this.turretSubsystem = turretSubsystem;
@@ -101,8 +102,13 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     allianceCargoColor = alliance == Alliance.Red ? CargoColor.RED : CargoColor.BLUE;
   }
 
+  public void ignoreColorSensor(boolean ignore) {
+    ignoreColorSensor = ignore;
+    logger.info("set ignoreColorSensor to: {}", ignore);
+  }
+
   public boolean isNextCargoAlliance() {
-    return storedCargoColors[0] == allianceCargoColor;
+    return ignoreColorSensor || storedCargoColors[0] == allianceCargoColor;
   }
 
   public CargoColor readCargoColor() {
