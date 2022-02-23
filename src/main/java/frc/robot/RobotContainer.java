@@ -39,6 +39,8 @@ import frc.robot.subsystems.MagazineSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.subsystems.MagazineSubsystem.CargoColor;
+
 import java.util.Map;
 import org.strykeforce.telemetry.TelemetryController;
 import org.strykeforce.telemetry.TelemetryService;
@@ -62,6 +64,8 @@ public class RobotContainer {
   private final Joystick driveJoystick = new Joystick(0);
 
   // Dashboard Widgets
+  private SuppliedValueWidget firstCargo;
+  private SuppliedValueWidget secondCargo;
   private SuppliedValueWidget allianceColor;
   private Alliance alliance = Alliance.Invalid;
 
@@ -105,6 +109,17 @@ public class RobotContainer {
   }
 
   private void configureMatchDashboard() {
+    firstCargo =
+        Shuffleboard.getTab("Match")
+            .addBoolean(
+                "First Cargo", () -> magazineSubsystem.getAllCargoColors()[0] != CargoColor.NONE)
+            .withProperties(Map.of("colorWhenFalse", "black"));
+    secondCargo =
+        Shuffleboard.getTab("Match")
+            .addBoolean(
+                "Second Cargo", () -> magazineSubsystem.getAllCargoColors()[1] != CargoColor.NONE)
+            .withProperties(Map.of("colorWhenFalse", "black"));
+
     allianceColor =
         Shuffleboard.getTab("Match")
             .addBoolean("AllianceColor", () -> alliance != Alliance.Invalid)
