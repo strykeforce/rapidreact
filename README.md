@@ -4,8 +4,8 @@
 
 ## Controls
 
-![driver](docs/driver-controls.PNG)
-![operator](docs/operator-controls.PNG)
+![driver](docs/driver-controls.png)
+![operator](docs/operator-controls.png)
 
 ## Talons
 
