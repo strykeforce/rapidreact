@@ -24,17 +24,12 @@ import frc.robot.commands.magazine.PitClearCargoColor;
 import frc.robot.commands.magazine.PitMagazineOpenLoopCommand;
 import frc.robot.commands.magazine.PitReadCargoColor;
 import frc.robot.commands.magazine.UpperMagazineOpenLoopCommand;
-import frc.robot.commands.shooter.HoodOpenLoopCommand;
-import frc.robot.commands.shooter.PitHoodOpenLoopCommand;
-import frc.robot.commands.shooter.PitShooterOpenLoopCommand;
-import frc.robot.commands.shooter.ShooterOpenLoopCommand;
 import frc.robot.commands.turret.OpenLoopTurretCommand;
 import frc.robot.commands.turret.PitTurretCloseLoopPositionCommand;
 import frc.robot.commands.turret.TurretAimCommandGroup;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import java.util.Map;
@@ -53,7 +48,7 @@ public class RobotContainer {
   private final VisionSubsystem visionSubsystem = new VisionSubsystem();
   private final TurretSubsystem turretSubsystem = new TurretSubsystem(visionSubsystem);
   private final MagazineSubsystem magazineSubsystem = new MagazineSubsystem(turretSubsystem);
-  private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem(magazineSubsystem);
+  // private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem(magazineSubsystem);
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   private final TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
 
@@ -66,7 +61,7 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     turretSubsystem.setMagazineSubsystem(magazineSubsystem);
-    magazineSubsystem.setShooterSubsystem(shooterSubsystem);
+    // magazineSubsystem.setShooterSubsystem(shooterSubsystem);
     configureTelemetry();
     configureDriverButtonBindings();
     configurePitDashboard();
@@ -79,7 +74,7 @@ public class RobotContainer {
 
   private void configureTelemetry() {
     driveSubsystem.registerWith(telemetryService);
-    shooterSubsystem.registerWith(telemetryService);
+    // shooterSubsystem.registerWith(telemetryService);
     magazineSubsystem.registerWith(telemetryService);
     turretSubsystem.registerWith(telemetryService);
     intakeSubsystem.registerWith(telemetryService);
@@ -137,16 +132,16 @@ public class RobotContainer {
         "Pit/Magazine/ClearCargoColor", new PitClearCargoColor(magazineSubsystem));
 
     // Shooter Commands
-    SmartDashboard.putNumber(SmartDashboardConstants.kPitShooterOpenLoop, 0.0);
-    SmartDashboard.putData(
-        "Pit/Shooter/shooterStart", new PitShooterOpenLoopCommand(shooterSubsystem));
-    SmartDashboard.putData(
-        "Pit/Shooter/shooterStop", new ShooterOpenLoopCommand(shooterSubsystem, 0.0));
+    // SmartDashboard.putNumber(SmartDashboardConstants.kPitShooterOpenLoop, 0.0);
+    // SmartDashboard.putData(
+    //     "Pit/Shooter/shooterStart", new PitShooterOpenLoopCommand(shooterSubsystem));
+    // SmartDashboard.putData(
+    //     "Pit/Shooter/shooterStop", new ShooterOpenLoopCommand(shooterSubsystem, 0.0));
 
     // Hood Commands
-    SmartDashboard.putNumber(SmartDashboardConstants.kPitHoodOpenLoop, 0.0);
-    SmartDashboard.putData("Pit/Hood/hoodStart", new PitHoodOpenLoopCommand(shooterSubsystem));
-    SmartDashboard.putData("Pit/Hood/hoodStop", new HoodOpenLoopCommand(shooterSubsystem, 0.0));
+    // SmartDashboard.putNumber(SmartDashboardConstants.kPitHoodOpenLoop, 0.0);
+    // SmartDashboard.putData("Pit/Hood/hoodStart", new PitHoodOpenLoopCommand(shooterSubsystem));
+    // SmartDashboard.putData("Pit/Hood/hoodStop", new HoodOpenLoopCommand(shooterSubsystem, 0.0));
 
     // intake pit commands
     SmartDashboard.putNumber("Pit/Intake/Speed", 0.0);

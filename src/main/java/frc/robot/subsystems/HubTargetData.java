@@ -64,8 +64,8 @@ public class HubTargetData extends TargetListTargetData {
    */
   public double getErrorPixels() {
     // FIXME use inside edges
-    int minX = targets.get(0).topLeft.x;
-    int maxX = targets.get(targets.size() - 1).bottomRight.x;
+    int minX = targets.get(0).bottomRight.x;
+    int maxX = targets.get(targets.size() - 1).topLeft.x;
     return (maxX + minX) / 2.0 - kFrameCenter;
   }
 
@@ -95,67 +95,6 @@ public class HubTargetData extends TargetListTargetData {
     return (kFrameCenter - Math.abs(getErrorPixels())) / kFrameCenter;
   }
 
-  /**
-   * Uses the width of the highest target to find the distance
-   *
-   * @return distance to target in inches, 2767 if not valid
-   */
-  public double getDistance1() {
-    if (!isValid()) {
-      return 2767;
-    }
-
-    List<Rect> targetData = targetsOrderedByTopLeftY();
-    double width = targetData.get(0).width();
-
-    double enclosedAngle = Math.toDegrees(kHorizonFov) * width / (kFrameCenter * 2);
-    return VisionConstants.kTargetWidthIn / 2 / Math.tan(Math.toRadians(enclosedAngle / 2));
-  }
-
-  /**
-   * Uses the distance between the two highest targets to find the distance
-   *
-   * @return distance to target in inches, 2767 if not valid
-   */
-  public double getDistance2() {
-    if (!isValid() && (targets.size() > 1)) {
-      return 2767;
-    }
-
-    List<Rect> targetData = targetsOrderedByTopLeftY();
-    Rect target1 = targetData.get(0);
-    Rect target2 = targetData.get(1);
-
-    double targetDistance;
-    if (target1.topLeft.x > target2.topLeft.x) {
-      targetDistance = target1.topLeft.x - target2.bottomRight.x;
-    } else {
-      targetDistance = target2.topLeft.x - target1.bottomRight.x;
-    }
-
-    double enclosedAngle = Math.toDegrees(kHorizonFov) * targetDistance / (kFrameCenter * 2);
-    return 5.5 / 2 / Math.tan(Math.toRadians(enclosedAngle / 2));
-    // 5.5 distance between targets in
-  }
-
-  /**
-   * Uses the height of the highest target to find the distance
-   *
-   * @return distance to target in inches, 2767 if not valid
-   */
-  public double getDistance3() {
-    if (!isValid()) {
-      return 2767;
-    }
-
-    List<Rect> targetData = targetsOrderedByTopLeftY();
-    double height = targetData.get(0).height();
-
-    double enclosedAngle = Math.toDegrees(kHorizonFov) * height / (kFrameCenter * 2);
-    return 2 / 2 / Math.tan(Math.toRadians(enclosedAngle / 2));
-    // 1st 2 is target height
-  }
-
   public double testGetTargetsPixelWidth() {
     double pixelWidth;
 
@@ -177,7 +116,7 @@ public class HubTargetData extends TargetListTargetData {
   public double testGetDistance() {
     double pixelWidth;
 
-    if (targets.size() % 2 == 1) {
+    if (targets.size() % 2 == 1) { // odd # of targets
       Rect leftTarget = targets.get((targets.size() - 1) / 2 - 1);
       Rect rightTarget = targets.get((targets.size() - 1) / 2 + 1);
 
@@ -185,7 +124,7 @@ public class HubTargetData extends TargetListTargetData {
 
       double enclosedAngle = Math.toDegrees(kHorizonFov) * pixelWidth / (kFrameCenter * 2);
       return 25.25 / 2 / Math.tan(Math.toRadians(enclosedAngle / 2));
-    } else {
+    } else { // even # of targets
       Rect leftTarget = targets.get(targets.size() / 2 - 2);
       Rect rightTarget = targets.get(targets.size() / 2 + 1);
 
@@ -202,7 +141,7 @@ public class HubTargetData extends TargetListTargetData {
     }
 
     return Math.sqrt(
-            Math.pow(testGetTargetsPixelWidth(), 2)
+            Math.pow(testGetDistance(), 2)
                 - Math.pow(VisionConstants.kTapeHeightIn - VisionConstants.kCameraHeight, 2))
         + VisionConstants.kUpperHubRadiusIn;
   }
