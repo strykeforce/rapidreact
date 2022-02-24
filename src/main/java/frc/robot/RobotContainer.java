@@ -20,6 +20,7 @@ import frc.robot.commands.drive.XLockCommand;
 import frc.robot.commands.drive.ZeroGyroCommand;
 import frc.robot.commands.intake.IntakeOpenLoopCommand;
 import frc.robot.commands.intake.PitIntakeOpenLoopCommand;
+import frc.robot.commands.magazine.IgnoreColorSensorCommand;
 import frc.robot.commands.magazine.PitClearCargoColor;
 import frc.robot.commands.magazine.PitMagazineOpenLoopCommand;
 import frc.robot.commands.magazine.PitReadCargoColor;
@@ -37,6 +38,7 @@ import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
+import frc.robot.subsystems.MagazineSubsystem.CargoColor;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
@@ -64,6 +66,8 @@ public class RobotContainer {
   private final Joystick driveJoystick = new Joystick(0);
 
   // Dashboard Widgets
+  private SuppliedValueWidget firstCargo;
+  private SuppliedValueWidget secondCargo;
   private SuppliedValueWidget allianceColor;
   private Alliance alliance = Alliance.Invalid;
 
@@ -104,9 +108,24 @@ public class RobotContainer {
     new JoystickButton(driveJoystick, Button.X.id).whenPressed(new XLockCommand(driveSubsystem));
     new JoystickButton(driveJoystick, Button.UP.id)
         .whenPressed(new DeadeyeLatencyTestCommandGroup(visionSubsystem, turretSubsystem));
+    new JoystickButton(driveJoystick, Toggle.LEFT_TOGGLE.id)
+        .whenPressed(new IgnoreColorSensorCommand(magazineSubsystem, true));
+    new JoystickButton(driveJoystick, Toggle.LEFT_TOGGLE.id)
+        .whenReleased(new IgnoreColorSensorCommand(magazineSubsystem, false));
   }
 
   private void configureMatchDashboard() {
+    firstCargo =
+        Shuffleboard.getTab("Match")
+            .addBoolean(
+                "First Cargo", () -> magazineSubsystem.getAllCargoColors()[0] != CargoColor.NONE)
+            .withProperties(Map.of("colorWhenFalse", "black"));
+    secondCargo =
+        Shuffleboard.getTab("Match")
+            .addBoolean(
+                "Second Cargo", () -> magazineSubsystem.getAllCargoColors()[1] != CargoColor.NONE)
+            .withProperties(Map.of("colorWhenFalse", "black"));
+
     allianceColor =
         Shuffleboard.getTab("Match")
             .addBoolean("AllianceColor", () -> alliance != Alliance.Invalid)

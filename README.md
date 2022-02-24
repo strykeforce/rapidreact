@@ -2,6 +2,11 @@
 
 [![CI](https://github.com/strykeforce/rapidreact/actions/workflows/main.yml/badge.svg)](https://github.com/strykeforce/rapidreact/actions/workflows/main.yml)
 
+## Controls
+
+![driver](docs/driver-controls.png)
+![operator](docs/operator-controls.png)
+
 ## Talons
 
 | Subsystem | Type | Talon           | ID  | PDP | Motor  | Breaker |
