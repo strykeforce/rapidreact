@@ -37,11 +37,10 @@ import frc.robot.commands.turret.TurretAimCommandGroup;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
+import frc.robot.subsystems.MagazineSubsystem.CargoColor;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
-import frc.robot.subsystems.MagazineSubsystem.CargoColor;
-
 import java.util.Map;
 import org.strykeforce.telemetry.TelemetryController;
 import org.strykeforce.telemetry.TelemetryService;
@@ -107,8 +106,10 @@ public class RobotContainer {
     new JoystickButton(driveJoystick, Button.X.id).whenPressed(new XLockCommand(driveSubsystem));
     new JoystickButton(driveJoystick, Button.UP.id)
         .whenPressed(new DeadeyeLatencyTestCommandGroup(visionSubsystem, turretSubsystem));
-    new JoystickButton(driveJoystick, Toggle.LEFT_TOGGLE.id).whenPressed(new IgnoreColorSensorCommand(magazineSubsystem, true));
-    new JoystickButton(driveJoystick, Toggle.LEFT_TOGGLE.id).whenReleased(new IgnoreColorSensorCommand(magazineSubsystem, false));
+    new JoystickButton(driveJoystick, Toggle.LEFT_TOGGLE.id)
+        .whenPressed(new IgnoreColorSensorCommand(magazineSubsystem, true));
+    new JoystickButton(driveJoystick, Toggle.LEFT_TOGGLE.id)
+        .whenReleased(new IgnoreColorSensorCommand(magazineSubsystem, false));
   }
 
   private void configureMatchDashboard() {

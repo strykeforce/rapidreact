@@ -318,12 +318,12 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     BLUE("blue"),
     NONE("black");
 
-  public String color;
+    public String color;
 
-  private CargoColor(String color) {
-    this.color = color;
+    private CargoColor(String color) {
+      this.color = color;
+    }
   }
-}
 
   public enum MagazineState {
     MANUAL_INTAKE,
