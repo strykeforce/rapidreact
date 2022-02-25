@@ -232,7 +232,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
     return Set.of();
   }
 
-  enum ShooterState {
+  public enum ShooterState {
     STOP,
     ARMING,
     ARMED,

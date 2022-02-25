@@ -195,6 +195,10 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     currMagazineState = MagazineState.PAUSE;
   }
 
+  public MagazineState getCurrMagazineState() {
+    return currMagazineState;
+  }
+
   @Override
   public void periodic() {
     switch (currMagazineState) {
