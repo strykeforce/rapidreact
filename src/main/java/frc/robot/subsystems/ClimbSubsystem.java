@@ -7,13 +7,17 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import frc.robot.Constants;
 import frc.robot.Constants.ClimbConstants;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 
 public class ClimbSubsystem extends MeasurableSubsystem {
-  private final TalonFX extendFalcon1;
-  private final TalonFX extendFalcon2;
+  private static final Logger logger = LoggerFactory.getLogger(ClimbSubsystem.class);
+
+  private final TalonFX extendFalcon1Static;
+  private final TalonFX extendFalcon2Moveable;
   private final TalonSRX shoulderFalcon;
   private ClimbState currClimbState = ClimbState.ZEROING;
   private double set1SetPointTicks;
@@ -21,24 +25,24 @@ public class ClimbSubsystem extends MeasurableSubsystem {
   private double shoulderSetPointTicks;
 
   public ClimbSubsystem() {
-    extendFalcon1 = new TalonFX(Constants.ClimbConstants.kExtend1FalconID);
-    extendFalcon2 = new TalonFX(Constants.ClimbConstants.kExtend2FalconID);
+    extendFalcon1Static = new TalonFX(Constants.ClimbConstants.kExtend1FalconID);
+    extendFalcon2Moveable = new TalonFX(Constants.ClimbConstants.kExtend2FalconID);
     shoulderFalcon = new TalonSRX(Constants.ClimbConstants.kClimbShoulderId);
     configTalons();
   }
 
   private void configTalons() {
-    extendFalcon1.configFactoryDefault(Constants.kTalonConfigTimeout);
-    extendFalcon1.configAllSettings(
+    extendFalcon1Static.configFactoryDefault(Constants.kTalonConfigTimeout);
+    extendFalcon1Static.configAllSettings(
         ClimbConstants.getExtendFalconConfig(), Constants.kTalonConfigTimeout);
-    extendFalcon1.enableVoltageCompensation(true);
-    extendFalcon1.setNeutralMode(NeutralMode.Brake);
+    extendFalcon1Static.enableVoltageCompensation(true);
+    extendFalcon1Static.setNeutralMode(NeutralMode.Brake);
 
-    extendFalcon2.configFactoryDefault(Constants.kTalonConfigTimeout);
-    extendFalcon2.configAllSettings(
+    extendFalcon2Moveable.configFactoryDefault(Constants.kTalonConfigTimeout);
+    extendFalcon2Moveable.configAllSettings(
         ClimbConstants.getExtendFalconConfig(), Constants.kTalonConfigTimeout);
-    extendFalcon2.enableVoltageCompensation(true);
-    extendFalcon2.setNeutralMode(NeutralMode.Brake);
+    extendFalcon2Moveable.enableVoltageCompensation(true);
+    extendFalcon2Moveable.setNeutralMode(NeutralMode.Brake);
 
     shoulderFalcon.configFactoryDefault(Constants.kTalonConfigTimeout);
     shoulderFalcon.configAllSettings(
@@ -48,30 +52,40 @@ public class ClimbSubsystem extends MeasurableSubsystem {
   }
 
   public void openLoopShoulder(double speed) {
+    logger.info("Shoulder is rotating: {} ticks per 100 ms", speed);
     shoulderFalcon.set(ControlMode.PercentOutput, speed);
   }
 
-  public void openLoopSet1(double speed) {
-    extendFalcon1.set(ControlMode.PercentOutput, speed);
+  public void openLoopSet1Static(double speed) {
+    logger.info("Set 1 Static arms: {} ticks per 100 ms", speed);
+    extendFalcon1Static.set(ControlMode.PercentOutput, speed);
   }
 
-  public void openLoopSet2(double speed) {
-    extendFalcon2.set(ControlMode.PercentOutput, speed);
+  public void openLoopSet2Moveable(double speed) {
+    logger.info("Set 2 Moveable arms: {} ticks per 100 ms", speed);
+    extendFalcon2Moveable.set(ControlMode.PercentOutput, speed);
+  }
+
+  public void offsetShoulder(double offset) {
+    rotateShoulder(shoulderSetPointTicks + offset);
   }
 
   public void rotateShoulder(double setPointsTicks) {
+    logger.info("Shoulder is rotating to {} ticks", setPointsTicks);
     shoulderSetPointTicks = setPointsTicks;
     shoulderFalcon.set(ControlMode.MotionMagic, setPointsTicks);
   }
 
   public void acuateLoopSet1(double setPointTicks) {
+    logger.info("Static arm set 1 is going to {} ticks", setPointTicks);
     set1SetPointTicks = setPointTicks;
-    extendFalcon1.set(ControlMode.MotionMagic, setPointTicks);
+    extendFalcon1Static.set(ControlMode.MotionMagic, setPointTicks);
   }
 
   public void acuateLoopSet2(double setPointTicks) {
+    logger.info("Moveable arm Set 2 is going to {} ticks", setPointTicks);
     set2SetPointTicks = setPointTicks;
-    extendFalcon2.set(ControlMode.MotionMagic, setPointTicks);
+    extendFalcon2Moveable.set(ControlMode.MotionMagic, setPointTicks);
   }
 
   public void zeroShoulder() {
@@ -96,8 +110,8 @@ public class ClimbSubsystem extends MeasurableSubsystem {
   @Override
   public void registerWith(TelemetryService telemetryService) {
     super.registerWith(telemetryService);
-    telemetryService.register(extendFalcon1);
-    telemetryService.register(extendFalcon2);
+    telemetryService.register(extendFalcon1Static);
+    telemetryService.register(extendFalcon2Moveable);
     telemetryService.register(shoulderFalcon);
   }
 

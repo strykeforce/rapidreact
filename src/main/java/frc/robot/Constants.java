@@ -257,6 +257,9 @@ public final class Constants {
     public static final int kExtend2FalconID = 61;
     public static final int kClimbShoulderId = 62;
 
+    public static final double kClimbArmTicksP100ms = 0.3;
+    public static final double kShoulderOffsetTicks = 50;
+
     public static TalonFXConfiguration getExtendFalconConfig() {
       TalonFXConfiguration extendConfig = new TalonFXConfiguration();
       extendConfig.supplyCurrLimit.currentLimit = 10;
@@ -428,7 +431,10 @@ public final class Constants {
     }
   }
 
-  public static final class SmartDashboardConstants {
+  public static final class DashboardConstants {
+    public static final double kLeftStickDeadBand = 0.1;
+    public static final double kRightStickDeadBand = 0.1;
+    public static final double kTriggerDeadBand = 0.1;
     public static final String kPitHoodOpenLoop = "Pit/Hood/hoodSpeed";
     public static final String kPitShooterOpenLoop = "Pit/Shooter/shooterSpeed";
     public static final String kTurretSetpointRadians = "Pit/Turret/SetpointRadians";

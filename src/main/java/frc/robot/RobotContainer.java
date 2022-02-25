@@ -12,7 +12,13 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.SuppliedValueWidget;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.Constants.SmartDashboardConstants;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.ClimbConstants;
+import frc.robot.Constants.DashboardConstants;
+import frc.robot.commands.climb.OpenLoopSet1StaticCommand;
+import frc.robot.commands.climb.OpenLoopSet2MoveableCommand;
+import frc.robot.commands.climb.RotateShoulderDownCommand;
+import frc.robot.commands.climb.RotateShoulderUpCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.LockZeroCommand;
@@ -64,6 +70,7 @@ public class RobotContainer {
   private final TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
 
   private final Joystick driveJoystick = new Joystick(0);
+  private final XboxController xboxController = new XboxController(1);
 
   // Dashboard Widgets
   private SuppliedValueWidget firstCargo;
@@ -114,6 +121,21 @@ public class RobotContainer {
         .whenReleased(new IgnoreColorSensorCommand(magazineSubsystem, false));
   }
 
+  private void configureOperatorButtonBindings() {
+    LeftStickUp.whenActive(
+        new OpenLoopSet2MoveableCommand(climbSubsystem, ClimbConstants.kClimbArmTicksP100ms));
+    LeftStickDown.whenActive(
+        new OpenLoopSet2MoveableCommand(climbSubsystem, -ClimbConstants.kClimbArmTicksP100ms));
+    LeftStickStop.whenActive(new OpenLoopSet2MoveableCommand(climbSubsystem, 0.0));
+    RightStickUp.whenActive(
+        new OpenLoopSet1StaticCommand(climbSubsystem, ClimbConstants.kClimbArmTicksP100ms));
+    RightStickDown.whenActive(
+        new OpenLoopSet1StaticCommand(climbSubsystem, ClimbConstants.kClimbArmTicksP100ms));
+    RightStickStop.whenActive(new OpenLoopSet1StaticCommand(climbSubsystem, 0.0));
+    LeftTriggerDown.whenActive(new RotateShoulderDownCommand(climbSubsystem));
+    RightTriggerDown.whenActive(new RotateShoulderUpCommand(climbSubsystem));
+  }
+
   private void configureMatchDashboard() {
     firstCargo =
         Shuffleboard.getTab("Match")
@@ -157,22 +179,21 @@ public class RobotContainer {
         "Pit/Magazine/ClearCargoColor", new PitClearCargoColor(magazineSubsystem));
 
     // Shooter Commands
-    SmartDashboard.putNumber(SmartDashboardConstants.kPitShooterOpenLoop, 0.0);
+    SmartDashboard.putNumber(DashboardConstants.kPitShooterOpenLoop, 0.0);
     SmartDashboard.putData(
         "Pit/Shooter/shooterStart", new PitShooterOpenLoopCommand(shooterSubsystem));
     SmartDashboard.putData(
         "Pit/Shooter/shooterStop", new ShooterOpenLoopCommand(shooterSubsystem, 0.0));
 
     // Hood Commands
-    SmartDashboard.putNumber(SmartDashboardConstants.kPitHoodOpenLoop, 0.0);
+    SmartDashboard.putNumber(DashboardConstants.kPitHoodOpenLoop, 0.0);
     SmartDashboard.putData("Pit/Hood/hoodStart", new PitHoodOpenLoopCommand(shooterSubsystem));
     SmartDashboard.putData("Pit/Hood/hoodStop", new HoodOpenLoopCommand(shooterSubsystem, 0.0));
     // intake pit commands
     SmartDashboard.putNumber("Pit/Intake/Speed", 0.0);
     // Turret Pit Commands
     SmartDashboard.putNumber(
-        SmartDashboardConstants.kTurretSetpointRadians,
-        turretSubsystem.getRotation2d().getRadians());
+        DashboardConstants.kTurretSetpointRadians, turretSubsystem.getRotation2d().getRadians());
     SmartDashboard.putData(
         "Pit/Turret/CloseLoopPosition", new PitTurretCloseLoopPositionCommand(turretSubsystem));
     SmartDashboard.putData("Pit/Intake/Start", new PitIntakeOpenLoopCommand(intakeSubsystem));
@@ -259,4 +280,76 @@ public class RobotContainer {
       this.id = id;
     }
   }
+
+  Trigger LeftStickUp =
+      new Trigger() {
+        @Override
+        public boolean get() {
+          return xboxController.getRawAxis(XboxController.Axis.kLeftY.value)
+              > DashboardConstants.kLeftStickDeadBand;
+        }
+      };
+
+  Trigger LeftStickDown =
+      new Trigger() {
+        @Override
+        public boolean get() {
+          return xboxController.getRawAxis(XboxController.Axis.kLeftY.value)
+              < -DashboardConstants.kLeftStickDeadBand;
+        }
+      };
+
+  Trigger LeftStickStop =
+      new Trigger() {
+        @Override
+        public boolean get() {
+          return xboxController.getRawAxis(XboxController.Axis.kLeftY.value)
+              < DashboardConstants.kLeftStickDeadBand;
+        }
+      };
+
+  Trigger RightStickUp =
+      new Trigger() {
+        @Override
+        public boolean get() {
+          return xboxController.getRawAxis(XboxController.Axis.kRightY.value)
+              > DashboardConstants.kRightStickDeadBand;
+        }
+      };
+
+  Trigger RightStickDown =
+      new Trigger() {
+        @Override
+        public boolean get() {
+          return xboxController.getRawAxis(XboxController.Axis.kRightY.value)
+              < -DashboardConstants.kRightStickDeadBand;
+        }
+      };
+
+  Trigger RightStickStop =
+      new Trigger() {
+        @Override
+        public boolean get() {
+          return xboxController.getRawAxis(XboxController.Axis.kRightY.value)
+              < DashboardConstants.kRightStickDeadBand;
+        }
+      };
+
+  Trigger LeftTriggerDown =
+      new Trigger() {
+        @Override
+        public boolean get() {
+          return xboxController.getRawAxis(XboxController.Axis.kLeftTrigger.value)
+              > DashboardConstants.kTriggerDeadBand;
+        }
+      };
+
+  Trigger RightTriggerDown =
+      new Trigger() {
+        @Override
+        public boolean get() {
+          return xboxController.getRawAxis(XboxController.Axis.kRightTrigger.value)
+              > DashboardConstants.kTriggerDeadBand;
+        }
+      };
 }
