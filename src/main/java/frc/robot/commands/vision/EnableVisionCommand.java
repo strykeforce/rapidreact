@@ -15,4 +15,9 @@ public class EnableVisionCommand extends InstantCommand {
   public void initialize() {
     visionSubsystem.enable();
   }
+
+  @Override
+  public boolean runsWhenDisabled() {
+    return true;
+  }
 }

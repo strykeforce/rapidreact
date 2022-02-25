@@ -37,5 +37,9 @@ target_link_libraries(Deadeye_daemon
         Deadeye::library
         )
 
+enable_testing()
+find_package(Catch2 REQUIRED)
+add_subdirectory(tests)
+
 include(GNUInstallDirs)
 install(TARGETS Deadeye_daemon DESTINATION ${CMAKE_INSTALL_BINDIR})
