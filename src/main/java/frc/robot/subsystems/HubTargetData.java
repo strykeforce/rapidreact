@@ -139,11 +139,12 @@ public class HubTargetData extends TargetListTargetData {
     if (!isValid()) {
       return 2767;
     }
-
-    return Math.sqrt(
+    double x = testGetDistance();
+    return 0.00462384837384838 * Math.sqrt(x) - 2.70841658341659 * x + 518.807692307693;
+    /*return Math.sqrt(
             Math.pow(testGetDistance(), 2)
                 - Math.pow(VisionConstants.kTapeHeightIn - VisionConstants.kCameraHeight, 2))
-        + VisionConstants.kUpperHubRadiusIn;
+        + VisionConstants.kUpperHubRadiusIn;*/
   }
 
   @SuppressWarnings("rawtypes")

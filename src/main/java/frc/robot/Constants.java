@@ -178,7 +178,7 @@ public final class Constants {
     public static final int kReverseLimit = -100;
     public static final int kCloseEnoughTicks = 40;
     public static final Rotation2d kCloseEnoughTarget = Rotation2d.fromDegrees(1); // 1
-    public static final double kRotateByInitialKp = 0.4; // 4
+    public static final double kRotateByInitialKp = 0.6; // 0.4
     public static final double kRotateByFinalKp = 0.95; // 0.95
     public static final int kRotateByStableCounts = 3; // 3
     public static final double kMaxStringPotZero = 100;

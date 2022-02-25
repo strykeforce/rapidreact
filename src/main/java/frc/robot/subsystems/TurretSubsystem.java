@@ -6,6 +6,7 @@ import static frc.robot.Constants.TurretConstants.kTurretMidpoint;
 import static frc.robot.Constants.TurretConstants.kTurretTicksPerRadian;
 import static frc.robot.Constants.TurretConstants.kTurretZeroTicks;
 import static frc.robot.Constants.TurretConstants.kWrapRange;
+import static frc.robot.Constants.TurretConstants.kCloseEnoughTicks;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -27,12 +28,12 @@ public class TurretSubsystem extends MeasurableSubsystem {
 
   public boolean talonReset;
   private TalonSRX turret;
-  private double targetTurretPosition = 0;
   private int turretStableCounts = 0;
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
   private TurretState currentState = TurretState.IDLE;
   private final VisionSubsystem visionSubsystem;
   private MagazineSubsystem magazineSubsystem;
+  public double targetTurretPosition = 0;
 
   private int trackingStableCount;
   private double rotateKp;
@@ -62,8 +63,10 @@ public class TurretSubsystem extends MeasurableSubsystem {
     return List.of(turret);
   }
 
-  public void rotateBy(Rotation2d errorRotation2d) {
-
+  public boolean rotateBy(Rotation2d errorRotation2d) {
+    double setPointTicks;
+    //double oldSetPointTicks = turret;
+    // TODO: do target angle math without rotation2d, check if greater than max ticks and need to return true
     Rotation2d targetAngle =
         new Rotation2d(turret.getSelectedSensorPosition() / kTurretTicksPerRadian); // current angle
     targetAngle = targetAngle.plus(errorRotation2d);
@@ -71,12 +74,21 @@ public class TurretSubsystem extends MeasurableSubsystem {
         targetAngle.plus(
             Rotation2d.fromDegrees(
                 Constants.VisionConstants.kHorizAngleCorrectionDegrees)); // target angle
+    setPointTicks = targetAngle.getRadians() * kTurretTicksPerRadian;
+    logger.info("RotateBy: SetPointTicks: {}", setPointTicks);
     if (targetAngle.getDegrees() <= kWrapRange
             && turret.getSelectedSensorPosition() > kTurretMidpoint
         || targetAngle.getDegrees() < 0) {
-      targetAngle = targetAngle.plus(Rotation2d.fromDegrees(360)); // add 360 deg
+          setPointTicks = (targetAngle.getRadians() + (2 * Math.PI)) * kTurretTicksPerRadian;
+          rotateTo(setPointTicks);
+          return true;
+      //targetAngle = targetAngle.plus(Rotation2d.fromDegrees(360)); // add 360 deg
+  
+    } else {
+      rotateTo(setPointTicks);
+      return false;
     }
-    rotateTo(targetAngle);
+
   }
 
   public Rotation2d getRotation2d() {
@@ -115,6 +127,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
     turret.set(ControlMode.PercentOutput, percentOutput);
   }
 
+  //private
   public boolean isRotationFinished() {
     // double currentTurretPosition = turret.getSelectedSensorPosition();
     // if (Math.abs(targetTurretPosition - currentTurretPosition)
@@ -126,12 +139,24 @@ public class TurretSubsystem extends MeasurableSubsystem {
     // return turretStableCounts >= Constants.ShooterConstants.kStableCounts;
     return trackingStableCount > TurretConstants.kRotateByStableCounts;
   }
+  public boolean isTurretAtTarget() {
+    double currentTurretPosition = turret.getSelectedSensorPosition();
+    if (Math.abs(targetTurretPosition - currentTurretPosition)
+        > Constants.TurretConstants.kCloseEnoughTicks) {
+      turretStableCounts = 0;
+    } else {
+      turretStableCounts++;
+    }
+    return turretStableCounts >= Constants.ShooterConstants.kStableCounts;
+  }
+
 
   @Override
   public @NotNull Set<Measure> getMeasures() {
     return Set.of(
-        new Measure("TurretAtTarget", () -> isRotationFinished() ? 1.0 : 0.0),
-        new Measure("rotateKp", this::getRotateByKp));
+      new Measure("isRotationFinished", () -> isRotationFinished() ? 1.0 : 0.0),
+      new Measure("TurretAtTarget", () -> isTurretAtTarget() ? 1.0 : 0.0),
+      new Measure("rotateKp", this::getRotateByKp));
   }
 
   @Override
@@ -224,12 +249,22 @@ public class TurretSubsystem extends MeasurableSubsystem {
           nextState = TurretState.AIMING;
           rotateKp = TurretConstants.kRotateByInitialKp;
         }
-        rotateBy(errorRotation2d.times(rotateKp));
+        if (rotateBy(errorRotation2d.times(rotateKp))) {
+          logger.info("{} -> WRAPPING", currentState);
+          currentState = TurretState.WRAPPING;
+          break;
+        }
 
         if (currentState != nextState) {
           logger.info("{} -> {}", currentState, nextState);
         }
         currentState = nextState;
+        break;
+      case WRAPPING: 
+        if (isTurretAtTarget()) {
+          currentState = TurretState.AIMING;
+          logger.info("WRAPPING-> AIMING");
+        }
         break;
       case FENDER_ADJUSTING:
         if (isRotationFinished()) {
@@ -254,6 +289,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
     TRACKING,
     IDLE,
     FENDER_ADJUSTING,
-    FENDER_AIMED;
+    FENDER_AIMED,
+    WRAPPING;
   }
 }
