@@ -184,10 +184,12 @@ public final class Constants {
     public static final double kMaxStringPotZero = 100;
     public static final double kMinStringPotZero = 0;
     public static final int kTurretId = 42;
+    public static final double kFastCruiseVelocity = 4_000;
+    public static final double kSlowCruiseVelocity = 2_000;
     public static final Rotation2d kFenderAlliance = Rotation2d.fromDegrees(0.0);
     public static final Rotation2d kFenderOpponent = Rotation2d.fromDegrees(90.0);
     public static final Translation2d kHubPositionMeters = new Translation2d(8.23, 4.11); // meters
-    public static final Rotation2d kSeekAngleError = Rotation2d.fromDegrees(30);
+    public static final Rotation2d kSeekAngleError = Rotation2d.fromDegrees(30); // 30 degrees
     public static final int kMaxSeekCount = 6;
     public static final Rotation2d kTurretRobotOffset = Rotation2d.fromDegrees(270);
 
@@ -209,7 +211,7 @@ public final class Constants {
       turretConfig.slot0.maxIntegralAccumulator = 4500;
       turretConfig.voltageMeasurementFilter = 32;
       turretConfig.voltageCompSaturation = 12;
-      turretConfig.motionCruiseVelocity = 2_000; // 4_000
+      turretConfig.motionCruiseVelocity = kFastCruiseVelocity; // 4_000
       turretConfig.motionAcceleration = 30_000;
       turretConfig.forwardLimitSwitchNormal = LimitSwitchNormal.Disabled;
       turretConfig.reverseLimitSwitchNormal = LimitSwitchNormal.Disabled;

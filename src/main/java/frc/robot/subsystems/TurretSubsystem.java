@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
+import static frc.robot.Constants.TurretConstants.kFastCruiseVelocity;
 import static frc.robot.Constants.TurretConstants.kRotateByFinalKp;
+import static frc.robot.Constants.TurretConstants.kSlowCruiseVelocity;
 import static frc.robot.Constants.TurretConstants.kTurretId;
 import static frc.robot.Constants.TurretConstants.kTurretTicksPerRadian;
 import static frc.robot.Constants.TurretConstants.kTurretZeroTicks;
@@ -34,6 +36,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
   private MagazineSubsystem magazineSubsystem;
   private final DriveSubsystem driveSubsystem;
   private double targetTurretPosition = 0;
+  private double cruiseVelocity = kFastCruiseVelocity;
 
   private int trackingStableCount;
   private int seekingCount = 0;
@@ -66,15 +69,6 @@ public class TurretSubsystem extends MeasurableSubsystem {
   }
 
   public boolean rotateBy(Rotation2d errorRotation2d) {
-    // Rotation2d targetAngle =
-    //     new Rotation2d(turret.getSelectedSensorPosition() / kTurretTicksPerRadian); // current
-    // angle
-    // targetAngle = targetAngle.plus(errorRotation2d);
-    // targetAngle =
-    //     targetAngle.plus(
-    //         Rotation2d.fromDegrees(
-    //             Constants.VisionConstants.kHorizAngleCorrectionDegrees)); // target angle
-
     double targetAngleRadians =
         errorRotation2d.getRadians()
             + turret.getSelectedSensorPosition() / kTurretTicksPerRadian
@@ -132,14 +126,6 @@ public class TurretSubsystem extends MeasurableSubsystem {
 
   // private
   public boolean isRotationFinished() {
-    // double currentTurretPosition = turret.getSelectedSensorPosition();
-    // if (Math.abs(targetTurretPosition - currentTurretPosition)
-    //     > Constants.TurretConstants.kCloseEnoughTicks) {
-    //   turretStableCounts = 0;
-    // } else {
-    //   turretStableCounts++;
-    // }
-    // return turretStableCounts >= Constants.ShooterConstants.kStableCounts;
     return trackingStableCount > TurretConstants.kRotateByStableCounts;
   }
 
@@ -198,7 +184,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
     Translation2d deltaPosition = TurretConstants.kHubPositionMeters.minus(pose.getTranslation());
     Rotation2d seekingAngle = new Rotation2d(deltaPosition.getX(), deltaPosition.getY());
     seekingAngle = seekingAngle.minus(pose.getRotation());
-    seekingAngle = seekingAngle.plus(TurretConstants.kTurretRobotOffset);
+    // seekingAngle = seekingAngle.plus(TurretConstants.kTurretRobotOffset); // plus
 
     if (seekLeft) {
       seekingAngle = seekingAngle.plus(TurretConstants.kTurretRobotOffset);
@@ -209,6 +195,24 @@ public class TurretSubsystem extends MeasurableSubsystem {
     rotateTo(getNonWrappedSetpoint(seekingAngle.getRadians()));
 
     logger.info("Seeking angle is at: {}", seekingAngle);
+  }
+
+  private void setCruiseVelocity(boolean isFast) {
+    if (isFast) {
+      if (cruiseVelocity != kFastCruiseVelocity) {
+        cruiseVelocity = kFastCruiseVelocity;
+        turret.configMotionCruiseVelocity(cruiseVelocity);
+      }
+    } else {
+      if (cruiseVelocity == kFastCruiseVelocity) {
+        cruiseVelocity = kSlowCruiseVelocity;
+        turret.configMotionCruiseVelocity(cruiseVelocity);
+      }
+    }
+  }
+
+  public void resetSeekCount() {
+    seekingCount = 0;
   }
 
   public void trackTarget() {
@@ -242,7 +246,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
         // fall through
       case SEEK_RIGHT:
         targetData = visionSubsystem.getTargetData();
-
+        setCruiseVelocity(false);
         if (targetData.isValid()) {
           logger.info("{} -> AIMING", currentState);
           currentState = TurretState.AIMING;
@@ -271,6 +275,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
       case AIMING:
         // fall through
       case TRACKING:
+        setCruiseVelocity(true);
         targetData = visionSubsystem.getTargetData();
         if (!targetData.isValid()) {
           logger.info("{} -> SEEKING: {}", currentState, targetData);
@@ -279,10 +284,6 @@ public class TurretSubsystem extends MeasurableSubsystem {
           setSeekAngle(true);
           break;
         }
-        // rotateKp =
-        //     MathUtil.interpolate(
-        //         TurretConstants.kRotateByInitialKp, kRotateByFinalKp,
-        // targetData.getInterpolateT());
         errorRotation2d = targetData.getErrorRotation2d();
 
         if (Math.abs(errorRotation2d.getRadians())
@@ -313,12 +314,14 @@ public class TurretSubsystem extends MeasurableSubsystem {
         currentState = nextState;
         break;
       case WRAPPING:
+        setCruiseVelocity(true);
         if (isTurretAtTarget()) {
           currentState = TurretState.AIMING;
           logger.info("WRAPPING-> AIMING");
         }
         break;
       case FENDER_ADJUSTING:
+        setCruiseVelocity(true);
         if (isRotationFinished()) {
           currentState = TurretState.FENDER_AIMED;
           logger.info("FENDER_ADJUSTING -> FENDER_AIMED");

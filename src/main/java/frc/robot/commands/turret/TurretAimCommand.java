@@ -17,6 +17,7 @@ public class TurretAimCommand extends CommandBase {
 
   @Override
   public void initialize() {
+    turretSubsystem.resetSeekCount();
     turretSubsystem.trackTarget();
   }
 

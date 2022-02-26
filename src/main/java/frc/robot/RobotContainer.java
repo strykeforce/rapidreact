@@ -140,6 +140,16 @@ public class RobotContainer {
     SmartDashboard.putData("Pit/Magazine/ReadCargoColor", new PitReadCargoColor(magazineSubsystem));
     SmartDashboard.putData(
         "Pit/Magazine/ClearCargoColor", new PitClearCargoColor(magazineSubsystem));
+    SmartDashboard.putNumber("Pit/Drive/PoseX", 8.42);
+    SmartDashboard.putNumber("Pit/Drive/PoseY", 7.89);
+    SmartDashboard.putData(
+        "Pit/Drive/Set Odometry",
+        new ResetOdometryCommand(
+            driveSubsystem,
+            new Pose2d(
+                SmartDashboard.getNumber("Pit/Drive/PoseX", 8.42),
+                SmartDashboard.getNumber("Pit/Drive/PoseY", 7.89),
+                Rotation2d.fromDegrees(0))));
 
     // Shooter Commands
     // SmartDashboard.putNumber(SmartDashboardConstants.kPitShooterOpenLoop, 0.0);
