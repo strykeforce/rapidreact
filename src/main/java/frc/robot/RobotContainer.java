@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
@@ -16,6 +19,7 @@ import frc.robot.Constants.SmartDashboardConstants;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.LockZeroCommand;
+import frc.robot.commands.drive.ResetOdometryCommand;
 import frc.robot.commands.drive.XLockCommand;
 import frc.robot.commands.drive.ZeroGyroCommand;
 import frc.robot.commands.intake.IntakeOpenLoopCommand;
@@ -46,7 +50,8 @@ public class RobotContainer {
 
   private final DriveSubsystem driveSubsystem = new DriveSubsystem();
   private final VisionSubsystem visionSubsystem = new VisionSubsystem();
-  private final TurretSubsystem turretSubsystem = new TurretSubsystem(visionSubsystem);
+  private final TurretSubsystem turretSubsystem =
+      new TurretSubsystem(visionSubsystem, driveSubsystem);
   private final MagazineSubsystem magazineSubsystem = new MagazineSubsystem(turretSubsystem);
   // private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem(magazineSubsystem);
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
@@ -92,6 +97,11 @@ public class RobotContainer {
     driveSubsystem.setDefaultCommand(new DriveTeleopCommand(driveJoystick, driveSubsystem));
     new JoystickButton(driveJoystick, Button.RESET.id)
         .whenPressed(new ZeroGyroCommand(driveSubsystem));
+    new JoystickButton(driveJoystick, Button.HAMBURGER.id)
+        .whenPressed(
+            new ResetOdometryCommand(
+                driveSubsystem,
+                new Pose2d(new Translation2d(0.415, 7.42), Rotation2d.fromDegrees(0))));
     // new JoystickButton(driveJoystick, Button.HAMBURGER.id)
     //     .whenPressed(new TwoPathCommandGroup(driveSubsystem, "straightPath", "straightPath2"));
     new JoystickButton(driveJoystick, Button.DOWN.id)

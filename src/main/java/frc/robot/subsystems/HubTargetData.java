@@ -5,7 +5,6 @@ import static frc.robot.Constants.VisionConstants.kHorizonFov;
 import com.squareup.moshi.JsonReader;
 import com.squareup.moshi.JsonWriter;
 import edu.wpi.first.math.geometry.Rotation2d;
-import frc.robot.Constants.VisionConstants;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -142,9 +141,9 @@ public class HubTargetData extends TargetListTargetData {
     double x = testGetDistance();
     return 0.00462384837384838 * Math.sqrt(x) - 2.70841658341659 * x + 518.807692307693;
     /*return Math.sqrt(
-            Math.pow(testGetDistance(), 2)
-                - Math.pow(VisionConstants.kTapeHeightIn - VisionConstants.kCameraHeight, 2))
-        + VisionConstants.kUpperHubRadiusIn;*/
+        Math.pow(testGetDistance(), 2)
+            - Math.pow(VisionConstants.kTapeHeightIn - VisionConstants.kCameraHeight, 2))
+    + VisionConstants.kUpperHubRadiusIn;*/
   }
 
   @SuppressWarnings("rawtypes")
