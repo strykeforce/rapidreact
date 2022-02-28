@@ -377,8 +377,9 @@ public final class Constants {
   }
 
   public static final class SmartDashboardConstants {
-    public static final String kPitHoodOpenLoop = "Pit/Hood/hoodSpeed";
-    public static final String kPitShooterOpenLoop = "Pit/Shooter/shooterSpeed";
+    public static final String kPitHoodSetPointTicks = "Pit/Hood/hoodSpeed";
+    public static final String kPitShooterSetPointTicks = "Pit/Shooter/shooterSpeed";
     public static final String kTurretSetpointRadians = "Pit/Turret/SetpointRadians";
+    public static final String kPitKickerSetPointTicks = "Pit/Kicker/kickerSpeed";
   }
 }

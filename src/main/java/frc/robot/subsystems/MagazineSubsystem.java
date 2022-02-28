@@ -31,6 +31,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   private final TurretSubsystem turretSubsystem;
   private ShooterSubsystem shooterSubsystem;
   private Timer timer = new Timer();
+  private boolean ignoreColorSensor = false;
 
   public MagazineSubsystem(TurretSubsystem turretSubsystem) {
     this.turretSubsystem = turretSubsystem;
@@ -101,8 +102,13 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     allianceCargoColor = alliance == Alliance.Red ? CargoColor.RED : CargoColor.BLUE;
   }
 
+  public void ignoreColorSensor(boolean ignore) {
+    ignoreColorSensor = ignore;
+    logger.info("set ignoreColorSensor to: {}", ignore);
+  }
+
   public boolean isNextCargoAlliance() {
-    return storedCargoColors[0] == allianceCargoColor;
+    return ignoreColorSensor || storedCargoColors[0] == allianceCargoColor;
   }
 
   public CargoColor readCargoColor() {
@@ -153,6 +159,18 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     currMagazineState = MagazineState.WAIT_CARGO;
   }
 
+  public void manualLowerMagazine(double lowerSpeed) {
+    if (lowerSpeed == 0.0) currMagazineState = MagazineState.STOP;
+    else currMagazineState = MagazineState.MANUAL_INTAKE;
+    lowerOpenLoopRotate(lowerSpeed);
+  }
+
+  public void manualUpperMagazine(double upperSpeed) {
+    if (upperSpeed == 0.0) currMagazineState = MagazineState.STOP;
+    else currMagazineState = MagazineState.MANUAL_INTAKE;
+    lowerOpenLoopRotate(upperSpeed);
+  }
+
   private void autoStopUpperMagazine(double speed) {
     if (isUpperBeamBroken() && upperMagazineTalon.getMotorOutputPercent() != 0.0) {
       upperOpenLoopRotate(0.0);
@@ -177,9 +195,16 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     currMagazineState = MagazineState.PAUSE;
   }
 
+  public MagazineState getCurrMagazineState() {
+    return currMagazineState;
+  }
+
   @Override
   public void periodic() {
     switch (currMagazineState) {
+      case MANUAL_INTAKE:
+        break;
+
       case WAIT_CARGO:
         // check number of cargo
         if (storedCargoColors[0] != CargoColor.NONE && storedCargoColors[1] != CargoColor.NONE) {
@@ -293,12 +318,19 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   }
 
   public enum CargoColor {
-    RED,
-    BLUE,
-    NONE;
+    RED("red"),
+    BLUE("blue"),
+    NONE("black");
+
+    public String color;
+
+    private CargoColor(String color) {
+      this.color = color;
+    }
   }
 
   public enum MagazineState {
+    MANUAL_INTAKE,
     WAIT_CARGO,
     READ_CARGO,
     INDEX_CARGO,
