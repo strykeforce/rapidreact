@@ -5,17 +5,17 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants.SmartDashboardConstants;
 import frc.robot.subsystems.ShooterSubsystem;
 
-public class PitHoodOpenLoopCommand extends InstantCommand {
+public class PitHoodClosedLoopCommand extends InstantCommand {
   private final ShooterSubsystem shooterSubsystem;
 
-  public PitHoodOpenLoopCommand(ShooterSubsystem shooterSubsystem) {
+  public PitHoodClosedLoopCommand(ShooterSubsystem shooterSubsystem) {
     addRequirements(shooterSubsystem);
     this.shooterSubsystem = shooterSubsystem;
   }
 
   @Override
   public void initialize() {
-    shooterSubsystem.hoodOpenLoop(
-        SmartDashboard.getNumber(SmartDashboardConstants.kPitHoodOpenLoop, 0.0));
+    shooterSubsystem.hoodClosedLoop(
+        SmartDashboard.getNumber(SmartDashboardConstants.kPitHoodSetPointTicks, 0.0));
   }
 }
