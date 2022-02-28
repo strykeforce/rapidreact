@@ -2,12 +2,12 @@
 all:
   hosts:
     deadeye-a:
-      ansible_host: 10.27.67.10
+      ansible_host: deadeye-a
       deadeye_unit: A
       deadeye_build_type: Release
       camera_0_pipeline: rr::HubPipeline
     deadeye-c:
-      ansible_host: 10.27.67.12
+      ansible_host: deadeye-c
       deadeye_unit: C
       deadeye_build_type: Release
       camera_0_pipeline: rr::HubPipeline

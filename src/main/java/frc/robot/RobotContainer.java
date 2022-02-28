@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.SuppliedValueWidget;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -25,11 +26,18 @@ import frc.robot.commands.magazine.PitClearCargoColor;
 import frc.robot.commands.magazine.PitMagazineOpenLoopCommand;
 import frc.robot.commands.magazine.PitReadCargoColor;
 import frc.robot.commands.magazine.UpperMagazineOpenLoopCommand;
+import frc.robot.commands.sequences.ArmShooterCommandGroup;
+import frc.robot.commands.sequences.AutoIntakeCommand;
+import frc.robot.commands.sequences.PitShooterTuneCommandGroup;
+import frc.robot.commands.sequences.StopShooterCommandGroup;
 import frc.robot.commands.shooter.HoodOpenLoopCommand;
-import frc.robot.commands.shooter.PitHoodOpenLoopCommand;
-import frc.robot.commands.shooter.PitShooterOpenLoopCommand;
+import frc.robot.commands.shooter.PitHoodClosedLoopCommand;
+import frc.robot.commands.shooter.PitShooterClosedLoopCommand;
 import frc.robot.commands.shooter.ShooterOpenLoopCommand;
+import frc.robot.commands.shooter.StopShooterCommand;
 import frc.robot.commands.turret.DeadeyeLatencyTestCommandGroup;
+import frc.robot.commands.turret.HighFenderShotCommand;
+import frc.robot.commands.turret.LowFenderShotCommand;
 import frc.robot.commands.turret.OpenLoopTurretCommand;
 import frc.robot.commands.turret.PitTurretCloseLoopPositionCommand;
 import frc.robot.commands.turret.TurretAimCommandGroup;
@@ -61,6 +69,7 @@ public class RobotContainer {
   private final TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
 
   private final Joystick driveJoystick = new Joystick(0);
+  private final XboxController xboxController = new XboxController(1);
 
   // Dashboard Widgets
   private SuppliedValueWidget firstCargo;
@@ -111,6 +120,30 @@ public class RobotContainer {
         .whenReleased(new IgnoreColorSensorCommand(magazineSubsystem, false));
   }
 
+  private void configureOperatorButtonBindings() {
+    new JoystickButton(xboxController, XboxController.Button.kY.value)
+        .whenPressed(new AutoIntakeCommand(magazineSubsystem, intakeSubsystem));
+    new JoystickButton(xboxController, XboxController.Button.kY.value)
+        .whenReleased(new IntakeOpenLoopCommand(intakeSubsystem, 0.0));
+    new JoystickButton(xboxController, XboxController.Button.kB.value)
+        .whenPressed(
+            new ArmShooterCommandGroup(visionSubsystem, turretSubsystem, shooterSubsystem));
+    new JoystickButton(xboxController, XboxController.Button.kX.value)
+        .whenPressed(
+            new StopShooterCommandGroup(
+                magazineSubsystem, visionSubsystem, turretSubsystem, shooterSubsystem));
+    new JoystickButton(xboxController, XboxController.Button.kRightBumper.value)
+        .whenPressed(
+            new HighFenderShotCommand(turretSubsystem, shooterSubsystem, magazineSubsystem));
+    new JoystickButton(xboxController, XboxController.Button.kRightBumper.value)
+        .whenReleased(new StopShooterCommand(shooterSubsystem));
+    new JoystickButton(xboxController, XboxController.Button.kLeftBumper.value)
+        .whenPressed(
+            new LowFenderShotCommand(turretSubsystem, shooterSubsystem, magazineSubsystem));
+    new JoystickButton(xboxController, XboxController.Button.kLeftBumper.value)
+        .whenReleased(new StopShooterCommand(shooterSubsystem));
+  }
+
   private void configureMatchDashboard() {
     firstCargo =
         Shuffleboard.getTab("Match")
@@ -154,18 +187,21 @@ public class RobotContainer {
         "Pit/Magazine/ClearCargoColor", new PitClearCargoColor(magazineSubsystem));
 
     // Shooter Commands
-    SmartDashboard.putNumber(SmartDashboardConstants.kPitShooterOpenLoop, 0.0);
+    SmartDashboard.putNumber(SmartDashboardConstants.kPitShooterSetPointTicks, 0.0);
+    SmartDashboard.putNumber(SmartDashboardConstants.kPitKickerSetPointTicks, 0.0);
     SmartDashboard.putData(
-        "Pit/Shooter/shooterStart", new PitShooterOpenLoopCommand(shooterSubsystem));
+        "Pit/Shooter/shooterStart", new PitShooterClosedLoopCommand(shooterSubsystem));
     SmartDashboard.putData(
         "Pit/Shooter/shooterStop", new ShooterOpenLoopCommand(shooterSubsystem, 0.0));
 
     // Hood Commands
-    SmartDashboard.putNumber(SmartDashboardConstants.kPitHoodOpenLoop, 0.0);
-    SmartDashboard.putData("Pit/Hood/hoodStart", new PitHoodOpenLoopCommand(shooterSubsystem));
+    SmartDashboard.putNumber(SmartDashboardConstants.kPitHoodSetPointTicks, 0.0);
+    SmartDashboard.putData("Pit/Hood/hoodStart", new PitHoodClosedLoopCommand(shooterSubsystem));
     SmartDashboard.putData("Pit/Hood/hoodStop", new HoodOpenLoopCommand(shooterSubsystem, 0.0));
+
     // intake pit commands
     SmartDashboard.putNumber("Pit/Intake/Speed", 0.0);
+
     // Turret Pit Commands
     SmartDashboard.putNumber(
         SmartDashboardConstants.kTurretSetpointRadians,
@@ -186,6 +222,15 @@ public class RobotContainer {
     SmartDashboard.putData("Pit/Turret/Stop", new OpenLoopTurretCommand(turretSubsystem, 0.0));
     // SmartDashboard.putData("Pit/Turret/AimTurret", new TurretAimCommand(visionSubsystem,
     // turretSubsystem));
+
+    // tuning commands
+    SmartDashboard.putData(
+        "Pit/Tune/Start",
+        new PitShooterTuneCommandGroup(shooterSubsystem, magazineSubsystem, intakeSubsystem));
+    SmartDashboard.putData(
+        "Pit/Tune/Stop",
+        new StopShooterCommandGroup(
+            magazineSubsystem, visionSubsystem, turretSubsystem, shooterSubsystem));
   }
 
   public enum Axis {

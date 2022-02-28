@@ -7,6 +7,10 @@
         name: deadeye-daemon.service
         state: stopped
         enabled: false
+    - name: create deadeye directory
+      file:
+        path: "{{ deadeye_dir }}"
+        state: directory
     - name: Sync remote repo from local
       ansible.posix.synchronize:
         src: ../../../../deadeye
