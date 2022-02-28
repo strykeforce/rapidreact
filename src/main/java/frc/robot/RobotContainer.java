@@ -16,7 +16,13 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.SuppliedValueWidget;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.Constants.SmartDashboardConstants;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.ClimbConstants;
+import frc.robot.Constants.DashboardConstants;
+import frc.robot.commands.climb.OpenLoopSet1StaticCommand;
+import frc.robot.commands.climb.OpenLoopSet2MoveableCommand;
+import frc.robot.commands.climb.RotateShoulderDownCommand;
+import frc.robot.commands.climb.RotateShoulderUpCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.LockZeroCommand;
@@ -31,14 +37,20 @@ import frc.robot.commands.magazine.PitMagazineOpenLoopCommand;
 import frc.robot.commands.magazine.PitReadCargoColor;
 import frc.robot.commands.magazine.UpperMagazineOpenLoopCommand;
 import frc.robot.commands.sequences.AutoIntakeCommand;
+import frc.robot.commands.shooter.HoodOpenLoopCommand;
+import frc.robot.commands.shooter.PitHoodClosedLoopCommand;
+import frc.robot.commands.shooter.PitShooterClosedLoopCommand;
+import frc.robot.commands.shooter.ShooterOpenLoopCommand;
 import frc.robot.commands.turret.DeadeyeLatencyTestCommandGroup;
 import frc.robot.commands.turret.OpenLoopTurretCommand;
 import frc.robot.commands.turret.PitTurretCloseLoopPositionCommand;
 import frc.robot.commands.turret.TurretAimCommandGroup;
+import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
 import frc.robot.subsystems.MagazineSubsystem.CargoColor;
+import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import java.util.Map;
@@ -57,8 +69,9 @@ public class RobotContainer {
   private final VisionSubsystem visionSubsystem = new VisionSubsystem();
   private final TurretSubsystem turretSubsystem =
       new TurretSubsystem(visionSubsystem, driveSubsystem);
+  private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
   private final MagazineSubsystem magazineSubsystem = new MagazineSubsystem(turretSubsystem);
-  // private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem(magazineSubsystem);
+  private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem(magazineSubsystem);
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   private final TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
 
@@ -129,6 +142,18 @@ public class RobotContainer {
   }
 
   private void configureOperatorButtonBindings() {
+    LeftStickUp.whenActive(
+        new OpenLoopSet2MoveableCommand(climbSubsystem, ClimbConstants.kClimbArmTicksP100ms));
+    LeftStickDown.whenActive(
+        new OpenLoopSet2MoveableCommand(climbSubsystem, -ClimbConstants.kClimbArmTicksP100ms));
+    LeftStickStop.whenActive(new OpenLoopSet2MoveableCommand(climbSubsystem, 0.0));
+    RightStickUp.whenActive(
+        new OpenLoopSet1StaticCommand(climbSubsystem, ClimbConstants.kClimbArmTicksP100ms));
+    RightStickDown.whenActive(
+        new OpenLoopSet1StaticCommand(climbSubsystem, ClimbConstants.kClimbArmTicksP100ms));
+    RightStickStop.whenActive(new OpenLoopSet1StaticCommand(climbSubsystem, 0.0));
+    LeftTriggerDown.whenActive(new RotateShoulderDownCommand(climbSubsystem));
+    RightTriggerDown.whenActive(new RotateShoulderUpCommand(climbSubsystem));
     new JoystickButton(xboxController, XboxController.Button.kY.value)
         .whenPressed(new AutoIntakeCommand(magazineSubsystem, intakeSubsystem));
     new JoystickButton(xboxController, XboxController.Button.kY.value)
@@ -201,25 +226,24 @@ public class RobotContainer {
                 Rotation2d.fromDegrees(0))));
 
     // Shooter Commands
-    // SmartDashboard.putNumber(SmartDashboardConstants.kPitShooterSetPointTicks, 0.0);
-    // SmartDashboard.putNumber(SmartDashboardConstants.kPitKickerSetPointTicks, 0.0);
-    // SmartDashboard.putData(
-    //     "Pit/Shooter/shooterStart", new PitShooterClosedLoopCommand(shooterSubsystem));
-    // SmartDashboard.putData(
-    //     "Pit/Shooter/shooterStop", new ShooterOpenLoopCommand(shooterSubsystem, 0.0));
+    SmartDashboard.putNumber(DashboardConstants.kPitShooterSetpointTicks, 0.0);
+    SmartDashboard.putNumber(DashboardConstants.kPitKickerSetpointTicks, 0.0);
+    SmartDashboard.putData(
+        "Pit/Shooter/shooterStart", new PitShooterClosedLoopCommand(shooterSubsystem));
+    SmartDashboard.putData(
+        "Pit/Shooter/shooterStop", new ShooterOpenLoopCommand(shooterSubsystem, 0.0));
 
     // Hood Commands
-    // SmartDashboard.putNumber(SmartDashboardConstants.kPitHoodSetPointTicks, 0.0);
-    // SmartDashboard.putData("Pit/Hood/hoodStart", new PitHoodClosedLoopCommand(shooterSubsystem));
-    // SmartDashboard.putData("Pit/Hood/hoodStop", new HoodOpenLoopCommand(shooterSubsystem, 0.0));
+    SmartDashboard.putNumber(DashboardConstants.kPitHoodSetpointTicks, 0.0);
+    SmartDashboard.putData("Pit/Hood/hoodStart", new PitHoodClosedLoopCommand(shooterSubsystem));
+    SmartDashboard.putData("Pit/Hood/hoodStop", new HoodOpenLoopCommand(shooterSubsystem, 0.0));
 
     // intake pit commands
     SmartDashboard.putNumber("Pit/Intake/Speed", 0.0);
 
     // Turret Pit Commands
     SmartDashboard.putNumber(
-        SmartDashboardConstants.kTurretSetpointRadians,
-        turretSubsystem.getRotation2d().getRadians());
+        DashboardConstants.kTurretSetpointRadians, turretSubsystem.getRotation2d().getRadians());
     SmartDashboard.putData(
         "Pit/Turret/CloseLoopPosition", new PitTurretCloseLoopPositionCommand(turretSubsystem));
     // SmartDashboard.putData("Pit/Turret/StopTracking", new StopTrackingCommand(turretSubsystem));
@@ -316,4 +340,76 @@ public class RobotContainer {
       this.id = id;
     }
   }
+
+  Trigger LeftStickUp =
+      new Trigger() {
+        @Override
+        public boolean get() {
+          return xboxController.getRawAxis(XboxController.Axis.kLeftY.value)
+              > DashboardConstants.kLeftStickDeadBand;
+        }
+      };
+
+  Trigger LeftStickDown =
+      new Trigger() {
+        @Override
+        public boolean get() {
+          return xboxController.getRawAxis(XboxController.Axis.kLeftY.value)
+              < -DashboardConstants.kLeftStickDeadBand;
+        }
+      };
+
+  Trigger LeftStickStop =
+      new Trigger() {
+        @Override
+        public boolean get() {
+          return xboxController.getRawAxis(XboxController.Axis.kLeftY.value)
+              < DashboardConstants.kLeftStickDeadBand;
+        }
+      };
+
+  Trigger RightStickUp =
+      new Trigger() {
+        @Override
+        public boolean get() {
+          return xboxController.getRawAxis(XboxController.Axis.kRightY.value)
+              > DashboardConstants.kRightStickDeadBand;
+        }
+      };
+
+  Trigger RightStickDown =
+      new Trigger() {
+        @Override
+        public boolean get() {
+          return xboxController.getRawAxis(XboxController.Axis.kRightY.value)
+              < -DashboardConstants.kRightStickDeadBand;
+        }
+      };
+
+  Trigger RightStickStop =
+      new Trigger() {
+        @Override
+        public boolean get() {
+          return xboxController.getRawAxis(XboxController.Axis.kRightY.value)
+              < DashboardConstants.kRightStickDeadBand;
+        }
+      };
+
+  Trigger LeftTriggerDown =
+      new Trigger() {
+        @Override
+        public boolean get() {
+          return xboxController.getRawAxis(XboxController.Axis.kLeftTrigger.value)
+              > DashboardConstants.kTriggerDeadBand;
+        }
+      };
+
+  Trigger RightTriggerDown =
+      new Trigger() {
+        @Override
+        public boolean get() {
+          return xboxController.getRawAxis(XboxController.Axis.kRightTrigger.value)
+              > DashboardConstants.kTriggerDeadBand;
+        }
+      };
 }

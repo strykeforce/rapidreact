@@ -26,9 +26,9 @@
 | Shooter   | FX   | kicker          | 41  |     | Falcon |         |
 | Shooter   | SRX  | hood            | 42  |     | 550    |         |
 | Turret    | SRX  | turret          | 50  | 4   | 550    |         |
-| Climb     | FX   | climbExtend1    | 60  | 19  | Falcon |  40     |
-| Climb     | FX   | climbExtend2    | 61  | 10  | Falcon |  40     |
-| Climb     | SRX  | climbRotate     | 62  |     | 550    |         |
+| Climb     | FX   | extend1Static   | 60  | 19  | Falcon |  40     |
+| Climb     | FX   | extend2Rotating | 61  | 10  | Falcon |  40     |
+| Climb     | SRX  | shoulder        | 62  |     | 550    |         |
 
 * Lower beam break: lower magazine forward limit
 * Upper beam break: upper magazine forward limit
