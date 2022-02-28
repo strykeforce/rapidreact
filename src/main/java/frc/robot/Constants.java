@@ -435,8 +435,9 @@ public final class Constants {
     public static final double kLeftStickDeadBand = 0.1;
     public static final double kRightStickDeadBand = 0.1;
     public static final double kTriggerDeadBand = 0.1;
-    public static final String kPitHoodOpenLoop = "Pit/Hood/hoodSpeed";
-    public static final String kPitShooterOpenLoop = "Pit/Shooter/shooterSpeed";
+    public static final String kPitHoodSetpointTicks = "Pit/Hood/hoodSpeed";
+    public static final String kPitShooterSetpointTicks = "Pit/Shooter/shooterSpeed";
     public static final String kTurretSetpointRadians = "Pit/Turret/SetpointRadians";
+    public static final String kPitKickerSetpointTicks = "Pit/Kicker/kickerSpeed";
   }
 }
