@@ -7,8 +7,10 @@ package frc.robot;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.commands.sequences.SetAllianceCommand;
 import frc.robot.commands.vision.DisableVisionCommand;
 import frc.robot.commands.vision.EnableVisionCommand;
 import org.slf4j.Logger;
@@ -42,8 +44,13 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
     haveAlliance = false;
+
     CommandScheduler.getInstance()
         .schedule(new EnableVisionCommand(m_robotContainer.getVisionSubsystem()));
+    SmartDashboard.putData(
+        "Match/SetAllianceRed", new SetAllianceCommand(Alliance.Red, m_robotContainer));
+    SmartDashboard.putData(
+        "Match/SetAllianceBlue", new SetAllianceCommand(Alliance.Blue, m_robotContainer));
   }
 
   /**
