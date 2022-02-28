@@ -17,12 +17,15 @@ public class TurretAimCommand extends CommandBase {
 
   @Override
   public void initialize() {
+    turretSubsystem.resetSeekCount();
     turretSubsystem.trackTarget();
   }
 
   @Override
   public boolean isFinished() {
-    return false; // turretSubsystem.getState() == TurretState.TRACKING;
+    // return turretSubsystem.getState() == TurretState.TRACKING;
+    // return turretSubsystem.isRotationFinished();
+    return false;
   }
 
   @Override
