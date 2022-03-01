@@ -42,9 +42,12 @@
 | Drive     | SPI/MXP   | NAVX        |
 | Magazine  | I2C/MXP   | ColorSensor |
 
-### PWM
+## PWM
 
 | Subsystem | name          | ID |
 | --------- | ------------- | -- |
 | Climb     | staticRatchet | 0  |
 | Climb     | mobileRatchet | 1  |
+
+## Deadeye Vision System
+See the [README](./deadeye/README.md) in `/deadeye`.
