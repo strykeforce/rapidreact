@@ -23,6 +23,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
   private final TalonFX kickerFalcon;
   private final TalonSRX hoodTalon;
   private final MagazineSubsystem magazineSubsystem;
+  private boolean highFender;
   private ShooterState currentState = ShooterState.STOP;
   private double shooterSetPointTicks, kickerSetpointTicks, hoodSetPointTicks;
   private String[][] lookupTable;
@@ -94,120 +95,132 @@ public class ShooterSubsystem extends MeasurableSubsystem {
               (Math.round(widthPixels / ShooterConstants.kLookupRes)
                   + 1
                   - ShooterConstants.kLookupMinPixel);
-      logger.info("Selected Index: {}", index);
-    }
-    double[] shootSolution = new double[3];
-    shootSolution[0] = Double.parseDouble(lookupTable[index][2]);
-    shootSolution[1] = Double.parseDouble(lookupTable[index][3]);
-    shootSolution[2] = Double.parseDouble(lookupTable[index][4]);
-    logger.info(
-        "Kicker Speed: {} Shooter Speed: {} Hood Pos: {}",
-        shootSolution[0],
-        shootSolution[1],
-        shootSolution[2]);
-    return shootSolution;
-  }
-
-  public void shooterOpenLoop(double speed) {
-    logger.info("Shooter on {}", speed);
-    // shooterFalcon.set(ControlMode.PercentOutput, speed);
-    // kickerFalcon.set(ControlMode.PercentOutput, -speed);
-  }
-
-  public void hoodOpenLoop(double speed) {
-    logger.info("hood on {}", speed);
-    // hoodTalon.set(ControlMode.PercentOutput, speed);
-  }
-
-  public void shooterClosedLoop(double kickerSpeed, double shooterSpeed) {
-    shooterFalcon.set(ControlMode.Velocity, shooterSpeed);
-    kickerFalcon.set(ControlMode.Velocity, kickerSpeed);
-    shooterSetPointTicks = shooterSpeed;
-    kickerSetpointTicks = kickerSpeed;
-    logger.info("Kicker at {} speed, Shooter at {} speed", kickerSpeed, shooterSpeed);
-  }
-
-  public void hoodClosedLoop(double hoodPos) {
-    hoodTalon.set(ControlMode.MotionMagic, hoodPos);
-    hoodSetPointTicks = hoodPos;
-    logger.info("Hood is moving to {}", hoodPos);
-  }
-
-  public boolean isShooterAtSpeed() {
-    return (Math.abs(shooterSetPointTicks - shooterFalcon.getSelectedSensorVelocity())
-            < ShooterConstants.kCloseEnoughTicksP100ms
-        && Math.abs(kickerSetpointTicks - kickerFalcon.getSelectedSensorVelocity())
-            < ShooterConstants.kCloseEnoughTicksP100ms);
-  }
-
-  public boolean isHoodAtPos() {
-    return (Math.abs(hoodSetPointTicks - hoodTalon.getSelectedSensorPosition())
-        < ShooterConstants.kCloseEnoughTicks);
-  }
-
-  public ShooterState getCurrentState() {
-    return currentState;
-  }
-
-  public void arm() {
-    currentState = ShooterState.ARMING;
-    shooterClosedLoop(
-        ShooterConstants.kKickerArmTicksP100ms, ShooterConstants.kShooterArmTicksP100ms);
-    logger.info("Arming starting");
-  }
-
-  public void shoot() {
-    logger.info("SHOOT: {} -> ADJUSTING}", currentState);
-    currentState = ShooterState.ADJUSTING;
-    if (!magazineSubsystem.isNextCargoAlliance()) {
+                  logger.info("Selected Index: {}", index);
+                }
+                double[] shootSolution = new double[3];
+                shootSolution[0] = Double.parseDouble(lookupTable[index][2]);
+                shootSolution[1] = Double.parseDouble(lookupTable[index][3]);
+                shootSolution[2] = Double.parseDouble(lookupTable[index][4]);
+                logger.info(
+                  "Kicker Speed: {} Shooter Speed: {} Hood Pos: {}",
+                  shootSolution[0],
+                  shootSolution[1],
+                  shootSolution[2]);
+                  return shootSolution;
+                }
+                
+                public void shooterOpenLoop(double speed) {
+                  logger.info("Shooter on {}", speed);
+                  // shooterFalcon.set(ControlMode.PercentOutput, speed);
+                  // kickerFalcon.set(ControlMode.PercentOutput, -speed);
+                }
+                
+                public void hoodOpenLoop(double speed) {
+                  logger.info("hood on {}", speed);
+                  // hoodTalon.set(ControlMode.PercentOutput, speed);
+                }
+                
+                public void shooterClosedLoop(double kickerSpeed, double shooterSpeed) {
+                  shooterFalcon.set(ControlMode.Velocity, shooterSpeed);
+                  kickerFalcon.set(ControlMode.Velocity, kickerSpeed);
+                  shooterSetPointTicks = shooterSpeed;
+                  kickerSetpointTicks = kickerSpeed;
+                  logger.info("Kicker at {} speed, Shooter at {} speed", kickerSpeed, shooterSpeed);
+                }
+                
+                public void hoodClosedLoop(double hoodPos) {
+                  hoodTalon.set(ControlMode.MotionMagic, hoodPos);
+                  hoodSetPointTicks = hoodPos;
+                  logger.info("Hood is moving to {}", hoodPos);
+                }
+                
+                public boolean isShooterAtSpeed() {
+                  return (Math.abs(shooterSetPointTicks - shooterFalcon.getSelectedSensorVelocity())
+                  < ShooterConstants.kCloseEnoughTicksP100ms
+                  && Math.abs(kickerSetpointTicks - kickerFalcon.getSelectedSensorVelocity())
+                  < ShooterConstants.kCloseEnoughTicksP100ms);
+                }
+                
+                public boolean isHoodAtPos() {
+                  return (Math.abs(hoodSetPointTicks - hoodTalon.getSelectedSensorPosition())
+                  < ShooterConstants.kCloseEnoughTicks);
+                }
+                
+                public ShooterState getCurrentState() {
+                  return currentState;
+                }
+                
+                public void arm() {
+                  currentState = ShooterState.ARMING;
+                  shooterClosedLoop(
+                    ShooterConstants.kKickerArmTicksP100ms, ShooterConstants.kShooterArmTicksP100ms);
+                    logger.info("Arming starting");
+                  }
+                  
+                  public void shoot() {
+                    logger.info("SHOOT: {} -> ADJUSTING}", currentState);
+                    currentState = ShooterState.ADJUSTING;
+                    if (!magazineSubsystem.isNextCargoAlliance()) {
       shooterClosedLoop(
+        ShooterConstants.kKickerOpTicksP100ms, ShooterConstants.kShooterOpTicksP100ms);
+        hoodClosedLoop(ShooterConstants.kHoodOpTicks);
+      } else {
+        double[] shootSolution = getShootSolution();
+        shooterClosedLoop(shootSolution[0], shootSolution[1]);
+        hoodClosedLoop(shootSolution[2]);
+      }
+    }
+    
+    public void fenderShot() {
+      fenderShot(highFender);
+    }
+    
+    public void fenderShot(boolean highFender) {
+      this.highFender = highFender;
+      logger.info("FENDER_SHOT: {} -> ADJUSTING", currentState);
+      currentState = ShooterState.ADJUSTING;
+      if (!magazineSubsystem.isNextCargoAlliance()) {
+        shooterClosedLoop(
           ShooterConstants.kKickerOpTicksP100ms, ShooterConstants.kShooterOpTicksP100ms);
-      hoodClosedLoop(ShooterConstants.kHoodOpTicks);
-    } else {
-      double[] shootSolution = getShootSolution();
-      shooterClosedLoop(shootSolution[0], shootSolution[1]);
-      hoodClosedLoop(shootSolution[2]);
-    }
-  }
-
-  public void fenderShot() {
-    logger.info("FENDER_SHOT: {} -> ADJUSTING", currentState);
-    currentState = ShooterState.ADJUSTING;
-    if (!magazineSubsystem.isNextCargoAlliance()) {
-      shooterClosedLoop(
-          ShooterConstants.kKickerOpTicksP100ms, ShooterConstants.kShooterOpTicksP100ms);
-      hoodClosedLoop(ShooterConstants.kHoodOpTicks);
-    } else {
-      shooterClosedLoop(
-          ShooterConstants.kKickerFenderTicksP100ms, ShooterConstants.kShooterFenderTicksP100ms);
-      hoodClosedLoop(ShooterConstants.kHoodFenderTicks);
-    }
-  }
-
-  public void stop() {
-    logger.info("{} -> STOP", currentState);
-    currentState = ShooterState.STOP;
-  }
-
-  @Override
-  public void periodic() {
-    switch (currentState) {
-      case STOP:
-        if (kickerFalcon.getMotorOutputPercent() != 0.0
-            || shooterFalcon.getMotorOutputPercent() != 0.0) {
-          shooterOpenLoop(0.0);
-        }
-        break;
-      case ARMING:
-        if (isShooterAtSpeed()) {
-          currentState = ShooterState.ARMED;
-          logger.info("ARMING -> ARMED");
-        }
-        break;
-      case ARMED:
-        // Just indicates that it is ready to shoot for other classes
-        break;
-      case ADJUSTING:
+          hoodClosedLoop(ShooterConstants.kHoodOpTicks);
+        } else if (highFender && magazineSubsystem.isNextCargoAlliance()) {
+          shooterClosedLoop(
+            ShooterConstants.kKickerFenderHighTicksP100ms,
+            ShooterConstants.kShooterFenderHighTicksP100ms);
+            hoodClosedLoop(ShooterConstants.kHoodFenderHighTicks);
+          } else {
+            shooterClosedLoop(
+              ShooterConstants.kKickerFenderLowTicksP100ms,
+              ShooterConstants.kShooterFenderLowTicksP100ms);
+              hoodClosedLoop(ShooterConstants.kHoodFenderLowTicks);
+            }
+          }
+          
+          
+          public void stop() {
+            logger.info("{} -> STOP", currentState);
+            currentState = ShooterState.STOP;
+          }
+          
+          @Override
+          public void periodic() {
+            switch (currentState) {
+              case STOP:
+              if (kickerFalcon.getMotorOutputPercent() != 0.0
+              || shooterFalcon.getMotorOutputPercent() != 0.0) {
+                shooterOpenLoop(0.0);
+              }
+              break;
+              case ARMING:
+              if (isShooterAtSpeed()) {
+                currentState = ShooterState.ARMED;
+                logger.info("ARMING -> ARMED");
+              }
+              break;
+              case ARMED:
+              // Just indicates that it is ready to shoot for other classes
+              break;
+              case ADJUSTING:
         if (isHoodAtPos() && isShooterAtSpeed()) {
           currentState = ShooterState.SHOOT;
           logger.info("ADJUSTING -> SHOOT");

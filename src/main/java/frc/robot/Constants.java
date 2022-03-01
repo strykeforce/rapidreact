@@ -358,9 +358,12 @@ public final class Constants {
     public static final double kKickerOpTicksP100ms = 1000;
     public static final double kShooterOpTicksP100ms = 1000;
     public static final double kHoodOpTicks = 5000;
-    public static final double kKickerFenderTicksP100ms = 1000;
-    public static final double kShooterFenderTicksP100ms = 1000;
-    public static final double kHoodFenderTicks = 400;
+    public static final double kKickerFenderHighTicksP100ms = 1000;
+    public static final double kShooterFenderHighTicksP100ms = 1000;
+    public static final double kHoodFenderHighTicks = 400;
+    public static final double kKickerFenderLowTicksP100ms = 1000;
+    public static final double kShooterFenderLowTicksP100ms = 1000;
+    public static final double kHoodFenderLowTicks = 400;
 
     public static final int kStableCounts = 5; // FIX ME
     public static final double kCloseEnoughTicksP100ms = 100;
