@@ -24,7 +24,7 @@ public class HighFenderShotCommand extends CommandBase {
   @Override
   public void initialize() {
     turretSubsystem.fenderShot();
-    shooterSubsystem.fenderShot();
+    shooterSubsystem.fenderShot(true);
     magazineSubsystem.shoot();
   }
 

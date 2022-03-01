@@ -42,6 +42,8 @@ import frc.robot.commands.shooter.PitHoodClosedLoopCommand;
 import frc.robot.commands.shooter.PitShooterClosedLoopCommand;
 import frc.robot.commands.shooter.ShooterOpenLoopCommand;
 import frc.robot.commands.turret.DeadeyeLatencyTestCommandGroup;
+import frc.robot.commands.turret.HighFenderShotCommand;
+import frc.robot.commands.turret.LowFenderShotCommand;
 import frc.robot.commands.turret.OpenLoopTurretCommand;
 import frc.robot.commands.turret.PitTurretCloseLoopPositionCommand;
 import frc.robot.commands.turret.TurretAimCommandGroup;
@@ -165,14 +167,14 @@ public class RobotContainer {
     //     .whenPressed(
     //         new StopShooterCommandGroup(
     //             magazineSubsystem, visionSubsystem, turretSubsystem, shooterSubsystem));
-    // new JoystickButton(xboxController, XboxController.Button.kRightBumper.value)
-    //     .whenPressed(
-    //         new HighFenderShotCommand(turretSubsystem, shooterSubsystem, magazineSubsystem));
+    new JoystickButton(xboxController, XboxController.Button.kRightBumper.value)
+        .whenPressed(
+            new HighFenderShotCommand(turretSubsystem, shooterSubsystem, magazineSubsystem));
     // new JoystickButton(xboxController, XboxController.Button.kRightBumper.value)
     //     .whenReleased(new StopShooterCommand(shooterSubsystem));
-    // new JoystickButton(xboxController, XboxController.Button.kLeftBumper.value)
-    //     .whenPressed(
-    //         new LowFenderShotCommand(turretSubsystem, shooterSubsystem, magazineSubsystem));
+    new JoystickButton(xboxController, XboxController.Button.kLeftBumper.value)
+        .whenPressed(
+            new LowFenderShotCommand(turretSubsystem, shooterSubsystem, magazineSubsystem));
     // new JoystickButton(xboxController, XboxController.Button.kLeftBumper.value)
     //     .whenReleased(new StopShooterCommand(shooterSubsystem));
   }
