@@ -1,0 +1,19 @@
+max_velocity = 2.0 #m/s
+max_acceleration = 2.0 #m/s
+start_velocity = 0.0 #m/s
+end_velocity = 2.0 #m/s
+is_reversed = true
+target_yaw = -156 #degrees
+
+[start_pose]
+    x = 7.58
+    y = 0.68
+    angle = 91.5
+[end_pose]
+    x = 5.06
+    y = 1.87
+    angle = 67.5
+
+[[internal_points]]
+    x = 6.79  ## formerly  close to the ball at 5.82.  Took a deeper curve into the tower
+    y = 2.36

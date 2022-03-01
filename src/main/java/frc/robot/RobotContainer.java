@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
@@ -23,6 +26,7 @@ import frc.robot.commands.climb.RotateShoulderUpCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.LockZeroCommand;
+import frc.robot.commands.drive.ResetOdometryCommand;
 import frc.robot.commands.drive.XLockCommand;
 import frc.robot.commands.drive.ZeroGyroCommand;
 import frc.robot.commands.intake.IntakeOpenLoopCommand;
@@ -32,19 +36,12 @@ import frc.robot.commands.magazine.PitClearCargoColor;
 import frc.robot.commands.magazine.PitMagazineOpenLoopCommand;
 import frc.robot.commands.magazine.PitReadCargoColor;
 import frc.robot.commands.magazine.UpperMagazineOpenLoopCommand;
-import frc.robot.commands.sequences.ArmShooterCommandGroup;
 import frc.robot.commands.sequences.AutoIntakeCommand;
-import frc.robot.commands.sequences.PitShooterTuneCommandGroup;
-import frc.robot.commands.sequences.StopShooterCommandGroup;
-import frc.robot.commands.sequences.TwoPathCommandGroup;
 import frc.robot.commands.shooter.HoodOpenLoopCommand;
 import frc.robot.commands.shooter.PitHoodClosedLoopCommand;
 import frc.robot.commands.shooter.PitShooterClosedLoopCommand;
 import frc.robot.commands.shooter.ShooterOpenLoopCommand;
-import frc.robot.commands.shooter.StopShooterCommand;
 import frc.robot.commands.turret.DeadeyeLatencyTestCommandGroup;
-import frc.robot.commands.turret.HighFenderShotCommand;
-import frc.robot.commands.turret.LowFenderShotCommand;
 import frc.robot.commands.turret.OpenLoopTurretCommand;
 import frc.robot.commands.turret.PitTurretCloseLoopPositionCommand;
 import frc.robot.commands.turret.TurretAimCommandGroup;
@@ -70,7 +67,8 @@ public class RobotContainer {
 
   private final DriveSubsystem driveSubsystem = new DriveSubsystem();
   private final VisionSubsystem visionSubsystem = new VisionSubsystem();
-  private final TurretSubsystem turretSubsystem = new TurretSubsystem(visionSubsystem);
+  private final TurretSubsystem turretSubsystem =
+      new TurretSubsystem(visionSubsystem, driveSubsystem);
   private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
   private final MagazineSubsystem magazineSubsystem = new MagazineSubsystem(turretSubsystem);
   private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem(magazineSubsystem);
@@ -89,16 +87,20 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     turretSubsystem.setMagazineSubsystem(magazineSubsystem);
-    magazineSubsystem.setShooterSubsystem(shooterSubsystem);
+    // magazineSubsystem.setShooterSubsystem(shooterSubsystem);
     configureTelemetry();
     configureDriverButtonBindings();
     configurePitDashboard();
     configureMatchDashboard();
   }
 
+  public VisionSubsystem getVisionSubsystem() {
+    return visionSubsystem;
+  }
+
   private void configureTelemetry() {
     driveSubsystem.registerWith(telemetryService);
-    shooterSubsystem.registerWith(telemetryService);
+    // shooterSubsystem.registerWith(telemetryService);
     magazineSubsystem.registerWith(telemetryService);
     turretSubsystem.registerWith(telemetryService);
     intakeSubsystem.registerWith(telemetryService);
@@ -117,10 +119,20 @@ public class RobotContainer {
     new JoystickButton(driveJoystick, Button.RESET.id)
         .whenPressed(new ZeroGyroCommand(driveSubsystem));
     new JoystickButton(driveJoystick, Button.HAMBURGER.id)
-        .whenPressed(new TwoPathCommandGroup(driveSubsystem, "straightPath", "straightPath2"));
+        .whenPressed(
+            new ResetOdometryCommand(
+                driveSubsystem,
+                new Pose2d(new Translation2d(0.415, 7.42), Rotation2d.fromDegrees(0))));
+    // new JoystickButton(driveJoystick, Button.HAMBURGER.id)
+    //     .whenPressed(new TwoPathCommandGroup(driveSubsystem, "straightPath", "straightPath2"));
     new JoystickButton(driveJoystick, Button.DOWN.id)
         .whenPressed(new TurretAimCommandGroup(visionSubsystem, turretSubsystem));
     new JoystickButton(driveJoystick, Button.X.id).whenPressed(new XLockCommand(driveSubsystem));
+    // new JoystickButton(driveJoystick, Button.UP.id)
+    //     .whenPressed(new TestLogTargetsDistanceCommand(visionSubsystem));
+    //     .whenPressed(new DeadeyeLatencyTestCommandGroup(visionSubsystem, turretSubsystem));
+    // new JoystickButton(driveJoystick, Button.UP.id)
+    //     .whenPressed(new DeadeyeLatencyTestCommandGroup(visionSubsystem, turretSubsystem));
     new JoystickButton(driveJoystick, Button.UP.id)
         .whenPressed(new DeadeyeLatencyTestCommandGroup(visionSubsystem, turretSubsystem));
     new JoystickButton(driveJoystick, Toggle.LEFT_TOGGLE.id)
@@ -146,23 +158,23 @@ public class RobotContainer {
         .whenPressed(new AutoIntakeCommand(magazineSubsystem, intakeSubsystem));
     new JoystickButton(xboxController, XboxController.Button.kY.value)
         .whenReleased(new IntakeOpenLoopCommand(intakeSubsystem, 0.0));
-    new JoystickButton(xboxController, XboxController.Button.kB.value)
-        .whenPressed(
-            new ArmShooterCommandGroup(visionSubsystem, turretSubsystem, shooterSubsystem));
-    new JoystickButton(xboxController, XboxController.Button.kX.value)
-        .whenPressed(
-            new StopShooterCommandGroup(
-                magazineSubsystem, visionSubsystem, turretSubsystem, shooterSubsystem));
-    new JoystickButton(xboxController, XboxController.Button.kRightBumper.value)
-        .whenPressed(
-            new HighFenderShotCommand(turretSubsystem, shooterSubsystem, magazineSubsystem));
-    new JoystickButton(xboxController, XboxController.Button.kRightBumper.value)
-        .whenReleased(new StopShooterCommand(shooterSubsystem));
-    new JoystickButton(xboxController, XboxController.Button.kLeftBumper.value)
-        .whenPressed(
-            new LowFenderShotCommand(turretSubsystem, shooterSubsystem, magazineSubsystem));
-    new JoystickButton(xboxController, XboxController.Button.kLeftBumper.value)
-        .whenReleased(new StopShooterCommand(shooterSubsystem));
+    // new JoystickButton(xboxController, XboxController.Button.kB.value)
+    //     .whenPressed(
+    //         new ArmShooterCommandGroup(visionSubsystem, turretSubsystem, shooterSubsystem));
+    // new JoystickButton(xboxController, XboxController.Button.kX.value)
+    //     .whenPressed(
+    //         new StopShooterCommandGroup(
+    //             magazineSubsystem, visionSubsystem, turretSubsystem, shooterSubsystem));
+    // new JoystickButton(xboxController, XboxController.Button.kRightBumper.value)
+    //     .whenPressed(
+    //         new HighFenderShotCommand(turretSubsystem, shooterSubsystem, magazineSubsystem));
+    // new JoystickButton(xboxController, XboxController.Button.kRightBumper.value)
+    //     .whenReleased(new StopShooterCommand(shooterSubsystem));
+    // new JoystickButton(xboxController, XboxController.Button.kLeftBumper.value)
+    //     .whenPressed(
+    //         new LowFenderShotCommand(turretSubsystem, shooterSubsystem, magazineSubsystem));
+    // new JoystickButton(xboxController, XboxController.Button.kLeftBumper.value)
+    //     .whenReleased(new StopShooterCommand(shooterSubsystem));
   }
 
   private void configureMatchDashboard() {
@@ -191,10 +203,6 @@ public class RobotContainer {
     magazineSubsystem.setAllianceColor(alliance);
   }
 
-  public VisionSubsystem getVisionSubsystem() {
-    return visionSubsystem;
-  }
-
   private void configurePitDashboard() {
     // Magazine Commands
     SmartDashboard.putNumber("Pit/Magazine/Speed", 0.0);
@@ -206,6 +214,16 @@ public class RobotContainer {
     SmartDashboard.putData("Pit/Magazine/ReadCargoColor", new PitReadCargoColor(magazineSubsystem));
     SmartDashboard.putData(
         "Pit/Magazine/ClearCargoColor", new PitClearCargoColor(magazineSubsystem));
+    SmartDashboard.putNumber("Pit/Drive/PoseX", 8.42);
+    SmartDashboard.putNumber("Pit/Drive/PoseY", 7.89);
+    SmartDashboard.putData(
+        "Pit/Drive/Set Odometry",
+        new ResetOdometryCommand(
+            driveSubsystem,
+            new Pose2d(
+                SmartDashboard.getNumber("Pit/Drive/PoseX", 8.42),
+                SmartDashboard.getNumber("Pit/Drive/PoseY", 7.89),
+                Rotation2d.fromDegrees(0))));
 
     // Shooter Commands
     SmartDashboard.putNumber(DashboardConstants.kPitShooterSetpointTicks, 0.0);
@@ -228,6 +246,7 @@ public class RobotContainer {
         DashboardConstants.kTurretSetpointRadians, turretSubsystem.getRotation2d().getRadians());
     SmartDashboard.putData(
         "Pit/Turret/CloseLoopPosition", new PitTurretCloseLoopPositionCommand(turretSubsystem));
+    // SmartDashboard.putData("Pit/Turret/StopTracking", new StopTrackingCommand(turretSubsystem));
     SmartDashboard.putData("Pit/Intake/Start", new PitIntakeOpenLoopCommand(intakeSubsystem));
     SmartDashboard.putData("Pit/Intake/Stop", new IntakeOpenLoopCommand(intakeSubsystem, 0.0));
 
@@ -244,13 +263,13 @@ public class RobotContainer {
     // turretSubsystem));
 
     // tuning commands
-    SmartDashboard.putData(
-        "Pit/Tune/Start",
-        new PitShooterTuneCommandGroup(shooterSubsystem, magazineSubsystem, intakeSubsystem));
-    SmartDashboard.putData(
-        "Pit/Tune/Stop",
-        new StopShooterCommandGroup(
-            magazineSubsystem, visionSubsystem, turretSubsystem, shooterSubsystem));
+    // SmartDashboard.putData(
+    //     "Pit/Tune/Start",
+    //     new PitShooterTuneCommandGroup(shooterSubsystem, magazineSubsystem, intakeSubsystem));
+    // SmartDashboard.putData(
+    //     "Pit/Tune/Stop",
+    //     new StopShooterCommandGroup(
+    //         magazineSubsystem, visionSubsystem, turretSubsystem, shooterSubsystem));
   }
 
   public enum Axis {

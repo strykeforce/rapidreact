@@ -138,9 +138,8 @@ public final class Constants {
     public static final double kVerticalFov = 48.8;
     public static final double kHorizonFov = 1.012; // 50.8 //146 //radians 1.012 // deg 57.999
     public static final double kHorizonRes = 640; // 1280
-    public static final double kTargetWidthIn = 39.5; // 34.6
+    public static final double kTargetWidthIn = 5;
     public static final double kCameraHeight = 20.75;
-    public static final double kTargetHeight = 98.5;
     public static final double kSizeThreshold = 400;
     public static final double kDistanceThreshold = 200;
     public static final int kStableRange = 20;
@@ -153,6 +152,8 @@ public final class Constants {
     public static final int kTableRes = 1;
     public static final int kShooterIndex = 2;
     public static final int kHoodIndex = 3;
+    public static final double kTapeHeightIn = 101.625; // in
+    public static final double kUpperHubRadiusIn = 26.6875;
     // + is left
     public static final double kHorizAngleCorrectionDegrees = 0.0; // 2.5 degrees
     // + is further along track and lower
@@ -177,13 +178,20 @@ public final class Constants {
     public static final int kReverseLimit = -100;
     public static final int kCloseEnoughTicks = 40;
     public static final Rotation2d kCloseEnoughTarget = Rotation2d.fromDegrees(1); // 1
-    public static final double kRotateByKp = 0.4;
-    public static final int kRotateByStableCounts = 3;
+    public static final double kRotateByInitialKp = 0.4; // 0.4
+    public static final double kRotateByFinalKp = 0.95; // 0.95
+    public static final int kRotateByStableCounts = 3; // 3
     public static final double kMaxStringPotZero = 100;
     public static final double kMinStringPotZero = 0;
     public static final int kTurretId = 42;
+    public static final double kFastCruiseVelocity = 4_000;
+    public static final double kSlowCruiseVelocity = 2_000;
     public static final Rotation2d kFenderAlliance = Rotation2d.fromDegrees(0.0);
     public static final Rotation2d kFenderOpponent = Rotation2d.fromDegrees(90.0);
+    public static final Translation2d kHubPositionMeters = new Translation2d(8.23, 4.11); // meters
+    public static final Rotation2d kSeekAngleError = Rotation2d.fromDegrees(30); // 30 degrees
+    public static final int kMaxSeekCount = 6;
+    public static final Rotation2d kTurretRobotOffset = Rotation2d.fromDegrees(270);
 
     public static SupplyCurrentLimitConfiguration getSupplyCurrentLimitConfig() {
       return new SupplyCurrentLimitConfiguration(true, 5, 30, 500);
@@ -203,7 +211,7 @@ public final class Constants {
       turretConfig.slot0.maxIntegralAccumulator = 4500;
       turretConfig.voltageMeasurementFilter = 32;
       turretConfig.voltageCompSaturation = 12;
-      turretConfig.motionCruiseVelocity = 4_000;
+      turretConfig.motionCruiseVelocity = kFastCruiseVelocity; // 4_000
       turretConfig.motionAcceleration = 30_000;
       turretConfig.forwardLimitSwitchNormal = LimitSwitchNormal.Disabled;
       turretConfig.reverseLimitSwitchNormal = LimitSwitchNormal.Disabled;
