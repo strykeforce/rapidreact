@@ -23,6 +23,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
   private final TalonFX kickerFalcon;
   private final TalonSRX hoodTalon;
   private final MagazineSubsystem magazineSubsystem;
+  private boolean highFender;
   private ShooterState currentState = ShooterState.STOP;
   private double shooterSetPointTicks, kickerSetpointTicks, hoodSetPointTicks;
   private String[][] lookupTable;
@@ -171,16 +172,27 @@ public class ShooterSubsystem extends MeasurableSubsystem {
   }
 
   public void fenderShot() {
+    fenderShot(highFender);
+  }
+
+  public void fenderShot(boolean highFender) {
+    this.highFender = highFender;
     logger.info("FENDER_SHOT: {} -> ADJUSTING", currentState);
     currentState = ShooterState.ADJUSTING;
     if (!magazineSubsystem.isNextCargoAlliance()) {
       shooterClosedLoop(
           ShooterConstants.kKickerOpTicksP100ms, ShooterConstants.kShooterOpTicksP100ms);
       hoodClosedLoop(ShooterConstants.kHoodOpTicks);
+    } else if (highFender) {
+      shooterClosedLoop(
+          ShooterConstants.kKickerFenderHighTicksP100ms,
+          ShooterConstants.kShooterFenderHighTicksP100ms);
+      hoodClosedLoop(ShooterConstants.kHoodFenderHighTicks);
     } else {
       shooterClosedLoop(
-          ShooterConstants.kKickerFenderTicksP100ms, ShooterConstants.kShooterFenderTicksP100ms);
-      hoodClosedLoop(ShooterConstants.kHoodFenderTicks);
+          ShooterConstants.kKickerFenderLowTicksP100ms,
+          ShooterConstants.kShooterFenderLowTicksP100ms);
+      hoodClosedLoop(ShooterConstants.kHoodFenderLowTicks);
     }
   }
 

@@ -1,5 +1,6 @@
 package frc.robot.commands.drive;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
@@ -21,10 +22,17 @@ public class DriveTeleopCommand extends CommandBase {
   public void execute() {
     driveSubsystem.drive(
         DriveConstants.kMaxSpeedMetersPerSecond
-            * deadband(joystick.getRawAxis(RobotContainer.Axis.LEFT_X.id)),
+            * MathUtil.applyDeadband(
+                joystick.getRawAxis(RobotContainer.Axis.LEFT_X.id),
+                DriveConstants.kDeadbandAllStick),
         DriveConstants.kMaxSpeedMetersPerSecond
-            * deadband(joystick.getRawAxis(RobotContainer.Axis.LEFT_Y.id)),
-        DriveConstants.kMaxOmega * -deadband(joystick.getRawAxis(RobotContainer.Axis.RIGHT_Y.id)));
+            * MathUtil.applyDeadband(
+                joystick.getRawAxis(RobotContainer.Axis.LEFT_Y.id),
+                DriveConstants.kDeadbandAllStick),
+        DriveConstants.kMaxOmega
+            * -MathUtil.applyDeadband(
+                joystick.getRawAxis(RobotContainer.Axis.RIGHT_Y.id),
+                DriveConstants.kDeadbandAllStick));
   }
 
   @Override
