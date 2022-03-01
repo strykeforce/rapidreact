@@ -28,7 +28,7 @@
 | Turret    | SRX  | turret          | 50  |  4  | 550    |  30     |
 | Climb     | FX   | extend1Static   | 60  |  1  | Falcon |  40     |
 | Climb     | FX   | extend2Rotating | 61  |  10 | Falcon |  40     |
-| Climb     | SRX  | shoulder        | 62  |     | 550    |         |
+| Climb     | SRX  | shoulder        | 62  |  2  | 550    |  30     |
 
 * Lower beam break: lower magazine forward limit
 * Upper beam break: upper magazine forward limit
