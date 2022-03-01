@@ -66,10 +66,12 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   }
 
   public void enableUpperBeamBreak(boolean enable) {
-    if(enable) {
-      upperMagazineTalon.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
+    if (enable) {
+      upperMagazineTalon.configForwardLimitSwitchSource(
+          LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
     } else {
-      upperMagazineTalon.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled);
+      upperMagazineTalon.configForwardLimitSwitchSource(
+          LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled);
     }
     logger.info("Enabling talon limit switch");
   }
