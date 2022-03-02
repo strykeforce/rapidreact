@@ -223,11 +223,17 @@ public class DriveSubsystem extends MeasurableSubsystem {
           TrajectoryGenerator.generateTrajectory(startPose, path, endPose, trajectoryConfig);
       return new PathData(targetYaw, trajectoryGenerated);
     } catch (Exception error) {
-      //logger.error(error.toString());
-      //logger.error("Path {} not found", trajectoryName);
-      //throw new RuntimeException(error);
+      logger.error(error.toString());
+      logger.error("Path {} not found - Running Default Path", trajectoryName);
 
-      TrajectoryGenerator.generateTrajectory(DriveConstants.startPose2d, DriveConstants.translation, DriveConstants.endPose2d, DriveConstants.getDefaultTrajectory());
+      Trajectory trajectoryGenerated =
+          TrajectoryGenerator.generateTrajectory(
+              DriveConstants.startPose2d,
+              DriveConstants.getDefaultInternalWaypoints(),
+              DriveConstants.endPose2d,
+              DriveConstants.getDefaultTrajectoryConfig());
+
+      return new PathData(getGyroRotation2d(), trajectoryGenerated);
     }
   }
 

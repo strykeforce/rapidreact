@@ -4,9 +4,6 @@
 
 package frc.robot;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
@@ -14,12 +11,12 @@ import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.util.Color;
+import java.util.ArrayList;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -41,44 +38,35 @@ public final class Constants {
     public static final double kDeadbandAllStick = 0.10;
     public static final double kCloseEnoughTicks = 10.0;
 
-    // Contents for Sanity
-    // Wheel math
-    // Gear values
-    //
-
-    // TODO: verify diameter and run calibration
-    // 500 cm calibration = actual / odometry
-
     public static final Pose2d startPose2d = new Pose2d(0, 0, Rotation2d.fromDegrees(0));
     public static final Pose2d endPose2d = new Pose2d(-1, 0, Rotation2d.fromDegrees(0));
-    public static final Translation2d translation = new Translation2d(0.5,0);
-    
 
-    public static TrajectoryConfig getDefaultTrajectory()
-    {
-      TrajectoryConfig trajectoryConfig = new TrajectoryConfig(1,1);
+    public static ArrayList<Translation2d> getDefaultInternalWaypoints() {
+      ArrayList<Translation2d> waypoints = new ArrayList<>();
+      waypoints.add(new Translation2d(-0.5, 0));
+      return waypoints;
+    }
+
+    public static TrajectoryConfig getDefaultTrajectoryConfig() {
+      TrajectoryConfig trajectoryConfig = new TrajectoryConfig(1, 1);
       trajectoryConfig.setReversed(true);
       trajectoryConfig.setStartVelocity(0.0);
       trajectoryConfig.setEndVelocity(0.0);
       return trajectoryConfig;
-
     }
 
-    
-      
-    
-    
-    
-
-
+    // TODO: verify diameter and run calibration
+    // 500 cm calibration = actual / odometry
 
     public static final double kWheelDiameterInches = 3.0 * (554.0 / 500.0);
 
     // From: https://github.com/strykeforce/axis-config/
     public static final double kMaxSpeedMetersPerSecond = 3.889;
+    public static final double kRobotWidth = 0.5461;
+    public static final double kRobotLength = 0.6477;
 
     public static final double kMaxOmega =
-        (kMaxSpeedMetersPerSecond / Math.hypot(0.5461 / 2.0, 0.6477 / 2.0))
+        (kMaxSpeedMetersPerSecond / Math.hypot(kRobotWidth / 2.0, kRobotLength / 2.0))
             / 2.0; // wheel locations below
 
     // From: https://github.com/strykeforce/axis-config/
@@ -94,8 +82,8 @@ public final class Constants {
     }
 
     public static Translation2d[] getWheelLocationMeters() {
-      final double x = 0.6477 / 2.0; // front-back, was ROBOT_LENGTH
-      final double y = 0.5461 / 2.0; // left-right, was ROBOT_WIDTH
+      final double x = kRobotLength / 2.0; // front-back, was ROBOT_LENGTH
+      final double y = kRobotWidth / 2.0; // left-right, was ROBOT_WIDTH
       Translation2d[] locs = new Translation2d[4];
       locs[0] = new Translation2d(x, y); // left front
       locs[1] = new Translation2d(x, -y); // right front
