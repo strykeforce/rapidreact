@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
@@ -11,8 +14,11 @@ import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.util.Color;
 
 /**
@@ -42,6 +48,30 @@ public final class Constants {
 
     // TODO: verify diameter and run calibration
     // 500 cm calibration = actual / odometry
+
+    public static final Pose2d startPose2d = new Pose2d(0, 0, Rotation2d.fromDegrees(0));
+    public static final Pose2d endPose2d = new Pose2d(-1, 0, Rotation2d.fromDegrees(0));
+    public static final Translation2d translation = new Translation2d(0.5,0);
+    
+
+    public static TrajectoryConfig getDefaultTrajectory()
+    {
+      TrajectoryConfig trajectoryConfig = new TrajectoryConfig(1,1);
+      trajectoryConfig.setReversed(true);
+      trajectoryConfig.setStartVelocity(0.0);
+      trajectoryConfig.setEndVelocity(0.0);
+      return trajectoryConfig;
+
+    }
+
+    
+      
+    
+    
+    
+
+
+
     public static final double kWheelDiameterInches = 3.0 * (554.0 / 500.0);
 
     // From: https://github.com/strykeforce/axis-config/
