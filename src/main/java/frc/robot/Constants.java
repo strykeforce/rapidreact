@@ -186,6 +186,7 @@ public final class Constants {
     public static final int kTurretId = 42;
     public static final double kFastCruiseVelocity = 4_000;
     public static final double kSlowCruiseVelocity = 2_000;
+    public static final int kNotValidTargetCounts = 5; // how many frames to wait before seeking
     public static final Rotation2d kFenderAlliance = Rotation2d.fromDegrees(0.0);
     public static final Rotation2d kFenderOpponent = Rotation2d.fromDegrees(90.0);
     public static final Translation2d kHubPositionMeters = new Translation2d(8.23, 4.11); // meters
