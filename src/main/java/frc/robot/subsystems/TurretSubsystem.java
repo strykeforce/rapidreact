@@ -39,6 +39,8 @@ public class TurretSubsystem extends MeasurableSubsystem {
   private double cruiseVelocity = kFastCruiseVelocity;
 
   private int trackingStableCount;
+  private int
+      notValidTargetCount; // don't go to seeking if there is only a few frames of no valid target
   private int seekingCount = 0;
   private double rotateKp;
 
@@ -105,8 +107,9 @@ public class TurretSubsystem extends MeasurableSubsystem {
   }
 
   private double getNonWrappedSetpoint(double positionRadians) {
-    positionRadians %= 2 * Math.PI;
-    positionRadians = positionRadians < 0 ? positionRadians + 2 * Math.PI : positionRadians;
+    positionRadians %= 2 * Math.PI; // <---- FIXME does it work for 180 wrap?
+    positionRadians =
+        positionRadians < 0 ? positionRadians + 2 * Math.PI : positionRadians; // <---- Same here
     return positionRadians * kTurretTicksPerRadian;
   }
 
@@ -187,9 +190,9 @@ public class TurretSubsystem extends MeasurableSubsystem {
     // seekingAngle = seekingAngle.plus(TurretConstants.kTurretRobotOffset); // plus
 
     if (seekLeft) {
-      seekingAngle = seekingAngle.plus(TurretConstants.kTurretRobotOffset);
+      seekingAngle = seekingAngle.plus(TurretConstants.kSeekAngleError);
     } else {
-      seekingAngle = seekingAngle.minus(TurretConstants.kTurretRobotOffset);
+      seekingAngle = seekingAngle.minus(TurretConstants.kSeekAngleError);
     }
 
     rotateTo(getNonWrappedSetpoint(seekingAngle.getRadians()));
@@ -278,11 +281,17 @@ public class TurretSubsystem extends MeasurableSubsystem {
         setCruiseVelocity(true);
         targetData = visionSubsystem.getTargetData();
         if (!targetData.isValid()) {
-          logger.info("{} -> SEEKING: {}", currentState, targetData);
-          currentState = TurretState.SEEK_LEFT;
-          seekingCount = 0;
-          setSeekAngle(true);
-          break;
+          notValidTargetCount++;
+
+          if (notValidTargetCount > TurretConstants.kNotValidTargetCounts) {
+            logger.info("{} -> SEEKING: {}", currentState, targetData);
+            currentState = TurretState.SEEK_LEFT;
+            seekingCount = 0;
+            setSeekAngle(true);
+            break;
+          }
+        } else {
+          notValidTargetCount = 0;
         }
         errorRotation2d = targetData.getErrorRotation2d();
 
