@@ -161,6 +161,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
     logger.info("Locking wheels to X");
   }
 
+  public SwerveModule[] getSwerveModules() {
+    return swerveDrive.getSwerveModules();
+  }
+
   private SwerveModuleState[] getSwerveModuleStates() {
     TalonSwerveModule[] swerveModules = (TalonSwerveModule[]) swerveDrive.getSwerveModules();
     SwerveModuleState[] swerveModuleStates = new SwerveModuleState[4];

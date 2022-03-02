@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.can.BaseTalon;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.opencsv.CSVReader;
@@ -148,6 +149,10 @@ public class ShooterSubsystem extends MeasurableSubsystem {
 
   public ShooterState getCurrentState() {
     return currentState;
+  }
+
+  public List<BaseTalon> getShooterTalons() {
+    return List.of(kickerFalcon, shooterFalcon);
   }
 
   public void arm() {
