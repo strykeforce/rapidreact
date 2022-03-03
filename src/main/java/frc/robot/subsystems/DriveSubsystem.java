@@ -66,7 +66,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
       var azimuthTalon = new TalonSRX(i);
       azimuthTalon.configFactoryDefault(kTalonConfigTimeout);
       azimuthTalon.configAllSettings(DriveConstants.getAzimuthTalonConfig(), kTalonConfigTimeout);
-      azimuthTalon.enableCurrentLimit(true);
+      azimuthTalon.configSupplyCurrentLimit(
+          DriveConstants.getAzimuthSupplyCurrentLimit(), kTalonConfigTimeout);
       azimuthTalon.enableVoltageCompensation(true);
       azimuthTalon.setNeutralMode(NeutralMode.Coast);
 

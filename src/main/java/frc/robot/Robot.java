@@ -75,6 +75,7 @@ public class Robot extends TimedRobot {
         logger.info("Set Alliance: {}", alliance);
       }
     }
+    m_robotContainer.upudateMatchData();
   }
 
   /** This function is called once each time the robot enters Disabled mode. */

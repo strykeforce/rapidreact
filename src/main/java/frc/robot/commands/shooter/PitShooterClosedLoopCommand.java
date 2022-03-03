@@ -15,7 +15,7 @@ public class PitShooterClosedLoopCommand extends InstantCommand {
 
   @Override
   public void initialize() {
-    shooterSubsystem.shooterClosedLoop(
+    shooterSubsystem.manualClosedLoop(
         SmartDashboard.getNumber(DashboardConstants.kPitKickerSetpointTicks, 0.0),
         SmartDashboard.getNumber(DashboardConstants.kPitShooterSetpointTicks, 0.0));
   }
