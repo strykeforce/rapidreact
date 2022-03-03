@@ -107,9 +107,9 @@ public class TurretSubsystem extends MeasurableSubsystem {
   }
 
   private double getNonWrappedSetpoint(double positionRadians) {
-    positionRadians %= 2 * Math.PI; // <---- FIXME does it work for 180 wrap?
-    positionRadians =
-        positionRadians < 0 ? positionRadians + 2 * Math.PI : positionRadians; // <---- Same here
+    positionRadians %= 2 * Math.PI;
+    positionRadians = positionRadians < 0 ? positionRadians + 2 * Math.PI : positionRadians;
+
     return positionRadians * kTurretTicksPerRadian;
   }
 
@@ -158,12 +158,11 @@ public class TurretSubsystem extends MeasurableSubsystem {
   }
 
   public void zeroTurret() {
-    double stringPotPosition = turret.getSensorCollection().getAnalogInRaw();
-    if (stringPotPosition <= Constants.TurretConstants.kMaxStringPotZero
-        && stringPotPosition >= Constants.TurretConstants.kMinStringPotZero) {
+    // double stringPotPosition = turret.getSensorCollection().getAnalogInRaw();
+    if (!turret.getSensorCollection().isFwdLimitSwitchClosed()) {
       int absPos = turret.getSensorCollection().getPulseWidthPosition() & 0xFFF;
       // inverted because absolute and relative encoders are out of phase
-      int offset = -(absPos - kTurretZeroTicks);
+      int offset = absPos - kTurretZeroTicks;
       turret.setSelectedSensorPosition(offset);
       logger.info(
           "Turret zeroed; offset: {} zeroTicks: {} absPosition: {}",

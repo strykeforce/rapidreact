@@ -92,6 +92,10 @@ public final class Constants {
       return locs;
     }
 
+    public static SupplyCurrentLimitConfiguration getAzimuthSupplyCurrentLimit() {
+      return new SupplyCurrentLimitConfiguration(true, 10, 15, 0.04);
+    }
+
     public static TalonSRXConfiguration getAzimuthTalonConfig() {
       // constructor sets encoder to Quad/CTRE_MagEncoder_Relative
       TalonSRXConfiguration azimuthConfig = new TalonSRXConfiguration();
@@ -188,12 +192,12 @@ public final class Constants {
 
   public static final class TurretConstants {
     public static final double kWrapRange = 1;
-    public static final double kTurretTicksPerDegree = 72.404; // 0.01745329 57.2957877856
-    public static final double kTurretTicksPerRadian = 4148.444; // 4148.44421883
+    public static final double kTurretTicksPerDegree = 114.653; // 0.01745329 57.2957877856 72.404
+    public static final double kTurretTicksPerRadian = 6569.133; // 4148.44421883
     public static final double kTurretMidpoint = 13_000;
-    public static int kTurretZeroTicks = 1931;
-    public static final int kForwardLimit = 26095; // 26000
-    public static final int kReverseLimit = -100;
+    public static final int kTurretZeroTicks = 1250;
+    public static final int kForwardLimit = 14_000;
+    public static final int kReverseLimit = -14_000;
     public static final int kCloseEnoughTicks = 40;
     public static final Rotation2d kCloseEnoughTarget = Rotation2d.fromDegrees(1); // 1
     public static final double kRotateByInitialKp = 0.4; // 0.4
@@ -201,7 +205,7 @@ public final class Constants {
     public static final int kRotateByStableCounts = 3; // 3
     public static final double kMaxStringPotZero = 100;
     public static final double kMinStringPotZero = 0;
-    public static final int kTurretId = 42;
+    public static final int kTurretId = 50;
     public static final double kFastCruiseVelocity = 4_000;
     public static final double kSlowCruiseVelocity = 2_000;
     public static final int kNotValidTargetCounts = 5; // how many frames to wait before seeking
@@ -213,27 +217,32 @@ public final class Constants {
     public static final Rotation2d kTurretRobotOffset = Rotation2d.fromDegrees(270);
 
     public static SupplyCurrentLimitConfiguration getSupplyCurrentLimitConfig() {
-      return new SupplyCurrentLimitConfiguration(true, 5, 30, 500);
+      return new SupplyCurrentLimitConfiguration(true, 10, 30, 0.5);
     }
 
     public static TalonSRXConfiguration getTurretTalonConfig() {
       TalonSRXConfiguration turretConfig = new TalonSRXConfiguration();
+
       turretConfig.forwardSoftLimitThreshold = Constants.TurretConstants.kForwardLimit;
       turretConfig.reverseSoftLimitThreshold = Constants.TurretConstants.kReverseLimit;
       turretConfig.forwardSoftLimitEnable = true;
       turretConfig.reverseSoftLimitEnable = true;
-      turretConfig.slot0.kP = 2;
-      turretConfig.slot0.kI = 0.01;
-      turretConfig.slot0.kD = 80;
-      turretConfig.slot0.kF = 0.21;
-      turretConfig.slot0.integralZone = 40;
-      turretConfig.slot0.maxIntegralAccumulator = 4500;
+      turretConfig.slot0.kP = 2.5;
+      turretConfig.slot0.kI = 0.04;
+      turretConfig.slot0.kD = 100;
+      turretConfig.slot0.kF = 0.13;
+      turretConfig.slot0.integralZone = 100;
+      turretConfig.slot0.maxIntegralAccumulator = 0;
+      turretConfig.slot0.allowableClosedloopError = 15;
       turretConfig.voltageMeasurementFilter = 32;
       turretConfig.voltageCompSaturation = 12;
       turretConfig.motionCruiseVelocity = kFastCruiseVelocity; // 4_000
-      turretConfig.motionAcceleration = 30_000;
+      turretConfig.motionAcceleration = 20_000;
       turretConfig.forwardLimitSwitchNormal = LimitSwitchNormal.Disabled;
       turretConfig.reverseLimitSwitchNormal = LimitSwitchNormal.Disabled;
+      turretConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
+      turretConfig.velocityMeasurementWindow = 64;
+
       return turretConfig;
     }
   }
@@ -248,11 +257,61 @@ public final class Constants {
     public static final Color kNoCargo = new Color(0.25, 0.5, 0.25); // FIXME need to get real color
 
     public static final double kMagazineIntakeSpeed = 0.5; // FIXME need an actual percentage
-    public static final double kMagazineFeedSpeed = 0.5;
-    public static final double kMagazineIndexSpeed = 0.5;
+    public static final double kMagazineFeedSpeed = 0.25;
+    public static final double kMagazineIndexSpeed = 0.35;
     public static final double kShootDelay = 0.5;
 
-    public static TalonSRXConfiguration getMagazineTalonConfig() {
+    public static SupplyCurrentLimitConfiguration getLowerMagazineCurrentLimit() {
+      SupplyCurrentLimitConfiguration supplyCurrentLimitConfig =
+          new SupplyCurrentLimitConfiguration();
+
+      supplyCurrentLimitConfig.currentLimit = 10.0;
+      supplyCurrentLimitConfig.triggerThresholdCurrent = 20.0;
+      supplyCurrentLimitConfig.triggerThresholdTime = 0.5;
+      supplyCurrentLimitConfig.enable = true;
+
+      return supplyCurrentLimitConfig;
+    }
+
+    public static SupplyCurrentLimitConfiguration getUpperMagazineCurrentLimit() {
+      SupplyCurrentLimitConfiguration supplyCurrentLimitConfig =
+          new SupplyCurrentLimitConfiguration();
+
+      supplyCurrentLimitConfig.currentLimit = 10.0;
+      supplyCurrentLimitConfig.triggerThresholdCurrent = 20.0;
+      supplyCurrentLimitConfig.triggerThresholdTime = 0.5;
+      supplyCurrentLimitConfig.enable = true;
+
+      return supplyCurrentLimitConfig;
+    }
+
+    public static TalonSRXConfiguration getLowerMagazineTalonConfig() {
+      TalonSRXConfiguration magazineConfig = new TalonSRXConfiguration();
+
+      magazineConfig.primaryPID.selectedFeedbackCoefficient = 1.0;
+      magazineConfig.auxiliaryPID.selectedFeedbackSensor = FeedbackDevice.None;
+
+      magazineConfig.forwardLimitSwitchSource = LimitSwitchSource.Deactivated;
+      magazineConfig.reverseLimitSwitchSource = LimitSwitchSource.Deactivated;
+
+      magazineConfig.slot0.kP = 0.1;
+      magazineConfig.slot0.kI = 0.0;
+      magazineConfig.slot0.kD = 10.0;
+      magazineConfig.slot0.kF = 0.1;
+      magazineConfig.slot0.integralZone = 0;
+      magazineConfig.slot0.allowableClosedloopError = 0;
+      magazineConfig.slot0.maxIntegralAccumulator = 0;
+      magazineConfig.motionCruiseVelocity = 0;
+      magazineConfig.motionAcceleration = 0;
+      magazineConfig.velocityMeasurementWindow = 64;
+      magazineConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
+      magazineConfig.voltageCompSaturation = 12;
+      magazineConfig.voltageMeasurementFilter = 32;
+
+      return magazineConfig;
+    }
+
+    public static TalonSRXConfiguration getUpperMagazineTalonConfig() {
       TalonSRXConfiguration magazineConfig = new TalonSRXConfiguration();
 
       magazineConfig.primaryPID.selectedFeedbackCoefficient = 1.0;
@@ -264,17 +323,20 @@ public final class Constants {
       magazineConfig.continuousCurrentLimit = 10;
       magazineConfig.peakCurrentDuration = 10;
       magazineConfig.peakCurrentLimit = 15;
-      magazineConfig.slot0.kP = 0.0;
+      magazineConfig.slot0.kP = 0.2;
       magazineConfig.slot0.kI = 0.0;
-      magazineConfig.slot0.kD = 0.0;
-      magazineConfig.slot0.kF = 0.0;
+      magazineConfig.slot0.kD = 10.0;
+      magazineConfig.slot0.kF = 0.21;
       magazineConfig.slot0.integralZone = 0;
       magazineConfig.slot0.allowableClosedloopError = 0;
       magazineConfig.slot0.maxIntegralAccumulator = 0;
       magazineConfig.motionCruiseVelocity = 0;
       magazineConfig.motionAcceleration = 0;
       magazineConfig.velocityMeasurementWindow = 64;
+      magazineConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
       magazineConfig.voltageCompSaturation = 12;
+      magazineConfig.voltageMeasurementFilter = 32;
+
       return magazineConfig;
     }
   }
@@ -344,13 +406,13 @@ public final class Constants {
 
   public static final class IntakeConstants {
     public static final int kIntakeFalconID = 20;
-    public static final double kIntakeSpeed = 0.5; // FIXME need an actual percentage
+    public static final double kIntakeSpeed = -0.25; // FIXME need an actual percentage
 
     public static TalonFXConfiguration getIntakeFalconConfig() {
       TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
       intakeConfig.supplyCurrLimit.currentLimit = 10;
       intakeConfig.supplyCurrLimit.triggerThresholdCurrent = 15;
-      intakeConfig.supplyCurrLimit.triggerThresholdTime = .02;
+      intakeConfig.supplyCurrLimit.triggerThresholdTime = .5;
       intakeConfig.supplyCurrLimit.enable = true;
       intakeConfig.slot0.kP = 0.0;
       intakeConfig.slot0.kI = 0.0;
@@ -376,21 +438,21 @@ public final class Constants {
     public static final double kLookupMaxPixel = 300;
     public static final double kLookupRes = 1.0;
 
-    public static int kHoodZeroTicks; // FIX ME
-    public static final int kForwardSoftLimts = 1000;
-    public static final int kReverseSoftLimits = 0;
+    public static int kHoodZeroTicks = 1800;
+    public static final int kForwardSoftLimts = 5800;
+    public static final int kReverseSoftLimits = 100;
 
     public static final double kKickerArmTicksP100ms = 1000;
     public static final double kShooterArmTicksP100ms = 1000;
     public static final double kKickerOpTicksP100ms = 1000;
     public static final double kShooterOpTicksP100ms = 1000;
-    public static final double kHoodOpTicks = 5000;
+    public static final double kHoodOpTicks = 5800;
     public static final double kKickerFenderHighTicksP100ms = 1000;
     public static final double kShooterFenderHighTicksP100ms = 1000;
     public static final double kHoodFenderHighTicks = 400;
     public static final double kKickerFenderLowTicksP100ms = 1000;
     public static final double kShooterFenderLowTicksP100ms = 1000;
-    public static final double kHoodFenderLowTicks = 400;
+    public static final double kHoodFenderLowTicks = 5800;
 
     public static final int kStableCounts = 5; // FIX ME
     public static final double kCloseEnoughTicksP100ms = 100;
@@ -398,66 +460,93 @@ public final class Constants {
 
     public static TalonFXConfiguration getShooterFalconConfig() {
       TalonFXConfiguration shooterConfig = new TalonFXConfiguration();
-      shooterConfig.supplyCurrLimit.currentLimit = 10;
-      shooterConfig.supplyCurrLimit.triggerThresholdCurrent = 15;
-      shooterConfig.supplyCurrLimit.triggerThresholdTime = .02;
+      shooterConfig.supplyCurrLimit.currentLimit = 40;
+      shooterConfig.supplyCurrLimit.triggerThresholdCurrent = 1;
+      shooterConfig.supplyCurrLimit.triggerThresholdTime = 0.001;
       shooterConfig.supplyCurrLimit.enable = true;
-      shooterConfig.slot0.kP = 0.0;
-      shooterConfig.slot0.kI = 0.0;
-      shooterConfig.slot0.kD = 0.0;
-      shooterConfig.slot0.kF = 0.0;
-      shooterConfig.slot0.integralZone = 0;
-      shooterConfig.slot0.maxIntegralAccumulator = 0;
+      shooterConfig.statorCurrLimit.currentLimit = 80.0;
+      shooterConfig.statorCurrLimit.triggerThresholdCurrent = 1.0;
+      shooterConfig.statorCurrLimit.triggerThresholdTime = 0.001;
+      shooterConfig.statorCurrLimit.enable = true;
+      shooterConfig.slot0.kP = 0.2;
+      shooterConfig.slot0.kI = 0.001;
+      shooterConfig.slot0.kD = 2.0;
+      shooterConfig.slot0.kF = 0.0465;
+      shooterConfig.slot0.integralZone = 500;
+      shooterConfig.slot0.maxIntegralAccumulator = 10000;
       shooterConfig.slot0.allowableClosedloopError = 0;
-      shooterConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
-      shooterConfig.velocityMeasurementWindow = 64;
-      shooterConfig.voltageCompSaturation = 12;
+      shooterConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_20Ms;
+      shooterConfig.velocityMeasurementWindow = 16;
+      shooterConfig.voltageCompSaturation = 0;
+      shooterConfig.voltageMeasurementFilter = 32;
+      shooterConfig.peakOutputForward = 1.0;
+      shooterConfig.peakOutputReverse = -0.1;
+
       return shooterConfig;
     }
 
     public static TalonFXConfiguration getKickerFalconConfig() {
       TalonFXConfiguration kickerConfig = new TalonFXConfiguration();
-      kickerConfig.supplyCurrLimit.currentLimit = 10;
-      kickerConfig.supplyCurrLimit.triggerThresholdCurrent = 15;
-      kickerConfig.supplyCurrLimit.triggerThresholdTime = .02;
+      kickerConfig.supplyCurrLimit.currentLimit = 40;
+      kickerConfig.supplyCurrLimit.triggerThresholdCurrent = 1;
+      kickerConfig.supplyCurrLimit.triggerThresholdTime = 0.001;
       kickerConfig.supplyCurrLimit.enable = true;
-      kickerConfig.slot0.kP = 0.0;
-      kickerConfig.slot0.kI = 0.0;
+      kickerConfig.statorCurrLimit.currentLimit = 80.0;
+      kickerConfig.statorCurrLimit.triggerThresholdCurrent = 1.0;
+      kickerConfig.statorCurrLimit.triggerThresholdTime = 0.001;
+      kickerConfig.statorCurrLimit.enable = true;
+      kickerConfig.slot0.kP = 0.2;
+      kickerConfig.slot0.kI = 0.001;
       kickerConfig.slot0.kD = 0.0;
-      kickerConfig.slot0.kF = 0.0;
-      kickerConfig.slot0.integralZone = 0;
-      kickerConfig.slot0.maxIntegralAccumulator = 0;
+      kickerConfig.slot0.kF = 0.0472;
+      kickerConfig.slot0.integralZone = 500;
+      kickerConfig.slot0.maxIntegralAccumulator = 10_000;
       kickerConfig.slot0.allowableClosedloopError = 0;
-      kickerConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
-      kickerConfig.velocityMeasurementWindow = 64;
-      kickerConfig.voltageCompSaturation = 12;
+      kickerConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_20Ms;
+      kickerConfig.velocityMeasurementWindow = 16;
+      kickerConfig.voltageCompSaturation = 0;
+      kickerConfig.voltageMeasurementFilter = 32;
+      kickerConfig.peakOutputForward = 1.0;
+      kickerConfig.peakOutputReverse = -0.1;
+
       return kickerConfig;
     }
 
+    public static SupplyCurrentLimitConfiguration getHoodCurrentLimit() {
+      SupplyCurrentLimitConfiguration hoodCurrentLimit = new SupplyCurrentLimitConfiguration();
+
+      hoodCurrentLimit.currentLimit = 10.0;
+      hoodCurrentLimit.triggerThresholdCurrent = 15.0;
+      hoodCurrentLimit.triggerThresholdTime = 0.04;
+      hoodCurrentLimit.enable = true;
+
+      return hoodCurrentLimit;
+    }
+
     public static TalonSRXConfiguration getHoodTalonConfig() {
-      TalonSRXConfiguration HoodConfig = new TalonSRXConfiguration();
+      TalonSRXConfiguration hoodConfig = new TalonSRXConfiguration();
 
-      HoodConfig.primaryPID.selectedFeedbackCoefficient = 1.0;
-      HoodConfig.auxiliaryPID.selectedFeedbackSensor = FeedbackDevice.None;
+      hoodConfig.primaryPID.selectedFeedbackCoefficient = 1.0;
+      hoodConfig.auxiliaryPID.selectedFeedbackSensor = FeedbackDevice.None;
 
-      HoodConfig.forwardLimitSwitchSource = LimitSwitchSource.Deactivated;
-      HoodConfig.reverseLimitSwitchSource = LimitSwitchSource.Deactivated;
+      hoodConfig.forwardLimitSwitchSource = LimitSwitchSource.Deactivated;
+      hoodConfig.reverseLimitSwitchSource = LimitSwitchSource.Deactivated;
 
-      HoodConfig.continuousCurrentLimit = 10;
-      HoodConfig.peakCurrentDuration = 10;
-      HoodConfig.peakCurrentLimit = 15;
-      HoodConfig.slot0.kP = 0.0;
-      HoodConfig.slot0.kI = 0.0;
-      HoodConfig.slot0.kD = 0.0;
-      HoodConfig.slot0.kF = 0.0;
-      HoodConfig.slot0.integralZone = 0;
-      HoodConfig.slot0.allowableClosedloopError = 0;
-      HoodConfig.slot0.maxIntegralAccumulator = 0;
-      HoodConfig.motionCruiseVelocity = 0;
-      HoodConfig.motionAcceleration = 0;
-      HoodConfig.velocityMeasurementWindow = 64;
-      HoodConfig.voltageCompSaturation = 12;
-      return HoodConfig;
+      hoodConfig.slot0.kP = 6.0;
+      hoodConfig.slot0.kI = 0.0;
+      hoodConfig.slot0.kD = 120.0;
+      hoodConfig.slot0.kF = 0.57;
+      hoodConfig.slot0.integralZone = 0;
+      hoodConfig.slot0.allowableClosedloopError = 0;
+      hoodConfig.slot0.maxIntegralAccumulator = 0;
+      hoodConfig.motionCruiseVelocity = 1500;
+      hoodConfig.motionAcceleration = 80_000;
+      hoodConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
+      hoodConfig.velocityMeasurementWindow = 64;
+      hoodConfig.voltageCompSaturation = 12;
+      hoodConfig.voltageMeasurementFilter = 32;
+
+      return hoodConfig;
     }
   }
 
