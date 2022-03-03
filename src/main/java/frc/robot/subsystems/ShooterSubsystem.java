@@ -135,12 +135,19 @@ public class ShooterSubsystem extends MeasurableSubsystem {
   public void shooterOpenLoop(double speed) {
     logger.info("Shooter on {}", speed);
     shooterFalcon.set(ControlMode.PercentOutput, speed);
-    kickerFalcon.set(ControlMode.PercentOutput, -speed);
+    kickerFalcon.set(ControlMode.PercentOutput, speed);
+    if (speed == 0.0) currentState = ShooterState.STOP;
+    else currentState = ShooterState.MANUAL_SHOOT;
   }
 
   public void hoodOpenLoop(double speed) {
     logger.info("hood on {}", speed);
     hoodTalon.set(ControlMode.PercentOutput, speed);
+  }
+
+  public void manualClosedLoop(double kickerSpeed, double shooterSpeed) {
+    currentState = ShooterState.MANUAL_SHOOT;
+    shooterClosedLoop(kickerSpeed, shooterSpeed);
   }
 
   public void shooterClosedLoop(double kickerSpeed, double shooterSpeed) {
@@ -227,6 +234,8 @@ public class ShooterSubsystem extends MeasurableSubsystem {
   @Override
   public void periodic() {
     switch (currentState) {
+      case MANUAL_SHOOT:
+        break;
       case STOP:
         if (kickerFalcon.getMotorOutputPercent() != 0.0
             || shooterFalcon.getMotorOutputPercent() != 0.0) {
@@ -272,6 +281,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
     ARMING,
     ARMED,
     ADJUSTING,
-    SHOOT;
+    SHOOT,
+    MANUAL_SHOOT;
   }
 }

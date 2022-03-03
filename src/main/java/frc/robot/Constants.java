@@ -406,7 +406,7 @@ public final class Constants {
 
   public static final class IntakeConstants {
     public static final int kIntakeFalconID = 20;
-    public static final double kIntakeSpeed = -0.25; // FIXME need an actual percentage
+    public static final double kIntakeSpeed = -0.5; // FIXME need an actual percentage
 
     public static TalonFXConfiguration getIntakeFalconConfig() {
       TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
@@ -438,20 +438,20 @@ public final class Constants {
     public static final double kLookupMaxPixel = 300;
     public static final double kLookupRes = 1.0;
 
-    public static int kHoodZeroTicks = 1800;
+    public static final int kHoodZeroTicks = 1800;
     public static final int kForwardSoftLimts = 5800;
     public static final int kReverseSoftLimits = 100;
 
     public static final double kKickerArmTicksP100ms = 1000;
     public static final double kShooterArmTicksP100ms = 1000;
-    public static final double kKickerOpTicksP100ms = 1000;
-    public static final double kShooterOpTicksP100ms = 1000;
+    public static final double kKickerOpTicksP100ms = 4000;
+    public static final double kShooterOpTicksP100ms = 4000;
     public static final double kHoodOpTicks = 5800;
-    public static final double kKickerFenderHighTicksP100ms = 1000;
-    public static final double kShooterFenderHighTicksP100ms = 1000;
-    public static final double kHoodFenderHighTicks = 400;
-    public static final double kKickerFenderLowTicksP100ms = 1000;
-    public static final double kShooterFenderLowTicksP100ms = 1000;
+    public static final double kKickerFenderHighTicksP100ms = 7000;
+    public static final double kShooterFenderHighTicksP100ms = 7000;
+    public static final double kHoodFenderHighTicks = 5800;
+    public static final double kKickerFenderLowTicksP100ms = 4000;
+    public static final double kShooterFenderLowTicksP100ms = 4000;
     public static final double kHoodFenderLowTicks = 5800;
 
     public static final int kStableCounts = 5; // FIX ME
@@ -473,7 +473,7 @@ public final class Constants {
       shooterConfig.slot0.kD = 2.0;
       shooterConfig.slot0.kF = 0.0465;
       shooterConfig.slot0.integralZone = 500;
-      shooterConfig.slot0.maxIntegralAccumulator = 10000;
+      shooterConfig.slot0.maxIntegralAccumulator = 20_000;
       shooterConfig.slot0.allowableClosedloopError = 0;
       shooterConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_20Ms;
       shooterConfig.velocityMeasurementWindow = 16;
@@ -500,7 +500,7 @@ public final class Constants {
       kickerConfig.slot0.kD = 0.0;
       kickerConfig.slot0.kF = 0.0472;
       kickerConfig.slot0.integralZone = 500;
-      kickerConfig.slot0.maxIntegralAccumulator = 10_000;
+      kickerConfig.slot0.maxIntegralAccumulator = 20_000;
       kickerConfig.slot0.allowableClosedloopError = 0;
       kickerConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_20Ms;
       kickerConfig.velocityMeasurementWindow = 16;

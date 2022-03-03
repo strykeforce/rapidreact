@@ -278,7 +278,8 @@ public class MagazineSubsystem extends MeasurableSubsystem {
 
       case PAUSE:
         if (shooterSubsystem.getCurrentState() == ShooterState.SHOOT
-            && turretSubsystem.getState() == TurretState.TRACKING) {
+            && (turretSubsystem.getState() == TurretState.TRACKING
+                || turretSubsystem.getState() == TurretState.FENDER_AIMED)) {
           logger.info("PAUSE -> SHOOT");
           enableUpperBeamBreak(false);
           upperOpenLoopRotate(MagazineConstants.kMagazineFeedSpeed);

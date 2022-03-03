@@ -330,7 +330,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
         break;
       case FENDER_ADJUSTING:
         setCruiseVelocity(true);
-        if (isRotationFinished()) {
+        if (isTurretAtTarget()) {
           currentState = TurretState.FENDER_AIMED;
           logger.info("FENDER_ADJUSTING -> FENDER_AIMED");
         }
