@@ -23,14 +23,15 @@ public class AutoIntakeCommand extends CommandBase {
     intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeSpeed);
     magazineReversed = false;
   }
+
   @Override
   public void execute() {
-      if (magazineSubsystem.getCurrMagazineState() == MagazineState.EJECT_CARGO) {
-        intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeEjectSpeed);
-        magazineReversed = true;
-      } else if (magazineReversed == true) {
-        intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeSpeed);
-      }
+    if (magazineSubsystem.getCurrMagazineState() == MagazineState.EJECT_CARGO) {
+      intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeEjectSpeed);
+      magazineReversed = true;
+    } else if (magazineReversed == true) {
+      intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeSpeed);
+    }
   }
 
   @Override

@@ -92,10 +92,12 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     upperMagazineTalon.set(ControlMode.PercentOutput, percentOutput);
     logger.info("Upper magazine motor turned on {}", percentOutput);
   }
+
   public void lowerClosedLoopRotate(double speed) {
     lowerMagazineTalon.set(ControlMode.MotionMagic, speed);
     logger.info("Lower magazine motor closedLoopRotate {}", speed);
   }
+
   public void upperClosedLoopRotate(double speed) {
     upperMagazineTalon.set(ControlMode.MotionMagic, speed);
     logger.info("Upper magazine motor closedLoopRotate {}", speed);
@@ -264,7 +266,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
         // Read cargo color, switch states depending on amount of cargo
         CargoColor cargoColor = readCargoColor();
         if (cargoColor != CargoColor.NONE) {
-          //ignoreColorSensor || storedCargoColors[0]
+          // ignoreColorSensor || storedCargoColors[0]
           if (storedCargoColors[1] != CargoColor.NONE) {
             if (storedCargoColors[1] != allianceCargoColor && (!ignoreColorSensor)) {
               lowerClosedLoopRotate(MagazineConstants.kMagazineEjectSpeed);
@@ -295,11 +297,11 @@ public class MagazineSubsystem extends MeasurableSubsystem {
         break;
 
       case EJECT_CARGO:
-         if (ejectTimer.hasElapsed(MagazineConstants.kEjectTimerDelay)) {
-           storedCargoColors[1] = CargoColor.NONE;
-           currMagazineState = MagazineState.WAIT_CARGO;
-           lowerClosedLoopRotate(MagazineConstants.kMagazineIntakeSpeed);
-         }
+        if (ejectTimer.hasElapsed(MagazineConstants.kEjectTimerDelay)) {
+          storedCargoColors[1] = CargoColor.NONE;
+          currMagazineState = MagazineState.WAIT_CARGO;
+          lowerClosedLoopRotate(MagazineConstants.kMagazineIntakeSpeed);
+        }
         break;
       case PAUSE:
         if (shooterSubsystem.getCurrentState() == ShooterState.SHOOT

@@ -240,6 +240,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
       rotateTo(TurretConstants.kFenderOpponent);
     }
   }
+
   public void fenderShot() {
     fenderShot(lastDoRotate);
   }
