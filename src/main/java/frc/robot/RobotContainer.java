@@ -23,7 +23,9 @@ import frc.robot.commands.climb.OpenLoopSet1MoveableCommand;
 import frc.robot.commands.climb.OpenLoopSet2StaticCommand;
 import frc.robot.commands.climb.RotateShoulderDownCommand;
 import frc.robot.commands.climb.RotateShoulderUpCommand;
-import frc.robot.commands.climb.ToggleRatchetPosCommand;
+import frc.robot.commands.climb.ShoulderHoldPositionCommand;
+import frc.robot.commands.climb.ToggleRotatingRatchetPosCommand;
+import frc.robot.commands.climb.ToggleStaticRatchetPosCommand;
 import frc.robot.commands.climb.ZeroMotorsCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
@@ -113,6 +115,7 @@ public class RobotContainer {
     turretSubsystem.registerWith(telemetryService);
     intakeSubsystem.registerWith(telemetryService);
     visionSubsystem.registerWith(telemetryService);
+    climbSubsystem.registerWith(telemetryService);
     telemetryService.start();
   }
 
@@ -162,18 +165,34 @@ public class RobotContainer {
   }
 
   private void configureOperatorButtonBindings() {
+    // Manual Climb
+    // Rotating Arm
     LeftStickUp.whenActive(
         new OpenLoopSet1MoveableCommand(climbSubsystem, ClimbConstants.kClimbArmTicksP100ms));
     LeftStickDown.whenActive(
         new OpenLoopSet1MoveableCommand(climbSubsystem, -ClimbConstants.kClimbArmTicksP100ms));
     LeftStickStop.whenActive(new OpenLoopSet1MoveableCommand(climbSubsystem, 0.0));
+    new JoystickButton(xboxController, XboxController.Button.kLeftStick.value)
+        .whenPressed(new ToggleRotatingRatchetPosCommand(climbSubsystem));
+
+    // Static Arm
     RightStickUp.whenActive(
         new OpenLoopSet2StaticCommand(climbSubsystem, ClimbConstants.kClimbArmTicksP100ms));
     RightStickDown.whenActive(
-        new OpenLoopSet2StaticCommand(climbSubsystem, ClimbConstants.kClimbArmTicksP100ms));
+        new OpenLoopSet2StaticCommand(climbSubsystem, -ClimbConstants.kClimbArmTicksP100ms));
     RightStickStop.whenActive(new OpenLoopSet2StaticCommand(climbSubsystem, 0.0));
-    LeftTriggerDown.whenActive(new RotateShoulderDownCommand(climbSubsystem));
-    RightTriggerDown.whenActive(new RotateShoulderUpCommand(climbSubsystem));
+    new JoystickButton(xboxController, XboxController.Button.kRightStick.value)
+        .whenPressed(new ToggleStaticRatchetPosCommand(climbSubsystem));
+
+    // Shoulder
+    LeftTriggerDown.whenActive(new RotateShoulderUpCommand(climbSubsystem));
+    LeftTriggerDown.whenInactive(new ShoulderHoldPositionCommand(climbSubsystem));
+    RightTriggerDown.whenActive(new RotateShoulderDownCommand(climbSubsystem));
+    RightTriggerDown.whenInactive(new ShoulderHoldPositionCommand(climbSubsystem));
+
+    new JoystickButton(xboxController, XboxController.Button.kStart.value)
+        .whenReleased(new ZeroMotorsCommand(climbSubsystem));
+
     new JoystickButton(xboxController, XboxController.Button.kY.value)
         .whenPressed(new AutoIntakeCommand(magazineSubsystem, intakeSubsystem));
     new JoystickButton(xboxController, XboxController.Button.kY.value)
@@ -195,10 +214,6 @@ public class RobotContainer {
             new LowFenderShotCommand(turretSubsystem, shooterSubsystem, magazineSubsystem));
     new JoystickButton(xboxController, XboxController.Button.kLeftBumper.value)
         .whenReleased(new StopShooterCommand(shooterSubsystem));
-    new JoystickButton(xboxController, XboxController.Button.kStart.value)
-        .whenReleased(new ZeroMotorsCommand(climbSubsystem));
-    new JoystickButton(xboxController, XboxController.Button.kBack.value)
-        .whenReleased(new ToggleRatchetPosCommand(climbSubsystem));
   }
 
   private void configureMatchDashboard() {
@@ -402,7 +417,7 @@ public class RobotContainer {
       new Trigger() {
         @Override
         public boolean get() {
-          return xboxController.getRawAxis(XboxController.Axis.kLeftY.value)
+          return Math.abs(xboxController.getRawAxis(XboxController.Axis.kLeftY.value))
               < DashboardConstants.kLeftStickDeadBand;
         }
       };
@@ -429,7 +444,7 @@ public class RobotContainer {
       new Trigger() {
         @Override
         public boolean get() {
-          return xboxController.getRawAxis(XboxController.Axis.kRightY.value)
+          return Math.abs(xboxController.getRawAxis(XboxController.Axis.kRightY.value))
               < DashboardConstants.kRightStickDeadBand;
         }
       };

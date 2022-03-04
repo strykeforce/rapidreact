@@ -26,7 +26,8 @@ public class ClimbSubsystem extends MeasurableSubsystem {
   private double set1SetPointTicks;
   private double set2SetPointTicks;
   private double shoulderSetPointTicks;
-  private boolean isRatchetOn = false;
+  private boolean isRotatingRatchetOn = false;
+  private boolean isStaticRatchetOn = false;
 
   public ClimbSubsystem() {
     extendFalcon1Moveable = new TalonFX(ClimbConstants.kExtend1FalconID);
@@ -54,8 +55,10 @@ public class ClimbSubsystem extends MeasurableSubsystem {
     shoulderFalcon.configFactoryDefault(Constants.kTalonConfigTimeout);
     shoulderFalcon.configAllSettings(
         ClimbConstants.getShoulderTalonConfig(), Constants.kTalonConfigTimeout);
+    shoulderFalcon.configSupplyCurrentLimit(
+        ClimbConstants.getShoulderCurrentLimit(), Constants.kTalonConfigTimeout);
     shoulderFalcon.enableVoltageCompensation(true);
-    shoulderFalcon.setNeutralMode(NeutralMode.Coast);
+    shoulderFalcon.setNeutralMode(NeutralMode.Brake);
   }
 
   public void openLoopShoulder(double speed) {
@@ -95,22 +98,25 @@ public class ClimbSubsystem extends MeasurableSubsystem {
     extendFalcon2Static.set(ControlMode.MotionMagic, setPointTicks);
   }
 
-  public void toggleRatchetPos() {
-    if (isRatchetOn) {
-      rotateRatchet.set(ClimbConstants.kRotateRatchetOff);
-      staticRatchet.set(ClimbConstants.kStaticRatchetOff);
-    } else {
-      rotateRatchet.set(ClimbConstants.kRotateRatchetOn);
-      staticRatchet.set(ClimbConstants.kStaticRatchetOn);
-    }
-    isRatchetOn = !isRatchetOn;
-    logger.info("Ratchet position is going to {}", isRatchetOn);
+  public void toggleStaticRatchet() {
+    if (isStaticRatchetOn) staticRatchet.set(ClimbConstants.kStaticRatchetOff);
+    else staticRatchet.set(ClimbConstants.kStaticRatchetOn);
+    isStaticRatchetOn = !isStaticRatchetOn;
+    logger.info("Setting Static Ratchet to: {}", isStaticRatchetOn);
+  }
+
+  public void toggleRotatingRatchet() {
+    if (isRotatingRatchetOn) rotateRatchet.set(ClimbConstants.kRotateRatchetOff);
+    else rotateRatchet.set(ClimbConstants.kRotateRatchetOn);
+    isRotatingRatchetOn = !isRotatingRatchetOn;
+    logger.info("Setting Rotating Ratchet to {}", isRotatingRatchetOn);
   }
 
   public void zeroClimb() {
     extendFalcon1Moveable.setSelectedSensorPosition(0.0);
     extendFalcon2Static.setSelectedSensorPosition(0.0);
     shoulderFalcon.setSelectedSensorPosition(0.0);
+    logger.info("Zeroing all Climb axes");
   }
 
   @Override

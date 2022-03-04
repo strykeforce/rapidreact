@@ -349,34 +349,41 @@ public final class Constants {
     public static final int kRotateRatchetId = 0;
     public static final int kStaticRatchetId = 1;
 
-    public static final double kClimbArmTicksP100ms = 0.3;
-    public static final double kShoulderOffsetTicks = 50;
-    public static final double kRotateRatchetOn = 0.9;
-    public static final double kStaticRatchetOn = 0.9;
+    public static final double kClimbArmTicksP100ms = 0.2;
+    public static final double kShoulderOffsetTicks = 10;
+    public static final double kRotateRatchetOn = 0.5;
+    public static final double kStaticRatchetOn = 0.5;
     public static final double kRotateRatchetOff = 0.0;
     public static final double kStaticRatchetOff = 0.0;
 
     public static TalonFXConfiguration getExtendFalconConfig() {
       TalonFXConfiguration extendConfig = new TalonFXConfiguration();
-      extendConfig.supplyCurrLimit.currentLimit = 10;
-      extendConfig.supplyCurrLimit.triggerThresholdCurrent = 15;
-      extendConfig.supplyCurrLimit.triggerThresholdTime = .02;
+      extendConfig.supplyCurrLimit.currentLimit = 40;
+      extendConfig.supplyCurrLimit.triggerThresholdCurrent = 10;
+      extendConfig.supplyCurrLimit.triggerThresholdTime = .001;
       extendConfig.supplyCurrLimit.enable = true;
-      extendConfig.slot0.kP = 0.0;
+      extendConfig.slot0.kP = 0.1;
       extendConfig.slot0.kI = 0.0;
-      extendConfig.slot0.kD = 0.0;
-      extendConfig.slot0.kF = 0.0;
+      extendConfig.slot0.kD = 1.0;
+      extendConfig.slot0.kF = 0.05;
       extendConfig.slot0.integralZone = 0;
       extendConfig.slot0.maxIntegralAccumulator = 0;
       extendConfig.slot0.allowableClosedloopError = 0;
+      extendConfig.motionCruiseVelocity = 20_000;
+      extendConfig.motionAcceleration = 50_000;
       extendConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
       extendConfig.velocityMeasurementWindow = 64;
       extendConfig.voltageCompSaturation = 12;
-      extendConfig.forwardSoftLimitEnable = true;
-      extendConfig.forwardSoftLimitThreshold = 2767; // FIXME: No real constant
-      extendConfig.reverseSoftLimitEnable = true;
-      extendConfig.reverseSoftLimitThreshold = 2767; // FIXME: NO REAL CONSTANTS
+      extendConfig.voltageMeasurementFilter = 32;
+      extendConfig.forwardSoftLimitEnable = false;
+      extendConfig.forwardSoftLimitThreshold = 210_000;
+      extendConfig.reverseSoftLimitEnable = false;
+      extendConfig.reverseSoftLimitThreshold = 1000;
       return extendConfig;
+    }
+
+    public static SupplyCurrentLimitConfiguration getShoulderCurrentLimit() {
+      return new SupplyCurrentLimitConfiguration(true, 3, 3, 0.1);
     }
 
     public static TalonSRXConfiguration getShoulderTalonConfig() {
@@ -388,24 +395,21 @@ public final class Constants {
       ShoulderConfig.forwardLimitSwitchSource = LimitSwitchSource.Deactivated;
       ShoulderConfig.reverseLimitSwitchSource = LimitSwitchSource.Deactivated;
 
-      ShoulderConfig.continuousCurrentLimit = 10;
-      ShoulderConfig.peakCurrentDuration = 10;
-      ShoulderConfig.peakCurrentLimit = 15;
-      ShoulderConfig.slot0.kP = 0.0;
+      ShoulderConfig.slot0.kP = 4.0;
       ShoulderConfig.slot0.kI = 0.0;
-      ShoulderConfig.slot0.kD = 0.0;
-      ShoulderConfig.slot0.kF = 0.0;
+      ShoulderConfig.slot0.kD = 20.0;
+      ShoulderConfig.slot0.kF = 0.55;
       ShoulderConfig.slot0.integralZone = 0;
       ShoulderConfig.slot0.allowableClosedloopError = 0;
       ShoulderConfig.slot0.maxIntegralAccumulator = 0;
-      ShoulderConfig.motionCruiseVelocity = 0;
-      ShoulderConfig.motionAcceleration = 0;
+      ShoulderConfig.motionCruiseVelocity = 200;
+      ShoulderConfig.motionAcceleration = 5_000;
       ShoulderConfig.velocityMeasurementWindow = 64;
       ShoulderConfig.voltageCompSaturation = 12;
       ShoulderConfig.forwardSoftLimitEnable = true;
-      ShoulderConfig.forwardSoftLimitThreshold = 2767;
+      ShoulderConfig.forwardSoftLimitThreshold = 9500;
       ShoulderConfig.reverseSoftLimitEnable = true;
-      ShoulderConfig.reverseSoftLimitThreshold = 2767;
+      ShoulderConfig.reverseSoftLimitThreshold = -6000;
 
       return ShoulderConfig;
     }
@@ -476,10 +480,10 @@ public final class Constants {
       shooterConfig.statorCurrLimit.triggerThresholdTime = 0.001;
       shooterConfig.statorCurrLimit.enable = true;
       shooterConfig.slot0.kP = 0.2;
-      shooterConfig.slot0.kI = 0.001;
+      shooterConfig.slot0.kI = 0.0035;
       shooterConfig.slot0.kD = 2.0;
       shooterConfig.slot0.kF = 0.0465;
-      shooterConfig.slot0.integralZone = 500;
+      shooterConfig.slot0.integralZone = 200;
       shooterConfig.slot0.maxIntegralAccumulator = 20_000;
       shooterConfig.slot0.allowableClosedloopError = 0;
       shooterConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_20Ms;
@@ -503,10 +507,10 @@ public final class Constants {
       kickerConfig.statorCurrLimit.triggerThresholdTime = 0.001;
       kickerConfig.statorCurrLimit.enable = true;
       kickerConfig.slot0.kP = 0.2;
-      kickerConfig.slot0.kI = 0.001;
+      kickerConfig.slot0.kI = 0.0035;
       kickerConfig.slot0.kD = 0.0;
       kickerConfig.slot0.kF = 0.0472;
-      kickerConfig.slot0.integralZone = 500;
+      kickerConfig.slot0.integralZone = 200;
       kickerConfig.slot0.maxIntegralAccumulator = 20_000;
       kickerConfig.slot0.allowableClosedloopError = 0;
       kickerConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_20Ms;
