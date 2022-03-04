@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import edu.wpi.first.wpilibj.Servo;
 import frc.robot.Constants;
 import frc.robot.Constants.ClimbConstants;
 import java.util.Set;
@@ -19,15 +20,22 @@ public class ClimbSubsystem extends MeasurableSubsystem {
   private final TalonFX extendFalcon1Moveable;
   private final TalonFX extendFalcon2Static;
   private final TalonSRX shoulderFalcon;
+  private final Servo rotateRatchet;
+  private final Servo staticRatchet;
   private ClimbState currClimbState = ClimbState.ZEROING;
   private double set1SetPointTicks;
   private double set2SetPointTicks;
   private double shoulderSetPointTicks;
+  private boolean isRotatingRatchetOn = false;
+  private boolean isStaticRatchetOn = false;
 
   public ClimbSubsystem() {
-    extendFalcon1Moveable = new TalonFX(Constants.ClimbConstants.kExtend1FalconID);
-    extendFalcon2Static = new TalonFX(Constants.ClimbConstants.kExtend2FalconID);
-    shoulderFalcon = new TalonSRX(Constants.ClimbConstants.kClimbShoulderId);
+    extendFalcon1Moveable = new TalonFX(ClimbConstants.kExtend1FalconID);
+    extendFalcon2Static = new TalonFX(ClimbConstants.kExtend2FalconID);
+    shoulderFalcon = new TalonSRX(ClimbConstants.kClimbShoulderId);
+    rotateRatchet = new Servo(ClimbConstants.kRotateRatchetId);
+    staticRatchet = new Servo(ClimbConstants.kStaticRatchetId);
+
     configTalons();
   }
 
@@ -47,8 +55,10 @@ public class ClimbSubsystem extends MeasurableSubsystem {
     shoulderFalcon.configFactoryDefault(Constants.kTalonConfigTimeout);
     shoulderFalcon.configAllSettings(
         ClimbConstants.getShoulderTalonConfig(), Constants.kTalonConfigTimeout);
+    shoulderFalcon.configSupplyCurrentLimit(
+        ClimbConstants.getShoulderCurrentLimit(), Constants.kTalonConfigTimeout);
     shoulderFalcon.enableVoltageCompensation(true);
-    shoulderFalcon.setNeutralMode(NeutralMode.Coast);
+    shoulderFalcon.setNeutralMode(NeutralMode.Brake);
   }
 
   public void openLoopShoulder(double speed) {
@@ -88,23 +98,25 @@ public class ClimbSubsystem extends MeasurableSubsystem {
     extendFalcon2Static.set(ControlMode.MotionMagic, setPointTicks);
   }
 
-  public void zeroShoulder() {
-    switch (currClimbState) {
-      case ZEROING:
-        shoulderFalcon.configContinuousCurrentLimit(1, 3);
-        shoulderFalcon.set(ControlMode.PercentOutput, -0.2);
-        double velocity = shoulderFalcon.getSelectedSensorVelocity();
-        if (velocity <= 10) {
-          currClimbState = ClimbState.ZEROED;
-        }
-      case ZEROED:
-        {
-          shoulderFalcon.configContinuousCurrentLimit(
-              Constants.ClimbConstants.getShoulderTalonConfig().continuousCurrentLimit,
-              Constants.ClimbConstants.getShoulderTalonConfig().peakCurrentDuration);
-          shoulderFalcon.set(ControlMode.PercentOutput, 0);
-        }
-    }
+  public void toggleStaticRatchet() {
+    if (isStaticRatchetOn) staticRatchet.set(ClimbConstants.kStaticRatchetOff);
+    else staticRatchet.set(ClimbConstants.kStaticRatchetOn);
+    isStaticRatchetOn = !isStaticRatchetOn;
+    logger.info("Setting Static Ratchet to: {}", isStaticRatchetOn);
+  }
+
+  public void toggleRotatingRatchet() {
+    if (isRotatingRatchetOn) rotateRatchet.set(ClimbConstants.kRotateRatchetOff);
+    else rotateRatchet.set(ClimbConstants.kRotateRatchetOn);
+    isRotatingRatchetOn = !isRotatingRatchetOn;
+    logger.info("Setting Rotating Ratchet to {}", isRotatingRatchetOn);
+  }
+
+  public void zeroClimb() {
+    extendFalcon1Moveable.setSelectedSensorPosition(0.0);
+    extendFalcon2Static.setSelectedSensorPosition(0.0);
+    shoulderFalcon.setSelectedSensorPosition(0.0);
+    logger.info("Zeroing all Climb axes");
   }
 
   @Override
