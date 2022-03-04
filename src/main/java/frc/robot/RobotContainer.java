@@ -23,6 +23,8 @@ import frc.robot.commands.climb.OpenLoopSet1MoveableCommand;
 import frc.robot.commands.climb.OpenLoopSet2StaticCommand;
 import frc.robot.commands.climb.RotateShoulderDownCommand;
 import frc.robot.commands.climb.RotateShoulderUpCommand;
+import frc.robot.commands.climb.ToggleRatchetPosCommand;
+import frc.robot.commands.climb.ZeroMotorsCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.LockZeroCommand;
@@ -193,6 +195,10 @@ public class RobotContainer {
             new LowFenderShotCommand(turretSubsystem, shooterSubsystem, magazineSubsystem));
     new JoystickButton(xboxController, XboxController.Button.kLeftBumper.value)
         .whenReleased(new StopShooterCommand(shooterSubsystem));
+    new JoystickButton(xboxController, XboxController.Button.kStart.value)
+        .whenReleased(new ZeroMotorsCommand(climbSubsystem));
+    new JoystickButton(xboxController, XboxController.Button.kBack.value)
+        .whenReleased(new ToggleRatchetPosCommand(climbSubsystem));
   }
 
   private void configureMatchDashboard() {

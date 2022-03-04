@@ -29,6 +29,7 @@ import java.util.ArrayList;
 public final class Constants {
 
   public static final int kTalonConfigTimeout = 10; // ms
+  public static final String ClimbConstants = null;
 
   public Constants() {}
 
@@ -345,9 +346,15 @@ public final class Constants {
     public static final int kExtend1FalconID = 60;
     public static final int kExtend2FalconID = 61;
     public static final int kClimbShoulderId = 62;
+    public static final int kRotateRatchetId = 0;
+    public static final int kStaticRatchetId = 1;
 
     public static final double kClimbArmTicksP100ms = 0.3;
     public static final double kShoulderOffsetTicks = 50;
+    public static final double kRotateRatchetOn = 0.9;
+    public static final double kStaticRatchetOn = 0.9;
+    public static final double kRotateRatchetOff = 0.0;
+    public static final double kStaticRatchetOff = 0.0;
 
     public static TalonFXConfiguration getExtendFalconConfig() {
       TalonFXConfiguration extendConfig = new TalonFXConfiguration();
