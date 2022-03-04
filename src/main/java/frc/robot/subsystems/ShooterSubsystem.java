@@ -27,6 +27,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
   private ShooterState currentState = ShooterState.STOP;
   private double shooterSetPointTicks, kickerSetpointTicks, hoodSetPointTicks;
   private String[][] lookupTable;
+  private boolean needShootAdjustment = true;
 
   public ShooterSubsystem(MagazineSubsystem magazineSubsystem) {
     this.magazineSubsystem = magazineSubsystem;
@@ -129,7 +130,31 @@ public class ShooterSubsystem extends MeasurableSubsystem {
         shootSolution[0],
         shootSolution[1],
         shootSolution[2]);
+
+    if (needShootAdjustment) {
+      shootSolution[2] += hoodAdjustments(widthPixels);
+    }
     return shootSolution;
+  }
+
+  public void setNeedShootAdjust(boolean shootAdjustment) {
+    needShootAdjustment = shootAdjustment;
+  }
+
+  private double hoodAdjustments(double widthPixels) {
+    if (widthPixels >= ShooterConstants.kDistance1 && widthPixels < ShooterConstants.kDistance2) {
+      return ShooterConstants.kDistanceOffset1;
+    }
+    if (widthPixels >= ShooterConstants.kDistance2 && widthPixels < ShooterConstants.kDistance3) {
+      return ShooterConstants.kDistanceOffset2;
+    }
+    if (widthPixels >= ShooterConstants.kDistance3 && widthPixels < ShooterConstants.kDistance4) {
+      return ShooterConstants.kDistanceOffset3;
+    }
+    if (widthPixels >= ShooterConstants.kDistance4) {
+      return ShooterConstants.kDistanceOffset4;
+    }
+    return 0.0;
   }
 
   public void shooterOpenLoop(double speed) {

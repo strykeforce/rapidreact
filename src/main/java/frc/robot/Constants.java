@@ -438,6 +438,15 @@ public final class Constants {
     public static final double kLookupMaxPixel = 300;
     public static final double kLookupRes = 1.0;
 
+    public static final int kDistance1 = 50;
+    public static final int kDistance2 = 180;
+    public static final int kDistance3 = 270;
+    public static final int kDistance4 = 300;
+    public static final double kDistanceOffset1 = 0.0;
+    public static final double kDistanceOffset2 = 0.0;
+    public static final double kDistanceOffset3 = 0.0;
+    public static final double kDistanceOffset4 = 0.0;
+
     public static final int kHoodZeroTicks = 1800;
     public static final int kForwardSoftLimts = 5800;
     public static final int kReverseSoftLimits = 100;
