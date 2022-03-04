@@ -228,7 +228,7 @@ class HealthCheckCommand : CommandBase(driveSubsystem : DriveSubsystem,
                 val statorCurrentRange = 0.375..1.0
 
                 positionTalon {
-                    encoderTraget = 0
+                    encoderTarget = 0
                     encoderGoodEnough = 100
                 }
 
@@ -279,6 +279,50 @@ class HealthCheckCommand : CommandBase(driveSubsystem : DriveSubsystem,
                     speedRange = 14_000..19_000
                 }
             }
+            // hood
+            talonCheck {
+                name = "Hood Tests"
+                talons = shooterSubsystem.hoodTalons
+
+                val supplyCurrent = 0.375..1.0
+                val statorCurrent = 0.375..1.0
+
+                positionTalon {
+                    encoderTarget = 0
+                    encoderGoodEnough = 100
+                }
+
+                positionTest {
+                    percentOutput = 0.2
+                    encoderChangetarget = 7000
+                    encoderGoodEnough = 500
+                    encoderTimeCount = 500
+
+                    supplyCurrentRange = supplyCurrent
+                    statorCurrentRange = statorCurrent
+                }
+
+                positionTest {
+                    percentOutput = -0.2
+                    encoderChangetarget = 7000
+                    encoderGoodEnough = 500
+                    encoderTimeCount = 500
+
+                    supplyCurrentRange = supplyCurrent
+                    statorCurrentRange = statorCurrent
+                }
+            }
         }
+    }
+
+    override fun execute() {
+        healthCheck.execute()
+    }
+
+    override fun isFinished() = healthCheck.isFinished()
+
+    override fun end(interrupted: Boolean) {
+        healthCheck.report()
+        driveSubsystem.lockZero()
     }
 }

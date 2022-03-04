@@ -155,6 +155,10 @@ public class ShooterSubsystem extends MeasurableSubsystem {
     return List.of(kickerFalcon, shooterFalcon);
   }
 
+  public List<BaseTalon> getHoodTalons() {
+    return List.of(hoodTalon);
+  }
+
   public void arm() {
     currentState = ShooterState.ARMING;
     shooterClosedLoop(
