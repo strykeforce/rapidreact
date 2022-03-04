@@ -17,7 +17,7 @@ public class VisionSubsystem extends MeasurableSubsystem
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   public VisionSubsystem() {
-    deadeye = new Deadeye<>("C0", HubTargetData.class);
+    deadeye = new Deadeye<>("A0", HubTargetData.class);
     deadeye.setTargetDataListener(this);
     HubTargetData.kFrameCenter = deadeye.getCapture().width / 2;
   }

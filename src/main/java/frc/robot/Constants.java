@@ -256,10 +256,13 @@ public final class Constants {
         new Color(0.5, 0.25, 0.25); // FIXME need to get real color
     public static final Color kNoCargo = new Color(0.25, 0.5, 0.25); // FIXME need to get real color
 
-    public static final double kMagazineIntakeSpeed = 0.5; // FIXME need an actual percentage
-    public static final double kMagazineFeedSpeed = 0.25;
-    public static final double kMagazineIndexSpeed = 0.35;
+    public static final double kMagazineIntakeSpeed = 2000; // 0.5 
+    public static final double kMagazineFeedSpeed = 2000; // 0.25
+    public static final double kMagazineIndexSpeed = 2000; // 0.35
+    public static final double kMagazineEjectSpeed = 2000;// -0.5
     public static final double kShootDelay = 0.5;
+    public static final double kEjectTimerDelay = 4; //FIXME IM COMPLETELY WRONG 
+
 
     public static SupplyCurrentLimitConfiguration getLowerMagazineCurrentLimit() {
       SupplyCurrentLimitConfiguration supplyCurrentLimitConfig =
@@ -406,7 +409,8 @@ public final class Constants {
 
   public static final class IntakeConstants {
     public static final int kIntakeFalconID = 20;
-    public static final double kIntakeSpeed = -0.5; // FIXME need an actual percentage
+    public static final double kIntakeSpeed = -0.5; // -0.5
+    public static final double kIntakeEjectSpeed = 0.5; //0.5
 
     public static TalonFXConfiguration getIntakeFalconConfig() {
       TalonFXConfiguration intakeConfig = new TalonFXConfiguration();

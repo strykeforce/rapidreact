@@ -37,6 +37,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
   private final DriveSubsystem driveSubsystem;
   private double targetTurretPosition = 0;
   private double cruiseVelocity = kFastCruiseVelocity;
+  private boolean lastDoRotate = false;
 
   private int trackingStableCount;
   private int
@@ -229,14 +230,18 @@ public class TurretSubsystem extends MeasurableSubsystem {
     currentState = TurretState.IDLE;
   }
 
-  public void fenderShot() {
+  public void fenderShot(boolean doRotate) {
     logger.info("{} -> FENDER_ADJUSTING}", currentState);
     currentState = TurretState.FENDER_ADJUSTING;
-    if (magazineSubsystem.isNextCargoAlliance()) {
+    lastDoRotate = doRotate;
+    if (magazineSubsystem.isNextCargoAlliance() || (!doRotate)) {
       rotateTo(TurretConstants.kFenderAlliance);
     } else {
       rotateTo(TurretConstants.kFenderOpponent);
     }
+  }
+  public void fenderShot() {
+    fenderShot(lastDoRotate);
   }
 
   @Override
