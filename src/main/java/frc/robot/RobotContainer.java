@@ -18,13 +18,13 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ClimbConstants;
 import frc.robot.Constants.DashboardConstants;
-import frc.robot.commands.climb.OpenLoopSet1MoveableCommand;
-import frc.robot.commands.climb.OpenLoopSet2StaticCommand;
+import frc.robot.commands.climb.OpenLoopPivotArmCommand;
+import frc.robot.commands.climb.OpenLoopFixedArmCommand;
 import frc.robot.commands.climb.RotateShoulderDownCommand;
 import frc.robot.commands.climb.RotateShoulderUpCommand;
 import frc.robot.commands.climb.ShoulderHoldPositionCommand;
-import frc.robot.commands.climb.ToggleRotatingRatchetPosCommand;
-import frc.robot.commands.climb.ToggleStaticRatchetPosCommand;
+import frc.robot.commands.climb.TogglePivotRatchetCommand;
+import frc.robot.commands.climb.ToggleFixedRatchetCommand;
 import frc.robot.commands.climb.ZeroMotorsCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
@@ -167,21 +167,21 @@ public class RobotContainer {
     // Manual Climb
     // Rotating Arm
     LeftStickUp.whenActive(
-        new OpenLoopSet1MoveableCommand(climbSubsystem, ClimbConstants.kClimbArmsOpenLoopSpeed));
+        new OpenLoopPivotArmCommand(climbSubsystem, ClimbConstants.kClimbArmsOpenLoopSpeed));
     LeftStickDown.whenActive(
-        new OpenLoopSet1MoveableCommand(climbSubsystem, -ClimbConstants.kClimbArmsOpenLoopSpeed));
-    LeftStickStop.whenActive(new OpenLoopSet1MoveableCommand(climbSubsystem, 0.0));
+        new OpenLoopPivotArmCommand(climbSubsystem, -ClimbConstants.kClimbArmsOpenLoopSpeed));
+    LeftStickStop.whenActive(new OpenLoopPivotArmCommand(climbSubsystem, 0.0));
     new JoystickButton(xboxController, XboxController.Button.kLeftStick.value)
-        .whenPressed(new ToggleRotatingRatchetPosCommand(climbSubsystem));
+        .whenPressed(new TogglePivotRatchetCommand(climbSubsystem));
 
     // Static Arm
     RightStickUp.whenActive(
-        new OpenLoopSet2StaticCommand(climbSubsystem, ClimbConstants.kClimbArmsOpenLoopSpeed));
+        new OpenLoopFixedArmCommand(climbSubsystem, ClimbConstants.kClimbArmsOpenLoopSpeed));
     RightStickDown.whenActive(
-        new OpenLoopSet2StaticCommand(climbSubsystem, -ClimbConstants.kClimbArmsOpenLoopSpeed));
-    RightStickStop.whenActive(new OpenLoopSet2StaticCommand(climbSubsystem, 0.0));
+        new OpenLoopFixedArmCommand(climbSubsystem, -ClimbConstants.kClimbArmsOpenLoopSpeed));
+    RightStickStop.whenActive(new OpenLoopFixedArmCommand(climbSubsystem, 0.0));
     new JoystickButton(xboxController, XboxController.Button.kRightStick.value)
-        .whenPressed(new ToggleStaticRatchetPosCommand(climbSubsystem));
+        .whenPressed(new ToggleFixedRatchetCommand(climbSubsystem));
 
     // Shoulder
     LeftTriggerDown.whenActive(new RotateShoulderUpCommand(climbSubsystem));
