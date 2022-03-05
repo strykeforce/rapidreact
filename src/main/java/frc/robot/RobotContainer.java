@@ -45,7 +45,6 @@ import frc.robot.commands.sequences.HighClimbCommandGroup;
 import frc.robot.commands.sequences.HighFenderShotCommand;
 import frc.robot.commands.sequences.LowFenderShotCommand;
 import frc.robot.commands.sequences.MidClimbCommandGroup;
-import frc.robot.commands.sequences.PitShooterTuneCommandGroup;
 import frc.robot.commands.sequences.StopShooterCommandGroup;
 import frc.robot.commands.sequences.TraverseClimbCommandGroup;
 import frc.robot.commands.shooter.HoodOpenLoopCommand;
@@ -322,13 +321,13 @@ public class RobotContainer {
     SmartDashboard.putData("Pit/Intake/Stop", new IntakeOpenLoopCommand(intakeSubsystem, 0.0));
 
     // tuning commands
-    SmartDashboard.putData(
-        "Pit/Tune/Start",
-        new PitShooterTuneCommandGroup(shooterSubsystem, magazineSubsystem, intakeSubsystem));
-    SmartDashboard.putData(
-        "Pit/Tune/Stop",
-        new StopShooterCommandGroup(
-            magazineSubsystem, visionSubsystem, turretSubsystem, shooterSubsystem));
+    // SmartDashboard.putData(
+    //     "Pit/Tune/Start",
+    //     new PitShooterTuneCommandGroup(shooterSubsystem, magazineSubsystem, intakeSubsystem));
+    // SmartDashboard.putData(
+    //     "Pit/Tune/Stop",
+    //     new StopShooterCommandGroup(
+    //         magazineSubsystem, visionSubsystem, turretSubsystem, shooterSubsystem));
   }
 
   public enum Axis {

@@ -163,7 +163,11 @@ public final class Constants {
   }
 
   public static final class VisionConstants {
+    // Actual 2022 Constants
+    // + is left
+    public static final double kHorizAngleCorrectionDegrees = 0.0; // 2.5 degrees
 
+    // Old 2020 Constants
     public static final double kMinContourAreaSize = 100;
     public static final double kVerticalFov = 48.8;
     public static final double kHorizonFov = 1.012; // 50.8 //146 //radians 1.012 // deg 57.999
@@ -184,8 +188,6 @@ public final class Constants {
     public static final int kHoodIndex = 3;
     public static final double kTapeHeightIn = 101.625; // in
     public static final double kUpperHubRadiusIn = 26.6875;
-    // + is left
-    public static final double kHorizAngleCorrectionDegrees = 0.0; // 2.5 degrees
     // + is further along track and lower
     public static final int kHoodInchesCorrectionR1 = 13; // 8-15 feet (was 20)
     public static final int kHoodInchesCorrectionR2 = 13; // 15-19 feet (old 10)
@@ -199,31 +201,43 @@ public final class Constants {
   }
 
   public static final class TurretConstants {
-    public static final double kWrapRange = 1;
-    public static final double kTurretTicksPerDegree = 114.653; // 0.01745329 57.2957877856 72.404
-    public static final double kTurretTicksPerRadian = 6569.133; // 4148.44421883
-    public static final double kTurretMidpoint = 13_000;
-    public static final int kTurretZeroTicks = 1250;
-    public static final int kForwardLimit = 14_000;
-    public static final int kReverseLimit = -14_000;
-    public static final int kCloseEnoughTicks = 40;
-    public static final Rotation2d kCloseEnoughTarget = Rotation2d.fromDegrees(1); // 1
-    public static final double kRotateByInitialKp = 0.4; // 0.4
-    public static final double kRotateByFinalKp = 0.95; // 0.95
-    public static final int kRotateByStableCounts = 3; // 3
-    public static final double kMaxStringPotZero = 100;
-    public static final double kMinStringPotZero = 0;
+    // Talon Constants
     public static final int kTurretId = 50;
     public static final double kFastCruiseVelocity = 4_000;
     public static final double kSlowCruiseVelocity = 2_000;
+    public static final int kTurretZeroTicks = 1250;
+    public static final int kForwardLimit = 14_000;
+    public static final int kReverseLimit = -14_000;
+    public static final double kMaxStringPotZero = 100; // 2020 Robot
+    public static final double kMinStringPotZero = 0; // 2020 Robot
+
+    // Ticks -> Degrees/Radians
+    public static final double kTurretTicksPerDegree = 114.653; // 0.01745329 57.2957877856 72.404
+    public static final double kTurretTicksPerRadian = 6569.133; // 4148.44421883
+    public static final double kTurretMidpoint = 13_000;
+    public static final double kWrapRange = 1;
+
+    // Rotate Under Vision Constants
+    public static final double kRotateByInitialKp = 0.4; // 0.4
+    public static final double kRotateByFinalKp = 0.95; // 0.95
     public static final int kNotValidTargetCounts = 5; // how many frames to wait before seeking
-    public static final Rotation2d kFenderAlliance = Rotation2d.fromDegrees(0.0);
-    public static final Rotation2d kFenderOpponent = Rotation2d.fromDegrees(90.0);
+
+    // Seek Constants
     public static final Translation2d kHubPositionMeters = new Translation2d(8.23, 4.11); // meters
     public static final Rotation2d kSeekAngleError = Rotation2d.fromDegrees(30); // 30 degrees
     public static final int kMaxSeekCount = 6;
     public static final Rotation2d kTurretRobotOffset = Rotation2d.fromDegrees(270);
 
+    // Close Enough & Stable Counts
+    public static final int kCloseEnoughTicks = 40;
+    public static final Rotation2d kCloseEnoughTarget = Rotation2d.fromDegrees(1); // 1
+    public static final int kRotateByStableCounts = 3; // 3
+
+    // Fender Shot Constants
+    public static final Rotation2d kFenderAlliance = Rotation2d.fromDegrees(0.0);
+    public static final Rotation2d kFenderOpponent = Rotation2d.fromDegrees(90.0);
+
+    // Talon Constants
     public static SupplyCurrentLimitConfiguration getSupplyCurrentLimitConfig() {
       return new SupplyCurrentLimitConfiguration(true, 10, 30, 0.5);
     }
@@ -256,32 +270,27 @@ public final class Constants {
   }
 
   public static final class MagazineConstants {
+    // Talon Constants
     public static final int kLowerMagazineTalonID = 30;
     public static final int kUpperMagazineTalonID = 31;
+
+    // Color Sensor Constants
     public static final Color kBlueCargo =
         new Color(0.15, 0.35, 0.5); // FIXME need to get real color
     public static final Color kRedCargo =
         new Color(0.5, 0.25, 0.25); // FIXME need to get real color
     public static final Color kNoCargo = new Color(0.25, 0.5, 0.25); // FIXME need to get real color
 
+    // Speed Constants
     public static final double kMagazineIntakeSpeed = 0.5; // FIXME need an actual percentage
     public static final double kMagazineFeedSpeed = 0.25;
     public static final double kMagazineIndexSpeed = 0.35;
+
+    // State Machine Sequence Constants
     public static final double kShootDelay = 0.5;
 
+    // Lower Magazine Talon Config
     public static SupplyCurrentLimitConfiguration getLowerMagazineCurrentLimit() {
-      SupplyCurrentLimitConfiguration supplyCurrentLimitConfig =
-          new SupplyCurrentLimitConfiguration();
-
-      supplyCurrentLimitConfig.currentLimit = 10.0;
-      supplyCurrentLimitConfig.triggerThresholdCurrent = 20.0;
-      supplyCurrentLimitConfig.triggerThresholdTime = 0.5;
-      supplyCurrentLimitConfig.enable = true;
-
-      return supplyCurrentLimitConfig;
-    }
-
-    public static SupplyCurrentLimitConfiguration getUpperMagazineCurrentLimit() {
       SupplyCurrentLimitConfiguration supplyCurrentLimitConfig =
           new SupplyCurrentLimitConfiguration();
 
@@ -317,6 +326,19 @@ public final class Constants {
       magazineConfig.voltageMeasurementFilter = 32;
 
       return magazineConfig;
+    }
+
+    // Upper Magazine Talon Config
+    public static SupplyCurrentLimitConfiguration getUpperMagazineCurrentLimit() {
+      SupplyCurrentLimitConfiguration supplyCurrentLimitConfig =
+          new SupplyCurrentLimitConfiguration();
+
+      supplyCurrentLimitConfig.currentLimit = 10.0;
+      supplyCurrentLimitConfig.triggerThresholdCurrent = 20.0;
+      supplyCurrentLimitConfig.triggerThresholdTime = 0.5;
+      supplyCurrentLimitConfig.enable = true;
+
+      return supplyCurrentLimitConfig;
     }
 
     public static TalonSRXConfiguration getUpperMagazineTalonConfig() {
@@ -361,10 +383,12 @@ public final class Constants {
     public static final double kClimbArmsOpenLoopSpeed = 0.2;
 
     // Zeroing Constants
-    public static final double kClimbArmsZeroSpeed = -0.1;
+    public static final double kClimbArmsZeroSpeed = 0.1;
     public static final double kZeroTargetSpeedTicksPer100ms = 5;
     public static final double kZeroStableCounts = 25;
     public static final int kShoulderZeroTicks = 2675;
+    public static final double kShoulderPostZeroTicks = 0;
+    public static final double kPostZeroTickArmRatchetOn = -100;
 
     public static SupplyCurrentLimitConfiguration getZeroSupplyCurrentLimit() {
       return new SupplyCurrentLimitConfiguration(true, 5, 5, 0.1);
@@ -381,6 +405,7 @@ public final class Constants {
     public static final double kFixedRatchetOff = 0.0;
     public static final double kDisengageRatchetSpeed = 0.2;
     public static final double kDisengageRatchetTicks = 100;
+    public static final double kDisengageRatchetServoTimer = 0.2;
 
     // Closed Loop Movement Constants
     public static final double kFixedArmCloseEnough = 1_000.0;
@@ -442,7 +467,7 @@ public final class Constants {
       pivotConfig.forwardSoftLimitEnable = true;
       pivotConfig.forwardSoftLimitThreshold = 0;
       pivotConfig.reverseSoftLimitEnable = true;
-      pivotConfig.reverseSoftLimitThreshold = -20_000;
+      pivotConfig.reverseSoftLimitThreshold = -200_000;
       pivotConfig.neutralDeadband = 0.01;
       pivotConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
       pivotConfig.velocityMeasurementWindow = 64;
@@ -482,7 +507,7 @@ public final class Constants {
       fixedConfig.forwardSoftLimitEnable = true;
       fixedConfig.forwardSoftLimitThreshold = 0;
       fixedConfig.reverseSoftLimitEnable = true;
-      fixedConfig.reverseSoftLimitThreshold = -20_000;
+      fixedConfig.reverseSoftLimitThreshold = -220_000;
       fixedConfig.neutralDeadband = 0.01;
       fixedConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
       fixedConfig.velocityMeasurementWindow = 64;

@@ -13,6 +13,7 @@ public class TogglePivotRatchetCommand extends InstantCommand {
 
   @Override
   public void initialize() {
+    climbSubsystem.setClimbIdle();
     climbSubsystem.togglePivotArmRatchet();
   }
 }

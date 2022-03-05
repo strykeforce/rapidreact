@@ -14,6 +14,7 @@ public class ToggleFixedRatchetCommand extends InstantCommand {
 
   @Override
   public void initialize() {
+    climbSubsystem.setClimbIdle();
     climbSubsystem.toggleFixedArmRatchet();
   }
 }
