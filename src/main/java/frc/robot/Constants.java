@@ -62,8 +62,8 @@ public final class Constants {
 
     // From: https://github.com/strykeforce/axis-config/
     public static final double kMaxSpeedMetersPerSecond = 3.889;
-    public static final double kRobotWidth = 0.5461;
-    public static final double kRobotLength = 0.6477;
+    public static final double kRobotWidth = 0.625;
+    public static final double kRobotLength = 0.625;
 
     public static final double kMaxOmega =
         (kMaxSpeedMetersPerSecond / Math.hypot(kRobotWidth / 2.0, kRobotLength / 2.0))

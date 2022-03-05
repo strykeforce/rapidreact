@@ -292,6 +292,8 @@ public class RobotContainer {
     SmartDashboard.putData("Pit/Turret/Forward", new OpenLoopTurretCommand(turretSubsystem, 0.3));
     SmartDashboard.putData("Pit/Turret/Reverse", new OpenLoopTurretCommand(turretSubsystem, -0.3));
     SmartDashboard.putData("Pit/Turret/Stop", new OpenLoopTurretCommand(turretSubsystem, 0.0));
+    SmartDashboard.putData(
+        "Pit/Turret/Seek", new TurretAimCommandGroup(visionSubsystem, turretSubsystem));
     // SmartDashboard.putData("Pit/Turret/AimTurret", new TurretAimCommand(visionSubsystem,
     // turretSubsystem));
 
