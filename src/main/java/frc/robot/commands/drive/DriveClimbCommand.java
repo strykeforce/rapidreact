@@ -43,21 +43,10 @@ public class DriveClimbCommand extends CommandBase {
             + MathUtil.applyDeadband(
                 driveJoystick.getRawAxis(Axis.RIGHT_Y.id), DriveConstants.kDeadbandAllStick);
 
-    // Interpolate
-    fwd =
-        MathUtil.interpolate(
-            -DriveConstants.kMaxFwdStrStickClimb, DriveConstants.kMaxFwdStrStickClimb, fwd);
-    str =
-        MathUtil.interpolate(
-            -DriveConstants.kMaxFwdStrStickClimb, DriveConstants.kMaxFwdStrStickClimb, str);
-    yaw =
-        MathUtil.interpolate(
-            -DriveConstants.kMaxYawStickClimb, DriveConstants.kMaxYawStickClimb, yaw);
-
     driveSubsystem.drive(
-        fwd * DriveConstants.kMaxSpeedMetersPerSecond,
-        str * DriveConstants.kMaxSpeedMetersPerSecond,
-        yaw * -DriveConstants.kMaxOmega);
+        fwd * DriveConstants.kMaxFwdStrStickClimb,
+        str * DriveConstants.kMaxFwdStrStickClimb,
+        (yaw + DriveConstants.kYawJackFactorClimb) * -DriveConstants.kMaxYawStickClimb);
   }
 
   @Override

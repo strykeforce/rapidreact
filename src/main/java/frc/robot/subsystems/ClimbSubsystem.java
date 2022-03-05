@@ -43,6 +43,8 @@ public class ClimbSubsystem extends MeasurableSubsystem {
   private double pivotArmSetPointTicks;
   private double fixedArmSetPointTicks;
   private double shoulderSetPointTicks;
+  private double pivotArmDisengageRatchetStartTicks = 0;
+  private double fixedArmDisengageRatchetStartTicks = 0;
   private boolean isPivotRatchetOn = false;
   private boolean isFixedRatchetOn = false;
 
@@ -61,13 +63,13 @@ public class ClimbSubsystem extends MeasurableSubsystem {
   private void configTalons() {
     pivotArmFalcon.configFactoryDefault(Constants.kTalonConfigTimeout);
     pivotArmFalcon.configAllSettings(
-        ClimbConstants.getExtendFalconConfig(), Constants.kTalonConfigTimeout);
+        ClimbConstants.getPivotArmFalconConfig(), Constants.kTalonConfigTimeout);
     pivotArmFalcon.enableVoltageCompensation(true);
     pivotArmFalcon.setNeutralMode(NeutralMode.Brake);
 
     fixedArmFalcon.configFactoryDefault(Constants.kTalonConfigTimeout);
     fixedArmFalcon.configAllSettings(
-        ClimbConstants.getExtendFalconConfig(), Constants.kTalonConfigTimeout);
+        ClimbConstants.getFixedArmFalconConfig(), Constants.kTalonConfigTimeout);
     fixedArmFalcon.enableVoltageCompensation(true);
     fixedArmFalcon.setNeutralMode(NeutralMode.Brake);
 
@@ -146,13 +148,15 @@ public class ClimbSubsystem extends MeasurableSubsystem {
   }
 
   public void disengageFixedRatchet() {
+    fixedArmDisengageRatchetStartTicks = fixedArmFalcon.getSelectedSensorPosition();
     enableFixedRatchet(false);
-    actuateFixedArm(fixedArmSetPointTicks + ClimbConstants.kDisengageFixedTicks);
+    openLoopFixedArm(ClimbConstants.kDisengageRatchetSpeed);
   }
 
   public void disengagePivotRatchet() {
+    pivotArmDisengageRatchetStartTicks = pivotArmFalcon.getSelectedSensorPosition();
     enablePivotRatchet(false);
-    actuatePivotArm(pivotArmSetPointTicks + ClimbConstants.kDisengagePivotTicks);
+    openLoopPivotArm(ClimbConstants.kDisengageRatchetSpeed);
   }
 
   public boolean isFixedArmFinished() {
@@ -200,9 +204,14 @@ public class ClimbSubsystem extends MeasurableSubsystem {
     currFixedArmState = FixedArmState.ZEROING;
     shoulderState = ShoulderState.ZEROING;
 
-    shoulderTalon.configSupplyCurrentLimit(ClimbConstants.getZeroCurrentLimit());
-    pivotArmFalcon.configSupplyCurrentLimit(ClimbConstants.getZeroCurrentLimit());
-    fixedArmFalcon.configSupplyCurrentLimit(ClimbConstants.getZeroCurrentLimit());
+    pivotArmFalcon.configSupplyCurrentLimit(
+        ClimbConstants.getZeroSupplyCurrentLimit(), Constants.kTalonConfigTimeout);
+    fixedArmFalcon.configSupplyCurrentLimit(
+        ClimbConstants.getZeroSupplyCurrentLimit(), Constants.kTalonConfigTimeout);
+    pivotArmFalcon.configStatorCurrentLimit(
+        ClimbConstants.getZeroStatorCurrentLimit(), Constants.kTalonConfigTimeout);
+    fixedArmFalcon.configStatorCurrentLimit(
+        ClimbConstants.getZeroStatorCurrentLimit(), Constants.kTalonConfigTimeout);
 
     openLoopPivotArm(ClimbConstants.kClimbArmsZeroSpeed);
     openLoopFixedArm(ClimbConstants.kClimbArmsZeroSpeed);
@@ -296,6 +305,10 @@ public class ClimbSubsystem extends MeasurableSubsystem {
 
         if (fixedArmZeroStableCounts > ClimbConstants.kZeroStableCounts) {
           fixedArmFalcon.setSelectedSensorPosition(0.0);
+          fixedArmFalcon.configSupplyCurrentLimit(
+              ClimbConstants.getFixedArmSupplyCurrentLimit(), Constants.kTalonConfigTimeout);
+          fixedArmFalcon.configStatorCurrentLimit(
+              ClimbConstants.getFixedArmStatorCurrentLimit(), Constants.kTalonConfigTimeout);
           logger.info("Fixed: {} -> ZEROED");
           currFixedArmState = FixedArmState.ZEROED;
           break;
@@ -305,7 +318,8 @@ public class ClimbSubsystem extends MeasurableSubsystem {
       case ZEROED:
         break;
       case DISENGAGE_RATCHET:
-        if (isFixedArmFinished()) {
+        if ((fixedArmFalcon.getSelectedSensorPosition() - fixedArmDisengageRatchetStartTicks)
+            > ClimbConstants.kDisengageRatchetTicks) {
           logger.info("Fixed: DISENGAGE_RATCHET -> {}", desiredFixedArmState);
           currFixedArmState = desiredFixedArmState;
           if (desiredFixedArmState != FixedArmState.IDLE) {
@@ -371,6 +385,10 @@ public class ClimbSubsystem extends MeasurableSubsystem {
 
         if (pivotArmZeroStableCounts > ClimbConstants.kZeroStableCounts) {
           pivotArmFalcon.setSelectedSensorPosition(0.0);
+          pivotArmFalcon.configSupplyCurrentLimit(
+              ClimbConstants.getPivotArmSupplyCurrentLimit(), Constants.kTalonConfigTimeout);
+          pivotArmFalcon.configStatorCurrentLimit(
+              ClimbConstants.getPivotArmStatorCurrentLimit(), Constants.kTalonConfigTimeout);
           logger.info("Pivot: {} -> ZEROED");
           currPivotArmState = PivotArmState.ZEROED;
           break;
@@ -379,7 +397,8 @@ public class ClimbSubsystem extends MeasurableSubsystem {
       case ZEROED:
         break;
       case DISENGAGE_RATCHET:
-        if (isPivotArmFinished()) {
+        if ((pivotArmFalcon.getSelectedSensorPosition() - pivotArmDisengageRatchetStartTicks)
+            > ClimbConstants.kDisengageRatchetTicks) {
           logger.info("Pivot: DISENGAGE_RATCHET -> {}", desiredPivotArmState);
           currPivotArmState = desiredPivotArmState;
           if (desiredPivotArmState != PivotArmState.IDLE) {
@@ -532,10 +551,10 @@ public class ClimbSubsystem extends MeasurableSubsystem {
   }
 
   public enum FixedArmState {
-    IDLE(0),
-    ZEROING(0),
-    ZEROED(0),
-    DISENGAGE_RATCHET(0),
+    IDLE(0), // not used
+    ZEROING(0), // not used
+    ZEROED(0), // not used
+    DISENGAGE_RATCHET(0), // not used
     MID_EXT(ClimbConstants.kFMidExtTicks),
     MID_RET(ClimbConstants.kFMidRetTicks),
     HIGH_EXT(ClimbConstants.kFHighExtTicks),
@@ -550,10 +569,10 @@ public class ClimbSubsystem extends MeasurableSubsystem {
   }
 
   public enum PivotArmState {
-    IDLE(0),
-    ZEROING(0),
-    ZEROED(0),
-    DISENGAGE_RATCHET(0),
+    IDLE(0), // not used
+    ZEROING(0), // not used
+    ZEROED(0), // not used
+    DISENGAGE_RATCHET(0), // not used
     HIGH_EXT(ClimbConstants.kPHighExtTicks),
     HIGH_RET1(ClimbConstants.kPHighRet1Ticks),
     HIGH_RET2(ClimbConstants.kPHighRet2Ticks),
@@ -568,9 +587,9 @@ public class ClimbSubsystem extends MeasurableSubsystem {
   }
 
   public enum ShoulderState {
-    IDLE(0),
-    ZEROING(0),
-    ZEROED(0),
+    IDLE(0), // not used
+    ZEROING(0), // not used
+    ZEROED(0), // not used
     HIGH_PVT_BK1(ClimbConstants.kHighPvtBck1Ticks),
     HIGH_PVT_FWD1(ClimbConstants.kHighPvtFwd1Ticks),
     HIGH_PVT_BK2(ClimbConstants.kHighPvtBck2Ticks),
