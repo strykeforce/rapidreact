@@ -4,7 +4,9 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
 import frc.robot.Constants.ClimbConstants;
 import java.util.Set;
@@ -17,63 +19,87 @@ import org.strykeforce.telemetry.measurable.Measure;
 public class ClimbSubsystem extends MeasurableSubsystem {
   private static final Logger logger = LoggerFactory.getLogger(ClimbSubsystem.class);
 
-  private final TalonFX extendFalcon1Moveable;
-  private final TalonFX extendFalcon2Static;
-  private final TalonSRX shoulderFalcon;
-  private final Servo rotateRatchet;
-  private final Servo staticRatchet;
-  private ClimbState currClimbState = ClimbState.ZEROING;
-  private double set1SetPointTicks;
-  private double set2SetPointTicks;
+  private final TalonFX pivotArmFalcon;
+  private final TalonFX fixedArmFalcon;
+  private final TalonSRX shoulderTalon;
+  private final Servo pivotRatchet;
+  private final Servo fixedRatchet;
+  private final DigitalInput leftArmHome;
+  private final DigitalInput rightArmHome;
+
+  private FixedArmState currFixedArmState = FixedArmState.IDLE;
+  private FixedArmState desiredFixedArmState = FixedArmState.IDLE;
+  private PivotArmState currPivotArmState = PivotArmState.IDLE;
+  private PivotArmState desiredPivotArmState = PivotArmState.IDLE;
+  private ShoulderState shoulderState = ShoulderState.IDLE;
+  private int fixedArmStableCounts = 0;
+  private int pivotArmStableCounts = 0;
+  private int shoulderStableCounts = 0;
+  private int fixedArmZeroStableCounts = 0;
+  private int pivotArmZeroStableCounts;
+  private boolean continueToHigh = false;
+  private boolean continueToTraverse = false;
+  private boolean isClimbDone = false;
+  private Timer disengageFixedArmRatchetTimer = new Timer();
+  private Timer disengagePivotArmRatchetTimer = new Timer();
+
+  private double pivotArmSetPointTicks;
+  private double fixedArmSetPointTicks;
   private double shoulderSetPointTicks;
-  private boolean isRotatingRatchetOn = false;
-  private boolean isStaticRatchetOn = false;
+  private double pivotArmDisengageRatchetStartTicks = 0;
+  private double fixedArmDisengageRatchetStartTicks = 0;
+  private boolean isPivotRatchetOn = false;
+  private boolean isFixedRatchetOn = false;
 
   public ClimbSubsystem() {
-    extendFalcon1Moveable = new TalonFX(ClimbConstants.kExtend1FalconID);
-    extendFalcon2Static = new TalonFX(ClimbConstants.kExtend2FalconID);
-    shoulderFalcon = new TalonSRX(ClimbConstants.kClimbShoulderId);
-    rotateRatchet = new Servo(ClimbConstants.kRotateRatchetId);
-    staticRatchet = new Servo(ClimbConstants.kStaticRatchetId);
+    pivotArmFalcon = new TalonFX(ClimbConstants.kPivotArmFalconID);
+    fixedArmFalcon = new TalonFX(ClimbConstants.kFixedArmFalconID);
+    shoulderTalon = new TalonSRX(ClimbConstants.kClimbShoulderId);
+    pivotRatchet = new Servo(ClimbConstants.kPivotArmRatchetId);
+    fixedRatchet = new Servo(ClimbConstants.kFixedArmRatchetId);
+    leftArmHome = new DigitalInput(ClimbConstants.kLeftFixedHomeId);
+    rightArmHome = new DigitalInput(ClimbConstants.kRightFixedHomeId);
+    enablePivotRatchet(false);
+    enableFixedRatchet(false);
 
     configTalons();
   }
 
   private void configTalons() {
-    extendFalcon1Moveable.configFactoryDefault(Constants.kTalonConfigTimeout);
-    extendFalcon1Moveable.configAllSettings(
-        ClimbConstants.getExtendFalconConfig(), Constants.kTalonConfigTimeout);
-    extendFalcon1Moveable.enableVoltageCompensation(true);
-    extendFalcon1Moveable.setNeutralMode(NeutralMode.Brake);
+    pivotArmFalcon.configFactoryDefault(Constants.kTalonConfigTimeout);
+    pivotArmFalcon.configAllSettings(
+        ClimbConstants.getPivotArmFalconConfig(), Constants.kTalonConfigTimeout);
+    pivotArmFalcon.enableVoltageCompensation(true);
+    pivotArmFalcon.setNeutralMode(NeutralMode.Brake);
 
-    extendFalcon2Static.configFactoryDefault(Constants.kTalonConfigTimeout);
-    extendFalcon2Static.configAllSettings(
-        ClimbConstants.getExtendFalconConfig(), Constants.kTalonConfigTimeout);
-    extendFalcon2Static.enableVoltageCompensation(true);
-    extendFalcon2Static.setNeutralMode(NeutralMode.Brake);
+    fixedArmFalcon.configFactoryDefault(Constants.kTalonConfigTimeout);
+    fixedArmFalcon.configAllSettings(
+        ClimbConstants.getFixedArmFalconConfig(), Constants.kTalonConfigTimeout);
+    fixedArmFalcon.enableVoltageCompensation(true);
+    fixedArmFalcon.setNeutralMode(NeutralMode.Brake);
 
-    shoulderFalcon.configFactoryDefault(Constants.kTalonConfigTimeout);
-    shoulderFalcon.configAllSettings(
+    shoulderTalon.configFactoryDefault(Constants.kTalonConfigTimeout);
+    shoulderTalon.configAllSettings(
         ClimbConstants.getShoulderTalonConfig(), Constants.kTalonConfigTimeout);
-    shoulderFalcon.configSupplyCurrentLimit(
+    shoulderTalon.configSupplyCurrentLimit(
         ClimbConstants.getShoulderCurrentLimit(), Constants.kTalonConfigTimeout);
-    shoulderFalcon.enableVoltageCompensation(true);
-    shoulderFalcon.setNeutralMode(NeutralMode.Brake);
+    shoulderTalon.enableVoltageCompensation(true);
+    shoulderTalon.setNeutralMode(NeutralMode.Brake);
   }
 
   public void openLoopShoulder(double speed) {
     logger.info("Shoulder is rotating: {} ticks per 100 ms", speed);
-    shoulderFalcon.set(ControlMode.PercentOutput, speed);
+    shoulderTalon.set(ControlMode.PercentOutput, speed);
   }
 
-  public void openLoopSet1Moveable(double speed) {
-    logger.info("Set 1 Static arms: {} ticks per 100 ms", speed);
-    extendFalcon1Moveable.set(ControlMode.PercentOutput, speed);
+  public void openLoopPivotArm(double speed) {
+    logger.info("Pivot arms: {} ticks per 100 ms", speed);
+    pivotArmFalcon.set(ControlMode.PercentOutput, speed);
   }
 
-  public void openLoopSet2Static(double speed) {
-    logger.info("Set 2 Moveable arms: {} ticks per 100 ms", speed);
-    extendFalcon2Static.set(ControlMode.PercentOutput, speed);
+  public void openLoopFixedArm(double speed) {
+    logger.info("Fixed arms: {} ticks per 100 ms", speed);
+    fixedArmFalcon.set(ControlMode.PercentOutput, speed);
   }
 
   public void offsetShoulder(double offset) {
@@ -83,57 +109,543 @@ public class ClimbSubsystem extends MeasurableSubsystem {
   public void rotateShoulder(double setPointsTicks) {
     logger.info("Shoulder is rotating to {} ticks", setPointsTicks);
     shoulderSetPointTicks = setPointsTicks;
-    shoulderFalcon.set(ControlMode.MotionMagic, setPointsTicks);
+    shoulderTalon.set(ControlMode.MotionMagic, setPointsTicks);
   }
 
-  public void acuateLoopSet1(double setPointTicks) {
-    logger.info("Moveable arm set 1 is going to {} ticks", setPointTicks);
-    set1SetPointTicks = setPointTicks;
-    extendFalcon1Moveable.set(ControlMode.MotionMagic, setPointTicks);
+  public void actuatePivotArm(double setPointTicks) {
+    logger.info("Pivot arm is going to {} ticks", setPointTicks);
+    pivotArmSetPointTicks = setPointTicks;
+    pivotArmFalcon.set(ControlMode.MotionMagic, setPointTicks);
   }
 
-  public void acuateLoopSet2(double setPointTicks) {
-    logger.info("Static arm Set 2 is going to {} ticks", setPointTicks);
-    set2SetPointTicks = setPointTicks;
-    extendFalcon2Static.set(ControlMode.MotionMagic, setPointTicks);
+  public void actuateFixedArm(double setPointTicks) {
+    logger.info("Fixed arm is going to {} ticks", setPointTicks);
+    fixedArmSetPointTicks = setPointTicks;
+    fixedArmFalcon.set(ControlMode.MotionMagic, setPointTicks);
   }
 
-  public void toggleStaticRatchet() {
-    if (isStaticRatchetOn) staticRatchet.set(ClimbConstants.kStaticRatchetOff);
-    else staticRatchet.set(ClimbConstants.kStaticRatchetOn);
-    isStaticRatchetOn = !isStaticRatchetOn;
-    logger.info("Setting Static Ratchet to: {}", isStaticRatchetOn);
+  public void toggleFixedArmRatchet() {
+    if (isFixedRatchetOn) fixedRatchet.set(ClimbConstants.kFixedRatchetOff);
+    else fixedRatchet.set(ClimbConstants.kFixedRatchetOn);
+    isFixedRatchetOn = !isFixedRatchetOn;
+    logger.info("Setting Fixed Ratchet to: {}", isFixedRatchetOn);
   }
 
-  public void toggleRotatingRatchet() {
-    if (isRotatingRatchetOn) rotateRatchet.set(ClimbConstants.kRotateRatchetOff);
-    else rotateRatchet.set(ClimbConstants.kRotateRatchetOn);
-    isRotatingRatchetOn = !isRotatingRatchetOn;
-    logger.info("Setting Rotating Ratchet to {}", isRotatingRatchetOn);
+  public void togglePivotArmRatchet() {
+    if (isPivotRatchetOn) pivotRatchet.set(ClimbConstants.kPivotRatchetOff);
+    else pivotRatchet.set(ClimbConstants.kPivotRatchetOn);
+    isPivotRatchetOn = !isPivotRatchetOn;
+    logger.info("Setting Rotating Ratchet to {}", isPivotRatchetOn);
+  }
+
+  public void enableFixedRatchet(boolean enable) {
+    if (enable) fixedRatchet.set(ClimbConstants.kFixedRatchetOn);
+    else fixedRatchet.set(ClimbConstants.kFixedRatchetOff);
+    isFixedRatchetOn = enable;
+    logger.info("Setting Fixed Ratchet to: {}", isFixedRatchetOn);
+  }
+
+  public void enablePivotRatchet(boolean enable) {
+    if (enable) pivotRatchet.set(ClimbConstants.kPivotRatchetOn);
+    else pivotRatchet.set(ClimbConstants.kPivotRatchetOff);
+    isPivotRatchetOn = enable;
+    logger.info("Setting Pivot Ratchet to: {}", isPivotRatchetOn);
+  }
+
+  public void disengageFixedRatchet() {
+    disengageFixedArmRatchetTimer.reset();
+    disengageFixedArmRatchetTimer.start();
+    fixedArmDisengageRatchetStartTicks = fixedArmFalcon.getSelectedSensorPosition();
+    enableFixedRatchet(false);
+    openLoopFixedArm(ClimbConstants.kDisengageRatchetSpeed);
+  }
+
+  public void disengagePivotRatchet() {
+    disengagePivotArmRatchetTimer.reset();
+    disengagePivotArmRatchetTimer.start();
+    pivotArmDisengageRatchetStartTicks = pivotArmFalcon.getSelectedSensorPosition();
+    enablePivotRatchet(false);
+    openLoopPivotArm(ClimbConstants.kDisengageRatchetSpeed);
+  }
+
+  public boolean isFixedArmFinished() {
+    double currFixedArmPosTicks = fixedArmFalcon.getSelectedSensorPosition();
+    if (Math.abs(currFixedArmPosTicks - fixedArmSetPointTicks)
+        > ClimbConstants.kFixedArmCloseEnough) {
+      fixedArmStableCounts = 0;
+    } else {
+      fixedArmStableCounts++;
+    }
+    return fixedArmStableCounts >= ClimbConstants.kFixedArmStableCounts;
+  }
+
+  public boolean isPivotArmFinished() {
+    double currPivotArmPosTicks = pivotArmFalcon.getSelectedSensorPosition();
+    if (Math.abs(currPivotArmPosTicks - pivotArmSetPointTicks)
+        > ClimbConstants.kPivotArmCloseEnough) {
+      pivotArmStableCounts = 0;
+    } else {
+      pivotArmStableCounts++;
+    }
+    return pivotArmStableCounts >= ClimbConstants.kPivotArmStableCounts;
+  }
+
+  public boolean isShoulderFinished() {
+    double currShoulderPosTicks = shoulderTalon.getSelectedSensorPosition();
+    if (Math.abs(currShoulderPosTicks - shoulderSetPointTicks)
+        > ClimbConstants.kShoulderCloseEnough) {
+      shoulderStableCounts = 0;
+    } else {
+      shoulderStableCounts++;
+    }
+    return shoulderStableCounts >= ClimbConstants.kShoulderStableCounts;
+  }
+
+  public void testZeroClimb() {
+    pivotArmFalcon.setSelectedSensorPosition(0.0);
+    fixedArmFalcon.setSelectedSensorPosition(0.0);
+    shoulderTalon.setSelectedSensorPosition(0.0);
+    logger.info("Zeroing all Climb axes");
   }
 
   public void zeroClimb() {
-    extendFalcon1Moveable.setSelectedSensorPosition(0.0);
-    extendFalcon2Static.setSelectedSensorPosition(0.0);
-    shoulderFalcon.setSelectedSensorPosition(0.0);
-    logger.info("Zeroing all Climb axes");
+    currPivotArmState = PivotArmState.ZEROING;
+    currFixedArmState = FixedArmState.ZEROING;
+    shoulderState = ShoulderState.ZEROING;
+    pivotArmFalcon.configForwardSoftLimitEnable(false);
+    pivotArmFalcon.configReverseSoftLimitEnable(false);
+    fixedArmFalcon.configForwardSoftLimitEnable(false);
+    fixedArmFalcon.configReverseSoftLimitEnable(false);
+    enableFixedRatchet(false);
+    enablePivotRatchet(false);
+
+    pivotArmFalcon.configSupplyCurrentLimit(
+        ClimbConstants.getZeroSupplyCurrentLimit(), Constants.kTalonConfigTimeout);
+    fixedArmFalcon.configSupplyCurrentLimit(
+        ClimbConstants.getZeroSupplyCurrentLimit(), Constants.kTalonConfigTimeout);
+    pivotArmFalcon.configStatorCurrentLimit(
+        ClimbConstants.getZeroStatorCurrentLimit(), Constants.kTalonConfigTimeout);
+    fixedArmFalcon.configStatorCurrentLimit(
+        ClimbConstants.getZeroStatorCurrentLimit(), Constants.kTalonConfigTimeout);
+
+    openLoopPivotArm(ClimbConstants.kClimbArmsZeroSpeed);
+    openLoopFixedArm(ClimbConstants.kClimbArmsZeroSpeed);
+  }
+
+  public boolean isLeftArmTouchingBar() {
+    return !leftArmHome.get();
+  }
+
+  public boolean isRightArmTouchingBar() {
+    return !rightArmHome.get();
   }
 
   @Override
   public void registerWith(TelemetryService telemetryService) {
     super.registerWith(telemetryService);
-    telemetryService.register(extendFalcon1Moveable);
-    telemetryService.register(extendFalcon2Static);
-    telemetryService.register(shoulderFalcon);
+    telemetryService.register(pivotArmFalcon);
+    telemetryService.register(fixedArmFalcon);
+    telemetryService.register(shoulderTalon);
   }
 
   @Override
   public Set<Measure> getMeasures() {
-    return Set.of();
+    return Set.of(
+        new Measure("fixedArmSevo", () -> fixedRatchet.get()),
+        new Measure("pivotArmServo", () -> pivotRatchet.get()));
   }
 
-  public enum ClimbState {
-    ZEROING,
-    ZEROED
+  public void initiateClimb() {
+    logger.info("Initiating climb sequence");
+    isClimbDone = false;
+
+    disengageFixedRatchet();
+    disengagePivotRatchet();
+    currFixedArmState = FixedArmState.DISENGAGE_RATCHET;
+    currPivotArmState = PivotArmState.DISENGAGE_RATCHET;
+    desiredFixedArmState = FixedArmState.MID_EXT;
+    desiredPivotArmState = PivotArmState.IDLE;
+  }
+
+  public void midClimb() {
+    logger.info("{} -> MID_RET", currFixedArmState);
+
+    continueToHigh = false;
+    continueToTraverse = false;
+
+    currFixedArmState = FixedArmState.MID_RET;
+    actuateFixedArm(currFixedArmState.setpoint);
+    enableFixedRatchet(true);
+  }
+
+  public void highClimb() {
+    logger.info("{} -> MID_RET", currFixedArmState);
+
+    continueToHigh = true;
+    continueToTraverse = false;
+
+    currFixedArmState = FixedArmState.MID_RET;
+    actuateFixedArm(currFixedArmState.setpoint);
+  }
+
+  public void traverseClimb() {
+    logger.info("{} -> MID_RET", currFixedArmState);
+
+    continueToHigh = true;
+    continueToTraverse = true;
+
+    currFixedArmState = FixedArmState.MID_RET;
+    actuateFixedArm(currFixedArmState.setpoint);
+  }
+
+  public boolean isClimbDone() {
+    return isClimbDone;
+  }
+
+  public boolean isClimbInitiated() {
+    return currFixedArmState == FixedArmState.MID_EXT && isFixedArmFinished();
+  }
+
+  public void setClimbIdle() {
+    currFixedArmState = FixedArmState.IDLE;
+    currPivotArmState = PivotArmState.IDLE;
+    shoulderState = ShoulderState.IDLE;
+  }
+
+  @Override
+  public void periodic() {
+    switch (currFixedArmState) {
+      case IDLE:
+        // Do Nothing
+        break;
+      case ZEROING:
+        if (Math.abs(fixedArmFalcon.getSelectedSensorVelocity())
+            < ClimbConstants.kZeroTargetSpeedTicksPer100ms) {
+          fixedArmZeroStableCounts++;
+        } else {
+          fixedArmZeroStableCounts = 0;
+        }
+
+        if (fixedArmZeroStableCounts > ClimbConstants.kZeroStableCounts) {
+          fixedArmFalcon.setSelectedSensorPosition(0.0);
+          fixedArmFalcon.configSupplyCurrentLimit(
+              ClimbConstants.getFixedArmSupplyCurrentLimit(), Constants.kTalonConfigTimeout);
+          fixedArmFalcon.configStatorCurrentLimit(
+              ClimbConstants.getFixedArmStatorCurrentLimit(), Constants.kTalonConfigTimeout);
+          fixedArmFalcon.configForwardSoftLimitEnable(true);
+          fixedArmFalcon.configReverseSoftLimitEnable(true);
+          openLoopFixedArm(0.0);
+          logger.info("Fixed: {} -> ZEROED");
+          currFixedArmState = FixedArmState.ZEROED;
+          break;
+        }
+
+        break;
+      case ZEROED:
+        if (!isFixedRatchetOn
+            && fixedArmFalcon.getSelectedSensorPosition()
+                <= ClimbConstants.kPostZeroTickArmRatchetOn) {
+          enableFixedRatchet(true);
+        }
+        break;
+      case DISENGAGE_RATCHET:
+        if (((fixedArmFalcon.getSelectedSensorPosition() - fixedArmDisengageRatchetStartTicks)
+                > ClimbConstants.kDisengageRatchetTicks)
+            && disengageFixedArmRatchetTimer.hasElapsed(
+                ClimbConstants.kDisengageRatchetServoTimer)) {
+          logger.info("Fixed: DISENGAGE_RATCHET -> {}", desiredFixedArmState);
+          currFixedArmState = desiredFixedArmState;
+          if (desiredFixedArmState != FixedArmState.IDLE) {
+            actuateFixedArm(desiredFixedArmState.setpoint);
+          } else actuateFixedArm(fixedArmFalcon.getSelectedSensorPosition());
+        }
+        break;
+      case MID_EXT:
+        // wait
+        break;
+      case MID_RET:
+        if (isFixedArmFinished()) {
+          if (continueToHigh) {
+            logger.info("Shoulder: {} -> HIGH_PVT_BK1", shoulderState);
+            shoulderState = ShoulderState.HIGH_PVT_BK1;
+            rotateShoulder(shoulderState.setpoint);
+            currFixedArmState = FixedArmState.IDLE;
+          } else {
+            logger.info("Finished Mid Climb");
+            currFixedArmState = FixedArmState.IDLE;
+            currPivotArmState = PivotArmState.IDLE;
+            shoulderState = ShoulderState.IDLE;
+            isClimbDone = true;
+          }
+        }
+        break;
+      case HIGH_EXT:
+        if (isFixedArmFinished()) {
+          logger.info("Shoulder: {} -> HIGH)PVT_BK3", shoulderState);
+          shoulderState = ShoulderState.HIGH_PVT_BK3;
+          rotateShoulder(shoulderState.setpoint);
+          currFixedArmState = FixedArmState.IDLE;
+        }
+        break;
+      case TVS_RET:
+        if (isFixedArmFinished()) {
+          logger.info("Shoulder: {} -> TVS_PVT_BK1", shoulderState);
+          shoulderState = ShoulderState.TVS_PVT_BK1;
+          rotateShoulder(shoulderState.setpoint);
+          currFixedArmState = FixedArmState.IDLE;
+        }
+        break;
+      case TVS_EXT:
+        if (isFixedArmFinished()) {
+          logger.info("Shoulder: {} -> TVS_PVT_BK3", shoulderState);
+          shoulderState = ShoulderState.TVS_PVT_BK3;
+          rotateShoulder(shoulderState.setpoint);
+          currFixedArmState = FixedArmState.IDLE;
+        }
+        break;
+    }
+    switch (currPivotArmState) {
+      case IDLE:
+        // Do Nothing
+        break;
+      case ZEROING:
+        if (Math.abs(pivotArmFalcon.getSelectedSensorVelocity())
+            < ClimbConstants.kZeroTargetSpeedTicksPer100ms) {
+          pivotArmZeroStableCounts++;
+        } else {
+          pivotArmZeroStableCounts = 0;
+        }
+
+        if (pivotArmZeroStableCounts > ClimbConstants.kZeroStableCounts) {
+          pivotArmFalcon.setSelectedSensorPosition(0.0);
+          pivotArmFalcon.configSupplyCurrentLimit(
+              ClimbConstants.getPivotArmSupplyCurrentLimit(), Constants.kTalonConfigTimeout);
+          pivotArmFalcon.configStatorCurrentLimit(
+              ClimbConstants.getPivotArmStatorCurrentLimit(), Constants.kTalonConfigTimeout);
+          pivotArmFalcon.configForwardSoftLimitEnable(true);
+          pivotArmFalcon.configReverseSoftLimitEnable(true);
+          logger.info("Pivot: {} -> ZEROED");
+          currPivotArmState = PivotArmState.ZEROED;
+          openLoopPivotArm(0.0);
+          break;
+        }
+        break;
+      case ZEROED:
+        if (!isPivotRatchetOn
+            && pivotArmFalcon.getSelectedSensorPosition()
+                <= ClimbConstants.kPostZeroTickArmRatchetOn) enablePivotRatchet(true);
+        break;
+      case DISENGAGE_RATCHET:
+        if (((pivotArmFalcon.getSelectedSensorPosition() - pivotArmDisengageRatchetStartTicks)
+                > ClimbConstants.kDisengageRatchetTicks)
+            && disengagePivotArmRatchetTimer.hasElapsed(
+                ClimbConstants.kDisengageRatchetServoTimer)) {
+          logger.info("Pivot: DISENGAGE_RATCHET -> {}", desiredPivotArmState);
+          currPivotArmState = desiredPivotArmState;
+          if (desiredPivotArmState != PivotArmState.IDLE) {
+            actuatePivotArm(desiredPivotArmState.setpoint);
+          } else actuatePivotArm(pivotArmFalcon.getSelectedSensorPosition());
+        }
+        break;
+      case HIGH_EXT:
+        if (isPivotArmFinished()) {
+          logger.info("Shoulder: {} -> HIGH_PVT_FWD1", shoulderState);
+          shoulderState = ShoulderState.HIGH_PVT_FWD1;
+          rotateShoulder(shoulderState.setpoint);
+          currPivotArmState = PivotArmState.IDLE;
+        }
+        break;
+      case HIGH_RET1:
+        if (isPivotArmFinished()) {
+          logger.info("Shoulder: {} -> HIGH_PVT_BK2", shoulderState);
+          shoulderState = ShoulderState.HIGH_PVT_BK2;
+          rotateShoulder(shoulderState.setpoint);
+          currPivotArmState = PivotArmState.IDLE;
+        }
+        break;
+      case HIGH_RET2:
+        if (isPivotArmFinished()) {
+          logger.info("Shoulder: {} -> HIGH_PVT_FWD2", shoulderState);
+          shoulderState = ShoulderState.HIGH_PVT_FWD2;
+          rotateShoulder(shoulderState.setpoint);
+          currPivotArmState = PivotArmState.IDLE;
+        }
+        break;
+      case TVS_EXT:
+        if (isPivotArmFinished()) {
+          logger.info("Shoulder: {} -> TVS_PVT_FWD", shoulderState);
+          shoulderState = ShoulderState.TVS_PVT_FWD;
+          rotateShoulder(shoulderState.setpoint);
+          currPivotArmState = PivotArmState.IDLE;
+        }
+        break;
+      case TVS_RET:
+        if (isPivotArmFinished()) {
+          logger.info("Shoulder: {} -> TVS_PVT_BCK2", shoulderState);
+          shoulderState = ShoulderState.TVS_PVT_BK2;
+          rotateShoulder(shoulderState.setpoint);
+          currPivotArmState = PivotArmState.IDLE;
+        }
+        break;
+    }
+    switch (shoulderState) {
+      case IDLE:
+        // Do Nothing
+        break;
+      case ZEROING:
+        int absPos = shoulderTalon.getSensorCollection().getPulseWidthPosition() & 0xFFF;
+        int offset = absPos - ClimbConstants.kShoulderZeroTicks;
+        shoulderTalon.setSelectedSensorPosition(offset);
+        logger.info("Shoulder: {} -> ZEROED, absPos: {}, offset: {}", absPos, offset);
+        shoulderState = ShoulderState.ZEROED;
+        rotateShoulder(ClimbConstants.kShoulderPostZeroTicks);
+        break;
+      case ZEROED:
+        break;
+      case HIGH_PVT_BK1:
+        if (isShoulderFinished()) {
+          logger.info("Pivot: {} -> HIGH_EXT", currPivotArmState);
+          currPivotArmState = PivotArmState.HIGH_EXT;
+          actuatePivotArm(currPivotArmState.setpoint);
+          shoulderState = ShoulderState.IDLE;
+        }
+        break;
+      case HIGH_PVT_FWD1:
+        if (isShoulderFinished()) {
+          logger.info("Pivot: {} -> HIGH_RET1", currPivotArmState);
+          currPivotArmState = PivotArmState.HIGH_RET1;
+          enablePivotRatchet(true);
+          actuatePivotArm(currPivotArmState.setpoint);
+          shoulderState = ShoulderState.IDLE;
+        }
+        break;
+      case HIGH_PVT_BK2:
+        if (isShoulderFinished()) {
+          logger.info("Fixed: {} -> DISENGAGE_RATCHET", currFixedArmState);
+          currFixedArmState = FixedArmState.DISENGAGE_RATCHET;
+          desiredFixedArmState = FixedArmState.HIGH_EXT;
+          disengageFixedRatchet();
+          shoulderState = ShoulderState.IDLE;
+        }
+        break;
+      case HIGH_PVT_BK3:
+        if (isShoulderFinished()) {
+          logger.info("Pivot: {} -> HIGH_RET2", currPivotArmState);
+          currPivotArmState = PivotArmState.HIGH_RET2;
+          actuatePivotArm(currPivotArmState.setpoint);
+          shoulderState = ShoulderState.IDLE;
+        }
+        break;
+      case HIGH_PVT_FWD2:
+        if (isShoulderFinished()) {
+          if (continueToTraverse) {
+            logger.info("Fixed: {} -> TVS_RET", currFixedArmState);
+            currFixedArmState = FixedArmState.TVS_RET;
+            enableFixedRatchet(true);
+            actuateFixedArm(currFixedArmState.setpoint);
+            shoulderState = ShoulderState.IDLE;
+          } else {
+            logger.info("Finished High Climb");
+            currFixedArmState = FixedArmState.IDLE;
+            currPivotArmState = PivotArmState.IDLE;
+            shoulderState = ShoulderState.IDLE;
+            isClimbDone = true;
+          }
+        }
+        break;
+      case TVS_PVT_BK1:
+        if (isShoulderFinished()) {
+          logger.info("Pivot: {} -> DISENGAGE_RATCHET", currPivotArmState);
+          currPivotArmState = PivotArmState.DISENGAGE_RATCHET;
+          desiredPivotArmState = PivotArmState.TVS_EXT;
+          disengagePivotRatchet();
+          shoulderState = ShoulderState.IDLE;
+        }
+        break;
+      case TVS_PVT_FWD:
+        if (isShoulderFinished()) {
+          logger.info("Pivot: {} -> TVS_RET", currPivotArmState);
+          currPivotArmState = PivotArmState.TVS_RET;
+          enablePivotRatchet(true);
+          actuatePivotArm(currPivotArmState.setpoint);
+          shoulderState = ShoulderState.IDLE;
+        }
+        break;
+      case TVS_PVT_BK2:
+        if (isShoulderFinished()) {
+          logger.info("Fixed: {} -> DISENGAGE_RATCHET", currFixedArmState);
+          currFixedArmState = FixedArmState.DISENGAGE_RATCHET;
+          desiredFixedArmState = FixedArmState.TVS_EXT;
+          disengageFixedRatchet();
+          shoulderState = ShoulderState.IDLE;
+        }
+        break;
+      case TVS_PVT_BK3:
+        if (isShoulderFinished()) {
+          logger.info("Finished Traverse Climb");
+          shoulderState = ShoulderState.IDLE;
+          currFixedArmState = FixedArmState.IDLE;
+          currPivotArmState = PivotArmState.IDLE;
+          isClimbDone = true;
+        }
+        break;
+    }
+  }
+
+  public enum FixedArmState {
+    IDLE(0), // not used
+    ZEROING(0), // not used
+    ZEROED(0), // not used
+    DISENGAGE_RATCHET(0), // not used
+    MID_EXT(ClimbConstants.kFMidExtTicks),
+    MID_RET(ClimbConstants.kFMidRetTicks),
+    HIGH_EXT(ClimbConstants.kFHighExtTicks),
+    TVS_RET(ClimbConstants.kFTvsRetTicks),
+    TVS_EXT(ClimbConstants.kFTvsExtTicks);
+
+    public final double setpoint;
+
+    FixedArmState(double setpoint) {
+      this.setpoint = setpoint;
+    }
+  }
+
+  public enum PivotArmState {
+    IDLE(0), // not used
+    ZEROING(0), // not used
+    ZEROED(0), // not used
+    DISENGAGE_RATCHET(0), // not used
+    HIGH_EXT(ClimbConstants.kPHighExtTicks),
+    HIGH_RET1(ClimbConstants.kPHighRet1Ticks),
+    HIGH_RET2(ClimbConstants.kPHighRet2Ticks),
+    TVS_EXT(ClimbConstants.kPTvsExtTicks),
+    TVS_RET(ClimbConstants.kPTvsRetTicks);
+
+    public final double setpoint;
+
+    PivotArmState(double setpoint) {
+      this.setpoint = setpoint;
+    }
+  }
+
+  public enum ShoulderState {
+    IDLE(0), // not used
+    ZEROING(0), // not used
+    ZEROED(0), // not used
+    HIGH_PVT_BK1(ClimbConstants.kHighPvtBck1Ticks),
+    HIGH_PVT_FWD1(ClimbConstants.kHighPvtFwd1Ticks),
+    HIGH_PVT_BK2(ClimbConstants.kHighPvtBck2Ticks),
+    HIGH_PVT_BK3(ClimbConstants.kHighPvtBck3Ticks),
+    HIGH_PVT_FWD2(ClimbConstants.kHighPvtFwd2Ticks),
+    TVS_PVT_BK1(ClimbConstants.kTvsPvtBck1Ticks),
+    TVS_PVT_FWD(ClimbConstants.kTvsPvtFwdTicks),
+    TVS_PVT_BK2(ClimbConstants.kTvsPvtBck2Ticks),
+    TVS_PVT_BK3(ClimbConstants.kTvsPvtBck3Ticks);
+
+    public final double setpoint;
+
+    ShoulderState(double setpoint) {
+      this.setpoint = setpoint;
+    }
   }
 }
