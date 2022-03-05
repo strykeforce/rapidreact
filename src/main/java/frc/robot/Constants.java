@@ -29,7 +29,6 @@ import java.util.ArrayList;
 public final class Constants {
 
   public static final int kTalonConfigTimeout = 10; // ms
-  public static final String ClimbConstants = null;
 
   public Constants() {}
 
@@ -343,18 +342,46 @@ public final class Constants {
   }
 
   public static final class ClimbConstants {
-    public static final int kExtend1FalconID = 60;
-    public static final int kExtend2FalconID = 61;
+    public static final int kPivotArmFalconID = 60;
+    public static final int kFixedArmFalconID = 61;
     public static final int kClimbShoulderId = 62;
-    public static final int kRotateRatchetId = 0;
-    public static final int kStaticRatchetId = 1;
+    public static final int kPivotArmRatchetId = 0;
+    public static final int kFixedArmRatchetId = 1;
 
     public static final double kClimbArmTicksP100ms = 0.2;
     public static final double kShoulderOffsetTicks = 10;
-    public static final double kRotateRatchetOn = 0.5;
-    public static final double kStaticRatchetOn = 0.5;
-    public static final double kRotateRatchetOff = 0.0;
-    public static final double kStaticRatchetOff = 0.0;
+    public static final double kPivotRatchetOn = 0.5;
+    public static final double kFixedRatchetOn = 0.5;
+    public static final double kPivotRatchetOff = 0.0;
+    public static final double kFixedRatchetOff = 0.0;
+    public static final double kFixedArmCloseEnough = 100.0;
+    public static final double kPivotArmCloseEnough = 100.0;
+    public static final double kShoulderCloseEnough = 100.0;
+    public static final int kFixedArmStableCounts = 2;
+    public static final int kPivotArmStableCounts = 2;
+    public static final int kShoulderStableCounts = 2;
+    public static final double kDisengageFixedTicks = -10;
+    public static final double kDisengagePivotTicks = -10;
+
+    public static final double kFMidExtTicks = -190_000;
+    public static final double kFMidRetTicks = 15_000;
+    public static final double kHighPvtBck1Ticks = 4_750;
+    public static final double kPHighExtTicks = -180_000;
+    public static final double kHighPvtFwd1Ticks = 3_300;
+    public static final double kPHighRet1Ticks = -158_000;
+    public static final double kHighPvtBck2Ticks = 5_900;
+    public static final double kFHighExtTicks = -130_000;
+    public static final double kHighPvtBck3 = -875;
+    public static final double kPHighRet2Ticks = -110_000;
+    public static final double kHighPvtFwd2 = 550;
+    public static final double kFTvsRet = 15_000;
+    public static final double kTvsPvtBck1 = 4_750;
+    public static final double kPTvsExt = -180_000;
+    public static final double kTvsPvtFwd = 3_300;
+    public static final double kPTvsRet = -158_000;
+    public static final double kTvsPvtBck2 = 5_900;
+    public static final double kFTvsExt = -130_000;
+    public static final double kTvsPvtBck3 = 2_700;
 
     public static TalonFXConfiguration getExtendFalconConfig() {
       TalonFXConfiguration extendConfig = new TalonFXConfiguration();

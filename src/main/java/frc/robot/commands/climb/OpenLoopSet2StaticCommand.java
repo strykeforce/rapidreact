@@ -16,6 +16,6 @@ public class OpenLoopSet2StaticCommand extends InstantCommand {
 
   @Override
   public void initialize() {
-    climbSubsystem.openLoopSet2Static(speed);
+    climbSubsystem.openLoopFixedArm(speed);
   }
 }

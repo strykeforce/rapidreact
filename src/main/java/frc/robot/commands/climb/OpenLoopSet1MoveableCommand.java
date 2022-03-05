@@ -16,6 +16,6 @@ public class OpenLoopSet1MoveableCommand extends InstantCommand {
 
   @Override
   public void initialize() {
-    climbSubsystem.openLoopSet1Moveable(speed);
+    climbSubsystem.openLoopPivotArm(speed);
   }
 }
