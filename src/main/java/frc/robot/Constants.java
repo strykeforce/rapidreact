@@ -38,6 +38,11 @@ public final class Constants {
     public static final double kDeadbandAllStick = 0.10;
     public static final double kCloseEnoughTicks = 10.0;
 
+    // Climb Limits
+    public static final double kMaxFwdStrStickClimb = 0.1;
+    public static final double kMaxYawStickClimb = 0.1;
+    public static final double kYawJackFactorClimb = 0.01;
+
     public static final Pose2d startPose2d = new Pose2d(0, 0, Rotation2d.fromDegrees(0));
     public static final Pose2d endPose2d = new Pose2d(-1, 0, Rotation2d.fromDegrees(0));
 
@@ -347,9 +352,16 @@ public final class Constants {
     public static final int kClimbShoulderId = 62;
     public static final int kPivotArmRatchetId = 0;
     public static final int kFixedArmRatchetId = 1;
+    public static final int kLeftFixedHomeId = 0;
+    public static final int kRightFixedHomeId = 1;
 
-    public static final double kClimbArmTicksP100ms = 0.2;
+    public static final double kClimbArmsOpenLoopSpeed = 0.2;
+    public static final double kClimbArmsZeroSpeed = -0.1;
+    public static final double kZeroTargetSpeedTicksPer100ms = 5;
+    public static final double kZeroStableCounts = 25;
     public static final double kShoulderOffsetTicks = 10;
+    public static final int kShoulderZeroTicks = 1700; // FIXME
+
     public static final double kPivotRatchetOn = 0.5;
     public static final double kFixedRatchetOn = 0.5;
     public static final double kPivotRatchetOff = 0.0;
@@ -371,17 +383,25 @@ public final class Constants {
     public static final double kPHighRet1Ticks = -158_000;
     public static final double kHighPvtBck2Ticks = 5_900;
     public static final double kFHighExtTicks = -130_000;
-    public static final double kHighPvtBck3 = -875;
+    public static final double kHighPvtBck3Ticks = -875;
     public static final double kPHighRet2Ticks = -110_000;
-    public static final double kHighPvtFwd2 = 550;
-    public static final double kFTvsRet = 15_000;
-    public static final double kTvsPvtBck1 = 4_750;
-    public static final double kPTvsExt = -180_000;
-    public static final double kTvsPvtFwd = 3_300;
-    public static final double kPTvsRet = -158_000;
-    public static final double kTvsPvtBck2 = 5_900;
-    public static final double kFTvsExt = -130_000;
-    public static final double kTvsPvtBck3 = 2_700;
+    public static final double kHighPvtFwd2Ticks = 550;
+    public static final double kFTvsRetTicks = 15_000;
+    public static final double kTvsPvtBck1Ticks = 4_750;
+    public static final double kPTvsExtTicks = -180_000;
+    public static final double kTvsPvtFwdTicks = 3_300;
+    public static final double kPTvsRetTicks = -158_000;
+    public static final double kTvsPvtBck2Ticks = 5_900;
+    public static final double kFTvsExtTicks = -130_000;
+    public static final double kTvsPvtBck3Ticks = 2_700;
+
+    public static SupplyCurrentLimitConfiguration getZeroCurrentLimit() {
+      return new SupplyCurrentLimitConfiguration(true, 10, 15, 0.01);
+    }
+
+    public static SupplyCurrentLimitConfiguration getExtendFalconCurrentLimit() {
+      return new SupplyCurrentLimitConfiguration(true, 40, 10, 0.001);
+    }
 
     public static TalonFXConfiguration getExtendFalconConfig() {
       TalonFXConfiguration extendConfig = new TalonFXConfiguration();
