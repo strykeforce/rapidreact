@@ -751,7 +751,10 @@ public class ClimbSubsystem extends MeasurableSubsystem {
         new Measure("rightArmHome", () -> getRightArmHome()),
         new Measure("climbStateCounter", () -> climbStateCounter),
         new Measure("fixedArmTargetTicks", () -> currFixedArmState.setpoint),
-        new Measure("pivotArmTargetTicks", () -> currPivotArmState.setpoint));
+        new Measure("pivotArmTargetTicks", () -> currPivotArmState.setpoint),
+        new Measure("fixedArmState", currFixedArmState::ordinal),
+        new Measure("pivotArmState", currPivotArmState::ordinal),
+        new Measure("shoulderState", shoulderState::ordinal));
   }
 
   @Override
