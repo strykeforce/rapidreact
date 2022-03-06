@@ -253,12 +253,12 @@ public class TurretSubsystem extends MeasurableSubsystem {
     if (magazineSubsystem.isNextCargoAlliance() || (!doRotate)) {
       rotateTo(TurretConstants.kFenderAlliance);
       logger.info(
-          "Fender Shot -> Turret 0deg, isOurs: {}, doRotate: {}",
+          "Fender Shot: Turret 0deg, isOurs: {}, doRotate: {}",
           magazineSubsystem.isNextCargoAlliance(),
           doRotate);
     } else {
       rotateTo(TurretConstants.kFenderOpponent);
-      logger.info("Fender Shot -> Opponent Cargo");
+      logger.info("Fender Shot: Opponent Cargo");
     }
   }
 

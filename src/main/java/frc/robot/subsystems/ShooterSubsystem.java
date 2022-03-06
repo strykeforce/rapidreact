@@ -213,7 +213,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
       shooterClosedLoop(
           ShooterConstants.kKickerOpTicksP100ms, ShooterConstants.kShooterOpTicksP100ms);
       hoodClosedLoop(ShooterConstants.kHoodOpTicks);
-      logger.info("Next Cargo not ours -> Opponent Setpoints");
+      logger.info("Fender Shot: Opponent Setpoints");
     } else if (highFender) {
       shooterClosedLoop(
           ShooterConstants.kKickerFenderHighTicksP100ms,

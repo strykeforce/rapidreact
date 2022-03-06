@@ -144,17 +144,22 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   }
 
   public CargoColor readCargoColor() {
-    Color readColor = getColor();
-    ColorMatchResult matchResult = colorMatch.matchClosestColor(readColor);
-
     CargoColor currentCargoColor = CargoColor.NONE;
-    if (matchResult.color == MagazineConstants.kBlueCargo) {
-      currentCargoColor = CargoColor.BLUE;
-    } else if (matchResult.color == MagazineConstants.kRedCargo) {
-      currentCargoColor = CargoColor.RED;
-    }
+    if (!ignoreColorSensor) {
+      Color readColor = getColor();
+      ColorMatchResult matchResult = colorMatch.matchClosestColor(readColor);
 
-    if (currentCargoColor == CargoColor.NONE) return currentCargoColor;
+      if (matchResult.color == MagazineConstants.kBlueCargo) {
+        currentCargoColor = CargoColor.BLUE;
+      } else if (matchResult.color == MagazineConstants.kRedCargo) {
+        currentCargoColor = CargoColor.RED;
+      }
+
+      if (currentCargoColor == CargoColor.NONE) return currentCargoColor;
+    } else {
+      // Ignoring color sensor results
+      currentCargoColor = allianceCargoColor;
+    }
 
     if (storedCargoColors[0] == CargoColor.NONE) {
       storedCargoColors[0] = currentCargoColor;
@@ -233,7 +238,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   }
 
   public void shoot() {
-    if (storedCargoColors[0] == CargoColor.NONE) {
+    if (storedCargoColors[0] == CargoColor.NONE && !ignoreColorSensor) {
       logger.info("Magazine empty, not shooting");
       currMagazineState = MagazineState.STOP;
     } else {
@@ -255,7 +260,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
       case WAIT_CARGO:
         // check number of cargo
         if (storedCargoColors[0] != CargoColor.NONE && storedCargoColors[1] != CargoColor.NONE) {
-          logger.info("Magazine already full, switching to stop state");
+          logger.info("WAIT_CARGO -> STOP");
           currMagazineState = MagazineState.STOP;
           break;
         } else if (storedCargoColors[0] != CargoColor.NONE) {
@@ -269,7 +274,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
         if (isLowerBeamBroken()) {
           currMagazineState = MagazineState.READ_CARGO;
           lowerOpenLoopRotate(0.0);
-          logger.info("Switching state to read cargo color");
+          logger.info("WAIT_CARGO -> READ_CARGO");
         } else if (lowerMagazineTalon.getMotorOutputPercent() == 0.0) {
           lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIntakeSpeed);
         }
@@ -287,16 +292,16 @@ public class MagazineSubsystem extends MeasurableSubsystem {
               currMagazineState = MagazineState.EJECT_CARGO;
               ejectTimer.reset();
               ejectTimer.start();
-              logger.info("Has one cargo, second color not alliance, switching to EJECT state.");
+              logger.info("READ_CARGO -> EJECT_CARGO");
               break;
             }
             currMagazineState = MagazineState.STOP;
-            logger.info("Now have two cargo, switching to stop state");
+            logger.info("READ_CARGO -> STOP");
           } else {
             lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIntakeSpeed);
             upperClosedLoopRotate(MagazineConstants.kUpperMagazineIntakeSpeed);
             currMagazineState = MagazineState.INDEX_CARGO;
-            logger.info("Has one cargo, turning on magazine, switching to index state");
+            logger.info("READ_CARGO -> INDEX_CARGO");
           }
         }
         autoStopUpperMagazine(MagazineConstants.kUpperMagazineIntakeSpeed);
@@ -305,7 +310,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
       case INDEX_CARGO:
         if (!isLowerBeamBroken()) {
           currMagazineState = MagazineState.WAIT_CARGO;
-          logger.info("Switching to wait state");
+          logger.info("INDEX_CARGO -> WAIT_CARGO");
         }
         autoStopUpperMagazine(MagazineConstants.kUpperMagazineIntakeSpeed);
         break;
@@ -315,6 +320,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
           storedCargoColors[1] = CargoColor.NONE;
           currMagazineState = MagazineState.WAIT_CARGO;
           lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIntakeSpeed);
+          logger.info("EJECT_CARGO -> WAIT_CARGO");
         }
         break;
       case PAUSE:
