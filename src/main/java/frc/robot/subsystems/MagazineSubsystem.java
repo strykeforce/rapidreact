@@ -218,6 +218,14 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     upperClosedLoopRotate(MagazineConstants.kUpperMagazineIndexSpeed);
   }
 
+  public void manualEjectCargoReverse(double lowerSpeed, double upperSpeed) {
+    enableUpperBeamBreak(false);
+    lowerClosedLoopRotate(lowerSpeed);
+    upperClosedLoopRotate(upperSpeed);
+    clearCargoColors();
+    currMagazineState = MagazineState.MANUAL_INTAKE;
+  }
+
   private void autoStopUpperMagazine(double speed) {
     if (isUpperBeamBroken() && upperMagazineTalon.getMotorOutputPercent() != 0.0) {
       upperOpenLoopRotate(0.0);

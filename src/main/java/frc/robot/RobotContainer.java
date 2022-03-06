@@ -17,16 +17,8 @@ import edu.wpi.first.wpilibj.shuffleboard.SuppliedValueWidget;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.ClimbConstants;
 import frc.robot.Constants.DashboardConstants;
 import frc.robot.Constants.MagazineConstants;
-import frc.robot.commands.climb.OpenLoopFixedArmCommand;
-import frc.robot.commands.climb.OpenLoopPivotArmCommand;
-import frc.robot.commands.climb.RotateShoulderDownCommand;
-import frc.robot.commands.climb.RotateShoulderUpCommand;
-import frc.robot.commands.climb.ShoulderHoldPositionCommand;
-import frc.robot.commands.climb.ToggleFixedRatchetCommand;
-import frc.robot.commands.climb.TogglePivotRatchetCommand;
 import frc.robot.commands.climb.ZeroMotorsCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
@@ -37,6 +29,7 @@ import frc.robot.commands.drive.ZeroGyroCommand;
 import frc.robot.commands.intake.IntakeOpenLoopCommand;
 import frc.robot.commands.intake.PitIntakeOpenLoopCommand;
 import frc.robot.commands.magazine.IgnoreColorSensorCommand;
+import frc.robot.commands.magazine.ManualEjectCargoReverseCommand;
 import frc.robot.commands.magazine.PitClearCargoColor;
 import frc.robot.commands.magazine.PitMagazineOpenLoopCommand;
 import frc.robot.commands.magazine.PitReadCargoColor;
@@ -44,13 +37,11 @@ import frc.robot.commands.magazine.UpperMagazineOpenLoopCommand;
 import frc.robot.commands.sequences.ArmShooterCommandGroup;
 import frc.robot.commands.sequences.AutoIntakeCommand;
 import frc.robot.commands.sequences.EjectCargoCommand;
-import frc.robot.commands.sequences.HighClimbCommandGroup;
 import frc.robot.commands.sequences.HighFenderShotCommand;
 import frc.robot.commands.sequences.LowFenderShotCommand;
 import frc.robot.commands.sequences.MidClimbCommandGroup;
 import frc.robot.commands.sequences.PitShooterTuneCommandGroup;
 import frc.robot.commands.sequences.StopShooterCommandGroup;
-import frc.robot.commands.sequences.TraverseClimbCommandGroup;
 import frc.robot.commands.sequences.VisionShootCommand;
 import frc.robot.commands.shooter.HoodOpenLoopCommand;
 import frc.robot.commands.shooter.PitHoodClosedLoopCommand;
@@ -188,38 +179,38 @@ public class RobotContainer {
 
     // Auto Climb
     new JoystickButton(driveJoystick, Button.UP.id)
-        .whenPressed(new TraverseClimbCommandGroup(climbSubsystem, driveSubsystem, driveJoystick));
-    new JoystickButton(driveJoystick, Button.DOWN.id)
-        .whenPressed(new HighClimbCommandGroup(climbSubsystem, driveSubsystem, driveJoystick));
-    new JoystickButton(driveJoystick, Button.HAMBURGER.id)
         .whenPressed(new MidClimbCommandGroup(climbSubsystem, driveSubsystem, driveJoystick));
+    // new JoystickButton(driveJoystick, Button.DOWN.id)
+    //     .whenPressed(new HighClimbCommandGroup(climbSubsystem, driveSubsystem, driveJoystick));
+    // new JoystickButton(driveJoystick, Button.HAMBURGER.id)
+    //     .whenPressed(new MidClimbCommandGroup(climbSubsystem, driveSubsystem, driveJoystick));
   }
 
   private void configureOperatorButtonBindings() {
     // Manual Climb
     // Rotating Arm
-    LeftStickUp.whenActive(
-        new OpenLoopPivotArmCommand(climbSubsystem, ClimbConstants.kClimbArmsOpenLoopSpeed));
-    LeftStickDown.whenActive(
-        new OpenLoopPivotArmCommand(climbSubsystem, -ClimbConstants.kClimbArmsOpenLoopSpeed));
-    LeftStickStop.whenActive(new OpenLoopPivotArmCommand(climbSubsystem, 0.0));
-    new JoystickButton(xboxController, XboxController.Button.kLeftStick.value)
-        .whenPressed(new TogglePivotRatchetCommand(climbSubsystem));
+    // LeftStickUp.whenActive(
+    //     new OpenLoopPivotArmCommand(climbSubsystem, ClimbConstants.kClimbArmsOpenLoopSpeed));
+    // LeftStickDown.whenActive(
+    //     new OpenLoopPivotArmCommand(climbSubsystem, -ClimbConstants.kClimbArmsOpenLoopSpeed));
+    // LeftStickStop.whenActive(new OpenLoopPivotArmCommand(climbSubsystem, 0.0));
+    // new JoystickButton(xboxController, XboxController.Button.kLeftStick.value)
+    //     .whenPressed(new TogglePivotRatchetCommand(climbSubsystem));
 
-    // Static Arm
-    RightStickUp.whenActive(
-        new OpenLoopFixedArmCommand(climbSubsystem, ClimbConstants.kClimbArmsOpenLoopSpeed));
-    RightStickDown.whenActive(
-        new OpenLoopFixedArmCommand(climbSubsystem, -ClimbConstants.kClimbArmsOpenLoopSpeed));
-    RightStickStop.whenActive(new OpenLoopFixedArmCommand(climbSubsystem, 0.0));
-    new JoystickButton(xboxController, XboxController.Button.kRightStick.value)
-        .whenPressed(new ToggleFixedRatchetCommand(climbSubsystem));
+    // // Static Arm
+    // RightStickUp.whenActive(
+    //     new OpenLoopFixedArmCommand(climbSubsystem, ClimbConstants.kClimbArmsOpenLoopSpeed));
+    // RightStickDown.whenActive(
+    //     new OpenLoopFixedArmCommand(climbSubsystem, -ClimbConstants.kClimbArmsOpenLoopSpeed));
+    // RightStickStop.whenActive(new OpenLoopFixedArmCommand(climbSubsystem, 0.0));
+    // new JoystickButton(xboxController, XboxController.Button.kRightStick.value)
+    //     .whenPressed(new ToggleFixedRatchetCommand(climbSubsystem));
 
-    // Shoulder
-    LeftTriggerDown.whenActive(new RotateShoulderUpCommand(climbSubsystem));
-    LeftTriggerDown.whenInactive(new ShoulderHoldPositionCommand(climbSubsystem));
-    RightTriggerDown.whenActive(new RotateShoulderDownCommand(climbSubsystem));
-    RightTriggerDown.whenInactive(new ShoulderHoldPositionCommand(climbSubsystem));
+    // // Shoulder
+    // LeftTriggerDown.whenActive(new RotateShoulderUpCommand(climbSubsystem));
+    // LeftTriggerDown.whenInactive(new ShoulderHoldPositionCommand(climbSubsystem));
+    // RightTriggerDown.whenActive(new RotateShoulderDownCommand(climbSubsystem));
+    // RightTriggerDown.whenInactive(new ShoulderHoldPositionCommand(climbSubsystem));
 
     new JoystickButton(xboxController, XboxController.Button.kStart.value)
         .whenReleased(new ZeroMotorsCommand(climbSubsystem));
@@ -228,6 +219,12 @@ public class RobotContainer {
     new JoystickButton(xboxController, XboxController.Button.kY.value)
         .whenPressed(new AutoIntakeCommand(magazineSubsystem, intakeSubsystem));
     new JoystickButton(xboxController, XboxController.Button.kY.value)
+        .whenReleased(new IntakeOpenLoopCommand(intakeSubsystem, 0.0));
+
+    // Eject Cargo Reverse
+    new JoystickButton(xboxController, XboxController.Button.kBack.value)
+        .whenPressed(new ManualEjectCargoReverseCommand(magazineSubsystem, intakeSubsystem));
+    new JoystickButton(xboxController, XboxController.Button.kBack.value)
         .whenReleased(new IntakeOpenLoopCommand(intakeSubsystem, 0.0));
 
     // Arm Shooter
