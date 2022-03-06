@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.Constants;
 import frc.robot.Constants.TurretConstants;
+import frc.robot.Constants.VisionConstants;
 import java.util.List;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
@@ -72,16 +73,30 @@ public class TurretSubsystem extends MeasurableSubsystem {
   }
 
   public boolean rotateBy(Rotation2d errorRotation2d) {
-    double targetAngleRadians =
-        errorRotation2d.getRadians()
-            + turret.getSelectedSensorPosition() / kTurretTicksPerRadian // +
-            + Math.toRadians(Constants.VisionConstants.kHorizAngleCorrectionDegrees);
+    Rotation2d currentTurretPose =
+        new Rotation2d(-turret.getSelectedSensorPosition() / kTurretTicksPerRadian);
+    Rotation2d horizontalAngleCorrection =
+        Rotation2d.fromDegrees(VisionConstants.kHorizAngleCorrectionDegrees);
+
+    // logger.info(
+    //     "turret pose: {}, error: {}, horizontal correction: {}",
+    //     currentTurretPose,
+    //     errorRotation2d,
+    //     horizontalAngleCorrection);
+    Rotation2d targetAngle = currentTurretPose.minus(errorRotation2d);
+    targetAngle = targetAngle.plus(horizontalAngleCorrection);
+    rotateTo(targetAngle);
+
+    // double targetAngleRadians =
+    //     errorRotation2d.getRadians()
+    //         + turret.getSelectedSensorPosition() / kTurretTicksPerRadian // +
+    //         + Math.toRadians(Constants.VisionConstants.kHorizAngleCorrectionDegrees);
 
     // if (Math.toDegrees(targetAngleRadians) > 360 || Math.toDegrees(targetAngleRadians) < 0) {
     //   rotateTo(getNonWrappedSetpoint(targetAngleRadians));
     //   return true;
     // }
-    rotateTo(targetAngleRadians * -kTurretTicksPerRadian);
+    // rotateTo(targetAngleRadians * -kTurretTicksPerRadian);
     return false;
   }
 
@@ -103,7 +118,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
     } else {
       targetTurretPosition = setPointTicks;
       turret.set(ControlMode.MotionMagic, setPointTicks);
-      logger.info("Rotating Turret to {} ticks", setPointTicks);
+      // logger.info("Rotating Turret to {} ticks", setPointTicks);
     }
   }
 
@@ -116,7 +131,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
 
   public void rotateTo(Rotation2d position) {
     double positionTicks = position.getRadians() * -kTurretTicksPerRadian;
-    logger.info("Rotating Turret to {}", position);
+    // logger.info("Rotating Turret to {}", position);
     rotateTo(positionTicks);
   }
 
@@ -296,6 +311,8 @@ public class TurretSubsystem extends MeasurableSubsystem {
             setSeekAngle(true);
             break;
           }
+          // If not valid but < not valid counts just hold last position
+          break;
         } else {
           notValidTargetCount = 0;
         }
