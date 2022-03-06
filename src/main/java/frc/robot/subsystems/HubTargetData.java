@@ -62,7 +62,6 @@ public class HubTargetData extends TargetListTargetData {
    * @throws IndexOutOfBoundsException if the list of targets is empty
    */
   public double getErrorPixels() {
-    // FIXME use inside edges
     int minX = targets.get(0).bottomRight.x;
     int maxX = targets.get(targets.size() - 1).topLeft.x;
     return (maxX + minX) / 2.0 - kFrameCenter;

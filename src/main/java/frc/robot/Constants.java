@@ -205,28 +205,29 @@ public final class Constants {
     public static final int kTurretId = 50;
     public static final double kFastCruiseVelocity = 4_000;
     public static final double kSlowCruiseVelocity = 2_000;
-    public static final int kTurretZeroTicks = 1250;
-    public static final int kForwardLimit = 14_000;
-    public static final int kReverseLimit = -14_000;
+    public static final int kTurretZeroTicks = 756; // 1250
+    public static final int kForwardLimit = 13_800; // 14
+    public static final int kReverseLimit = -13_800; // 14
     public static final double kMaxStringPotZero = 100; // 2020 Robot
     public static final double kMinStringPotZero = 0; // 2020 Robot
 
     // Ticks -> Degrees/Radians
-    public static final double kTurretTicksPerDegree = 114.653; // 0.01745329 57.2957877856 72.404
-    public static final double kTurretTicksPerRadian = 6569.133; // 4148.44421883
+    public static final double kTurretTicksPerDegree =
+        120.522; // 114.653     0.01745329 57.2957877856 72.404
+    public static final double kTurretTicksPerRadian = 6905.414; // 6569.133
     public static final double kTurretMidpoint = 13_000;
     public static final double kWrapRange = 1;
 
     // Rotate Under Vision Constants
-    public static final double kRotateByInitialKp = 0.4; // 0.4
-    public static final double kRotateByFinalKp = 0.95; // 0.95
+    public static final double kRotateByInitialKp = -0.4; // 0.4
+    public static final double kRotateByFinalKp = -0.95; // 0.95
     public static final int kNotValidTargetCounts = 5; // how many frames to wait before seeking
 
     // Seek Constants
     public static final Translation2d kHubPositionMeters = new Translation2d(8.23, 4.11); // meters
     public static final Rotation2d kSeekAngleError = Rotation2d.fromDegrees(30); // 30 degrees
-    public static final int kMaxSeekCount = 6;
-    public static final Rotation2d kTurretRobotOffset = Rotation2d.fromDegrees(270);
+    public static final int kMaxSeekCount = 3; // 6
+    public static final Rotation2d kTurretRobotOffset = Rotation2d.fromDegrees(180);
 
     // Close Enough & Stable Counts
     public static final int kCloseEnoughTicks = 40;

@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
@@ -52,8 +53,10 @@ import frc.robot.commands.shooter.PitHoodClosedLoopCommand;
 import frc.robot.commands.shooter.PitShooterClosedLoopCommand;
 import frc.robot.commands.shooter.ShooterOpenLoopCommand;
 import frc.robot.commands.shooter.StopShooterCommand;
+import frc.robot.commands.turret.CheckSeekAngleCommand;
 import frc.robot.commands.turret.OpenLoopTurretCommand;
 import frc.robot.commands.turret.PitTurretCloseLoopPositionCommand;
+import frc.robot.commands.turret.RotateToCommand;
 import frc.robot.commands.turret.TurretAimCommandGroup;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
@@ -147,6 +150,23 @@ public class RobotContainer {
         .whenPressed(new HoodOpenLoopCommand(shooterSubsystem, -0.2));
     new JoystickButton(driveJoystick, Trim.LEFT_X_NEG.id)
         .whenReleased(new HoodOpenLoopCommand(shooterSubsystem, 0.0));
+
+    // Turret Open Loop
+    new JoystickButton(driveJoystick, Trim.RIGHT_X_POS.id)
+        .whenPressed(new OpenLoopTurretCommand(turretSubsystem, 0.3));
+    new JoystickButton(driveJoystick, Trim.RIGHT_X_POS.id)
+        .whenReleased(new OpenLoopTurretCommand(turretSubsystem, 0.0));
+    new JoystickButton(driveJoystick, Trim.RIGHT_X_NEG.id)
+        .whenPressed(new OpenLoopTurretCommand(turretSubsystem, -0.3));
+    new JoystickButton(driveJoystick, Trim.RIGHT_X_NEG.id)
+        .whenReleased(new OpenLoopTurretCommand(turretSubsystem, 0.0));
+    new JoystickButton(driveJoystick, Trim.RIGHT_Y_POS.id)
+        .whenPressed(new CheckSeekAngleCommand(turretSubsystem));
+    new JoystickButton(driveJoystick, Trim.LEFT_Y_NEG.id)
+        .whenPressed(
+            new ResetOdometryCommand(
+                driveSubsystem,
+                new Pose2d(new Translation2d(0.415, 7.42), Rotation2d.fromDegrees(0))));
 
     // Auto Intake
     new JoystickButton(driveJoystick, Shoulder.RIGHT_DOWN.id)
@@ -316,6 +336,14 @@ public class RobotContainer {
     SmartDashboard.putData("Pit/Turret/Forward", new OpenLoopTurretCommand(turretSubsystem, 0.3));
     SmartDashboard.putData("Pit/Turret/Reverse", new OpenLoopTurretCommand(turretSubsystem, -0.3));
     SmartDashboard.putData("Pit/Turret/Stop", new OpenLoopTurretCommand(turretSubsystem, 0.0));
+    SmartDashboard.putData(
+        "Pit/Turret/RotateToPos90",
+        new RotateToCommand(turretSubsystem, Rotation2d.fromDegrees(90)));
+    SmartDashboard.putData(
+        "Pit/Turret/RotateTo0", new RotateToCommand(turretSubsystem, Rotation2d.fromDegrees(0)));
+    SmartDashboard.putData(
+        "Pit/Turret/RotateToNeg90",
+        new RotateToCommand(turretSubsystem, Rotation2d.fromDegrees(-90)));
 
     // Intake Commands
     SmartDashboard.putData("Pit/Intake/Start", new PitIntakeOpenLoopCommand(intakeSubsystem));

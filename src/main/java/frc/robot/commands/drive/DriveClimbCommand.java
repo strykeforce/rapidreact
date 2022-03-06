@@ -44,8 +44,8 @@ public class DriveClimbCommand extends CommandBase {
                 driveJoystick.getRawAxis(Axis.RIGHT_Y.id), DriveConstants.kDeadbandAllStick);
 
     driveSubsystem.drive(
-        fwd * DriveConstants.kMaxFwdStrStickClimb,
-        str * DriveConstants.kMaxFwdStrStickClimb,
+        fwd * -DriveConstants.kMaxFwdStrStickClimb,
+        str * -DriveConstants.kMaxFwdStrStickClimb,
         (yaw + DriveConstants.kYawJackFactorClimb) * -DriveConstants.kMaxYawStickClimb);
   }
 

@@ -74,14 +74,14 @@ public class TurretSubsystem extends MeasurableSubsystem {
   public boolean rotateBy(Rotation2d errorRotation2d) {
     double targetAngleRadians =
         errorRotation2d.getRadians()
-            + turret.getSelectedSensorPosition() / kTurretTicksPerRadian
+            + turret.getSelectedSensorPosition() / kTurretTicksPerRadian // +
             + Math.toRadians(Constants.VisionConstants.kHorizAngleCorrectionDegrees);
 
-    if (Math.toDegrees(targetAngleRadians) > 360 || Math.toDegrees(targetAngleRadians) < 0) {
-      rotateTo(getNonWrappedSetpoint(targetAngleRadians));
-      return true;
-    }
-    rotateTo(targetAngleRadians * kTurretTicksPerRadian);
+    // if (Math.toDegrees(targetAngleRadians) > 360 || Math.toDegrees(targetAngleRadians) < 0) {
+    //   rotateTo(getNonWrappedSetpoint(targetAngleRadians));
+    //   return true;
+    // }
+    rotateTo(targetAngleRadians * -kTurretTicksPerRadian);
     return false;
   }
 
@@ -115,7 +115,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
   }
 
   public void rotateTo(Rotation2d position) {
-    double positionTicks = position.getRadians() * kTurretTicksPerRadian;
+    double positionTicks = position.getRadians() * -kTurretTicksPerRadian;
     logger.info("Rotating Turret to {}", position);
     rotateTo(positionTicks);
   }
@@ -181,21 +181,22 @@ public class TurretSubsystem extends MeasurableSubsystem {
   public TurretState getState() {
     return currentState;
   }
-
-  private void setSeekAngle(boolean seekLeft) {
+  // change back to private
+  public void setSeekAngle(boolean seekLeft) {
     Pose2d pose = driveSubsystem.getPoseMeters();
     Translation2d deltaPosition = TurretConstants.kHubPositionMeters.minus(pose.getTranslation());
     Rotation2d seekingAngle = new Rotation2d(deltaPosition.getX(), deltaPosition.getY());
+    logger.info("Pose: {}, Delta pose: {}, seek angle: {}", pose, deltaPosition, seekingAngle);
     seekingAngle = seekingAngle.minus(pose.getRotation());
-    // seekingAngle = seekingAngle.plus(TurretConstants.kTurretRobotOffset); // plus
+    seekingAngle = seekingAngle.plus(TurretConstants.kTurretRobotOffset); // plus
 
     if (seekLeft) {
-      seekingAngle = seekingAngle.plus(TurretConstants.kSeekAngleError);
+      seekingAngle = seekingAngle.minus(TurretConstants.kSeekAngleError); // plus
     } else {
-      seekingAngle = seekingAngle.minus(TurretConstants.kSeekAngleError);
+      seekingAngle = seekingAngle.plus(TurretConstants.kSeekAngleError);
     }
 
-    rotateTo(getNonWrappedSetpoint(seekingAngle.getRadians()));
+    rotateTo(seekingAngle); // getNonWrappedSetpoint
 
     logger.info("Seeking angle is at: {}", seekingAngle);
   }
@@ -276,7 +277,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
           } else {
             setSeekAngle(true);
             logger.info("{} -> LEFT", currentState);
-            currentState = TurretState.SEEK_RIGHT;
+            currentState = TurretState.SEEK_LEFT;
           }
         }
         break;
