@@ -51,7 +51,8 @@ public class HubTargetData extends TargetListTargetData {
    * @return true if valid
    */
   public boolean isValid() {
-    return valid && !targets.isEmpty();
+    return valid && targets.size() > 2;
+    // return valid && !targets.isEmpty();
   }
 
   /**
