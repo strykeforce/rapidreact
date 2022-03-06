@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ClimbConstants;
 import frc.robot.Constants.DashboardConstants;
+import frc.robot.Constants.MagazineConstants;
 import frc.robot.commands.climb.OpenLoopFixedArmCommand;
 import frc.robot.commands.climb.OpenLoopPivotArmCommand;
 import frc.robot.commands.climb.RotateShoulderDownCommand;
@@ -42,10 +43,12 @@ import frc.robot.commands.magazine.PitReadCargoColor;
 import frc.robot.commands.magazine.UpperMagazineOpenLoopCommand;
 import frc.robot.commands.sequences.ArmShooterCommandGroup;
 import frc.robot.commands.sequences.AutoIntakeCommand;
+import frc.robot.commands.sequences.EjectCargoCommand;
 import frc.robot.commands.sequences.HighClimbCommandGroup;
 import frc.robot.commands.sequences.HighFenderShotCommand;
 import frc.robot.commands.sequences.LowFenderShotCommand;
 import frc.robot.commands.sequences.MidClimbCommandGroup;
+import frc.robot.commands.sequences.PitShooterTuneCommandGroup;
 import frc.robot.commands.sequences.StopShooterCommandGroup;
 import frc.robot.commands.sequences.TraverseClimbCommandGroup;
 import frc.robot.commands.shooter.HoodOpenLoopCommand;
@@ -227,7 +230,15 @@ public class RobotContainer {
     new JoystickButton(xboxController, XboxController.Button.kX.value)
         .whenPressed(
             new StopShooterCommandGroup(
-                magazineSubsystem, visionSubsystem, turretSubsystem, shooterSubsystem));
+                magazineSubsystem,
+                visionSubsystem,
+                turretSubsystem,
+                shooterSubsystem,
+                intakeSubsystem));
+
+    // Eject Opponent Cargo
+    new JoystickButton(xboxController, XboxController.Button.kA.value)
+        .whenPressed(new EjectCargoCommand(turretSubsystem, shooterSubsystem, magazineSubsystem));
 
     // High Fender Shot
     new JoystickButton(xboxController, XboxController.Button.kRightBumper.value)
@@ -354,13 +365,24 @@ public class RobotContainer {
     // turretSubsystem));
 
     // tuning commands
-    // SmartDashboard.putData(
-    //     "Pit/Tune/Start",
-    //     new PitShooterTuneCommandGroup(shooterSubsystem, magazineSubsystem, intakeSubsystem));
-    // SmartDashboard.putData(
-    //     "Pit/Tune/Stop",
-    //     new StopShooterCommandGroup(
-    //         magazineSubsystem, visionSubsystem, turretSubsystem, shooterSubsystem));
+    SmartDashboard.putData(
+        "Tune/Start",
+        new PitShooterTuneCommandGroup(
+            shooterSubsystem,
+            magazineSubsystem,
+            intakeSubsystem,
+            turretSubsystem,
+            visionSubsystem));
+    SmartDashboard.putData(
+        "Tune/Stop",
+        new StopShooterCommandGroup(
+            magazineSubsystem,
+            visionSubsystem,
+            turretSubsystem,
+            shooterSubsystem,
+            intakeSubsystem));
+    SmartDashboard.putNumber(
+        DashboardConstants.kTuneUpperMagSpeedTicks, MagazineConstants.kUpperMagazineIntakeSpeed);
   }
 
   public enum Axis {

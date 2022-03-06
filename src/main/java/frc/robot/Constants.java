@@ -283,14 +283,17 @@ public final class Constants {
     public static final Color kNoCargo = new Color(0.25, 0.5, 0.25); // FIXME need to get real color
 
     // Speed Constants
-    public static final double kMagazineIntakeSpeed = 2000; // 0.5
-    public static final double kMagazineFeedSpeed = 2000; // 0.25
-    public static final double kMagazineIndexSpeed = 2000; // 0.35
-    public static final double kMagazineEjectSpeed = 2000; // -0.5
+    public static final double kLowerMagazineIntakeSpeed = 5000; // 0.5
+    public static final double kUpperMagazineIntakeSpeed = 2000;
+    public static final double kUpperMagazineFeedSpeed = 2000; // 0.25
+    public static final double kLowerMagazineIndexSpeed = 2000; // 0.35
+    public static final double kUpperMagazineIndexSpeed = 2000;
+    public static final double kMagazineEjectSpeed = -5000; // -0.5
 
     // State Machine Sequence Constants
-    public static final double kShootDelay = 0.5;
-    public static final double kEjectTimerDelay = 4; // FIXME IM COMPLETELY WRONG
+    public static final double kShootDelay = 0.7;
+    public static final double kEjectTimerDelay = 0.7;
+    public static final double kShootUpperBeamStableCounts = 2;
 
     // Lower Magazine Talon Config
     public static SupplyCurrentLimitConfiguration getLowerMagazineCurrentLimit() {
@@ -716,9 +719,10 @@ public final class Constants {
     public static final double kLeftStickDeadBand = 0.1;
     public static final double kRightStickDeadBand = 0.1;
     public static final double kTriggerDeadBand = 0.1;
-    public static final String kPitHoodSetpointTicks = "Pit/Hood/hoodSpeed";
-    public static final String kPitShooterSetpointTicks = "Pit/Shooter/shooterSpeed";
+    public static final String kPitHoodSetpointTicks = "Tune/Hood/hoodPos";
+    public static final String kPitShooterSetpointTicks = "Tune/Shooter/shooterSpeed";
     public static final String kTurretSetpointRadians = "Pit/Turret/SetpointRadians";
-    public static final String kPitKickerSetpointTicks = "Pit/Kicker/kickerSpeed";
+    public static final String kPitKickerSetpointTicks = "Tune/Kicker/kickerSpeed";
+    public static final String kTuneUpperMagSpeedTicks = "Tune/Magazine/UpperSpeed";
   }
 }
