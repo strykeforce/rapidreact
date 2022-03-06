@@ -446,6 +446,19 @@ public final class Constants {
     public static final double kTvsPvtBck3Ticks = 2_700;
     public static final double kFTvsRet2Ticks = -5_000;
 
+    // Climb States -> Desired Open Loop Speed (Arms only, Shoulder = closed loop)
+    public static final double kFMidExtSpeed = -0.25;
+    public static final double kFMidRetSpeed = 0.25;
+    public static final double kPHighExtSpeed = -0.25;
+    public static final double kPHighRet1Speed = 0.25;
+    public static final double kFHighExtSpeed = -0.25;
+    public static final double kPHighRet2Speed = 0.25;
+    public static final double kFTvsRet1Speed = 0.25;
+    public static final double kPTvsExtSpeed = -0.25;
+    public static final double kPTvsRetSpeed = 0.25;
+    public static final double kFTvsExtSpeed = -0.25;
+    public static final double kFTvsRet2Speed = 0.25;
+
     // Pivot Arm Falcon Config
     public static SupplyCurrentLimitConfiguration getPivotArmSupplyCurrentLimit() {
       return new SupplyCurrentLimitConfiguration(true, 80, 90, 0.1);
