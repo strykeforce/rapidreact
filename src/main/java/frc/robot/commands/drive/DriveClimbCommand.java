@@ -7,11 +7,14 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.RobotContainer.Axis;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DriveClimbCommand extends CommandBase {
   private final DriveSubsystem driveSubsystem;
   private final Joystick driveJoystick;
   private final ClimbSubsystem climbSubsystem;
+  private static final Logger logger = LoggerFactory.getLogger(DriveClimbCommand.class);
 
   public DriveClimbCommand(
       DriveSubsystem driveSubsystem, Joystick driveJoystick, ClimbSubsystem climbSubsystem) {
@@ -23,15 +26,6 @@ public class DriveClimbCommand extends CommandBase {
 
   @Override
   public void execute() {
-    // Determine Jack Factor
-    double addedYaw = 0.0;
-    if (climbSubsystem.isRightArmTouchingBar() && !climbSubsystem.isLeftArmTouchingBar()) {
-      addedYaw = DriveConstants.kYawJackFactorClimb;
-    } else if (climbSubsystem.isLeftArmTouchingBar() && !climbSubsystem.isRightArmTouchingBar()) {
-      addedYaw = -DriveConstants.kYawJackFactorClimb;
-    }
-
-    // Get Deadband
     double fwd =
         MathUtil.applyDeadband(
             driveJoystick.getRawAxis(Axis.LEFT_X.id), DriveConstants.kDeadbandAllStick);
@@ -39,14 +33,23 @@ public class DriveClimbCommand extends CommandBase {
         MathUtil.applyDeadband(
             driveJoystick.getRawAxis(Axis.LEFT_Y.id), DriveConstants.kDeadbandAllStick);
     double yaw =
-        addedYaw
-            + MathUtil.applyDeadband(
-                driveJoystick.getRawAxis(Axis.RIGHT_Y.id), DriveConstants.kDeadbandAllStick);
+        MathUtil.applyDeadband(
+            driveJoystick.getRawAxis(Axis.RIGHT_Y.id), DriveConstants.kDeadbandAllStick);
+
+    // Determine Jack Factor
+    double addedYaw = 0.0;
+    if (climbSubsystem.isRightArmTouchingBar() && !climbSubsystem.isLeftArmTouchingBar()) {
+      addedYaw = DriveConstants.kYawJackFactorClimb;
+      logger.info("Right Arm Touching Bar, Left Arm not Touching Bar yaw: {} + {} ", yaw, addedYaw);
+    } else if (climbSubsystem.isLeftArmTouchingBar() && !climbSubsystem.isRightArmTouchingBar()) {
+      addedYaw = -DriveConstants.kYawJackFactorClimb;
+      logger.info("Left Arm Touching Bar, Right Arm not Touching Bar yaw: {} + {}", yaw, addedYaw);
+    }
 
     driveSubsystem.drive(
         fwd * -DriveConstants.kMaxFwdStrStickClimb,
         str * -DriveConstants.kMaxFwdStrStickClimb,
-        (yaw + DriveConstants.kYawJackFactorClimb) * -DriveConstants.kMaxYawStickClimb);
+        (yaw + addedYaw) * -DriveConstants.kMaxYawStickClimb);
   }
 
   @Override
