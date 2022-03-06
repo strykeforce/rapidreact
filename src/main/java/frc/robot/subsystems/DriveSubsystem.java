@@ -89,7 +89,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
     swerveDrive = new SwerveDrive(swerveModules);
     swerveDrive.resetGyro();
-    swerveDrive.setGyroOffset(Rotation2d.fromDegrees(180));
+    swerveDrive.setGyroOffset(Rotation2d.fromDegrees(0));
 
     // Setup Holonomic Controller
     omegaController =

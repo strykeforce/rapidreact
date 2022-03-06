@@ -75,9 +75,9 @@ public final class Constants {
     public static final double kCloseEnoughTicks = 10.0;
 
     // Climb Limits
-    public static final double kMaxFwdStrStickClimb = 0.1 * kMaxSpeedMetersPerSecond;
-    public static final double kMaxYawStickClimb = 0.1 * kMaxOmega;
-    public static final double kYawJackFactorClimb = 0.01;
+    public static final double kMaxFwdStrStickClimb = 0.2 * kMaxSpeedMetersPerSecond;
+    public static final double kMaxYawStickClimb = 0.2 * kMaxOmega;
+    public static final double kYawJackFactorClimb = -0.4;
 
     // Default safety path constants
     public static final Pose2d startPose2d = new Pose2d(0, 0, Rotation2d.fromDegrees(0));
@@ -378,6 +378,9 @@ public final class Constants {
     public static final int kLeftFixedHomeId = 0;
     public static final int kRightFixedHomeId = 1;
 
+    // Home Sensor Constants
+    public static final int kHomeSensorStableCounts = 2;
+
     // Manual Climb Constants
     public static final double kShoulderOffsetTicks = 10;
     public static final double kClimbArmsOpenLoopSpeed = 0.2;
@@ -415,26 +418,33 @@ public final class Constants {
     public static final int kPivotArmStableCounts = 2;
     public static final int kShoulderStableCounts = 2;
 
+    // Open Loop Movement Constants
+    public static final double kFixedArmExtendSpeed = -0.2;
+    public static final double kFixedArmRetractSpeed = 0.2;
+    public static final double kPivotArmExtendSpeed = -0.2;
+    public static final double kPivotArmRetractSpeed = 0.2;
+
     // Climb States -> Desired Endpoint in Ticks
     public static final double kFMidExtTicks = -210_000;
-    public static final double kFMidRetTicks = -5_000;
+    public static final double kFMidRetTicks = -1_000;
     public static final double kHighPvtBck1Ticks = 4_750;
-    public static final double kPHighExtTicks = -190_000;
+    public static final double kPHighExtTicks = -200_000;
     public static final double kHighPvtFwd1Ticks = 3_300;
     public static final double kPHighRet1Ticks = -168_000;
-    public static final double kHighPvtBck2Ticks = 5_900;
-    public static final double kFHighExtTicks = -15_000;
-    public static final double kHighPvtBck3Ticks = -875;
+    public static final double kHighPvtBck2Ticks = 5_500;
+    public static final double kFHighExtTicks = -150_000;
+    public static final double kHighPvtBck3Ticks = -1100;
     public static final double kPHighRet2Ticks = -120_000;
-    public static final double kHighPvtFwd2Ticks = 550;
-    public static final double kFTvsRetTicks = -5_000;
+    public static final double kHighPvtFwd2Ticks = 250;
+    public static final double kFTvsRet1Ticks = -1_000;
     public static final double kTvsPvtBck1Ticks = 4_750;
-    public static final double kPTvsExtTicks = -190_000;
+    public static final double kPTvsExtTicks = -200_000;
     public static final double kTvsPvtFwdTicks = 3_300;
     public static final double kPTvsRetTicks = -168_000;
-    public static final double kTvsPvtBck2Ticks = 5_900;
+    public static final double kTvsPvtBck2Ticks = 5_500;
     public static final double kFTvsExtTicks = -150_000;
     public static final double kTvsPvtBck3Ticks = 2_700;
+    public static final double kFTvsRet2Ticks = -5_000;
 
     // Pivot Arm Falcon Config
     public static SupplyCurrentLimitConfiguration getPivotArmSupplyCurrentLimit() {
@@ -464,9 +474,9 @@ public final class Constants {
       pivotConfig.slot0.allowableClosedloopError = 0;
       pivotConfig.motionCruiseVelocity = 5_000;
       pivotConfig.motionAcceleration = 30_000;
-      pivotConfig.forwardSoftLimitEnable = true;
+      pivotConfig.forwardSoftLimitEnable = false;
       pivotConfig.forwardSoftLimitThreshold = 0;
-      pivotConfig.reverseSoftLimitEnable = true;
+      pivotConfig.reverseSoftLimitEnable = false;
       pivotConfig.reverseSoftLimitThreshold = -200_000;
       pivotConfig.neutralDeadband = 0.01;
       pivotConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
@@ -504,9 +514,9 @@ public final class Constants {
       fixedConfig.slot0.allowableClosedloopError = 0;
       fixedConfig.motionCruiseVelocity = 5_000;
       fixedConfig.motionAcceleration = 30_000;
-      fixedConfig.forwardSoftLimitEnable = true;
+      fixedConfig.forwardSoftLimitEnable = false;
       fixedConfig.forwardSoftLimitThreshold = 0;
-      fixedConfig.reverseSoftLimitEnable = true;
+      fixedConfig.reverseSoftLimitEnable = false;
       fixedConfig.reverseSoftLimitThreshold = -220_000;
       fixedConfig.neutralDeadband = 0.01;
       fixedConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
