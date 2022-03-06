@@ -47,8 +47,8 @@ public class DriveClimbCommand extends CommandBase {
     }
 
     driveSubsystem.drive(
-        fwd * DriveConstants.kMaxFwdStrStickClimb,
-        str * DriveConstants.kMaxFwdStrStickClimb,
+        fwd * -DriveConstants.kMaxFwdStrStickClimb,
+        str * -DriveConstants.kMaxFwdStrStickClimb,
         (yaw + addedYaw) * -DriveConstants.kMaxYawStickClimb);
   }
 

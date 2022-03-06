@@ -419,10 +419,10 @@ public final class Constants {
     public static final int kShoulderStableCounts = 2;
 
     // Open Loop Movement Constants
-    public static final double kFixedArmExtendSpeed = -0.2;
-    public static final double kFixedArmRetractSpeed = 0.2;
-    public static final double kPivotArmExtendSpeed = -0.2;
-    public static final double kPivotArmRetractSpeed = 0.2;
+    public static final double kFixedArmExtendSpeed = -0.25;
+    public static final double kFixedArmRetractSpeed = 0.25;
+    public static final double kPivotArmExtendSpeed = -0.25;
+    public static final double kPivotArmRetractSpeed = 0.25;
 
     // Climb States -> Desired Endpoint in Ticks
     public static final double kFMidExtTicks = -210_000;
@@ -431,8 +431,8 @@ public final class Constants {
     public static final double kPHighExtTicks = -200_000;
     public static final double kHighPvtFwd1Ticks = 3_300;
     public static final double kPHighRet1Ticks = -168_000;
-    public static final double kHighPvtBck2Ticks = 5_500;
-    public static final double kFHighExtTicks = -150_000;
+    public static final double kHighPvtBck2Ticks = 4_500;
+    public static final double kFHighExtTicks = -70_000;
     public static final double kHighPvtBck3Ticks = -1100;
     public static final double kPHighRet2Ticks = -120_000;
     public static final double kHighPvtFwd2Ticks = 250;
@@ -441,8 +441,8 @@ public final class Constants {
     public static final double kPTvsExtTicks = -200_000;
     public static final double kTvsPvtFwdTicks = 3_300;
     public static final double kPTvsRetTicks = -168_000;
-    public static final double kTvsPvtBck2Ticks = 5_500;
-    public static final double kFTvsExtTicks = -150_000;
+    public static final double kTvsPvtBck2Ticks = 4_500;
+    public static final double kFTvsExtTicks = -140_000;
     public static final double kTvsPvtBck3Ticks = 2_700;
     public static final double kFTvsRet2Ticks = -5_000;
 
@@ -547,7 +547,7 @@ public final class Constants {
       ShoulderConfig.slot0.integralZone = 0;
       ShoulderConfig.slot0.allowableClosedloopError = 0;
       ShoulderConfig.slot0.maxIntegralAccumulator = 0;
-      ShoulderConfig.motionCruiseVelocity = 200;
+      ShoulderConfig.motionCruiseVelocity = 500;
       ShoulderConfig.motionAcceleration = 5_000;
       ShoulderConfig.velocityMeasurementWindow = 64;
       ShoulderConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;

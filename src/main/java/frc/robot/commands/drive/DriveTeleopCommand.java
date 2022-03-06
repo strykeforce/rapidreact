@@ -21,11 +21,11 @@ public class DriveTeleopCommand extends CommandBase {
   @Override
   public void execute() {
     driveSubsystem.drive(
-        DriveConstants.kMaxSpeedMetersPerSecond
+        -DriveConstants.kMaxSpeedMetersPerSecond
             * MathUtil.applyDeadband(
                 joystick.getRawAxis(RobotContainer.Axis.LEFT_X.id),
                 DriveConstants.kDeadbandAllStick),
-        DriveConstants.kMaxSpeedMetersPerSecond
+        -DriveConstants.kMaxSpeedMetersPerSecond
             * MathUtil.applyDeadband(
                 joystick.getRawAxis(RobotContainer.Axis.LEFT_Y.id),
                 DriveConstants.kDeadbandAllStick),

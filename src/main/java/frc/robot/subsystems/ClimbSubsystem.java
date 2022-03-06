@@ -439,11 +439,21 @@ public class ClimbSubsystem extends MeasurableSubsystem {
         break;
       case HIGH_EXT:
         if (isFixedArmOpenLoopExtendFinished(currFixedArmState.setpoint)) {
-          logger.info("Shoulder: {} -> HIGH)PVT_BK3", shoulderState);
-          shoulderState = ShoulderState.HIGH_PVT_BK3;
-          rotateShoulder(shoulderState.setpoint);
-          currFixedArmState = FixedArmState.IDLE;
-          openLoopFixedArm(0.0);
+          if (continueToTraverse) {
+            logger.info("Shoulder: {} -> HIGH)PVT_BK3", shoulderState);
+            shoulderState = ShoulderState.HIGH_PVT_BK3;
+            rotateShoulder(shoulderState.setpoint);
+            currFixedArmState = FixedArmState.IDLE;
+            openLoopFixedArm(0.0);
+          } else {
+            logger.info("Finish High Climb");
+            shoulderState = ShoulderState.IDLE;
+            currFixedArmState = FixedArmState.IDLE;
+            currPivotArmState = PivotArmState.IDLE;
+            openLoopPivotArm(0.0);
+            openLoopFixedArm(0.0);
+            isClimbDone = true;
+          }
         }
         break;
       case TVS_RET1:
@@ -621,21 +631,11 @@ public class ClimbSubsystem extends MeasurableSubsystem {
         break;
       case HIGH_PVT_FWD2:
         if (isShoulderFinished()) {
-          if (continueToTraverse) {
-            logger.info("Fixed: {} -> TVS_RET1", currFixedArmState);
-            currFixedArmState = FixedArmState.TVS_RET1;
-            enableFixedRatchet(true);
-            openLoopFixedArm(ClimbConstants.kFixedArmRetractSpeed);
-            shoulderState = ShoulderState.IDLE;
-          } else {
-            logger.info("Finished High Climb");
-            currFixedArmState = FixedArmState.IDLE;
-            currPivotArmState = PivotArmState.IDLE;
-            shoulderState = ShoulderState.IDLE;
-            openLoopPivotArm(0.0);
-            openLoopFixedArm(0.0);
-            isClimbDone = true;
-          }
+          logger.info("Fixed: {} -> TVS_RET1", currFixedArmState);
+          currFixedArmState = FixedArmState.TVS_RET1;
+          enableFixedRatchet(true);
+          openLoopFixedArm(ClimbConstants.kFixedArmRetractSpeed);
+          shoulderState = ShoulderState.IDLE;
         }
         break;
       case TVS_PVT_BK1:
