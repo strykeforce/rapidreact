@@ -53,6 +53,11 @@
           - /usr/bin/ninja
           - install
       when: deadeye_repo is changed
+    - name: Set NetworkTables server in conf file
+      ansible.builtin.lineinfile:
+        path: /etc/opt/deadeye/deadeye.conf
+        regex: '^# DEADEYE_NT_SERVER='
+        line: DEADEYE_NT_SERVER={{ deadeye_nt_server }}
     - name: Install systemd unit
       ansible.builtin.template:
         src: ../files/{{ deadeye_service }}.j2

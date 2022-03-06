@@ -6,6 +6,7 @@ all:
       deadeye_unit: A
       deadeye_build_type: Release
       camera_0_pipeline: rr::HubPipeline
+      deadeye_nt_server: 127.0.0.1
     deadeye-c:
       ansible_host: deadeye-c
       deadeye_unit: C
