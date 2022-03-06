@@ -51,6 +51,7 @@ import frc.robot.commands.sequences.MidClimbCommandGroup;
 import frc.robot.commands.sequences.PitShooterTuneCommandGroup;
 import frc.robot.commands.sequences.StopShooterCommandGroup;
 import frc.robot.commands.sequences.TraverseClimbCommandGroup;
+import frc.robot.commands.sequences.VisionShootCommand;
 import frc.robot.commands.shooter.HoodOpenLoopCommand;
 import frc.robot.commands.shooter.PitHoodClosedLoopCommand;
 import frc.robot.commands.shooter.PitShooterClosedLoopCommand;
@@ -177,6 +178,14 @@ public class RobotContainer {
     new JoystickButton(driveJoystick, Shoulder.RIGHT_DOWN.id)
         .whenReleased(new IntakeOpenLoopCommand(intakeSubsystem, 0.0));
 
+    // Vision Shoot
+    new JoystickButton(driveJoystick, Shoulder.LEFT_DOWN.id)
+        .whenPressed(
+            new VisionShootCommand(
+                shooterSubsystem, turretSubsystem, magazineSubsystem, visionSubsystem));
+    new JoystickButton(driveJoystick, Shoulder.LEFT_DOWN.id)
+        .whenReleased(new StopShooterCommand(shooterSubsystem));
+
     // Auto Climb
     new JoystickButton(driveJoystick, Button.UP.id)
         .whenPressed(new TraverseClimbCommandGroup(climbSubsystem, driveSubsystem, driveJoystick));
@@ -239,6 +248,8 @@ public class RobotContainer {
     // Eject Opponent Cargo
     new JoystickButton(xboxController, XboxController.Button.kA.value)
         .whenPressed(new EjectCargoCommand(turretSubsystem, shooterSubsystem, magazineSubsystem));
+    new JoystickButton(xboxController, XboxController.Button.kA.value)
+        .whenReleased(new StopShooterCommand(shooterSubsystem));
 
     // High Fender Shot
     new JoystickButton(xboxController, XboxController.Button.kRightBumper.value)
