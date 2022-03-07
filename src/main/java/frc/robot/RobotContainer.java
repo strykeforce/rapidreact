@@ -183,7 +183,7 @@ public class RobotContainer {
     new JoystickButton(driveJoystick, Shoulder.RIGHT_DOWN.id)
         .whenPressed(
             new VisionShootCommand(
-                shooterSubsystem, turretSubsystem, magazineSubsystem, visionSubsystem));
+                shooterSubsystem, turretSubsystem, magazineSubsystem, visionSubsystem, true));
     new JoystickButton(driveJoystick, Shoulder.RIGHT_DOWN.id)
         .whenReleased(new StopShooterCommand(shooterSubsystem));
 

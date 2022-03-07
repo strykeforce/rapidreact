@@ -15,17 +15,20 @@ public class VisionShootCommand extends CommandBase {
   private MagazineSubsystem magazineSubsystem;
   private VisionSubsystem visionSubsystem;
   private boolean isArmed = false;
+  private final boolean disableTrackingOnFinish;
 
   public VisionShootCommand(
       ShooterSubsystem shooterSubsystem,
       TurretSubsystem turretSubsystem,
       MagazineSubsystem magazineSubsystem,
-      VisionSubsystem visionSubsystem) {
+      VisionSubsystem visionSubsystem,
+      boolean disableTrackingOnFinish) {
     addRequirements(shooterSubsystem, magazineSubsystem, turretSubsystem, visionSubsystem);
     this.shooterSubsystem = shooterSubsystem;
     this.turretSubsystem = turretSubsystem;
     this.magazineSubsystem = magazineSubsystem;
     this.visionSubsystem = visionSubsystem;
+    this.disableTrackingOnFinish = disableTrackingOnFinish;
   }
 
   @Override
@@ -63,9 +66,11 @@ public class VisionShootCommand extends CommandBase {
 
   @Override
   public void end(boolean interrupted) {
-    visionSubsystem.disable();
+    if(disableTrackingOnFinish){
+      visionSubsystem.disable();
+      turretSubsystem.stopTrackingTarget();
+    }
     shooterSubsystem.stop();
     magazineSubsystem.stopMagazine();
-    turretSubsystem.stopTrackingTarget();
   }
 }
