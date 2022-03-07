@@ -66,7 +66,7 @@ public class VisionShootCommand extends CommandBase {
 
   @Override
   public void end(boolean interrupted) {
-    if(disableTrackingOnFinish){
+    if (disableTrackingOnFinish) {
       visionSubsystem.disable();
       turretSubsystem.stopTrackingTarget();
     }
