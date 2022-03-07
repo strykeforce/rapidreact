@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -17,7 +18,9 @@ public class VisionSubsystem extends MeasurableSubsystem
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   public VisionSubsystem() {
-    deadeye = new Deadeye<>("A0", HubTargetData.class);
+    NetworkTableInstance networkTableInstance = NetworkTableInstance.create();
+    networkTableInstance.startClient("10.27.67.10");
+    deadeye = new Deadeye<>("A0", HubTargetData.class, networkTableInstance);
     deadeye.setTargetDataListener(this);
     HubTargetData.kFrameCenter = deadeye.getCapture().width / 2;
   }
