@@ -87,7 +87,7 @@ public class RobotContainer {
       new TurretSubsystem(visionSubsystem, driveSubsystem);
   private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
   private final MagazineSubsystem magazineSubsystem = new MagazineSubsystem(turretSubsystem);
-  private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem(magazineSubsystem);
+  private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem(magazineSubsystem, visionSubsystem);
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   //   private final PowerDistHub powerDistHub = new PowerDistHub();
   private final TelemetryService telemetryService = new TelemetryService(TelemetryController::new);

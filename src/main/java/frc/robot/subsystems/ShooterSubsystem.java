@@ -23,13 +23,15 @@ public class ShooterSubsystem extends MeasurableSubsystem {
   private final TalonFX kickerFalcon;
   private final TalonSRX hoodTalon;
   private final MagazineSubsystem magazineSubsystem;
+  private final VisionSubsystem visionSubsystem;
   private boolean highFender;
   private ShooterState currentState = ShooterState.STOP;
   private double shooterSetPointTicks, kickerSetpointTicks, hoodSetPointTicks;
   private String[][] lookupTable;
 
-  public ShooterSubsystem(MagazineSubsystem magazineSubsystem) {
+  public ShooterSubsystem(MagazineSubsystem magazineSubsystem, VisionSubsystem visionSubsystem) {
     this.magazineSubsystem = magazineSubsystem;
+    this.visionSubsystem = visionSubsystem;
     parseLookupTable();
     shooterFalcon = new TalonFX(ShooterConstants.kShooterFalconID);
     shooterFalcon.configFactoryDefault(Constants.kTalonConfigTimeout);
@@ -96,8 +98,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
   }
 
   private double[] getShootSolution() {
-    // fix me get pixel width from vision
-    double widthPixels = 50;
+    double widthPixels = visionSubsystem.getTargetPixelWidth();
     int index = 0;
 
     if (widthPixels < ShooterConstants.kLookupMinPixel) {
