@@ -26,7 +26,8 @@ public class AutoIntakeCommand extends CommandBase {
 
   @Override
   public void execute() {
-    if (magazineSubsystem.getCurrMagazineState() == MagazineState.EJECT_CARGO) {
+    if (magazineSubsystem.getCurrMagazineState() == MagazineState.EJECT_CARGO
+        && !magazineReversed) {
       intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeEjectSpeed);
       magazineReversed = true;
     } else if (magazineReversed == true) {

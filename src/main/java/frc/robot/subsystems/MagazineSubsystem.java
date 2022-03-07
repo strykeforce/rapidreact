@@ -105,6 +105,8 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   }
 
   public void stopMagazine() {
+    logger.info("Stopping Magazine");
+    currMagazineState = MagazineState.STOP;
     lowerMagazineTalon.set(ControlMode.PercentOutput, 0.0);
     upperMagazineTalon.set(ControlMode.PercentOutput, 0.0);
   }
@@ -295,21 +297,31 @@ public class MagazineSubsystem extends MeasurableSubsystem {
         if (cargoColor != CargoColor.NONE) {
           // ignoreColorSensor || storedCargoColors[0]
           if (storedCargoColors[1] != CargoColor.NONE) {
-            if (storedCargoColors[1] != allianceCargoColor && (!ignoreColorSensor)) {
-              lowerClosedLoopRotate(MagazineConstants.kMagazineEjectSpeed);
-              currMagazineState = MagazineState.EJECT_CARGO;
-              ejectTimer.reset();
-              ejectTimer.start();
-              logger.info("READ_CARGO -> EJECT_CARGO");
-              break;
-            }
+            // if (storedCargoColors[1] != allianceCargoColor && (!ignoreColorSensor)) {
+            // //storedCargoColors[1] != allianceColor
+            //   lowerClosedLoopRotate(MagazineConstants.kMagazineEjectSpeed);
+            //   currMagazineState = MagazineState.EJECT_CARGO;
+            //   ejectTimer.reset();
+            //   ejectTimer.start();
+            //   logger.info("READ_CARGO -> EJECT_CARGO");
+            //   break;
+            // }
             currMagazineState = MagazineState.STOP;
             logger.info("READ_CARGO -> STOP");
+            break;
+          } else if (cargoColor != allianceCargoColor && !ignoreColorSensor) {
+            lowerClosedLoopRotate(MagazineConstants.kMagazineEjectSpeed);
+            currMagazineState = MagazineState.EJECT_CARGO;
+            ejectTimer.reset();
+            ejectTimer.start();
+            logger.info("READ_CARGO -> EJECT_CARGO");
+            break;
           } else {
             lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIntakeSpeed);
             upperClosedLoopRotate(MagazineConstants.kUpperMagazineIntakeSpeed);
             currMagazineState = MagazineState.INDEX_CARGO;
             logger.info("READ_CARGO -> INDEX_CARGO");
+            break;
           }
         }
         autoStopUpperMagazine(MagazineConstants.kUpperMagazineIntakeSpeed);
@@ -358,7 +370,8 @@ public class MagazineSubsystem extends MeasurableSubsystem {
         break;
       case CARGO_SHOT:
         if (shootTimer.hasElapsed(MagazineConstants.kShootDelay)
-            && storedCargoColors[0] == CargoColor.NONE) {
+            && storedCargoColors[0] == CargoColor.NONE
+            && !ignoreColorSensor) {
           currMagazineState = MagazineState.STOP;
           logger.info("CARGO_SHOT -> STOP");
           break;
@@ -380,7 +393,10 @@ public class MagazineSubsystem extends MeasurableSubsystem {
         break;
 
       case STOP:
-        stopMagazine();
+        if (lowerMagazineTalon.getMotorOutputPercent() != 0.0
+            || upperMagazineTalon.getMotorOutputPercent() != 0.0) {
+          stopMagazine();
+        }
         break;
     }
   }

@@ -30,6 +30,7 @@ import java.util.ArrayList;
 public final class Constants {
 
   public static final int kTalonConfigTimeout = 10; // ms
+  public static final double kDeadeyePowerCycleTimeout = 5; // s
 
   public Constants() {}
 
@@ -423,6 +424,7 @@ public final class Constants {
     public static final int kFixedArmStableCounts = 2;
     public static final int kPivotArmStableCounts = 2;
     public static final int kShoulderStableCounts = 2;
+    public static final double kShoulderCriuiseVelDefault = 1_000;
 
     // Open Loop Movement Constants
     public static final double kFixedArmExtendSpeed = -0.25;
@@ -432,18 +434,22 @@ public final class Constants {
 
     // Climb States -> Desired Endpoint in Ticks
     public static final double kFMidExtTicks = -210_000;
-    public static final double kFMidRetTicks = -1_000;
-    public static final double kHighPvtBck1Ticks = 4_750;
-    public static final double kPHighExtTicks = -200_000;
-    public static final double kHighPvtFwd1Ticks = 3_300;
+    public static final double kFMidRetSt1Ticks = -135_000;
+    public static final double kFMidRetSt2Ticks = -115_000;
+    public static final double kFMidRetSt3Ticks = -5_000;
+    public static final double kHighPvtBck1Ticks = 5_500;
+    public static final double kPHighExtTicks = -197_000;
+    public static final double kHighPvtFwd1Ticks = 3_200;
     public static final double kPHighRet1Ticks = -168_000;
     public static final double kHighPvtBck2Ticks = 4_500;
-    public static final double kFHighExtTicks = -70_000;
-    public static final double kHighPvtBck3Ticks = -1100;
+    public static final double kFHighExtSt1Ticks = -80_000;
+    public static final double kFHighExtSt2Ticks = -120_000;
+    public static final double kFHighExtSt3Ticks = -140_000;
+    public static final double kHighPvtBck3Ticks = -2_500;
     public static final double kPHighRet2Ticks = -120_000;
-    public static final double kHighPvtFwd2Ticks = 250;
+    public static final double kHighPvtFwd2Ticks = 750;
     public static final double kFTvsRet1Ticks = -1_000;
-    public static final double kTvsPvtBck1Ticks = 4_750;
+    public static final double kTvsPvtBck1Ticks = 5_000;
     public static final double kPTvsExtTicks = -200_000;
     public static final double kTvsPvtFwdTicks = 3_300;
     public static final double kPTvsRetTicks = -168_000;
@@ -451,19 +457,40 @@ public final class Constants {
     public static final double kFTvsExtTicks = -140_000;
     public static final double kTvsPvtBck3Ticks = 2_700;
     public static final double kFTvsRet2Ticks = -5_000;
+    public static final double kFHighExtFinTicks = -190_000;
+    public static final double kHighPvtBckFinTicks = 700;
+    public static final double kFHighRetFinTicks = -175_000;
 
     // Climb States -> Desired Open Loop Speed (Arms only, Shoulder = closed loop)
-    public static final double kFMidExtSpeed = -0.25;
-    public static final double kFMidRetSpeed = 0.25;
-    public static final double kPHighExtSpeed = -0.25;
-    public static final double kPHighRet1Speed = 0.25;
-    public static final double kFHighExtSpeed = -0.25;
-    public static final double kPHighRet2Speed = 0.25;
+    public static final double kFMidExtSpeed = -0.8;
+    public static final double kFMidRetSt1Speed = 0.5;
+    public static final double kFMidRetSt2Speed = 0.16;
+    public static final double kFMidRetSt3Speed = 0.5;
+    public static final double kPHighExtSpeed = -0.5;
+    public static final double kPHighRet1Speed = 0.12;
+    public static final double kFHighExtSt1Speed = -0.35;
+    public static final double kFHighExtSt2Speed = -0.1;
+    public static final double kFHighExtSt3Speed = -0.4;
+    public static final double kPHighRet2Speed = 0.3;
     public static final double kFTvsRet1Speed = 0.25;
     public static final double kPTvsExtSpeed = -0.25;
     public static final double kPTvsRetSpeed = 0.25;
     public static final double kFTvsExtSpeed = -0.25;
     public static final double kFTvsRet2Speed = 0.25;
+    public static final double kFHighExtFinSpeed = -0.5;
+    public static final double kFHighRetFinSpeed = 0.2;
+
+    // Climb States -> Desired Shoulder Cruise Vel
+    public static final double kHighPvtBk1Vel = 1_000;
+    public static final double kHighPvtFwd1Vel = 1_000;
+    public static final double kHighPvtBk2Vel = 1_000;
+    public static final double kHighPvtBk3Vel = 1_000;
+    public static final double kHighPvtFwd2Vel = 500;
+    public static final double kTvsPvtBk1Vel = 1_000;
+    public static final double kTvsPvtFwdVel = 1_000;
+    public static final double kTvsPvtBk2Vel = 1_000;
+    public static final double kTvsPvtBk3Vel = 1_000;
+    public static final double kHighPvtBkFinVel = 100;
 
     // Pivot Arm Falcon Config
     public static SupplyCurrentLimitConfiguration getPivotArmSupplyCurrentLimit() {
@@ -566,7 +593,7 @@ public final class Constants {
       ShoulderConfig.slot0.integralZone = 0;
       ShoulderConfig.slot0.allowableClosedloopError = 0;
       ShoulderConfig.slot0.maxIntegralAccumulator = 0;
-      ShoulderConfig.motionCruiseVelocity = 500;
+      ShoulderConfig.motionCruiseVelocity = 1_000;
       ShoulderConfig.motionAcceleration = 5_000;
       ShoulderConfig.velocityMeasurementWindow = 64;
       ShoulderConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
