@@ -64,7 +64,11 @@
         dest: /etc/systemd/system/{{ deadeye_service }}
         mode: 0664
         owner: root
-    - name: Enable systemd unit
+    - name: Enable NetworkManager-wait-online systemd unit
+      ansible.builtin.systemd:
+        name: NetworkManager-wait-online
+        enabled: true
+    - name: Enable deadeyed systemd unit
       ansible.builtin.systemd:
         name: "{{ deadeye_service }}"
         enabled: true
