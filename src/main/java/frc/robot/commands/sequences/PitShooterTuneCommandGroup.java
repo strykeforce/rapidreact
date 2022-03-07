@@ -1,28 +1,31 @@
 package frc.robot.commands.sequences;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.Constants.IntakeConstants;
-import frc.robot.Constants.MagazineConstants;
 import frc.robot.commands.intake.IntakeOpenLoopCommand;
-import frc.robot.commands.magazine.LowerMagazineOpenLoopCommand;
-import frc.robot.commands.magazine.UpperMagazineOpenLoopCommand;
-import frc.robot.commands.shooter.PitHoodClosedLoopCommand;
-import frc.robot.commands.shooter.PitShooterClosedLoopCommand;
+import frc.robot.commands.magazine.UpperAndLowerMagazineClosedLoopTuningCommand;
+import frc.robot.commands.shooter.PitHoodAndShooterClosedLoopCommand;
+import frc.robot.commands.turret.RotateToCommand;
+import frc.robot.commands.vision.EnableVisionCommand;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.subsystems.VisionSubsystem;
 
 public class PitShooterTuneCommandGroup extends ParallelCommandGroup {
   public PitShooterTuneCommandGroup(
       ShooterSubsystem shooterSubsystem,
       MagazineSubsystem magazineSubsystem,
-      IntakeSubsystem intakeSubsystem) {
+      IntakeSubsystem intakeSubsystem,
+      TurretSubsystem turretSubsystem,
+      VisionSubsystem visionSubsystem) {
     addCommands(
-        new PitShooterClosedLoopCommand(shooterSubsystem),
-        new PitHoodClosedLoopCommand(shooterSubsystem),
+        new PitHoodAndShooterClosedLoopCommand(shooterSubsystem),
         new IntakeOpenLoopCommand(intakeSubsystem, IntakeConstants.kIntakeSpeed),
-        new LowerMagazineOpenLoopCommand(magazineSubsystem, MagazineConstants.kMagazineIntakeSpeed),
-        new UpperMagazineOpenLoopCommand(
-            magazineSubsystem, MagazineConstants.kMagazineIntakeSpeed));
+        new UpperAndLowerMagazineClosedLoopTuningCommand(magazineSubsystem),
+        new RotateToCommand(turretSubsystem, Rotation2d.fromDegrees(0.0)),
+        new EnableVisionCommand(visionSubsystem));
   }
 }

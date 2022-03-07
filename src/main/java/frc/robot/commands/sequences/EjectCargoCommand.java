@@ -6,12 +6,12 @@ import frc.robot.subsystems.MagazineSubsystem.MagazineState;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 
-public class LowFenderShotCommand extends CommandBase {
+public class EjectCargoCommand extends CommandBase {
   public final TurretSubsystem turretSubsystem;
   public final ShooterSubsystem shooterSubsystem;
   public final MagazineSubsystem magazineSubsystem;
 
-  public LowFenderShotCommand(
+  public EjectCargoCommand(
       TurretSubsystem turretSubsystem,
       ShooterSubsystem shooterSubsystem,
       MagazineSubsystem magazineSubsystem) {
@@ -23,7 +23,7 @@ public class LowFenderShotCommand extends CommandBase {
 
   @Override
   public void initialize() {
-    turretSubsystem.fenderShot(true);
+    turretSubsystem.fenderShot(false);
     shooterSubsystem.fenderShot(false);
     magazineSubsystem.shoot();
   }

@@ -30,6 +30,7 @@ import java.util.ArrayList;
 public final class Constants {
 
   public static final int kTalonConfigTimeout = 10; // ms
+  public static final double kDeadeyePowerCycleTimeout = 5; // s
 
   public Constants() {}
 
@@ -205,28 +206,29 @@ public final class Constants {
     public static final int kTurretId = 50;
     public static final double kFastCruiseVelocity = 4_000;
     public static final double kSlowCruiseVelocity = 2_000;
-    public static final int kTurretZeroTicks = 1250;
-    public static final int kForwardLimit = 14_000;
-    public static final int kReverseLimit = -14_000;
+    public static final int kTurretZeroTicks = 756; // 1250
+    public static final int kForwardLimit = 13_800; // 14
+    public static final int kReverseLimit = -13_800; // 14
     public static final double kMaxStringPotZero = 100; // 2020 Robot
     public static final double kMinStringPotZero = 0; // 2020 Robot
 
     // Ticks -> Degrees/Radians
-    public static final double kTurretTicksPerDegree = 114.653; // 0.01745329 57.2957877856 72.404
-    public static final double kTurretTicksPerRadian = 6569.133; // 4148.44421883
+    public static final double kTurretTicksPerDegree =
+        120.522; // 114.653     0.01745329 57.2957877856 72.404
+    public static final double kTurretTicksPerRadian = 6905.414; // 6569.133
     public static final double kTurretMidpoint = 13_000;
     public static final double kWrapRange = 1;
 
     // Rotate Under Vision Constants
-    public static final double kRotateByInitialKp = 0.4; // 0.4
-    public static final double kRotateByFinalKp = 0.95; // 0.95
+    public static final double kRotateByInitialKp = -0.4; // 0.4
+    public static final double kRotateByFinalKp = -0.95; // 0.95
     public static final int kNotValidTargetCounts = 5; // how many frames to wait before seeking
 
     // Seek Constants
     public static final Translation2d kHubPositionMeters = new Translation2d(8.23, 4.11); // meters
     public static final Rotation2d kSeekAngleError = Rotation2d.fromDegrees(30); // 30 degrees
-    public static final int kMaxSeekCount = 6;
-    public static final Rotation2d kTurretRobotOffset = Rotation2d.fromDegrees(270);
+    public static final int kMaxSeekCount = 3; // 6
+    public static final Rotation2d kTurretRobotOffset = Rotation2d.fromDegrees(180);
 
     // Close Enough & Stable Counts
     public static final int kCloseEnoughTicks = 40;
@@ -282,12 +284,17 @@ public final class Constants {
     public static final Color kNoCargo = new Color(0.25, 0.5, 0.25); // FIXME need to get real color
 
     // Speed Constants
-    public static final double kMagazineIntakeSpeed = 0.5; // FIXME need an actual percentage
-    public static final double kMagazineFeedSpeed = 0.25;
-    public static final double kMagazineIndexSpeed = 0.35;
+    public static final double kLowerMagazineIntakeSpeed = 5000; // 0.5
+    public static final double kUpperMagazineIntakeSpeed = 2000;
+    public static final double kUpperMagazineFeedSpeed = 2000; // 0.25
+    public static final double kLowerMagazineIndexSpeed = 2000; // 0.35
+    public static final double kUpperMagazineIndexSpeed = 2000;
+    public static final double kMagazineEjectSpeed = -5000; // -0.5
 
     // State Machine Sequence Constants
-    public static final double kShootDelay = 0.5;
+    public static final double kShootDelay = 0.7;
+    public static final double kEjectTimerDelay = 0.7;
+    public static final double kShootUpperBeamStableCounts = 2;
 
     // Lower Magazine Talon Config
     public static SupplyCurrentLimitConfiguration getLowerMagazineCurrentLimit() {
@@ -417,6 +424,7 @@ public final class Constants {
     public static final int kFixedArmStableCounts = 2;
     public static final int kPivotArmStableCounts = 2;
     public static final int kShoulderStableCounts = 2;
+    public static final double kShoulderCriuiseVelDefault = 1_000;
 
     // Open Loop Movement Constants
     public static final double kFixedArmExtendSpeed = -0.25;
@@ -426,18 +434,22 @@ public final class Constants {
 
     // Climb States -> Desired Endpoint in Ticks
     public static final double kFMidExtTicks = -210_000;
-    public static final double kFMidRetTicks = -1_000;
-    public static final double kHighPvtBck1Ticks = 4_750;
-    public static final double kPHighExtTicks = -200_000;
-    public static final double kHighPvtFwd1Ticks = 3_300;
+    public static final double kFMidRetSt1Ticks = -135_000;
+    public static final double kFMidRetSt2Ticks = -115_000;
+    public static final double kFMidRetSt3Ticks = -5_000;
+    public static final double kHighPvtBck1Ticks = 5_500;
+    public static final double kPHighExtTicks = -197_000;
+    public static final double kHighPvtFwd1Ticks = 3_200;
     public static final double kPHighRet1Ticks = -168_000;
     public static final double kHighPvtBck2Ticks = 4_500;
-    public static final double kFHighExtTicks = -70_000;
-    public static final double kHighPvtBck3Ticks = -1100;
+    public static final double kFHighExtSt1Ticks = -80_000;
+    public static final double kFHighExtSt2Ticks = -120_000;
+    public static final double kFHighExtSt3Ticks = -140_000;
+    public static final double kHighPvtBck3Ticks = -2_500;
     public static final double kPHighRet2Ticks = -120_000;
-    public static final double kHighPvtFwd2Ticks = 250;
+    public static final double kHighPvtFwd2Ticks = 750;
     public static final double kFTvsRet1Ticks = -1_000;
-    public static final double kTvsPvtBck1Ticks = 4_750;
+    public static final double kTvsPvtBck1Ticks = 5_000;
     public static final double kPTvsExtTicks = -200_000;
     public static final double kTvsPvtFwdTicks = 3_300;
     public static final double kPTvsRetTicks = -168_000;
@@ -445,19 +457,40 @@ public final class Constants {
     public static final double kFTvsExtTicks = -140_000;
     public static final double kTvsPvtBck3Ticks = 2_700;
     public static final double kFTvsRet2Ticks = -5_000;
+    public static final double kFHighExtFinTicks = -190_000;
+    public static final double kHighPvtBckFinTicks = 700;
+    public static final double kFHighRetFinTicks = -175_000;
 
     // Climb States -> Desired Open Loop Speed (Arms only, Shoulder = closed loop)
-    public static final double kFMidExtSpeed = -0.25;
-    public static final double kFMidRetSpeed = 0.25;
-    public static final double kPHighExtSpeed = -0.25;
-    public static final double kPHighRet1Speed = 0.25;
-    public static final double kFHighExtSpeed = -0.25;
-    public static final double kPHighRet2Speed = 0.25;
+    public static final double kFMidExtSpeed = -0.8;
+    public static final double kFMidRetSt1Speed = 0.5;
+    public static final double kFMidRetSt2Speed = 0.16;
+    public static final double kFMidRetSt3Speed = 0.5;
+    public static final double kPHighExtSpeed = -0.5;
+    public static final double kPHighRet1Speed = 0.12;
+    public static final double kFHighExtSt1Speed = -0.35;
+    public static final double kFHighExtSt2Speed = -0.1;
+    public static final double kFHighExtSt3Speed = -0.4;
+    public static final double kPHighRet2Speed = 0.3;
     public static final double kFTvsRet1Speed = 0.25;
     public static final double kPTvsExtSpeed = -0.25;
     public static final double kPTvsRetSpeed = 0.25;
     public static final double kFTvsExtSpeed = -0.25;
     public static final double kFTvsRet2Speed = 0.25;
+    public static final double kFHighExtFinSpeed = -0.5;
+    public static final double kFHighRetFinSpeed = 0.2;
+
+    // Climb States -> Desired Shoulder Cruise Vel
+    public static final double kHighPvtBk1Vel = 1_000;
+    public static final double kHighPvtFwd1Vel = 1_000;
+    public static final double kHighPvtBk2Vel = 1_000;
+    public static final double kHighPvtBk3Vel = 1_000;
+    public static final double kHighPvtFwd2Vel = 500;
+    public static final double kTvsPvtBk1Vel = 1_000;
+    public static final double kTvsPvtFwdVel = 1_000;
+    public static final double kTvsPvtBk2Vel = 1_000;
+    public static final double kTvsPvtBk3Vel = 1_000;
+    public static final double kHighPvtBkFinVel = 100;
 
     // Pivot Arm Falcon Config
     public static SupplyCurrentLimitConfiguration getPivotArmSupplyCurrentLimit() {
@@ -560,7 +593,7 @@ public final class Constants {
       ShoulderConfig.slot0.integralZone = 0;
       ShoulderConfig.slot0.allowableClosedloopError = 0;
       ShoulderConfig.slot0.maxIntegralAccumulator = 0;
-      ShoulderConfig.motionCruiseVelocity = 500;
+      ShoulderConfig.motionCruiseVelocity = 1_000;
       ShoulderConfig.motionAcceleration = 5_000;
       ShoulderConfig.velocityMeasurementWindow = 64;
       ShoulderConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
@@ -578,6 +611,7 @@ public final class Constants {
   public static final class IntakeConstants {
     public static final int kIntakeFalconID = 20;
     public static final double kIntakeSpeed = -0.5;
+    public static final double kIntakeEjectSpeed = 0.5;
 
     public static TalonFXConfiguration getIntakeFalconConfig() {
       TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
@@ -735,9 +769,10 @@ public final class Constants {
     public static final double kLeftStickDeadBand = 0.1;
     public static final double kRightStickDeadBand = 0.1;
     public static final double kTriggerDeadBand = 0.1;
-    public static final String kPitHoodSetpointTicks = "Pit/Hood/hoodSpeed";
-    public static final String kPitShooterSetpointTicks = "Pit/Shooter/shooterSpeed";
+    public static final String kPitHoodSetpointTicks = "Tune/Hood/hoodPos";
+    public static final String kPitShooterSetpointTicks = "Tune/Shooter/shooterSpeed";
     public static final String kTurretSetpointRadians = "Pit/Turret/SetpointRadians";
-    public static final String kPitKickerSetpointTicks = "Pit/Kicker/kickerSpeed";
+    public static final String kPitKickerSetpointTicks = "Tune/Kicker/kickerSpeed";
+    public static final String kTuneUpperMagSpeedTicks = "Tune/Magazine/UpperSpeed";
   }
 }

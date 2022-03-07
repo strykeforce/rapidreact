@@ -13,7 +13,7 @@ import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 
 public class IntakeSubsystem extends MeasurableSubsystem {
-  private static final Logger logger = LoggerFactory.getLogger(MeasurableSubsystem.class);
+  private static final Logger logger = LoggerFactory.getLogger(IntakeSubsystem.class);
   private TalonFX intakeFalcon;
 
   public IntakeSubsystem() {

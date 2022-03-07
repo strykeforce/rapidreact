@@ -24,7 +24,7 @@ import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 
 public class MagazineSubsystem extends MeasurableSubsystem {
-  private static final Logger logger = LoggerFactory.getLogger(MeasurableSubsystem.class);
+  private static final Logger logger = LoggerFactory.getLogger(MagazineSubsystem.class);
   private ColorSensorV3 colorSensor;
   private Color lastColor = new Color(0, 0, 0);
   private int lastProximity = 0;
@@ -36,8 +36,10 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   private MagazineState currMagazineState = MagazineState.STOP;
   private final TurretSubsystem turretSubsystem;
   private ShooterSubsystem shooterSubsystem;
-  private Timer timer = new Timer();
+  private Timer shootTimer = new Timer();
+  private Timer ejectTimer = new Timer();
   private boolean ignoreColorSensor = false;
+  private int shootUpperBeamStableCounts = 0;
 
   public MagazineSubsystem(TurretSubsystem turretSubsystem) {
     this.turretSubsystem = turretSubsystem;
@@ -79,7 +81,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
       upperMagazineTalon.configForwardLimitSwitchSource(
           LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled);
     }
-    logger.info("Enabling talon limit switch");
+    logger.info("Enabling talon limit switch: {}", enable);
   }
 
   public void lowerOpenLoopRotate(double percentOutput) {
@@ -92,7 +94,19 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     logger.info("Upper magazine motor turned on {}", percentOutput);
   }
 
+  public void lowerClosedLoopRotate(double speed) {
+    lowerMagazineTalon.set(ControlMode.Velocity, speed);
+    logger.info("Lower magazine motor closedLoopRotate {}", speed);
+  }
+
+  public void upperClosedLoopRotate(double speed) {
+    upperMagazineTalon.set(ControlMode.Velocity, speed);
+    logger.info("Upper magazine motor closedLoopRotate {}", speed);
+  }
+
   public void stopMagazine() {
+    logger.info("Stopping Magazine");
+    currMagazineState = MagazineState.STOP;
     lowerMagazineTalon.set(ControlMode.PercentOutput, 0.0);
     upperMagazineTalon.set(ControlMode.PercentOutput, 0.0);
   }
@@ -132,17 +146,22 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   }
 
   public CargoColor readCargoColor() {
-    Color readColor = getColor();
-    ColorMatchResult matchResult = colorMatch.matchClosestColor(readColor);
-
     CargoColor currentCargoColor = CargoColor.NONE;
-    if (matchResult.color == MagazineConstants.kBlueCargo) {
-      currentCargoColor = CargoColor.BLUE;
-    } else if (matchResult.color == MagazineConstants.kRedCargo) {
-      currentCargoColor = CargoColor.RED;
-    }
+    if (!ignoreColorSensor) {
+      Color readColor = getColor();
+      ColorMatchResult matchResult = colorMatch.matchClosestColor(readColor);
 
-    if (currentCargoColor == CargoColor.NONE) return currentCargoColor;
+      if (matchResult.color == MagazineConstants.kBlueCargo) {
+        currentCargoColor = CargoColor.BLUE;
+      } else if (matchResult.color == MagazineConstants.kRedCargo) {
+        currentCargoColor = CargoColor.RED;
+      }
+
+      if (currentCargoColor == CargoColor.NONE) return currentCargoColor;
+    } else {
+      // Ignoring color sensor results
+      currentCargoColor = allianceCargoColor;
+    }
 
     if (storedCargoColors[0] == CargoColor.NONE) {
       storedCargoColors[0] = currentCargoColor;
@@ -193,12 +212,28 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     lowerOpenLoopRotate(upperSpeed);
   }
 
+  public void manualClosedLoopFullMagazine(double lowerSpeed, double upperSpeed) {
+    if (upperSpeed == 0.0 && lowerSpeed == 0.0) currMagazineState = MagazineState.STOP;
+    else currMagazineState = MagazineState.MANUAL_INTAKE;
+
+    lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIntakeSpeed);
+    upperClosedLoopRotate(MagazineConstants.kUpperMagazineIndexSpeed);
+  }
+
+  public void manualEjectCargoReverse(double lowerSpeed, double upperSpeed) {
+    enableUpperBeamBreak(false);
+    lowerClosedLoopRotate(lowerSpeed);
+    upperClosedLoopRotate(upperSpeed);
+    clearCargoColors();
+    currMagazineState = MagazineState.MANUAL_INTAKE;
+  }
+
   private void autoStopUpperMagazine(double speed) {
     if (isUpperBeamBroken() && upperMagazineTalon.getMotorOutputPercent() != 0.0) {
       upperOpenLoopRotate(0.0);
       logger.info("Stopping upper magazine, upper beam broken");
     } else if (!isUpperBeamBroken() && upperMagazineTalon.getMotorOutputPercent() == 0.0) {
-      upperOpenLoopRotate(speed);
+      upperClosedLoopRotate(speed);
       logger.info("Upper beam not broken, upper magazine running");
     }
   }
@@ -213,8 +248,13 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   }
 
   public void shoot() {
-    logger.info("{} -> PAUSE}", currMagazineState);
-    currMagazineState = MagazineState.PAUSE;
+    if (storedCargoColors[0] == CargoColor.NONE && !ignoreColorSensor) {
+      logger.info("Magazine empty, not shooting");
+      currMagazineState = MagazineState.STOP;
+    } else {
+      logger.info("{} -> PAUSE}", currMagazineState);
+      currMagazineState = MagazineState.PAUSE;
+    }
   }
 
   public MagazineState getCurrMagazineState() {
@@ -230,23 +270,23 @@ public class MagazineSubsystem extends MeasurableSubsystem {
       case WAIT_CARGO:
         // check number of cargo
         if (storedCargoColors[0] != CargoColor.NONE && storedCargoColors[1] != CargoColor.NONE) {
-          logger.info("Magazine already full, switching to stop state");
+          logger.info("WAIT_CARGO -> STOP");
           currMagazineState = MagazineState.STOP;
           break;
         } else if (storedCargoColors[0] != CargoColor.NONE) {
           if (lowerMagazineTalon.getMotorOutputPercent() == 0.0) {
-            lowerOpenLoopRotate(MagazineConstants.kMagazineIntakeSpeed);
+            lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIntakeSpeed);
           }
           // Checking if ball is in the top of the upper magazine
-          autoStopUpperMagazine(MagazineConstants.kMagazineIntakeSpeed);
+          autoStopUpperMagazine(MagazineConstants.kUpperMagazineIntakeSpeed);
         }
         // Knowing when to read cargo color
         if (isLowerBeamBroken()) {
           currMagazineState = MagazineState.READ_CARGO;
           lowerOpenLoopRotate(0.0);
-          logger.info("Switching state to read cargo color");
+          logger.info("WAIT_CARGO -> READ_CARGO");
         } else if (lowerMagazineTalon.getMotorOutputPercent() == 0.0) {
-          lowerOpenLoopRotate(MagazineConstants.kMagazineIntakeSpeed);
+          lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIntakeSpeed);
         }
 
         break;
@@ -255,53 +295,90 @@ public class MagazineSubsystem extends MeasurableSubsystem {
         // Read cargo color, switch states depending on amount of cargo
         CargoColor cargoColor = readCargoColor();
         if (cargoColor != CargoColor.NONE) {
+          // ignoreColorSensor || storedCargoColors[0]
           if (storedCargoColors[1] != CargoColor.NONE) {
+            // if (storedCargoColors[1] != allianceCargoColor && (!ignoreColorSensor)) {
+            // //storedCargoColors[1] != allianceColor
+            //   lowerClosedLoopRotate(MagazineConstants.kMagazineEjectSpeed);
+            //   currMagazineState = MagazineState.EJECT_CARGO;
+            //   ejectTimer.reset();
+            //   ejectTimer.start();
+            //   logger.info("READ_CARGO -> EJECT_CARGO");
+            //   break;
+            // }
             currMagazineState = MagazineState.STOP;
-            logger.info("Now have two cargo, switching to stop state");
+            logger.info("READ_CARGO -> STOP");
+            break;
+          } else if (cargoColor != allianceCargoColor && !ignoreColorSensor) {
+            lowerClosedLoopRotate(MagazineConstants.kMagazineEjectSpeed);
+            currMagazineState = MagazineState.EJECT_CARGO;
+            ejectTimer.reset();
+            ejectTimer.start();
+            logger.info("READ_CARGO -> EJECT_CARGO");
+            break;
           } else {
-            lowerOpenLoopRotate(MagazineConstants.kMagazineIntakeSpeed);
-            upperOpenLoopRotate(MagazineConstants.kMagazineIntakeSpeed);
+            lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIntakeSpeed);
+            upperClosedLoopRotate(MagazineConstants.kUpperMagazineIntakeSpeed);
             currMagazineState = MagazineState.INDEX_CARGO;
-            logger.info("Has one cargo, turning on magazine, switching to index state");
+            logger.info("READ_CARGO -> INDEX_CARGO");
+            break;
           }
         }
-        autoStopUpperMagazine(MagazineConstants.kMagazineIntakeSpeed);
+        autoStopUpperMagazine(MagazineConstants.kUpperMagazineIntakeSpeed);
         break;
 
       case INDEX_CARGO:
         if (!isLowerBeamBroken()) {
           currMagazineState = MagazineState.WAIT_CARGO;
-          logger.info("Switching to wait state");
+          logger.info("INDEX_CARGO -> WAIT_CARGO");
         }
-        autoStopUpperMagazine(MagazineConstants.kMagazineIntakeSpeed);
+        autoStopUpperMagazine(MagazineConstants.kUpperMagazineIntakeSpeed);
         break;
 
+      case EJECT_CARGO:
+        if (ejectTimer.hasElapsed(MagazineConstants.kEjectTimerDelay)) {
+          storedCargoColors[1] = CargoColor.NONE;
+          currMagazineState = MagazineState.WAIT_CARGO;
+          lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIntakeSpeed);
+          logger.info("EJECT_CARGO -> WAIT_CARGO");
+        }
+        break;
       case PAUSE:
         if (shooterSubsystem.getCurrentState() == ShooterState.SHOOT
             && (turretSubsystem.getState() == TurretState.TRACKING
                 || turretSubsystem.getState() == TurretState.FENDER_AIMED)) {
           logger.info("PAUSE -> SHOOT");
           enableUpperBeamBreak(false);
-          upperOpenLoopRotate(MagazineConstants.kMagazineFeedSpeed);
+          upperClosedLoopRotate(MagazineConstants.kUpperMagazineFeedSpeed);
           currMagazineState = MagazineState.SHOOT;
         }
         break;
       case SHOOT:
-        if (!isUpperBeamBroken()) {
+        if (!isUpperBeamBroken()) shootUpperBeamStableCounts++;
+        else shootUpperBeamStableCounts = 0;
+
+        if (shootUpperBeamStableCounts > MagazineConstants.kShootUpperBeamStableCounts) {
           currMagazineState = MagazineState.CARGO_SHOT;
-          timer.reset();
-          timer.start();
+          shootTimer.reset();
+          shootTimer.start();
           enableUpperBeamBreak(true);
-          lowerOpenLoopRotate(MagazineConstants.kMagazineIndexSpeed);
-          upperOpenLoopRotate(MagazineConstants.kMagazineIndexSpeed);
+          lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIndexSpeed);
+          upperClosedLoopRotate(MagazineConstants.kUpperMagazineIndexSpeed);
           shotOneCargo();
           logger.info("SHOOT -> CARGO_SHOT");
         }
         break;
       case CARGO_SHOT:
-        if (timer.hasElapsed(MagazineConstants.kShootDelay) && isUpperBeamBroken()) {
+        if (shootTimer.hasElapsed(MagazineConstants.kShootDelay)
+            && storedCargoColors[0] == CargoColor.NONE
+            && !ignoreColorSensor) {
+          currMagazineState = MagazineState.STOP;
+          logger.info("CARGO_SHOT -> STOP");
+          break;
+        } else if (shootTimer.hasElapsed(MagazineConstants.kShootDelay) && isUpperBeamBroken()) {
           logger.info("CARGO_SHOT -> PAUSE");
           currMagazineState = MagazineState.PAUSE;
+          enableUpperBeamBreak(false);
           if (turretSubsystem.getState() == TurretState.FENDER_AIMED) {
             shooterSubsystem.fenderShot();
             turretSubsystem.fenderShot();
@@ -311,17 +388,15 @@ public class MagazineSubsystem extends MeasurableSubsystem {
           upperOpenLoopRotate(0.0);
           lowerOpenLoopRotate(0.0);
           break;
-        } else if (timer.hasElapsed(MagazineConstants.kShootDelay)
-            && storedCargoColors[0] == CargoColor.NONE) {
-          currMagazineState = MagazineState.STOP;
-          logger.info("CARGO_SHOT -> STOP");
-          break;
         }
-        autoStopUpperMagazine(MagazineConstants.kMagazineIndexSpeed);
+        autoStopUpperMagazine(MagazineConstants.kUpperMagazineIndexSpeed);
         break;
 
       case STOP:
-        stopMagazine();
+        if (lowerMagazineTalon.getMotorOutputPercent() != 0.0
+            || upperMagazineTalon.getMotorOutputPercent() != 0.0) {
+          stopMagazine();
+        }
         break;
     }
   }
@@ -359,6 +434,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     WAIT_CARGO,
     READ_CARGO,
     INDEX_CARGO,
+    EJECT_CARGO,
     SHOOT,
     CARGO_SHOT,
     PAUSE,
