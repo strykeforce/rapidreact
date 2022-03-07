@@ -1,6 +1,6 @@
 [Unit]
 Description=Rapid React Deadeye Vision System Daemon
-Requires=network-online.target
+Wants=network-online.target
 After=network-online.target
 Wants=var-opt-deadeye.mount
 Wants=deadeye-admin.service
