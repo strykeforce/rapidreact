@@ -445,7 +445,7 @@ public final class Constants {
     public static final double kFHighExtSt1Ticks = -80_000;
     public static final double kFHighExtSt2Ticks = -120_000;
     public static final double kFHighExtSt3Ticks = -140_000;
-    public static final double kHighPvtBck3Ticks = -2_500;
+    public static final double kHighPvtBck3Ticks = -3_000;
     public static final double kPHighRet2Ticks = -120_000;
     public static final double kHighPvtFwd2Ticks = 750;
     public static final double kFTvsRet1Ticks = -1_000;
@@ -484,7 +484,7 @@ public final class Constants {
     public static final double kHighPvtBk1Vel = 1_000;
     public static final double kHighPvtFwd1Vel = 1_000;
     public static final double kHighPvtBk2Vel = 1_000;
-    public static final double kHighPvtBk3Vel = 1_000;
+    public static final double kHighPvtBk3Vel = 500;
     public static final double kHighPvtFwd2Vel = 500;
     public static final double kTvsPvtBk1Vel = 1_000;
     public static final double kTvsPvtFwdVel = 1_000;
