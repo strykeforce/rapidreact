@@ -284,16 +284,16 @@ public final class Constants {
     public static final Color kNoCargo = new Color(0.25, 0.5, 0.25); // FIXME need to get real color
 
     // Speed Constants
-    public static final double kLowerMagazineIntakeSpeed = 5000; // 0.5
+    public static final double kLowerMagazineIntakeSpeed = 8000; // 0.5
     public static final double kUpperMagazineIntakeSpeed = 2000;
     public static final double kUpperMagazineFeedSpeed = 2000; // 0.25
     public static final double kLowerMagazineIndexSpeed = 2000; // 0.35
     public static final double kUpperMagazineIndexSpeed = 2000;
-    public static final double kMagazineEjectSpeed = -5000; // -0.5
+    public static final double kMagazineEjectSpeed = -8000; // -0.5
 
     // State Machine Sequence Constants
     public static final double kShootDelay = 0.7;
-    public static final double kEjectTimerDelay = 0.7;
+    public static final double kEjectTimerDelay = 1.0;
     public static final double kShootUpperBeamStableCounts = 2;
 
     // Lower Magazine Talon Config
@@ -641,8 +641,9 @@ public final class Constants {
     public static final String kLookupTablePath = "/home/lvuser/deploy/LookupTable.csv";
 
     // Lookup Table Consta
-    public static final double kLookupMinPixel = 50;
-    public static final double kLookupMaxPixel = 300;
+    public static final double kLookupMinPixel = 160;
+    public static final double kLookupMaxPixel = 380;
+    public static final double kNumRows = 221;
     public static final double kLookupRes = 1.0;
 
     // Hood Encoder Constants

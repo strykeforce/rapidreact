@@ -31,6 +31,6 @@ public class TurretAimCommand extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     logger.info("rotation finished");
-    turretSubsystem.stopTrackingTarget();
+    // turretSubsystem.stopTrackingTarget();
   }
 }

@@ -30,8 +30,10 @@ public class AutoIntakeCommand extends CommandBase {
         && !magazineReversed) {
       intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeEjectSpeed);
       magazineReversed = true;
-    } else if (magazineReversed == true) {
+    } else if (magazineReversed
+        && (magazineSubsystem.getCurrMagazineState() != MagazineState.EJECT_CARGO)) {
       intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeSpeed);
+      magazineReversed = false;
     }
   }
 

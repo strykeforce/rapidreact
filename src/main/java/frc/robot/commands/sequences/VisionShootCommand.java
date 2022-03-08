@@ -8,6 +8,8 @@ import frc.robot.subsystems.ShooterSubsystem.ShooterState;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.TurretSubsystem.TurretState;
 import frc.robot.subsystems.VisionSubsystem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class VisionShootCommand extends CommandBase {
   private ShooterSubsystem shooterSubsystem;
@@ -16,6 +18,7 @@ public class VisionShootCommand extends CommandBase {
   private VisionSubsystem visionSubsystem;
   private boolean isArmed = false;
   private final boolean disableTrackingOnFinish;
+  private final Logger logger = LoggerFactory.getLogger(VisionShootCommand.class);
 
   public VisionShootCommand(
       ShooterSubsystem shooterSubsystem,
@@ -34,6 +37,7 @@ public class VisionShootCommand extends CommandBase {
   @Override
   public void initialize() {
     // Check if Shooter Already Armed and Turret locked on
+    logger.info("Shooting...");
     if (shooterSubsystem.getCurrentState() == ShooterState.ARMED
         && turretSubsystem.getState() == TurretState.TRACKING) {
       isArmed = true;

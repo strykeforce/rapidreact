@@ -114,12 +114,17 @@ public class ShooterSubsystem extends MeasurableSubsystem {
           ShooterConstants.kLookupMaxPixel);
       index = lookupTable.length - 1;
     } else {
+      // total rows - (Width - minrows)
       index =
           (int)
-              (Math.round(widthPixels / ShooterConstants.kLookupRes)
-                  + 1
-                  - ShooterConstants.kLookupMinPixel);
-      logger.info("Selected Index: {}", index);
+              (ShooterConstants.kNumRows
+                  - (Math.round(widthPixels) - ShooterConstants.kLookupMinPixel));
+      // index =
+      //     (int)
+      //         (Math.round(widthPixels / ShooterConstants.kLookupRes)
+      //             + 1
+      //             - ShooterConstants.kLookupMinPixel);
+      logger.info("Selected Index: {}, widthPixels: {}", index, widthPixels);
     }
     double[] shootSolution = new double[3];
     shootSolution[0] = Double.parseDouble(lookupTable[index][2]);
