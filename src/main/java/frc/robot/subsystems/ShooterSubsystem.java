@@ -100,19 +100,19 @@ public class ShooterSubsystem extends MeasurableSubsystem {
   private double[] getShootSolution() {
     double widthPixels = visionSubsystem.getTargetPixelWidth();
     int index = 0;
-
+    double[] shootSolution = new double[3];
     if (widthPixels < ShooterConstants.kLookupMinPixel) {
       logger.warn(
           "Pixel width {} is less than min pixel in table, using {}",
           widthPixels,
           ShooterConstants.kLookupMinPixel);
-      index = 1;
+      index = lookupTable.length - 1;
     } else if (widthPixels > ShooterConstants.kLookupMaxPixel) {
       logger.warn(
           "Pixel width {} is more than max pixel in table, using {}",
           widthPixels,
           ShooterConstants.kLookupMaxPixel);
-      index = lookupTable.length - 1;
+      index = 1;
     } else {
       // total rows - (Width - minrows)
       index =
@@ -126,7 +126,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
       //             - ShooterConstants.kLookupMinPixel);
       logger.info("Selected Index: {}, widthPixels: {}", index, widthPixels);
     }
-    double[] shootSolution = new double[3];
+    
     shootSolution[0] = Double.parseDouble(lookupTable[index][2]);
     shootSolution[1] = Double.parseDouble(lookupTable[index][3]);
     shootSolution[2] = Double.parseDouble(lookupTable[index][4]);
