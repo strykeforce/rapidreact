@@ -126,7 +126,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
       //             - ShooterConstants.kLookupMinPixel);
       logger.info("Selected Index: {}, widthPixels: {}", index, widthPixels);
     }
-    
+
     shootSolution[0] = Double.parseDouble(lookupTable[index][2]);
     shootSolution[1] = Double.parseDouble(lookupTable[index][3]);
     shootSolution[2] = Double.parseDouble(lookupTable[index][4]);
