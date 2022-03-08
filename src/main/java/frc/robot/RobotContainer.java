@@ -47,7 +47,6 @@ import frc.robot.commands.magazine.UpperMagazineOpenLoopCommand;
 import frc.robot.commands.sequences.ArmShooterCommandGroup;
 import frc.robot.commands.sequences.AutoIntakeCommand;
 import frc.robot.commands.sequences.EjectCargoCommand;
-import frc.robot.commands.sequences.HighClimbCommandGroup;
 import frc.robot.commands.sequences.HighFenderShotCommand;
 import frc.robot.commands.sequences.LowFenderShotCommand;
 import frc.robot.commands.sequences.MidClimbCommandGroup;
