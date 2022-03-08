@@ -23,13 +23,15 @@ public class ShooterSubsystem extends MeasurableSubsystem {
   private final TalonFX kickerFalcon;
   private final TalonSRX hoodTalon;
   private final MagazineSubsystem magazineSubsystem;
+  private final VisionSubsystem visionSubsystem;
   private boolean highFender;
   private ShooterState currentState = ShooterState.STOP;
   private double shooterSetPointTicks, kickerSetpointTicks, hoodSetPointTicks;
   private String[][] lookupTable;
 
-  public ShooterSubsystem(MagazineSubsystem magazineSubsystem) {
+  public ShooterSubsystem(MagazineSubsystem magazineSubsystem, VisionSubsystem visionSubsystem) {
     this.magazineSubsystem = magazineSubsystem;
+    this.visionSubsystem = visionSubsystem;
     parseLookupTable();
     shooterFalcon = new TalonFX(ShooterConstants.kShooterFalconID);
     shooterFalcon.configFactoryDefault(Constants.kTalonConfigTimeout);
@@ -96,31 +98,35 @@ public class ShooterSubsystem extends MeasurableSubsystem {
   }
 
   private double[] getShootSolution() {
-    // fix me get pixel width from vision
-    double widthPixels = 50;
+    double widthPixels = visionSubsystem.getTargetPixelWidth();
     int index = 0;
-
+    double[] shootSolution = new double[3];
     if (widthPixels < ShooterConstants.kLookupMinPixel) {
       logger.warn(
           "Pixel width {} is less than min pixel in table, using {}",
           widthPixels,
           ShooterConstants.kLookupMinPixel);
-      index = 1;
+      index = lookupTable.length - 1;
     } else if (widthPixels > ShooterConstants.kLookupMaxPixel) {
       logger.warn(
           "Pixel width {} is more than max pixel in table, using {}",
           widthPixels,
           ShooterConstants.kLookupMaxPixel);
-      index = lookupTable.length - 1;
+      index = 1;
     } else {
+      // total rows - (Width - minrows)
       index =
           (int)
-              (Math.round(widthPixels / ShooterConstants.kLookupRes)
-                  + 1
-                  - ShooterConstants.kLookupMinPixel);
-      logger.info("Selected Index: {}", index);
+              (ShooterConstants.kNumRows
+                  - (Math.round(widthPixels) - ShooterConstants.kLookupMinPixel));
+      // index =
+      //     (int)
+      //         (Math.round(widthPixels / ShooterConstants.kLookupRes)
+      //             + 1
+      //             - ShooterConstants.kLookupMinPixel);
+      logger.info("Selected Index: {}, widthPixels: {}", index, widthPixels);
     }
-    double[] shootSolution = new double[3];
+
     shootSolution[0] = Double.parseDouble(lookupTable[index][2]);
     shootSolution[1] = Double.parseDouble(lookupTable[index][3]);
     shootSolution[2] = Double.parseDouble(lookupTable[index][4]);
@@ -243,6 +249,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
         if (kickerFalcon.getMotorOutputPercent() != 0.0
             || shooterFalcon.getMotorOutputPercent() != 0.0) {
           shooterOpenLoop(0.0);
+          hoodClosedLoop(0);
         }
         break;
       case ARMING:

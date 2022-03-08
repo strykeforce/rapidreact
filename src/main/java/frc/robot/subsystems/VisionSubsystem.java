@@ -80,6 +80,11 @@ public class VisionSubsystem extends MeasurableSubsystem
     return td.isValid() ? td.getGroundDistance() : 2767.0;
   }
 
+  public double getTargetPixelWidth() {
+    var td = targetData;
+    return td.testGetTargetsPixelWidth();
+  }
+
   private double getValid() {
     var td = targetData;
     return td.isValid() ? 1.0 : 0.0;

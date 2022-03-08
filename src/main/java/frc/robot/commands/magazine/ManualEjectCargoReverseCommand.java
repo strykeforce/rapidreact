@@ -12,7 +12,7 @@ public class ManualEjectCargoReverseCommand extends InstantCommand {
 
   public ManualEjectCargoReverseCommand(
       MagazineSubsystem magazineSubsystem, IntakeSubsystem intakeSubsystem) {
-    addRequirements(magazineSubsystem);
+    addRequirements(magazineSubsystem, intakeSubsystem);
     this.magazineSubsystem = magazineSubsystem;
     this.intakeSubsystem = intakeSubsystem;
   }

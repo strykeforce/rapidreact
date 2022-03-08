@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.SuppliedValueWidget;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ClimbConstants;
@@ -41,6 +42,7 @@ import frc.robot.commands.magazine.ManualEjectCargoReverseCommand;
 import frc.robot.commands.magazine.PitClearCargoColor;
 import frc.robot.commands.magazine.PitMagazineOpenLoopCommand;
 import frc.robot.commands.magazine.PitReadCargoColor;
+import frc.robot.commands.magazine.StopMagazineCommand;
 import frc.robot.commands.magazine.UpperMagazineOpenLoopCommand;
 import frc.robot.commands.sequences.ArmShooterCommandGroup;
 import frc.robot.commands.sequences.AutoIntakeCommand;
@@ -87,7 +89,8 @@ public class RobotContainer {
       new TurretSubsystem(visionSubsystem, driveSubsystem);
   private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
   private final MagazineSubsystem magazineSubsystem = new MagazineSubsystem(turretSubsystem);
-  private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem(magazineSubsystem);
+  private final ShooterSubsystem shooterSubsystem =
+      new ShooterSubsystem(magazineSubsystem, visionSubsystem);
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   //   private final PowerDistHub powerDistHub = new PowerDistHub();
   private final TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
@@ -212,7 +215,10 @@ public class RobotContainer {
     new JoystickButton(xboxController, XboxController.Button.kBack.value)
         .whenPressed(new ManualEjectCargoReverseCommand(magazineSubsystem, intakeSubsystem));
     new JoystickButton(xboxController, XboxController.Button.kBack.value)
-        .whenReleased(new IntakeOpenLoopCommand(intakeSubsystem, 0.0));
+        .whenReleased(
+            new ParallelCommandGroup(
+                new IntakeOpenLoopCommand(intakeSubsystem, 0.0),
+                new StopMagazineCommand(magazineSubsystem)));
 
     // Arm Shooter
     new JoystickButton(xboxController, XboxController.Button.kB.value)

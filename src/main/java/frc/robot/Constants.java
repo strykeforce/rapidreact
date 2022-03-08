@@ -284,16 +284,16 @@ public final class Constants {
     public static final Color kNoCargo = new Color(0.25, 0.5, 0.25); // FIXME need to get real color
 
     // Speed Constants
-    public static final double kLowerMagazineIntakeSpeed = 5000; // 0.5
+    public static final double kLowerMagazineIntakeSpeed = 8000; // 0.5
     public static final double kUpperMagazineIntakeSpeed = 2000;
     public static final double kUpperMagazineFeedSpeed = 2000; // 0.25
     public static final double kLowerMagazineIndexSpeed = 2000; // 0.35
     public static final double kUpperMagazineIndexSpeed = 2000;
-    public static final double kMagazineEjectSpeed = -5000; // -0.5
+    public static final double kMagazineEjectSpeed = -8000; // -0.5
 
     // State Machine Sequence Constants
     public static final double kShootDelay = 0.7;
-    public static final double kEjectTimerDelay = 0.7;
+    public static final double kEjectTimerDelay = 1.0;
     public static final double kShootUpperBeamStableCounts = 2;
 
     // Lower Magazine Talon Config
@@ -445,7 +445,7 @@ public final class Constants {
     public static final double kFHighExtSt1Ticks = -80_000;
     public static final double kFHighExtSt2Ticks = -120_000;
     public static final double kFHighExtSt3Ticks = -140_000;
-    public static final double kHighPvtBck3Ticks = -2_500;
+    public static final double kHighPvtBck3Ticks = -3_000;
     public static final double kPHighRet2Ticks = -120_000;
     public static final double kHighPvtFwd2Ticks = 750;
     public static final double kFTvsRet1Ticks = -1_000;
@@ -484,7 +484,7 @@ public final class Constants {
     public static final double kHighPvtBk1Vel = 1_000;
     public static final double kHighPvtFwd1Vel = 1_000;
     public static final double kHighPvtBk2Vel = 1_000;
-    public static final double kHighPvtBk3Vel = 1_000;
+    public static final double kHighPvtBk3Vel = 500;
     public static final double kHighPvtFwd2Vel = 500;
     public static final double kTvsPvtBk1Vel = 1_000;
     public static final double kTvsPvtFwdVel = 1_000;
@@ -610,8 +610,8 @@ public final class Constants {
 
   public static final class IntakeConstants {
     public static final int kIntakeFalconID = 20;
-    public static final double kIntakeSpeed = -0.5;
-    public static final double kIntakeEjectSpeed = 0.5;
+    public static final double kIntakeSpeed = 0.5;
+    public static final double kIntakeEjectSpeed = -0.5;
 
     public static TalonFXConfiguration getIntakeFalconConfig() {
       TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
@@ -641,8 +641,9 @@ public final class Constants {
     public static final String kLookupTablePath = "/home/lvuser/deploy/LookupTable.csv";
 
     // Lookup Table Consta
-    public static final double kLookupMinPixel = 50;
-    public static final double kLookupMaxPixel = 300;
+    public static final double kLookupMinPixel = 160;
+    public static final double kLookupMaxPixel = 380;
+    public static final double kNumRows = 221;
     public static final double kLookupRes = 1.0;
 
     // Hood Encoder Constants
@@ -651,8 +652,8 @@ public final class Constants {
     public static final int kReverseSoftLimits = 100;
 
     // Arm Shooter Constants
-    public static final double kKickerArmTicksP100ms = 1000;
-    public static final double kShooterArmTicksP100ms = 1000;
+    public static final double kKickerArmTicksP100ms = 4000;
+    public static final double kShooterArmTicksP100ms = 4000;
 
     // Opponent Cargo Constants
     public static final double kKickerOpTicksP100ms = 4000;
@@ -660,14 +661,14 @@ public final class Constants {
     public static final double kHoodOpTicks = 5800;
 
     // High Fender Shot Constants
-    public static final double kKickerFenderHighTicksP100ms = 7000;
-    public static final double kShooterFenderHighTicksP100ms = 7000;
-    public static final double kHoodFenderHighTicks = 5800;
+    public static final double kKickerFenderHighTicksP100ms = 2000;
+    public static final double kShooterFenderHighTicksP100ms = 10000;
+    public static final double kHoodFenderHighTicks = 0;
 
     // Low Fender Shot Constants
-    public static final double kKickerFenderLowTicksP100ms = 4000;
-    public static final double kShooterFenderLowTicksP100ms = 4000;
-    public static final double kHoodFenderLowTicks = 5800;
+    public static final double kKickerFenderLowTicksP100ms = 0; // 3000
+    public static final double kShooterFenderLowTicksP100ms = 6500; // 4000
+    public static final double kHoodFenderLowTicks = 0;
 
     public static final int kStableCounts = 5; // FIX ME
     public static final double kCloseEnoughTicksP100ms = 100;
