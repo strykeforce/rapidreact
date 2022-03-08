@@ -249,6 +249,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
         if (kickerFalcon.getMotorOutputPercent() != 0.0
             || shooterFalcon.getMotorOutputPercent() != 0.0) {
           shooterOpenLoop(0.0);
+          hoodClosedLoop(0);
         }
         break;
       case ARMING:

@@ -652,8 +652,8 @@ public final class Constants {
     public static final int kReverseSoftLimits = 100;
 
     // Arm Shooter Constants
-    public static final double kKickerArmTicksP100ms = 1000;
-    public static final double kShooterArmTicksP100ms = 1000;
+    public static final double kKickerArmTicksP100ms = 4000;
+    public static final double kShooterArmTicksP100ms = 4000;
 
     // Opponent Cargo Constants
     public static final double kKickerOpTicksP100ms = 4000;
@@ -661,14 +661,14 @@ public final class Constants {
     public static final double kHoodOpTicks = 5800;
 
     // High Fender Shot Constants
-    public static final double kKickerFenderHighTicksP100ms = 7000;
-    public static final double kShooterFenderHighTicksP100ms = 7000;
-    public static final double kHoodFenderHighTicks = 5800;
+    public static final double kKickerFenderHighTicksP100ms = 2000;
+    public static final double kShooterFenderHighTicksP100ms = 10000;
+    public static final double kHoodFenderHighTicks = 0;
 
     // Low Fender Shot Constants
-    public static final double kKickerFenderLowTicksP100ms = 4000;
-    public static final double kShooterFenderLowTicksP100ms = 4000;
-    public static final double kHoodFenderLowTicks = 5800;
+    public static final double kKickerFenderLowTicksP100ms = 0; // 3000
+    public static final double kShooterFenderLowTicksP100ms = 6500; // 4000
+    public static final double kHoodFenderLowTicks = 0;
 
     public static final int kStableCounts = 5; // FIX ME
     public static final double kCloseEnoughTicksP100ms = 100;
