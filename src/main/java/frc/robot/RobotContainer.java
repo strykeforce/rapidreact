@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ClimbConstants;
 import frc.robot.Constants.DashboardConstants;
 import frc.robot.Constants.MagazineConstants;
+import frc.robot.commands.Auton.TwoCargoAuto;
 import frc.robot.commands.climb.OpenLoopFixedArmCommand;
 import frc.robot.commands.climb.OpenLoopPivotArmCommand;
 import frc.robot.commands.climb.RotateShoulderDownCommand;
@@ -200,6 +201,19 @@ public class RobotContainer {
     //     .whenPressed(new MidClimbCommandGroup(climbSubsystem, driveSubsystem, driveJoystick));
     new JoystickButton(driveJoystick, Button.UP.id)
         .whenPressed(new MidClimbCommandGroup(climbSubsystem, driveSubsystem, driveJoystick));
+    new JoystickButton(driveJoystick, Button.HAMBURGER.id)
+        .whenPressed(new DriveAutonCommand(driveSubsystem, "LeftCargoCollect"));
+    new JoystickButton(driveJoystick, Button.DOWN.id)
+        .whenPressed(
+            new TwoCargoAuto(
+                visionSubsystem,
+                turretSubsystem,
+                shooterSubsystem,
+                magazineSubsystem,
+                intakeSubsystem,
+                driveSubsystem,
+                "LeftCargoCollect",
+                Rotation2d.fromDegrees(-136.5)));
   }
 
   private void configureOperatorButtonBindings() {

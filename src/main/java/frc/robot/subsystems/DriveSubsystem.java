@@ -137,6 +137,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public void setGyroOffset(Rotation2d rotation) {
     swerveDrive.setGyroOffset(rotation);
+    logger.info("Set GyroOffset to {}", rotation);
   }
 
   public void lockZero() {
