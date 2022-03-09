@@ -287,7 +287,7 @@ public final class Constants {
     public static final double kLowerMagazineIntakeSpeed = 8000; // 0.5
     public static final double kUpperMagazineIntakeSpeed = 2000;
     public static final double kUpperMagazineFeedSpeed = 2000; // 0.25
-    public static final double kLowerMagazineIndexSpeed = 2000; // 0.35
+    public static final double kLowerMagazineIndexSpeed = 8000; // 0.35
     public static final double kUpperMagazineIndexSpeed = 2000;
     public static final double kMagazineEjectSpeed = -8000; // -0.5
 
@@ -775,5 +775,15 @@ public final class Constants {
     public static final String kTurretSetpointRadians = "Pit/Turret/SetpointRadians";
     public static final String kPitKickerSetpointTicks = "Tune/Kicker/kickerSpeed";
     public static final String kTuneUpperMagSpeedTicks = "Tune/Magazine/UpperSpeed";
+    public static final int kLockoutBNCid = 8;
+  }
+
+  public static final class AutoConstants {
+    public static final int kStartSwitchId = 2;
+    public static final int kEndSwitchId = 7;
+    public static final int kStableCounts = 100; // s
+    public static final Rotation2d kLeftStartYaw = Rotation2d.fromDegrees(136.5);
+    public static final Rotation2d kMidStartYaw = Rotation2d.fromDegrees(-156.0);
+    public static final Rotation2d kRightStartYaw = Rotation2d.fromDegrees(-88.5);
   }
 }

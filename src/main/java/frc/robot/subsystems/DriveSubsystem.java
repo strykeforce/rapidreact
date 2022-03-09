@@ -135,6 +135,14 @@ public class DriveSubsystem extends MeasurableSubsystem {
     swerveDrive.resetGyro();
   }
 
+  public void teleResetGyro() {
+    logger.info("Driver Joystick: Reset Gyro");
+    swerveDrive.setGyroOffset(Rotation2d.fromDegrees(0.0));
+    swerveDrive.resetGyro();
+    swerveDrive.resetOdometry(
+        new Pose2d(swerveDrive.getPoseMeters().getTranslation(), Rotation2d.fromDegrees(0.0)));
+  }
+
   public void setGyroOffset(Rotation2d rotation) {
     swerveDrive.setGyroOffset(rotation);
     logger.info("Set GyroOffset to {}", rotation);

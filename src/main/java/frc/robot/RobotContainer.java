@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
@@ -64,6 +65,7 @@ import frc.robot.commands.turret.OpenLoopTurretCommand;
 import frc.robot.commands.turret.PitTurretCloseLoopPositionCommand;
 import frc.robot.commands.turret.RotateToCommand;
 import frc.robot.commands.turret.TurretAimCommandGroup;
+import frc.robot.subsystems.AutoSwitch;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -83,7 +85,8 @@ import org.strykeforce.telemetry.TelemetryService;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-
+  private boolean isEvent = true;
+  private DigitalInput eventFlag = new DigitalInput(DashboardConstants.kLockoutBNCid);
   private final DriveSubsystem driveSubsystem = new DriveSubsystem();
   private final VisionSubsystem visionSubsystem = new VisionSubsystem();
   private final TurretSubsystem turretSubsystem =
@@ -94,6 +97,14 @@ public class RobotContainer {
       new ShooterSubsystem(magazineSubsystem, visionSubsystem);
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   //   private final PowerDistHub powerDistHub = new PowerDistHub();
+  private final AutoSwitch autoSwitch =
+      new AutoSwitch(
+          driveSubsystem,
+          intakeSubsystem,
+          magazineSubsystem,
+          turretSubsystem,
+          shooterSubsystem,
+          visionSubsystem);
   private final TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
 
   private final Joystick driveJoystick = new Joystick(0);
@@ -107,6 +118,11 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    // isEvent = eventFlag.get();
+    // if(isEvent){
+    //     System.out.println("Event Flag Removed - switching to log file");
+    //     System.out.property(ContextInitializer.CONFIG_FILE_PROPERTY, "logback-event.xml")
+    // }
     turretSubsystem.setMagazineSubsystem(magazineSubsystem);
     magazineSubsystem.setShooterSubsystem(shooterSubsystem);
     configureTelemetry();
@@ -114,11 +130,15 @@ public class RobotContainer {
     configureOperatorButtonBindings();
     configurePitDashboard();
     configureMatchDashboard();
-    // configureManualClimbButtons();
+    configureManualClimbButtons();
   }
 
   public VisionSubsystem getVisionSubsystem() {
     return visionSubsystem;
+  }
+
+  public AutoSwitch getAutoSwitch() {
+    return autoSwitch;
   }
 
   private void configureTelemetry() {
@@ -188,8 +208,8 @@ public class RobotContainer {
         .whenPressed(
             new VisionShootCommand(
                 shooterSubsystem, turretSubsystem, magazineSubsystem, visionSubsystem, true));
-    new JoystickButton(driveJoystick, Shoulder.RIGHT_DOWN.id)
-        .whenReleased(new StopShooterCommand(shooterSubsystem));
+    // new JoystickButton(driveJoystick, Shoulder.RIGHT_DOWN.id)
+    //     .whenReleased(new StopShooterCommand(shooterSubsystem));
 
     // Auto Climb
     // new JoystickButton(driveJoystick, Button.UP.id)
@@ -212,8 +232,8 @@ public class RobotContainer {
                 magazineSubsystem,
                 intakeSubsystem,
                 driveSubsystem,
-                "LeftCargoCollect",
-                Rotation2d.fromDegrees(-136.5)));
+                "MidCargo1Collect",
+                Rotation2d.fromDegrees(-156)));
   }
 
   private void configureOperatorButtonBindings() {
