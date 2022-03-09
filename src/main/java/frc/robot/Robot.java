@@ -76,7 +76,7 @@ public class Robot extends TimedRobot {
         logger.info("Set Alliance: {}", alliance);
       }
     }
-    m_robotContainer.upudateMatchData();
+    m_robotContainer.updateMatchData();
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -100,6 +100,7 @@ public class Robot extends TimedRobot {
     if (autoCommand != null) {
       autoCommand.schedule();
     }
+    m_robotContainer.zeroClimb();
   }
 
   /** This function is called periodically during autonomous. */
@@ -107,7 +108,9 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {}
 
   @Override
-  public void teleopInit() {}
+  public void teleopInit() {
+    m_robotContainer.zeroClimb();
+  }
 
   /** This function is called periodically during operator control. */
   @Override

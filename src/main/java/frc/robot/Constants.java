@@ -436,7 +436,7 @@ public final class Constants {
     public static final double kFMidExtTicks = -210_000;
     public static final double kFMidRetSt1Ticks = -135_000;
     public static final double kFMidRetSt2Ticks = -115_000;
-    public static final double kFMidRetSt3Ticks = -5_000;
+    public static final double kFMidRetSt3Ticks = -2_500;
     public static final double kHighPvtBck1Ticks = 5_500;
     public static final double kPHighExtTicks = -197_000;
     public static final double kHighPvtFwd1Ticks = 3_200;
@@ -448,17 +448,19 @@ public final class Constants {
     public static final double kHighPvtBck3Ticks = -3_000;
     public static final double kPHighRet2Ticks = -120_000;
     public static final double kHighPvtFwd2Ticks = 750;
-    public static final double kFTvsRet1Ticks = -1_000;
-    public static final double kTvsPvtBck1Ticks = 5_000;
-    public static final double kPTvsExtTicks = -200_000;
-    public static final double kTvsPvtFwdTicks = 3_300;
+    public static final double kFTvsRet1Ticks = -2_500;
+    public static final double kTvsPvtBck1Ticks = 5_500;
+    public static final double kPTvsExtTicks = -197_000;
+    public static final double kTvsPvtFwdTicks = 3_200;
     public static final double kPTvsRetTicks = -168_000;
     public static final double kTvsPvtBck2Ticks = 4_500;
-    public static final double kFTvsExtTicks = -140_000;
-    public static final double kTvsPvtBck3Ticks = 2_700;
+    public static final double kFTvsExtSt1Ticks = -80_000;
+    public static final double kFTvsExtSt2Ticks = -120_000;
+    public static final double kFTvsExtSt3Ticks = -140_000;
+    public static final double kTvsPvtBck3Ticks = -2_500;
     public static final double kFTvsRet2Ticks = -5_000;
     public static final double kFHighExtFinTicks = -190_000;
-    public static final double kHighPvtBckFinTicks = 700;
+    public static final double kHighPvtBckFinTicks = 1_000;
     public static final double kFHighRetFinTicks = -175_000;
 
     // Climb States -> Desired Open Loop Speed (Arms only, Shoulder = closed loop)
@@ -472,10 +474,12 @@ public final class Constants {
     public static final double kFHighExtSt2Speed = -0.1;
     public static final double kFHighExtSt3Speed = -0.4;
     public static final double kPHighRet2Speed = 0.3;
-    public static final double kFTvsRet1Speed = 0.25;
-    public static final double kPTvsExtSpeed = -0.25;
-    public static final double kPTvsRetSpeed = 0.25;
-    public static final double kFTvsExtSpeed = -0.25;
+    public static final double kFTvsRet1Speed = 0.5;
+    public static final double kPTvsExtSpeed = -0.5;
+    public static final double kPTvsRetSpeed = 0.12;
+    public static final double kFTvsExtSt1Speed = -0.35;
+    public static final double kFTvsExtSt2Speed = -0.1;
+    public static final double kFTvsExtSt3Speed = -0.4;
     public static final double kFTvsRet2Speed = 0.25;
     public static final double kFHighExtFinSpeed = -0.5;
     public static final double kFHighRetFinSpeed = 0.2;
@@ -489,8 +493,8 @@ public final class Constants {
     public static final double kTvsPvtBk1Vel = 1_000;
     public static final double kTvsPvtFwdVel = 1_000;
     public static final double kTvsPvtBk2Vel = 1_000;
-    public static final double kTvsPvtBk3Vel = 1_000;
-    public static final double kHighPvtBkFinVel = 100;
+    public static final double kTvsPvtBk3Vel = 500;
+    public static final double kHighPvtBkFinVel = 500;
 
     // Pivot Arm Falcon Config
     public static SupplyCurrentLimitConfiguration getPivotArmSupplyCurrentLimit() {

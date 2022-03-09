@@ -142,6 +142,10 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     logger.info("set ignoreColorSensor to: {}", ignore);
   }
 
+  public boolean isColorSensorIgnored() {
+    return ignoreColorSensor;
+  }
+
   public boolean isNextCargoAlliance() {
     return ignoreColorSensor || storedCargoColors[0] == allianceCargoColor;
   }

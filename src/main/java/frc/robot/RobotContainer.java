@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ClimbConstants;
 import frc.robot.Constants.DashboardConstants;
 import frc.robot.Constants.MagazineConstants;
-import frc.robot.commands.Auton.TwoCargoAuto;
+import frc.robot.commands.climb.EmergencyStopClimbCommand;
 import frc.robot.commands.climb.OpenLoopFixedArmCommand;
 import frc.robot.commands.climb.OpenLoopPivotArmCommand;
 import frc.robot.commands.climb.RotateShoulderDownCommand;
@@ -49,11 +49,13 @@ import frc.robot.commands.magazine.UpperMagazineOpenLoopCommand;
 import frc.robot.commands.sequences.ArmShooterCommandGroup;
 import frc.robot.commands.sequences.AutoIntakeCommand;
 import frc.robot.commands.sequences.EjectCargoCommand;
+import frc.robot.commands.sequences.HighClimbCommandGroup;
 import frc.robot.commands.sequences.HighFenderShotCommand;
 import frc.robot.commands.sequences.LowFenderShotCommand;
 import frc.robot.commands.sequences.MidClimbCommandGroup;
 import frc.robot.commands.sequences.PitShooterTuneCommandGroup;
 import frc.robot.commands.sequences.StopShooterCommandGroup;
+import frc.robot.commands.sequences.TraverseClimbCommandGroup;
 import frc.robot.commands.sequences.VisionShootCommand;
 import frc.robot.commands.shooter.HoodOpenLoopCommand;
 import frc.robot.commands.shooter.PitHoodClosedLoopCommand;
@@ -86,6 +88,7 @@ import org.strykeforce.telemetry.TelemetryService;
  */
 public class RobotContainer {
   private boolean isEvent = true;
+  private boolean haveZeroedClimb = false;
   private DigitalInput eventFlag = new DigitalInput(DashboardConstants.kLockoutBNCid);
   private final DriveSubsystem driveSubsystem = new DriveSubsystem();
   private final VisionSubsystem visionSubsystem = new VisionSubsystem();
@@ -141,6 +144,13 @@ public class RobotContainer {
     return autoSwitch;
   }
 
+  public void zeroClimb() {
+    if (!haveZeroedClimb) {
+      climbSubsystem.zeroClimb();
+      haveZeroedClimb = true;
+    }
+  }
+
   private void configureTelemetry() {
     driveSubsystem.registerWith(telemetryService);
     shooterSubsystem.registerWith(telemetryService);
@@ -171,13 +181,13 @@ public class RobotContainer {
         .whenReleased(new IgnoreColorSensorCommand(magazineSubsystem, false));
 
     // Hood Open Loop
-    new JoystickButton(driveJoystick, Trim.LEFT_X_POS.id)
+    new JoystickButton(driveJoystick, Trim.RIGHT_Y_POS.id)
         .whenPressed(new HoodOpenLoopCommand(shooterSubsystem, 0.2));
-    new JoystickButton(driveJoystick, Trim.LEFT_X_POS.id)
+    new JoystickButton(driveJoystick, Trim.RIGHT_Y_POS.id)
         .whenReleased(new HoodOpenLoopCommand(shooterSubsystem, 0.0));
-    new JoystickButton(driveJoystick, Trim.LEFT_X_NEG.id)
+    new JoystickButton(driveJoystick, Trim.RIGHT_Y_NEG.id)
         .whenPressed(new HoodOpenLoopCommand(shooterSubsystem, -0.2));
-    new JoystickButton(driveJoystick, Trim.LEFT_X_NEG.id)
+    new JoystickButton(driveJoystick, Trim.RIGHT_Y_NEG.id)
         .whenReleased(new HoodOpenLoopCommand(shooterSubsystem, 0.0));
 
     // Turret Open Loop
@@ -219,21 +229,14 @@ public class RobotContainer {
     //     .whenPressed(new HighClimbCommandGroup(climbSubsystem, driveSubsystem, driveJoystick));
     // new JoystickButton(driveJoystick, Button.HAMBURGER.id)
     //     .whenPressed(new MidClimbCommandGroup(climbSubsystem, driveSubsystem, driveJoystick));
+    new JoystickButton(driveJoystick, Trim.LEFT_X_POS.id)
+        .whenPressed(new TraverseClimbCommandGroup(climbSubsystem, driveSubsystem, driveJoystick));
+    new JoystickButton(driveJoystick, Trim.LEFT_X_NEG.id)
+        .whenPressed(new TraverseClimbCommandGroup(climbSubsystem, driveSubsystem, driveJoystick));
     new JoystickButton(driveJoystick, Button.UP.id)
-        .whenPressed(new MidClimbCommandGroup(climbSubsystem, driveSubsystem, driveJoystick));
-    new JoystickButton(driveJoystick, Button.HAMBURGER.id)
-        .whenPressed(new DriveAutonCommand(driveSubsystem, "LeftCargoCollect"));
+        .whenPressed(new HighClimbCommandGroup(climbSubsystem, driveSubsystem, driveJoystick));
     new JoystickButton(driveJoystick, Button.DOWN.id)
-        .whenPressed(
-            new TwoCargoAuto(
-                visionSubsystem,
-                turretSubsystem,
-                shooterSubsystem,
-                magazineSubsystem,
-                intakeSubsystem,
-                driveSubsystem,
-                "MidCargo1Collect",
-                Rotation2d.fromDegrees(-156)));
+        .whenPressed(new MidClimbCommandGroup(climbSubsystem, driveSubsystem, driveJoystick));
   }
 
   private void configureOperatorButtonBindings() {
@@ -329,6 +332,11 @@ public class RobotContainer {
         Shuffleboard.getTab("Match")
             .addBoolean("AllianceColor", () -> alliance != Alliance.Invalid)
             .withProperties(Map.of("colorWhenFalse", "black"));
+
+    Shuffleboard.getTab("Match")
+        .addBoolean("IgnoreColorSensor", () -> magazineSubsystem.isColorSensorIgnored());
+
+    SmartDashboard.putData("Match/EStopClimb", new EmergencyStopClimbCommand(climbSubsystem));
   }
 
   public void setAllianceColor(Alliance alliance) {
@@ -339,7 +347,7 @@ public class RobotContainer {
     magazineSubsystem.setAllianceColor(alliance);
   }
 
-  public void upudateMatchData() {
+  public void updateMatchData() {
     firstCargo.withProperties(
         Map.of(
             "colorWhenTrue",
