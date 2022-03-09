@@ -133,7 +133,7 @@ public class RobotContainer {
     configureOperatorButtonBindings();
     configurePitDashboard();
     configureMatchDashboard();
-    configureManualClimbButtons();
+    // configureManualClimbButtons();
   }
 
   public VisionSubsystem getVisionSubsystem() {
