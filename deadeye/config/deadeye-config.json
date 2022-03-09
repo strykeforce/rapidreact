@@ -1,0 +1,53 @@
+{
+  "camera": "A0",
+  "server": "10.27.67.2",
+  "date": "2022-03-09T16:46:06.950619",
+  "capture": {
+    "config": {
+      "saturation": 2,
+      "ispDigitalGainRange": "1 2",
+      "gainRange": "1 4",
+      "exposure": 0.05
+    },
+    "fps": 60,
+    "h": 720,
+    "type": "jetson",
+    "w": 1280
+  },
+  "pipeline": {
+    "config": {},
+    "filter": {
+      "area": [
+        0.0001,
+        0.01
+      ],
+      "aspect": [
+        0,
+        10
+      ],
+      "solidity": [
+        0,
+        1
+      ]
+    },
+    "hue": [
+      42,
+      90
+    ],
+    "log": {
+      "fps": 0,
+      "mount": true,
+      "path": "/var/opt/deadeye",
+      "type": "capture"
+    },
+    "sat": [
+      200,
+      255
+    ],
+    "sn": 29,
+    "val": [
+      151,
+      255
+    ]
+  }
+}
