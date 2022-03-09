@@ -147,7 +147,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   }
 
   public boolean isNextCargoAlliance() {
-    return ignoreColorSensor || storedCargoColors[0] == allianceCargoColor;
+    return ignoreColorSensor || storedCargoColors[0] == allianceCargoColor || storedCargoColors[0] == CargoColor.NONE;
   }
 
   public CargoColor readCargoColor() {
@@ -259,13 +259,13 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   }
 
   public void shoot() {
-    if (storedCargoColors[0] == CargoColor.NONE && !ignoreColorSensor) {
-      logger.info("Magazine empty, not shooting");
-      currMagazineState = MagazineState.STOP;
-    } else {
+    // if (storedCargoColors[0] == CargoColor.NONE && !ignoreColorSensor) {
+    //   logger.info("Magazine empty, not shooting");
+    //   currMagazineState = MagazineState.STOP;
+    // } else {
       logger.info("{} -> PAUSE}", currMagazineState);
       currMagazineState = MagazineState.PAUSE;
-    }
+    // }
   }
 
   public MagazineState getCurrMagazineState() {
