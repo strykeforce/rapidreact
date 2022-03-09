@@ -8,6 +8,7 @@ import frc.robot.subsystems.ShooterSubsystem
 import frc.robot.subsystems.TurretSubsystem
 import mu.KotlinLogging
 import org.strykeforce.healthcheck.HealthCheck
+import org.strykeforce.healthcheck.healthCheck
 import org.strykeforce.swerve.TalonSwerveModule
 
 private val logger = KotlinLogging.logger {}
@@ -178,8 +179,8 @@ class HealthCheckCommand(val driveSubsystem : DriveSubsystem,
                 val volt6supplyCurrentRange = 1.0..4.0
                 val volt12supplyCurrentRange = 13.0..17.0
 
-                val volt6supplyCurrentRange = 1.0..4.0
-                val volt12supplyCurrentRange = 13.0..17.0
+                val volt6statorCurrentRange = 1.0..4.0
+                val volt12statorCurrentRange = 13.0..17.0
 
                 timedTest {
                     percentOutput = 0.5
@@ -224,23 +225,23 @@ class HealthCheckCommand(val driveSubsystem : DriveSubsystem,
 
                 positionTest {
                     percentOutput = 0.2
-                    encoderChangingTarget = 25_000
+                    encoderChangeTarget = 25_000
                     encoderGoodEnough = 500
                     encoderTimeCount = 500
 
-                    supplyCurrentRange = supplyCurrent
-                    statorCurrentRange = statorCurrent
+                    supplyCurrentRange
+                    statorCurrentRange
                     speedRange = 550..750
                 }
 
                 positionTest {
                     percentOutput = -0.2
-                    encoderChangingTarget = 25_000
+                    encoderChangeTarget = 25_000
                     encoderGoodEnough = 500
                     encoderTimeCount = 500
 
-                    supplyCurrentRange = supplyCurrent
-                    statorCurrentRange = statorCurrent
+                    supplyCurrentRange
+                    statorCurrentRange
                     speedRange = -750..-550
                 }
             }
@@ -284,7 +285,7 @@ class HealthCheckCommand(val driveSubsystem : DriveSubsystem,
 
                 positionTest {
                     percentOutput = 0.2
-                    encoderChangetarget = 7000
+                    encoderChangeTarget = 7000
                     encoderGoodEnough = 500
                     encoderTimeCount = 500
 
@@ -294,7 +295,7 @@ class HealthCheckCommand(val driveSubsystem : DriveSubsystem,
 
                 positionTest {
                     percentOutput = -0.2
-                    encoderChangetarget = 7000
+                    encoderChangeTarget = 7000
                     encoderGoodEnough = 500
                     encoderTimeCount = 500
 
