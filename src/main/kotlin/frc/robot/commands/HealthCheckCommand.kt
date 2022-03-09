@@ -7,21 +7,16 @@ import frc.robot.subsystems.IntakeSubsystem
 import frc.robot.subsystems.ShooterSubsystem
 import frc.robot.subsystems.TurretSubsystem
 import mu.KotlinLogging
-import org.strykeforce.healthcheck.healthcheck
+import org.strykeforce.healthcheck.HealthCheck
 import org.strykeforce.swerve.TalonSwerveModule
 
 private val logger = KotlinLogging.logger {}
-private var driveSubsystem
-private var magazineSubsystem
-private var intakeSubsystem
-private var shooterSubsystem
-private var turretSubsystem
 
-class HealthCheckCommand : CommandBase(driveSubsystem : DriveSubsystem, 
-                                       magazineSubsystem : MagazineSubsystem, 
-                                       intakeSubsystem : IntakeSubsystem, 
-                                       shooterSubsystem : ShooterSubsystem, 
-                                       turretSubsystem : TurretSubsystem) {
+class HealthCheckCommand(val driveSubsystem : DriveSubsystem, 
+                        val magazineSubsystem : MagazineSubsystem, 
+                        val intakeSubsystem : IntakeSubsystem, 
+                        val shooterSubsystem : ShooterSubsystem, 
+                        val turretSubsystem : TurretSubsystem) : CommandBase() {
     init {
         addRequirements(
             driveSubsystem,
@@ -30,17 +25,12 @@ class HealthCheckCommand : CommandBase(driveSubsystem : DriveSubsystem,
             shooterSubsystem,
             turretSubsystem
         )
-        this.driveSubsystem = driveSubsystem
-        this.magazineSubsystem = magazineSubsystem
-        this.intakeSubsystem = intakeSubsystem
-        this.shooterSubsystem = shooterSubsystem
-        this.turretSubsystem = turretSubsystem
     }
 
     private lateinit var healthCheck : HealthCheck
 
     override fun initialize() {
-        healthcheck = healthcheck {
+        healthCheck = healthCheck {
             // azimuths
             talonCheck {
                 name = "Swerve Azimuth Tests"
