@@ -1,24 +1,21 @@
 package frc.robot.subsystems;
 
-import java.util.List;
-import java.util.Set;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.BaseTalon;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-
+import frc.robot.Constants;
+import frc.robot.Constants.IntakeConstants;
+import java.util.List;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 
-import frc.robot.Constants;
-import frc.robot.Constants.IntakeConstants;
-
 public class IntakeSubsystem extends MeasurableSubsystem {
-  private static final Logger logger = LoggerFactory.getLogger(MeasurableSubsystem.class);
+  private static final Logger logger = LoggerFactory.getLogger(IntakeSubsystem.class);
   private TalonFX intakeFalcon;
 
   public IntakeSubsystem() {

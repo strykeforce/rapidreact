@@ -24,13 +24,15 @@ public class ShooterSubsystem extends MeasurableSubsystem {
   private final TalonFX kickerFalcon;
   private final TalonSRX hoodTalon;
   private final MagazineSubsystem magazineSubsystem;
+  private final VisionSubsystem visionSubsystem;
   private boolean highFender;
   private ShooterState currentState = ShooterState.STOP;
   private double shooterSetPointTicks, kickerSetpointTicks, hoodSetPointTicks;
   private String[][] lookupTable;
 
-  public ShooterSubsystem(MagazineSubsystem magazineSubsystem) {
+  public ShooterSubsystem(MagazineSubsystem magazineSubsystem, VisionSubsystem visionSubsystem) {
     this.magazineSubsystem = magazineSubsystem;
+    this.visionSubsystem = visionSubsystem;
     parseLookupTable();
     shooterFalcon = new TalonFX(ShooterConstants.kShooterFalconID);
     shooterFalcon.configFactoryDefault(Constants.kTalonConfigTimeout);
@@ -50,14 +52,37 @@ public class ShooterSubsystem extends MeasurableSubsystem {
     hoodTalon.configFactoryDefault(Constants.kTalonConfigTimeout);
     hoodTalon.configAllSettings(
         ShooterConstants.getHoodTalonConfig(), Constants.kTalonConfigTimeout);
-    hoodTalon.enableCurrentLimit(true);
+    hoodTalon.configSupplyCurrentLimit(
+        ShooterConstants.getHoodCurrentLimit(), Constants.kTalonConfigTimeout);
     hoodTalon.enableVoltageCompensation(true);
-    hoodTalon.setNeutralMode(NeutralMode.Coast);
+    hoodTalon.setNeutralMode(NeutralMode.Brake);
 
     hoodTalon.configForwardSoftLimitEnable(true);
     hoodTalon.configForwardSoftLimitThreshold(ShooterConstants.kForwardSoftLimts);
     hoodTalon.configReverseSoftLimitEnable(true);
     hoodTalon.configReverseSoftLimitThreshold(ShooterConstants.kReverseSoftLimits);
+
+    zeroHood();
+  }
+
+  public void zeroHood() {
+    // double stringPotPosition = turret.getSensorCollection().getAnalogInRaw();
+    if (!hoodTalon.getSensorCollection().isFwdLimitSwitchClosed()) {
+      int absPos = hoodTalon.getSensorCollection().getPulseWidthPosition() & 0xFFF;
+      // inverted because absolute and relative encoders are out of phase
+      int offset = absPos - ShooterConstants.kHoodZeroTicks;
+      hoodTalon.setSelectedSensorPosition(offset);
+      logger.info(
+          "Hood zeroed; offset: {} zeroTicks: {} absPosition: {}",
+          offset,
+          ShooterConstants.kHoodZeroTicks,
+          absPos);
+    } else {
+      hoodTalon.configPeakOutputForward(0, 0);
+      hoodTalon.configPeakOutputReverse(0, 0);
+      logger.error("Hood zero failed. Killing hood...");
+    }
+    hoodTalon.clearStickyFaults();
   }
 
   private void parseLookupTable() {
@@ -74,31 +99,35 @@ public class ShooterSubsystem extends MeasurableSubsystem {
   }
 
   private double[] getShootSolution() {
-    // fix me get pixel width from vision
-    double widthPixels = 50;
+    double widthPixels = visionSubsystem.getTargetPixelWidth();
     int index = 0;
-
+    double[] shootSolution = new double[3];
     if (widthPixels < ShooterConstants.kLookupMinPixel) {
       logger.warn(
           "Pixel width {} is less than min pixel in table, using {}",
           widthPixels,
           ShooterConstants.kLookupMinPixel);
-      index = 1;
+      index = lookupTable.length - 1;
     } else if (widthPixels > ShooterConstants.kLookupMaxPixel) {
       logger.warn(
           "Pixel width {} is more than max pixel in table, using {}",
           widthPixels,
           ShooterConstants.kLookupMaxPixel);
-      index = lookupTable.length - 1;
+      index = 1;
     } else {
+      // total rows - (Width - minrows)
       index =
           (int)
-              (Math.round(widthPixels / ShooterConstants.kLookupRes)
-                  + 1
-                  - ShooterConstants.kLookupMinPixel);
-      logger.info("Selected Index: {}", index);
+              (ShooterConstants.kNumRows
+                  - (Math.round(widthPixels) - ShooterConstants.kLookupMinPixel));
+      // index =
+      //     (int)
+      //         (Math.round(widthPixels / ShooterConstants.kLookupRes)
+      //             + 1
+      //             - ShooterConstants.kLookupMinPixel);
+      logger.info("Selected Index: {}, widthPixels: {}", index, widthPixels);
     }
-    double[] shootSolution = new double[3];
+
     shootSolution[0] = Double.parseDouble(lookupTable[index][2]);
     shootSolution[1] = Double.parseDouble(lookupTable[index][3]);
     shootSolution[2] = Double.parseDouble(lookupTable[index][4]);
@@ -112,13 +141,20 @@ public class ShooterSubsystem extends MeasurableSubsystem {
 
   public void shooterOpenLoop(double speed) {
     logger.info("Shooter on {}", speed);
-    // shooterFalcon.set(ControlMode.PercentOutput, speed);
-    // kickerFalcon.set(ControlMode.PercentOutput, -speed);
+    shooterFalcon.set(ControlMode.PercentOutput, speed);
+    kickerFalcon.set(ControlMode.PercentOutput, speed);
+    if (speed == 0.0) currentState = ShooterState.STOP;
+    else currentState = ShooterState.MANUAL_SHOOT;
   }
 
   public void hoodOpenLoop(double speed) {
     logger.info("hood on {}", speed);
-    // hoodTalon.set(ControlMode.PercentOutput, speed);
+    hoodTalon.set(ControlMode.PercentOutput, speed);
+  }
+
+  public void manualClosedLoop(double kickerSpeed, double shooterSpeed) {
+    currentState = ShooterState.MANUAL_SHOOT;
+    shooterClosedLoop(kickerSpeed, shooterSpeed);
   }
 
   public void shooterClosedLoop(double kickerSpeed, double shooterSpeed) {
@@ -192,16 +228,19 @@ public class ShooterSubsystem extends MeasurableSubsystem {
       shooterClosedLoop(
           ShooterConstants.kKickerOpTicksP100ms, ShooterConstants.kShooterOpTicksP100ms);
       hoodClosedLoop(ShooterConstants.kHoodOpTicks);
+      logger.info("Fender Shot: Opponent Setpoints");
     } else if (highFender) {
       shooterClosedLoop(
           ShooterConstants.kKickerFenderHighTicksP100ms,
           ShooterConstants.kShooterFenderHighTicksP100ms);
       hoodClosedLoop(ShooterConstants.kHoodFenderHighTicks);
+      logger.info("High Fender Shot");
     } else {
       shooterClosedLoop(
           ShooterConstants.kKickerFenderLowTicksP100ms,
           ShooterConstants.kShooterFenderLowTicksP100ms);
       hoodClosedLoop(ShooterConstants.kHoodFenderLowTicks);
+      logger.info("Low Fender Shot");
     }
   }
 
@@ -213,10 +252,13 @@ public class ShooterSubsystem extends MeasurableSubsystem {
   @Override
   public void periodic() {
     switch (currentState) {
+      case MANUAL_SHOOT:
+        break;
       case STOP:
         if (kickerFalcon.getMotorOutputPercent() != 0.0
             || shooterFalcon.getMotorOutputPercent() != 0.0) {
           shooterOpenLoop(0.0);
+          hoodClosedLoop(0);
         }
         break;
       case ARMING:
@@ -243,9 +285,9 @@ public class ShooterSubsystem extends MeasurableSubsystem {
   @Override
   public void registerWith(TelemetryService telemetryService) {
     super.registerWith(telemetryService);
-    // telemetryService.register(shooterFalcon);
-    // telemetryService.register(kickerFalcon);
-    // telemetryService.register(hoodTalon);
+    telemetryService.register(shooterFalcon);
+    telemetryService.register(kickerFalcon);
+    telemetryService.register(hoodTalon);
   }
 
   @Override
@@ -258,6 +300,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
     ARMING,
     ARMED,
     ADJUSTING,
-    SHOOT;
+    SHOOT,
+    MANUAL_SHOOT;
   }
 }

@@ -1,4 +1,4 @@
-package frc.robot.commands.turret;
+package frc.robot.commands.sequences.shooting;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.MagazineSubsystem;
@@ -6,16 +6,16 @@ import frc.robot.subsystems.MagazineSubsystem.MagazineState;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 
-public class HighFenderShotCommand extends CommandBase {
+public class LowFenderShotCommand extends CommandBase {
   public final TurretSubsystem turretSubsystem;
   public final ShooterSubsystem shooterSubsystem;
   public final MagazineSubsystem magazineSubsystem;
 
-  public HighFenderShotCommand(
+  public LowFenderShotCommand(
       TurretSubsystem turretSubsystem,
       ShooterSubsystem shooterSubsystem,
       MagazineSubsystem magazineSubsystem) {
-    addRequirements(turretSubsystem);
+    addRequirements(turretSubsystem, shooterSubsystem, magazineSubsystem);
     this.turretSubsystem = turretSubsystem;
     this.shooterSubsystem = shooterSubsystem;
     this.magazineSubsystem = magazineSubsystem;
@@ -23,8 +23,8 @@ public class HighFenderShotCommand extends CommandBase {
 
   @Override
   public void initialize() {
-    turretSubsystem.fenderShot();
-    shooterSubsystem.fenderShot(true);
+    turretSubsystem.fenderShot(true);
+    shooterSubsystem.fenderShot(false);
     magazineSubsystem.shoot();
   }
 

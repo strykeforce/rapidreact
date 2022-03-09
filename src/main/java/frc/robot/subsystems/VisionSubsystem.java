@@ -17,7 +17,7 @@ public class VisionSubsystem extends MeasurableSubsystem
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   public VisionSubsystem() {
-    deadeye = new Deadeye<>("C0", HubTargetData.class);
+    deadeye = new Deadeye<>("A0", HubTargetData.class);
     deadeye.setTargetDataListener(this);
     HubTargetData.kFrameCenter = deadeye.getCapture().width / 2;
   }
@@ -48,7 +48,7 @@ public class VisionSubsystem extends MeasurableSubsystem
         new Measure("Error Radians", this::getErrorRadians),
         new Measure("Error Degrees", this::getErrorDegrees),
         new Measure("Target Data Valid", this::getValid),
-        new Measure("Test Pixel Distance", this::getTargetsDistancePixel),
+        new Measure("Test Pixel Width", this::getTargetsDistancePixel),
         new Measure("Test Ground Distance", this::getTargetsDistanceGround),
         new Measure("Target Data SN", () -> targetData.serial));
   }
@@ -71,11 +71,18 @@ public class VisionSubsystem extends MeasurableSubsystem
   }
 
   public double getTargetsDistancePixel() {
-    return targetData.testGetTargetsPixelWidth();
+    var td = targetData;
+    return td.isValid() ? td.testGetTargetsPixelWidth() : 2767.0;
   }
 
   public double getTargetsDistanceGround() {
-    return targetData.getGroundDistance();
+    var td = targetData;
+    return td.isValid() ? td.getGroundDistance() : 2767.0;
+  }
+
+  public double getTargetPixelWidth() {
+    var td = targetData;
+    return td.testGetTargetsPixelWidth();
   }
 
   private double getValid() {

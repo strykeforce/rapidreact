@@ -26,14 +26,15 @@
 | Shooter   | FX   | kicker          | 41  |  4  | Falcon |  40     |
 | Shooter   | SRX  | hood            | 42  |  7  | 550    |  30     |
 | Turret    | SRX  | turret          | 50  |  4  | 550    |  30     |
-| Climb     | FX   | extend1Static   | 60  |  1  | Falcon |  40     |
-| Climb     | FX   | extend2Rotating | 61  |  10 | Falcon |  40     |
-| Climb     | SRX  | shoulder        | 62  |  2  | 550    |  30     |
+| Climb     | FX   | pivotArm        | 60  |  0  | Falcon |  40     |
+| Climb     | FX   | fixedArm        | 61  |  10 | Falcon |  40     |
+| Climb     | SRX  | shoulder        | 62  |  1  | 550    |  30     |
 
 * Lower beam break: lower magazine forward limit
 * Upper beam break: upper magazine forward limit
 * Turret banana sensor : turret forward limit
 * Hood zero sensor : hood forward limit
+* Shoulder zero sensor: shoulder forward limit
 
 ## Roborio
 
@@ -44,10 +45,18 @@
 
 ## PWM
 
-| Subsystem | name          | ID |
-| --------- | ------------- | -- |
-| Climb     | staticRatchet | 0  |
-| Climb     | mobileRatchet | 1  |
+| Subsystem | name         | ID |
+| --------- | ------------ | -- |
+| Climb     | PivotRatchet | 0  |
+| Climb     | FixedRatchet | 1  |
+
+
+## DIO
+| Subsystem | name        | ID |
+| --------- | ----------- | -- |
+| Climb     | leftArmHome  | 0 |
+| Climb     | rightArmHome | 1 |
+
 
 ## Deadeye Vision System
 See the [README](./deadeye/README.md) in `/deadeye`.

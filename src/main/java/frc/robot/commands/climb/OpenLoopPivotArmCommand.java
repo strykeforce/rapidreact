@@ -3,12 +3,12 @@ package frc.robot.commands.climb;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.ClimbSubsystem;
 
-public class OpenLoopSet1StaticCommand extends InstantCommand {
+public class OpenLoopPivotArmCommand extends InstantCommand {
 
   double speed;
   private final ClimbSubsystem climbSubsystem;
 
-  public OpenLoopSet1StaticCommand(ClimbSubsystem climbSubsystem, double speed) {
+  public OpenLoopPivotArmCommand(ClimbSubsystem climbSubsystem, double speed) {
     addRequirements(climbSubsystem);
     this.climbSubsystem = climbSubsystem;
     this.speed = speed;
@@ -16,6 +16,6 @@ public class OpenLoopSet1StaticCommand extends InstantCommand {
 
   @Override
   public void initialize() {
-    climbSubsystem.openLoopSet1Static(speed);
+    climbSubsystem.openLoopPivotArm(speed);
   }
 }

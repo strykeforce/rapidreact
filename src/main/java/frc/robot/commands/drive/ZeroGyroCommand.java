@@ -15,6 +15,6 @@ public class ZeroGyroCommand extends InstantCommand {
 
   @Override
   public void initialize() {
-    driveSubsystem.resetGyro();
+    driveSubsystem.teleResetGyro();
   }
 }

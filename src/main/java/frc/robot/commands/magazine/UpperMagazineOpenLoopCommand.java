@@ -15,6 +15,6 @@ public class UpperMagazineOpenLoopCommand extends InstantCommand {
 
   @Override
   public void initialize() {
-    magazineSubsystem.upperOpenLoopRotate(speed);
+    magazineSubsystem.manualUpperMagazine(speed);
   }
 }

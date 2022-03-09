@@ -1,13 +1,15 @@
-package frc.robot.commands.sequences;
+package frc.robot.commands.sequences.intaking;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
+import frc.robot.subsystems.MagazineSubsystem.MagazineState;
 
 public class AutoIntakeCommand extends CommandBase {
   public final MagazineSubsystem magazineSubsystem;
   public final IntakeSubsystem intakeSubsystem;
+  public boolean magazineReversed = false;
 
   public AutoIntakeCommand(MagazineSubsystem magazineSubsystem, IntakeSubsystem intakeSubsystem) {
     addRequirements(magazineSubsystem, intakeSubsystem);
@@ -19,6 +21,20 @@ public class AutoIntakeCommand extends CommandBase {
   public void initialize() {
     magazineSubsystem.indexCargo();
     intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeSpeed);
+    magazineReversed = false;
+  }
+
+  @Override
+  public void execute() {
+    if (magazineSubsystem.getCurrMagazineState() == MagazineState.EJECT_CARGO
+        && !magazineReversed) {
+      intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeEjectSpeed);
+      magazineReversed = true;
+    } else if (magazineReversed
+        && (magazineSubsystem.getCurrMagazineState() != MagazineState.EJECT_CARGO)) {
+      intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeSpeed);
+      magazineReversed = false;
+    }
   }
 
   @Override

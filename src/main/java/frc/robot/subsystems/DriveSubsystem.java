@@ -66,7 +66,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
       var azimuthTalon = new TalonSRX(i);
       azimuthTalon.configFactoryDefault(kTalonConfigTimeout);
       azimuthTalon.configAllSettings(DriveConstants.getAzimuthTalonConfig(), kTalonConfigTimeout);
-      azimuthTalon.enableCurrentLimit(true);
+      azimuthTalon.configSupplyCurrentLimit(
+          DriveConstants.getAzimuthSupplyCurrentLimit(), kTalonConfigTimeout);
       azimuthTalon.enableVoltageCompensation(true);
       azimuthTalon.setNeutralMode(NeutralMode.Coast);
 
@@ -88,7 +89,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
     swerveDrive = new SwerveDrive(swerveModules);
     swerveDrive.resetGyro();
-    swerveDrive.setGyroOffset(Rotation2d.fromDegrees(180));
+    swerveDrive.setGyroOffset(Rotation2d.fromDegrees(0));
 
     // Setup Holonomic Controller
     omegaController =
@@ -134,8 +135,17 @@ public class DriveSubsystem extends MeasurableSubsystem {
     swerveDrive.resetGyro();
   }
 
+  public void teleResetGyro() {
+    logger.info("Driver Joystick: Reset Gyro");
+    swerveDrive.setGyroOffset(Rotation2d.fromDegrees(0.0));
+    swerveDrive.resetGyro();
+    swerveDrive.resetOdometry(
+        new Pose2d(swerveDrive.getPoseMeters().getTranslation(), Rotation2d.fromDegrees(0.0)));
+  }
+
   public void setGyroOffset(Rotation2d rotation) {
     swerveDrive.setGyroOffset(rotation);
+    logger.info("Set GyroOffset to {}", rotation);
   }
 
   public void lockZero() {
@@ -228,8 +238,16 @@ public class DriveSubsystem extends MeasurableSubsystem {
       return new PathData(targetYaw, trajectoryGenerated);
     } catch (Exception error) {
       logger.error(error.toString());
-      logger.error("Path {} not found", trajectoryName);
-      throw new RuntimeException(error);
+      logger.error("Path {} not found - Running Default Path", trajectoryName);
+
+      Trajectory trajectoryGenerated =
+          TrajectoryGenerator.generateTrajectory(
+              DriveConstants.startPose2d,
+              DriveConstants.getDefaultInternalWaypoints(),
+              DriveConstants.endPose2d,
+              DriveConstants.getDefaultTrajectoryConfig());
+
+      return new PathData(getGyroRotation2d(), trajectoryGenerated);
     }
   }
 
