@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.AutoConstants;
-import frc.robot.commands.Auton.TwoCargoAuto;
+import frc.robot.commands.auton.TwoCargoAuto;
 import frc.robot.commands.drive.DriveAutonCommand;
 import java.util.ArrayList;
 import org.slf4j.Logger;

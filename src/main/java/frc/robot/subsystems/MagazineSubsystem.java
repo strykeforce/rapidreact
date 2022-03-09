@@ -147,7 +147,9 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   }
 
   public boolean isNextCargoAlliance() {
-    return ignoreColorSensor || storedCargoColors[0] == allianceCargoColor;
+    return ignoreColorSensor
+        || storedCargoColors[0] == allianceCargoColor
+        || storedCargoColors[0] == CargoColor.NONE;
   }
 
   public CargoColor readCargoColor() {
@@ -220,7 +222,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   public void manualUpperMagazine(double upperSpeed) {
     if (upperSpeed == 0.0) currMagazineState = MagazineState.STOP;
     else currMagazineState = MagazineState.MANUAL_INTAKE;
-    lowerOpenLoopRotate(upperSpeed);
+    upperOpenLoopRotate(upperSpeed);
   }
 
   public void manualClosedLoopFullMagazine(double lowerSpeed, double upperSpeed) {
@@ -241,7 +243,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
 
   private void autoStopUpperMagazine(double speed) {
     if (isUpperBeamBroken() && upperMagazineTalon.getMotorOutputPercent() != 0.0) {
-      upperOpenLoopRotate(0.0);
+      lowerOpenLoopRotate(0.0);
       logger.info("Stopping upper magazine, upper beam broken");
     } else if (!isUpperBeamBroken() && upperMagazineTalon.getMotorOutputPercent() == 0.0) {
       upperClosedLoopRotate(speed);
@@ -259,13 +261,13 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   }
 
   public void shoot() {
-    if (storedCargoColors[0] == CargoColor.NONE && !ignoreColorSensor) {
-      logger.info("Magazine empty, not shooting");
-      currMagazineState = MagazineState.STOP;
-    } else {
-      logger.info("{} -> PAUSE}", currMagazineState);
-      currMagazineState = MagazineState.PAUSE;
-    }
+    // if (storedCargoColors[0] == CargoColor.NONE && !ignoreColorSensor) {
+    //   logger.info("Magazine empty, not shooting");
+    //   currMagazineState = MagazineState.STOP;
+    // } else {
+    logger.info("{} -> PAUSE}", currMagazineState);
+    currMagazineState = MagazineState.PAUSE;
+    // }
   }
 
   public MagazineState getCurrMagazineState() {

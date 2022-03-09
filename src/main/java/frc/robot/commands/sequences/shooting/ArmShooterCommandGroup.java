@@ -1,4 +1,4 @@
-package frc.robot.commands.sequences;
+package frc.robot.commands.sequences.shooting;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.commands.shooter.ArmShooterCommand;
