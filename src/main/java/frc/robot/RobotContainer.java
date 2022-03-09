@@ -13,7 +13,10 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SuppliedValueWidget;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -21,7 +24,9 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ClimbConstants;
 import frc.robot.Constants.DashboardConstants;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.MagazineConstants;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.climb.EmergencyStopClimbCommand;
 import frc.robot.commands.climb.OpenLoopFixedArmCommand;
 import frc.robot.commands.climb.OpenLoopPivotArmCommand;
@@ -30,7 +35,7 @@ import frc.robot.commands.climb.RotateShoulderUpCommand;
 import frc.robot.commands.climb.ShoulderHoldPositionCommand;
 import frc.robot.commands.climb.ToggleFixedRatchetCommand;
 import frc.robot.commands.climb.TogglePivotRatchetCommand;
-import frc.robot.commands.climb.ZeroMotorsCommand;
+import frc.robot.commands.climb.ZeroClimbCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.LockZeroCommand;
@@ -38,33 +43,30 @@ import frc.robot.commands.drive.ResetOdometryCommand;
 import frc.robot.commands.drive.XLockCommand;
 import frc.robot.commands.drive.ZeroGyroCommand;
 import frc.robot.commands.intake.IntakeOpenLoopCommand;
-import frc.robot.commands.intake.PitIntakeOpenLoopCommand;
 import frc.robot.commands.magazine.IgnoreColorSensorCommand;
+import frc.robot.commands.magazine.LowerMagazineOpenLoopCommand;
 import frc.robot.commands.magazine.ManualEjectCargoReverseCommand;
 import frc.robot.commands.magazine.PitClearCargoColor;
-import frc.robot.commands.magazine.PitMagazineOpenLoopCommand;
 import frc.robot.commands.magazine.PitReadCargoColor;
 import frc.robot.commands.magazine.StopMagazineCommand;
 import frc.robot.commands.magazine.UpperMagazineOpenLoopCommand;
-import frc.robot.commands.sequences.ArmShooterCommandGroup;
-import frc.robot.commands.sequences.AutoIntakeCommand;
-import frc.robot.commands.sequences.EjectCargoCommand;
-import frc.robot.commands.sequences.HighClimbCommandGroup;
-import frc.robot.commands.sequences.HighFenderShotCommand;
-import frc.robot.commands.sequences.LowFenderShotCommand;
-import frc.robot.commands.sequences.MidClimbCommandGroup;
-import frc.robot.commands.sequences.PitShooterTuneCommandGroup;
-import frc.robot.commands.sequences.StopShooterCommandGroup;
-import frc.robot.commands.sequences.TraverseClimbCommandGroup;
-import frc.robot.commands.sequences.VisionShootCommand;
+import frc.robot.commands.sequences.climb.HighClimbCommandGroup;
+import frc.robot.commands.sequences.climb.MidClimbCommandGroup;
+import frc.robot.commands.sequences.climb.TraverseClimbCommandGroup;
+import frc.robot.commands.sequences.intaking.AutoIntakeCommand;
+import frc.robot.commands.sequences.intaking.EjectCargoCommand;
+import frc.robot.commands.sequences.shooting.ArmShooterCommandGroup;
+import frc.robot.commands.sequences.shooting.HighFenderShotCommand;
+import frc.robot.commands.sequences.shooting.LowFenderShotCommand;
+import frc.robot.commands.sequences.shooting.PitShooterTuneCommandGroup;
+import frc.robot.commands.sequences.shooting.StopShooterCommandGroup;
+import frc.robot.commands.sequences.shooting.VisionShootCommand;
+import frc.robot.commands.shooter.HoodClosedLoopCommand;
 import frc.robot.commands.shooter.HoodOpenLoopCommand;
-import frc.robot.commands.shooter.PitHoodClosedLoopCommand;
-import frc.robot.commands.shooter.PitShooterClosedLoopCommand;
 import frc.robot.commands.shooter.ShooterOpenLoopCommand;
 import frc.robot.commands.shooter.StopShooterCommand;
 import frc.robot.commands.turret.CheckSeekAngleCommand;
 import frc.robot.commands.turret.OpenLoopTurretCommand;
-import frc.robot.commands.turret.PitTurretCloseLoopPositionCommand;
 import frc.robot.commands.turret.RotateToCommand;
 import frc.robot.commands.turret.TurretAimCommandGroup;
 import frc.robot.subsystems.AutoSwitch;
@@ -201,6 +203,8 @@ public class RobotContainer {
         .whenReleased(new OpenLoopTurretCommand(turretSubsystem, 0.0));
     new JoystickButton(driveJoystick, Trim.RIGHT_Y_POS.id)
         .whenPressed(new CheckSeekAngleCommand(turretSubsystem));
+
+    // Drive Practice Odometry Reset
     new JoystickButton(driveJoystick, Trim.LEFT_Y_NEG.id)
         .whenPressed(
             new ResetOdometryCommand(
@@ -218,17 +222,8 @@ public class RobotContainer {
         .whenPressed(
             new VisionShootCommand(
                 shooterSubsystem, turretSubsystem, magazineSubsystem, visionSubsystem, true));
-    // new JoystickButton(driveJoystick, Shoulder.RIGHT_DOWN.id)
-    //     .whenReleased(new StopShooterCommand(shooterSubsystem));
 
     // Auto Climb
-    // new JoystickButton(driveJoystick, Button.UP.id)
-    //     .whenPressed(new TraverseClimbCommandGroup(climbSubsystem, driveSubsystem,
-    // driveJoystick));
-    // new JoystickButton(driveJoystick, Button.DOWN.id)
-    //     .whenPressed(new HighClimbCommandGroup(climbSubsystem, driveSubsystem, driveJoystick));
-    // new JoystickButton(driveJoystick, Button.HAMBURGER.id)
-    //     .whenPressed(new MidClimbCommandGroup(climbSubsystem, driveSubsystem, driveJoystick));
     new JoystickButton(driveJoystick, Trim.LEFT_X_POS.id)
         .whenPressed(new TraverseClimbCommandGroup(climbSubsystem, driveSubsystem, driveJoystick));
     new JoystickButton(driveJoystick, Trim.LEFT_X_NEG.id)
@@ -242,7 +237,7 @@ public class RobotContainer {
   private void configureOperatorButtonBindings() {
     // Zero Climb
     new JoystickButton(xboxController, XboxController.Button.kStart.value)
-        .whenReleased(new ZeroMotorsCommand(climbSubsystem));
+        .whenReleased(new ZeroClimbCommand(climbSubsystem));
 
     // Auto Intake
     new JoystickButton(xboxController, XboxController.Button.kY.value)
@@ -336,6 +331,7 @@ public class RobotContainer {
     Shuffleboard.getTab("Match")
         .addBoolean("IgnoreColorSensor", () -> magazineSubsystem.isColorSensorIgnored());
 
+    Shuffleboard.getTab("Match").add("EstopClimb", new EmergencyStopClimbCommand(climbSubsystem));
     SmartDashboard.putData("Match/EStopClimb", new EmergencyStopClimbCommand(climbSubsystem));
   }
 
@@ -363,72 +359,136 @@ public class RobotContainer {
   }
 
   private void configurePitDashboard() {
+    ShuffleboardTab pitTab = Shuffleboard.getTab("Pit");
+
     // Magazine Commands
-    SmartDashboard.putNumber("Pit/Magazine/Speed", 0.0);
-    SmartDashboard.putData("Pit/Magazine/Start", new PitMagazineOpenLoopCommand(magazineSubsystem));
-    SmartDashboard.putData(
-        "Pit/Magazine/Stop", new UpperMagazineOpenLoopCommand(magazineSubsystem, 0.0));
-    SmartDashboard.putString("Pit/Magazine/First Cargo Color", "");
-    SmartDashboard.putString("Pit/Magazine/Second Cargo Color", "");
-    SmartDashboard.putData("Pit/Magazine/ReadCargoColor", new PitReadCargoColor(magazineSubsystem));
-    SmartDashboard.putData(
-        "Pit/Magazine/ClearCargoColor", new PitClearCargoColor(magazineSubsystem));
+    ShuffleboardLayout magazineCommands = pitTab.getLayout("Magazine", BuiltInLayouts.kGrid);
+    magazineCommands.add("Clear Cargo", new PitClearCargoColor(magazineSubsystem));
+    magazineCommands.add("Read Cargo Color", new PitReadCargoColor(magazineSubsystem));
+    magazineCommands.add("Stop", new StopMagazineCommand(magazineSubsystem));
+    magazineCommands.add(
+        "Start",
+        new ParallelCommandGroup(
+            new UpperMagazineOpenLoopCommand(magazineSubsystem, 0.5),
+            new LowerMagazineOpenLoopCommand(magazineSubsystem, 0.5)));
+
+    // SmartDashboard.putNumber("Pit/Magazine/Speed", 0.0);
+    // SmartDashboard.putData("Pit/Magazine/Start", new
+    // PitMagazineOpenLoopCommand(magazineSubsystem));
+    // SmartDashboard.putData(
+    //     "Pit/Magazine/Stop", new UpperMagazineOpenLoopCommand(magazineSubsystem, 0.0));
+    // SmartDashboard.putString("Pit/Magazine/First Cargo Color", "");
+    // SmartDashboard.putString("Pit/Magazine/Second Cargo Color", "");
+    // SmartDashboard.putData("Pit/Magazine/ReadCargoColor", new
+    // PitReadCargoColor(magazineSubsystem));
+    // SmartDashboard.putData(
+    //     "Pit/Magazine/ClearCargoColor", new PitClearCargoColor(magazineSubsystem));
 
     // Drive Commands
-    SmartDashboard.putNumber("Pit/Drive/PoseX", 8.42);
-    SmartDashboard.putNumber("Pit/Drive/PoseY", 7.89);
-    SmartDashboard.putData(
-        "Pit/Drive/Set Odometry",
-        new ResetOdometryCommand(
-            driveSubsystem,
-            new Pose2d(
-                SmartDashboard.getNumber("Pit/Drive/PoseX", 8.42),
-                SmartDashboard.getNumber("Pit/Drive/PoseY", 7.89),
-                Rotation2d.fromDegrees(0))));
-    SmartDashboard.putData("Pit/Drive/LockZero", new LockZeroCommand(driveSubsystem));
-    SmartDashboard.putData(
-        "Pit/Drive/pathDrive", new DriveAutonCommand(driveSubsystem, "straightPath"));
+    ShuffleboardLayout driveCommands = pitTab.getLayout("Drive", BuiltInLayouts.kGrid);
+    driveCommands.add("LockZero", new LockZeroCommand(driveSubsystem));
+    driveCommands.add("OdometryTuning", new DriveAutonCommand(driveSubsystem, "straightPath"));
 
-    // Shooter Commands
-    SmartDashboard.putNumber(DashboardConstants.kPitShooterSetpointTicks, 0.0);
-    SmartDashboard.putNumber(DashboardConstants.kPitKickerSetpointTicks, 0.0);
-    SmartDashboard.putData(
-        "Pit/Shooter/shooterStart", new PitShooterClosedLoopCommand(shooterSubsystem));
-    SmartDashboard.putData(
-        "Pit/Shooter/shooterStop", new ShooterOpenLoopCommand(shooterSubsystem, 0.0));
+    // SmartDashboard.putNumber("Pit/Drive/PoseX", 8.42);
+    // SmartDashboard.putNumber("Pit/Drive/PoseY", 7.89);
+    // SmartDashboard.putData(
+    //     "Pit/Drive/Set Odometry",
+    //     new ResetOdometryCommand(
+    //         driveSubsystem,
+    //         new Pose2d(
+    //             SmartDashboard.getNumber("Pit/Drive/PoseX", 8.42),
+    //             SmartDashboard.getNumber("Pit/Drive/PoseY", 7.89),
+    //             Rotation2d.fromDegrees(0))));
+    // SmartDashboard.putData("Pit/Drive/LockZero", new LockZeroCommand(driveSubsystem));
+    // SmartDashboard.putData(
+    //     "Pit/Drive/pathDrive", new DriveAutonCommand(driveSubsystem, "straightPath"));
 
-    // Hood Commands
-    SmartDashboard.putNumber(DashboardConstants.kPitHoodSetpointTicks, 0.0);
-    SmartDashboard.putData("Pit/Hood/hoodStart", new PitHoodClosedLoopCommand(shooterSubsystem));
-    SmartDashboard.putData("Pit/Hood/hoodStop", new HoodOpenLoopCommand(shooterSubsystem, 0.0));
+    // Shooter (shooter, kicker, hood) Commands
+    ShuffleboardLayout shooterCommands = pitTab.getLayout("Shooter", BuiltInLayouts.kGrid);
+    shooterCommands.add("Stop", new ShooterOpenLoopCommand(shooterSubsystem, 0.0));
+    shooterCommands.add("HoodToZero", new HoodClosedLoopCommand(shooterSubsystem, 0.0));
+    shooterCommands.add(
+        "HoodZeroCheck",
+        new HoodClosedLoopCommand(shooterSubsystem, ShooterConstants.kZeroCheckTicks));
 
-    // intake pit commands
-    SmartDashboard.putNumber("Pit/Intake/Speed", 0.0);
+    // SmartDashboard.putNumber(DashboardConstants.kPitShooterSetpointTicks, 0.0);
+    // SmartDashboard.putNumber(DashboardConstants.kPitKickerSetpointTicks, 0.0);
+    // SmartDashboard.putData(
+    //     "Pit/Shooter/shooterStart", new PitShooterClosedLoopCommand(shooterSubsystem));
+    // SmartDashboard.putData(
+    //     "Pit/Shooter/shooterStop", new ShooterOpenLoopCommand(shooterSubsystem, 0.0));
+
+    // // Hood Commands
+    // SmartDashboard.putNumber(DashboardConstants.kPitHoodSetpointTicks, 0.0);
+    // SmartDashboard.putData("Pit/Hood/hoodStart", new PitHoodClosedLoopCommand(shooterSubsystem));
+    // SmartDashboard.putData("Pit/Hood/hoodStop", new HoodOpenLoopCommand(shooterSubsystem, 0.0));
 
     // Turret Pit Commands
-    SmartDashboard.putNumber(
-        DashboardConstants.kTurretSetpointRadians, turretSubsystem.getRotation2d().getRadians());
-    SmartDashboard.putData(
-        "Pit/Turret/CloseLoopPosition", new PitTurretCloseLoopPositionCommand(turretSubsystem));
-    SmartDashboard.putData("Pit/Turret/Forward", new OpenLoopTurretCommand(turretSubsystem, 0.3));
-    SmartDashboard.putData("Pit/Turret/Reverse", new OpenLoopTurretCommand(turretSubsystem, -0.3));
-    SmartDashboard.putData("Pit/Turret/Stop", new OpenLoopTurretCommand(turretSubsystem, 0.0));
-    SmartDashboard.putData(
-        "Pit/Turret/RotateToPos90",
-        new RotateToCommand(turretSubsystem, Rotation2d.fromDegrees(90)));
-    SmartDashboard.putData(
-        "Pit/Turret/RotateTo0", new RotateToCommand(turretSubsystem, Rotation2d.fromDegrees(0)));
-    SmartDashboard.putData(
-        "Pit/Turret/RotateToNeg90",
-        new RotateToCommand(turretSubsystem, Rotation2d.fromDegrees(-90)));
+    ShuffleboardLayout turretCommands = pitTab.getLayout("Turret", BuiltInLayouts.kGrid);
+    turretCommands.add(
+        "LockZero", new RotateToCommand(turretSubsystem, Rotation2d.fromDegrees(0.0)));
+    turretCommands.add(
+        "Lock90", new RotateToCommand(turretSubsystem, Rotation2d.fromDegrees(90.0)));
+    turretCommands.add(
+        "LockNeg90", new RotateToCommand(turretSubsystem, Rotation2d.fromDegrees(-90.0)));
+
+    // SmartDashboard.putNumber(
+    //     DashboardConstants.kTurretSetpointRadians, turretSubsystem.getRotation2d().getRadians());
+    // SmartDashboard.putData(
+    //     "Pit/Turret/CloseLoopPosition", new PitTurretCloseLoopPositionCommand(turretSubsystem));
+    // SmartDashboard.putData("Pit/Turret/Forward", new OpenLoopTurretCommand(turretSubsystem,
+    // 0.3));
+    // SmartDashboard.putData("Pit/Turret/Reverse", new OpenLoopTurretCommand(turretSubsystem,
+    // -0.3));
+    // SmartDashboard.putData("Pit/Turret/Stop", new OpenLoopTurretCommand(turretSubsystem, 0.0));
+    // SmartDashboard.putData(
+    //     "Pit/Turret/RotateToPos90",
+    //     new RotateToCommand(turretSubsystem, Rotation2d.fromDegrees(90)));
+    // SmartDashboard.putData(
+    //     "Pit/Turret/RotateTo0", new RotateToCommand(turretSubsystem, Rotation2d.fromDegrees(0)));
+    // SmartDashboard.putData(
+    //     "Pit/Turret/RotateToNeg90",
+    //     new RotateToCommand(turretSubsystem, Rotation2d.fromDegrees(-90)));
 
     // Intake Commands
-    SmartDashboard.putData("Pit/Intake/Start", new PitIntakeOpenLoopCommand(intakeSubsystem));
-    SmartDashboard.putData("Pit/Intake/Stop", new IntakeOpenLoopCommand(intakeSubsystem, 0.0));
-    SmartDashboard.putData(
-        "Pit/Turret/Seek", new TurretAimCommandGroup(visionSubsystem, turretSubsystem));
-    // SmartDashboard.putData("Pit/Turret/AimTurret", new TurretAimCommand(visionSubsystem,
-    // turretSubsystem));
+    ShuffleboardLayout intakeCommands = pitTab.getLayout("Intake", BuiltInLayouts.kGrid);
+    intakeCommands.add(
+        "FWD", new IntakeOpenLoopCommand(intakeSubsystem, IntakeConstants.kIntakeSpeed));
+    intakeCommands.add(
+        "REV", new IntakeOpenLoopCommand(intakeSubsystem, IntakeConstants.kIntakeEjectSpeed));
+    intakeCommands.add("Stop", new IntakeOpenLoopCommand(intakeSubsystem, 0.0));
+
+    // SmartDashboard.putData("Pit/Intake/Start", new PitIntakeOpenLoopCommand(intakeSubsystem));
+    // SmartDashboard.putData("Pit/Intake/Stop", new IntakeOpenLoopCommand(intakeSubsystem, 0.0));
+    // SmartDashboard.putNumber("Pit/Intake/Speed", 0.0);
+
+    // Climb Commands
+    ShuffleboardLayout climbCommands = pitTab.getLayout("Climb", BuiltInLayouts.kGrid);
+    climbCommands.add("Zero", new ZeroClimbCommand(climbSubsystem));
+    climbCommands.add("ToggleFixedRatchet", new ToggleFixedRatchetCommand(climbSubsystem));
+    climbCommands.add("TogglePivotRatchet", new TogglePivotRatchetCommand(climbSubsystem));
+    climbCommands.add(
+        "FixedArmExtend",
+        new OpenLoopFixedArmCommand(climbSubsystem, -ClimbConstants.kClimbArmsOpenLoopSpeed));
+    climbCommands.add(
+        "FixedArmRetract",
+        new OpenLoopFixedArmCommand(climbSubsystem, ClimbConstants.kClimbArmsOpenLoopSpeed));
+    climbCommands.add("FixedArmsStop", new OpenLoopFixedArmCommand(climbSubsystem, 0.0));
+    climbCommands.add(
+        "PivotArmsExtend",
+        new OpenLoopPivotArmCommand(climbSubsystem, -ClimbConstants.kClimbArmsOpenLoopSpeed));
+    climbCommands.add(
+        "PivotArmsRetract",
+        new OpenLoopPivotArmCommand(climbSubsystem, ClimbConstants.kClimbArmsOpenLoopSpeed));
+    climbCommands.add("PivotArmsStop", new OpenLoopPivotArmCommand(climbSubsystem, 0.0));
+    climbCommands.add("ShoulderFWD", new RotateShoulderDownCommand(climbSubsystem));
+    climbCommands.add("ShoulderREV", new RotateShoulderUpCommand(climbSubsystem));
+    climbCommands.add("ShoulderSTOP", new ShoulderHoldPositionCommand(climbSubsystem));
+
+    // Vision Commands
+    pitTab.add("Seek", new TurretAimCommandGroup(visionSubsystem, turretSubsystem));
+    // SmartDashboard.putData(
+    //     "Pit/Turret/Seek", new TurretAimCommandGroup(visionSubsystem, turretSubsystem));
 
     // tuning commands
     SmartDashboard.putData(

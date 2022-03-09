@@ -644,7 +644,7 @@ public final class Constants {
     public static final int kHoodTalonID = 42;
     public static final String kLookupTablePath = "/home/lvuser/deploy/LookupTable.csv";
 
-    // Lookup Table Consta
+    // Lookup Table Constants
     public static final double kLookupMinPixel = 160;
     public static final double kLookupMaxPixel = 380;
     public static final double kNumRows = 221;
@@ -654,6 +654,7 @@ public final class Constants {
     public static final int kHoodZeroTicks = 1800;
     public static final int kForwardSoftLimts = 5800;
     public static final int kReverseSoftLimits = 100;
+    public static final int kZeroCheckTicks = 500; // FIXME
 
     // Arm Shooter Constants
     public static final double kKickerArmTicksP100ms = 4000;

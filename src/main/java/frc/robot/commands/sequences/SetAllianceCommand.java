@@ -18,4 +18,9 @@ public class SetAllianceCommand extends InstantCommand {
   public void initialize() {
     robotContainer.setAllianceColor(alliance);
   }
+
+  @Override
+  public boolean runsWhenDisabled() {
+    return true;
+  }
 }

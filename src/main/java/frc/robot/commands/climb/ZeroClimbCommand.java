@@ -3,10 +3,10 @@ package frc.robot.commands.climb;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.ClimbSubsystem;
 
-public class ZeroMotorsCommand extends InstantCommand {
+public class ZeroClimbCommand extends InstantCommand {
   private final ClimbSubsystem climbSubsystem;
 
-  public ZeroMotorsCommand(ClimbSubsystem climbSubsystem) {
+  public ZeroClimbCommand(ClimbSubsystem climbSubsystem) {
     this.climbSubsystem = climbSubsystem;
     addRequirements(climbSubsystem);
   }

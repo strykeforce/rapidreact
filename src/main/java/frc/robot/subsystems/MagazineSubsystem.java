@@ -220,7 +220,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   public void manualUpperMagazine(double upperSpeed) {
     if (upperSpeed == 0.0) currMagazineState = MagazineState.STOP;
     else currMagazineState = MagazineState.MANUAL_INTAKE;
-    lowerOpenLoopRotate(upperSpeed);
+    upperOpenLoopRotate(upperSpeed);
   }
 
   public void manualClosedLoopFullMagazine(double lowerSpeed, double upperSpeed) {
@@ -241,7 +241,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
 
   private void autoStopUpperMagazine(double speed) {
     if (isUpperBeamBroken() && upperMagazineTalon.getMotorOutputPercent() != 0.0) {
-      upperOpenLoopRotate(0.0);
+      lowerOpenLoopRotate(0.0);
       logger.info("Stopping upper magazine, upper beam broken");
     } else if (!isUpperBeamBroken() && upperMagazineTalon.getMotorOutputPercent() == 0.0) {
       upperClosedLoopRotate(speed);

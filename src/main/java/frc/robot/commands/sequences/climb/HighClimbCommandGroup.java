@@ -1,4 +1,4 @@
-package frc.robot.commands.sequences;
+package frc.robot.commands.sequences.climb;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
