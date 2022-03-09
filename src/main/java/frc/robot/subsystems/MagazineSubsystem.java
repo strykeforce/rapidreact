@@ -67,6 +67,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     colorMatch.addColorMatch(MagazineConstants.kBlueCargo);
     colorMatch.addColorMatch(MagazineConstants.kRedCargo);
     colorMatch.addColorMatch(MagazineConstants.kNoCargo);
+    upperClosedLoopRotate(MagazineConstants.kUpperMagazineIntakeSpeed);
   }
 
   public void setShooterSubsystem(ShooterSubsystem shooterSubsystem) {
@@ -141,6 +142,10 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     logger.info("set ignoreColorSensor to: {}", ignore);
   }
 
+  public boolean isColorSensorIgnored() {
+    return ignoreColorSensor;
+  }
+
   public boolean isNextCargoAlliance() {
     return ignoreColorSensor || storedCargoColors[0] == allianceCargoColor;
   }
@@ -193,6 +198,11 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   public void clearCargoColors() {
     storedCargoColors[0] = CargoColor.NONE;
     storedCargoColors[1] = CargoColor.NONE;
+  }
+
+  public void preloadCargo() {
+    storedCargoColors[0] = allianceCargoColor;
+    logger.info("Preloading {} Cargo", allianceCargoColor);
   }
 
   public void indexCargo() {

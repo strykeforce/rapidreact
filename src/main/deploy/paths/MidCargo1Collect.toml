@@ -3,17 +3,17 @@ max_acceleration = 2.0 #m/s
 start_velocity = 0.0 #m/s
 end_velocity = 0.0 #m/s
 is_reversed = false
-target_yaw = -156 #degrees
+target_yaw = -156.0 #degrees
 
 [start_pose]
     x = 6.57
     y = 2.66
-    angle = -156
+    angle = -156.0
 [end_pose]
     x = 5.06
     y = 1.87
-    angle = -156
+    angle = -156.0
 
 [[internal_points]]
-    x = 6.12
-    y = 2.46   #extends to curve into the inside.  TEST for running into tower.  Unsure right now
+    x = 5.924    #6.12
+    y = 2.254    #2.46
