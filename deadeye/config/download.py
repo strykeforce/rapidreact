@@ -6,8 +6,8 @@ import threading
 
 from networktables import NetworkTables
 
-NT_SERVER = "192.168.1.30"
-DEADEYE_CAMERA = "F0"
+NT_SERVER = "10.27.67.2"
+DEADEYE_CAMERA = "A0"
 
 cond = threading.Condition()
 notified = [False]
