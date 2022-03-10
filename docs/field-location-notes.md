@@ -1,6 +1,6 @@
 ## Field Locations Notes
 
-![field](docs/FieldLocationsImage.png)
+![field](FieldLocationsImage.png)
 
 ## Cargo Locations
 
