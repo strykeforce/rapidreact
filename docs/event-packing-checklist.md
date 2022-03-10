@@ -2,18 +2,19 @@
 Confirm the required versions of the following are correct on the competition robot or driver stations as approriate.
 
 - [ ] Driver Station (3 laptops)
-- [ ] WPILib GradleRIO version in `build.gradle`
+- [ ] WPILib GradleRIO version in `build.gradle` ([link](https://github.com/wpilibsuite/allwpilib/releases))
 - [ ] `vendordeps/WPILibNewCommands.json`
-- [ ] `vendordeps/thirdcoast.json`
+- [ ] `vendordeps/thirdcoast.json` ([link](https://github.com/strykeforce/thirdcoast/releases))
 - [ ] Deadeye Jetson software
-- [ ] `vendordeps/deadeye.json`
+- [ ] Deadeye cloned SD-card images (2) 
+- [ ] `vendordeps/deadeye.json` ([link](https://github.com/strykeforce/deadeye/releases))
 - [ ] roboRIO
-- [ ] navX firmware
-- [ ] `vendordeps/navx_frc.json`
-- [ ] Talon firmware
-- [ ] `vendordeps/Phoenix.json`
-- [ ] PDP firmware
-- [ ] `vendordeps/REVLib.json`
+- [ ] navX firmware ([link](https://www.kauailabs.com/navx-mxp/))
+- [ ] `vendordeps/navx_frc.json` ([link](https://www.kauailabs.com/dist/frc/2022/navx_frc.json))
+- [ ] CTRE firmware ([link](https://store.ctr-electronics.com/software/))
+- [ ] `vendordeps/Phoenix.json` ([link](https://maven.ctr-electronics.com/release/com/ctre/phoenix/Phoenix-frc2022-latest.json))
+- [ ] PDP firmware ([link](https://docs.revrobotics.com/rev-11-1850/software-resources/power-distribution-hub-firmware-changelog))
+- [ ] `vendordeps/REVLib.json` ([link](https://software-metadata.revrobotics.com/REVLib.json))
 
 ## Software Release
 
@@ -29,14 +30,14 @@ Create a GitHub release version and tag.
 
 Pack the following items to take to event.
 
-- [ ] Backup copy of all software releases (USB)
-- [ ] Tools (Check Drive Team tools)
 - [ ] Driver Station laptops (3)
+- [ ] Driver Station power supplies (3)
+- [ ] Laptop with Grapher (for fieldside pitting)
 - [ ] Controller case (2 controller sets)
-- [ ] USB thumb drive
 - [ ] Velcro measuring block
 - [ ] digital protractor
 - [ ] ethernet switch and 120v inverter
+- [ ] Grapher NUC, keyboard and mouse
 
 ### Cables
 
