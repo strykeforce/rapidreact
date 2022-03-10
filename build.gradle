@@ -2,6 +2,7 @@ import edu.wpi.first.gradlerio.deploy.roborio.RoboRIO
 
 plugins {
     id "java"
+    id "org.jetbrains.kotlin.jvm" version "1.6.10"
     id "edu.wpi.first.GradleRIO" version "2022.4.1"
     id "com.diffplug.spotless" version "6.2.0"
     id "idea"
@@ -77,6 +78,8 @@ dependencies {
     implementation "ch.qos.logback:logback-classic:1.2.10"
     implementation 'io.github.microutils:kotlin-logging:2.1.21'
 
+    implementation "org.jetbrains.kotlin:kotlin-stdlib"
+    implementation "org.jetbrains.kotlinx:kotlinx-html-jvm:0.7.+"
 
     testImplementation 'junit:junit:4.12'
 }
@@ -84,6 +87,12 @@ dependencies {
 // Simulation configuration (e.g. environment variables).
 wpi.sim.addGui().defaultEnabled = true
 wpi.sim.addDriverstation()
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "11"
+    }
+}
 
 // Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')
 // in order to make them all available at runtime. Also adding the manifest so WPILib
