@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SuppliedValueWidget;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ClimbConstants;
@@ -368,7 +369,7 @@ public class RobotContainer {
     magazineCommands.add("Stop", new StopMagazineCommand(magazineSubsystem));
     magazineCommands.add(
         "Start",
-        new ParallelCommandGroup(
+        new SequentialCommandGroup(
             new UpperMagazineOpenLoopCommand(magazineSubsystem, 0.5),
             new LowerMagazineOpenLoopCommand(magazineSubsystem, 0.5)));
 
