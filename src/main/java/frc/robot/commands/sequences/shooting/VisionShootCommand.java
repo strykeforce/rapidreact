@@ -49,6 +49,7 @@ public class VisionShootCommand extends CommandBase {
       shooterSubsystem.arm();
       turretSubsystem.trackTarget();
       turretSubsystem.resetSeekCount();
+      magazineSubsystem.shoot();
     }
   }
 

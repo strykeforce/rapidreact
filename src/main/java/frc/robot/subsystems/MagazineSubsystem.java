@@ -407,7 +407,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
           if (turretSubsystem.getState() == TurretState.FENDER_AIMED) {
             shooterSubsystem.fenderShot();
             turretSubsystem.fenderShot();
-          } else {
+          } else if (turretSubsystem.getState() == TurretState.TRACKING) {
             shooterSubsystem.shoot();
           }
           lowerOpenLoopRotate(0.0);

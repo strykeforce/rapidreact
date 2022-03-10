@@ -29,6 +29,7 @@ import frc.robot.Constants.DashboardConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.MagazineConstants;
 import frc.robot.Constants.ShooterConstants;
+import frc.robot.commands.HealthCheckCommand;
 import frc.robot.commands.climb.EmergencyStopClimbCommand;
 import frc.robot.commands.climb.OpenLoopFixedArmCommand;
 import frc.robot.commands.climb.OpenLoopPivotArmCommand;
@@ -102,14 +103,7 @@ public class RobotContainer {
   private ShooterSubsystem shooterSubsystem;
   private IntakeSubsystem intakeSubsystem;
   //   private final PowerDistHub powerDistHub = new PowerDistHub();
-  private final AutoSwitch autoSwitch =
-      new AutoSwitch(
-          driveSubsystem,
-          intakeSubsystem,
-          magazineSubsystem,
-          turretSubsystem,
-          shooterSubsystem,
-          visionSubsystem);
+  private final AutoSwitch autoSwitch;
   private final TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
 
   private final Joystick driveJoystick = new Joystick(0);
@@ -135,17 +129,23 @@ public class RobotContainer {
     magazineSubsystem = new MagazineSubsystem(turretSubsystem);
     shooterSubsystem = new ShooterSubsystem(magazineSubsystem, visionSubsystem);
     intakeSubsystem = new IntakeSubsystem();
-    // isEvent = eventFlag.get();
-    // if(isEvent){
-    //     System.out.println("Event Flag Removed - switching to log file");
-    //     System.out.property(ContextInitializer.CONFIG_FILE_PROPERTY, "logback-event.xml")
-    // }
+    autoSwitch =
+        new AutoSwitch(
+            driveSubsystem,
+            intakeSubsystem,
+            magazineSubsystem,
+            turretSubsystem,
+            shooterSubsystem,
+            visionSubsystem);
+
     turretSubsystem.setMagazineSubsystem(magazineSubsystem);
     magazineSubsystem.setShooterSubsystem(shooterSubsystem);
-    configureTelemetry();
+    if (!isEvent) {
+      configureTelemetry();
+      configurePitDashboard();
+    }
     configureDriverButtonBindings();
     configureOperatorButtonBindings();
-    configurePitDashboard();
     configureMatchDashboard();
     // configureManualClimbButtons();
   }
@@ -328,23 +328,33 @@ public class RobotContainer {
         Shuffleboard.getTab("Match")
             .addBoolean(
                 "First Cargo", () -> magazineSubsystem.getAllCargoColors()[0] != CargoColor.NONE)
-            .withProperties(Map.of("colorWhenFalse", "black"));
+            .withProperties(Map.of("colorWhenFalse", "black"))
+            .withSize(2, 2)
+            .withPosition(5, 0);
     secondCargo =
         Shuffleboard.getTab("Match")
             .addBoolean(
                 "Second Cargo", () -> magazineSubsystem.getAllCargoColors()[1] != CargoColor.NONE)
-            .withProperties(Map.of("colorWhenFalse", "black"));
+            .withProperties(Map.of("colorWhenFalse", "black"))
+            .withPosition(5, 2)
+            .withSize(2, 2);
 
     allianceColor =
         Shuffleboard.getTab("Match")
             .addBoolean("AllianceColor", () -> alliance != Alliance.Invalid)
-            .withProperties(Map.of("colorWhenFalse", "black"));
+            .withProperties(Map.of("colorWhenFalse", "black"))
+            .withSize(2, 2)
+            .withPosition(0, 0);
 
     Shuffleboard.getTab("Match")
-        .addBoolean("IgnoreColorSensor", () -> magazineSubsystem.isColorSensorIgnored());
+        .addBoolean("IgnoreColorSensor", () -> magazineSubsystem.isColorSensorIgnored())
+        .withSize(2, 2)
+        .withPosition(3, 0);
 
-    Shuffleboard.getTab("Match").add("EstopClimb", new EmergencyStopClimbCommand(climbSubsystem));
-    SmartDashboard.putData("Match/EStopClimb", new EmergencyStopClimbCommand(climbSubsystem));
+    Shuffleboard.getTab("Match")
+        .add("EstopClimb", new EmergencyStopClimbCommand(climbSubsystem))
+        .withSize(2, 2)
+        .withPosition(7, 0);
   }
 
   public void setAllianceColor(Alliance alliance) {
@@ -479,28 +489,34 @@ public class RobotContainer {
     climbCommands.add("Zero", new ZeroClimbCommand(climbSubsystem));
     climbCommands.add("ToggleFixedRatchet", new ToggleFixedRatchetCommand(climbSubsystem));
     climbCommands.add("TogglePivotRatchet", new TogglePivotRatchetCommand(climbSubsystem));
-    climbCommands.add(
-        "FixedArmExtend",
-        new OpenLoopFixedArmCommand(climbSubsystem, -ClimbConstants.kClimbArmsOpenLoopSpeed));
-    climbCommands.add(
-        "FixedArmRetract",
-        new OpenLoopFixedArmCommand(climbSubsystem, ClimbConstants.kClimbArmsOpenLoopSpeed));
-    climbCommands.add("FixedArmsStop", new OpenLoopFixedArmCommand(climbSubsystem, 0.0));
-    climbCommands.add(
-        "PivotArmsExtend",
-        new OpenLoopPivotArmCommand(climbSubsystem, -ClimbConstants.kClimbArmsOpenLoopSpeed));
-    climbCommands.add(
-        "PivotArmsRetract",
-        new OpenLoopPivotArmCommand(climbSubsystem, ClimbConstants.kClimbArmsOpenLoopSpeed));
-    climbCommands.add("PivotArmsStop", new OpenLoopPivotArmCommand(climbSubsystem, 0.0));
-    climbCommands.add("ShoulderFWD", new RotateShoulderDownCommand(climbSubsystem));
-    climbCommands.add("ShoulderREV", new RotateShoulderUpCommand(climbSubsystem));
-    climbCommands.add("ShoulderSTOP", new ShoulderHoldPositionCommand(climbSubsystem));
+    // climbCommands.add(
+    //     "FixedArmExtend",
+    //     new OpenLoopFixedArmCommand(climbSubsystem, -ClimbConstants.kClimbArmsOpenLoopSpeed));
+    // climbCommands.add(
+    //     "FixedArmRetract",
+    //     new OpenLoopFixedArmCommand(climbSubsystem, ClimbConstants.kClimbArmsOpenLoopSpeed));
+    // climbCommands.add("FixedArmsStop", new OpenLoopFixedArmCommand(climbSubsystem, 0.0));
+    // climbCommands.add(
+    //     "PivotArmsExtend",
+    //     new OpenLoopPivotArmCommand(climbSubsystem, -ClimbConstants.kClimbArmsOpenLoopSpeed));
+    // climbCommands.add(
+    //     "PivotArmsRetract",
+    //     new OpenLoopPivotArmCommand(climbSubsystem, ClimbConstants.kClimbArmsOpenLoopSpeed));
+    // climbCommands.add("PivotArmsStop", new OpenLoopPivotArmCommand(climbSubsystem, 0.0));
+    // climbCommands.add("ShoulderFWD", new RotateShoulderDownCommand(climbSubsystem));
+    // climbCommands.add("ShoulderREV", new RotateShoulderUpCommand(climbSubsystem));
+    // climbCommands.add("ShoulderSTOP", new ShoulderHoldPositionCommand(climbSubsystem));
 
     // Vision Commands
     pitTab.add("Seek", new TurretAimCommandGroup(visionSubsystem, turretSubsystem));
     // SmartDashboard.putData(
     //     "Pit/Turret/Seek", new TurretAimCommandGroup(visionSubsystem, turretSubsystem));
+
+    // HealthCheck
+    pitTab.add(
+        "HealthCheck",
+        new HealthCheckCommand(
+            driveSubsystem, magazineSubsystem, intakeSubsystem, shooterSubsystem, turretSubsystem));
 
     // tuning commands
     SmartDashboard.putData(

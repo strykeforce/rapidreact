@@ -7,7 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -48,10 +48,15 @@ public class Robot extends TimedRobot {
 
     CommandScheduler.getInstance()
         .schedule(new EnableVisionCommand(m_robotContainer.getVisionSubsystem()));
-    SmartDashboard.putData(
-        "Match/SetAllianceRed", new SetAllianceCommand(Alliance.Red, m_robotContainer));
-    SmartDashboard.putData(
-        "Match/SetAllianceBlue", new SetAllianceCommand(Alliance.Blue, m_robotContainer));
+
+    Shuffleboard.getTab("Match")
+        .add("SetAllianceRed", new SetAllianceCommand(Alliance.Red, m_robotContainer))
+        .withPosition(2, 0)
+        .withSize(1, 1);
+    Shuffleboard.getTab("Match")
+        .add("SetAllianceBlue", new SetAllianceCommand(Alliance.Blue, m_robotContainer))
+        .withPosition(2, 1)
+        .withSize(1, 1);
   }
 
   /**
