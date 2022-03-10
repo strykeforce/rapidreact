@@ -92,7 +92,6 @@ import org.strykeforce.telemetry.TelemetryService;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  private boolean isEvent = true;
   private boolean haveZeroedClimb = false;
   private DigitalInput eventFlag = new DigitalInput(DashboardConstants.kLockoutBNCid);
   private DriveSubsystem driveSubsystem;
@@ -117,10 +116,11 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    isEvent = eventFlag.get();
+    boolean isEvent = eventFlag.get();
     if (isEvent) {
-      System.out.println("Event Flag Removed - switching to log file");
+      // must be set before the first call to  LoggerFactory.getLogger();
       System.setProperty(ContextInitializer.CONFIG_FILE_PROPERTY, "logback-event.xml");
+      System.out.println("Event Flag Removed - logging to file in ~lvuser/logs/");
     }
     driveSubsystem = new DriveSubsystem();
     visionSubsystem = new VisionSubsystem();

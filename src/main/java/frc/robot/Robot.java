@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Robot extends TimedRobot {
 
-  private Logger logger = LoggerFactory.getLogger(Robot.class);
+  private Logger logger;
   private RobotContainer m_robotContainer;
   private boolean haveAlliance;
 
@@ -44,6 +44,8 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+    // first call to LoggerFactory.getLogger must be after RobotContainer sets logging location
+    logger = LoggerFactory.getLogger(Robot.class);
     haveAlliance = false;
 
     CommandScheduler.getInstance()
