@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import ch.qos.logback.classic.util.ContextInitializer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -93,15 +94,13 @@ public class RobotContainer {
   private boolean isEvent = true;
   private boolean haveZeroedClimb = false;
   private DigitalInput eventFlag = new DigitalInput(DashboardConstants.kLockoutBNCid);
-  private final DriveSubsystem driveSubsystem = new DriveSubsystem();
-  private final VisionSubsystem visionSubsystem = new VisionSubsystem();
-  private final TurretSubsystem turretSubsystem =
-      new TurretSubsystem(visionSubsystem, driveSubsystem);
-  private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
-  private final MagazineSubsystem magazineSubsystem = new MagazineSubsystem(turretSubsystem);
-  private final ShooterSubsystem shooterSubsystem =
-      new ShooterSubsystem(magazineSubsystem, visionSubsystem);
-  private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+  private DriveSubsystem driveSubsystem;
+  private VisionSubsystem visionSubsystem;
+  private TurretSubsystem turretSubsystem;
+  private ClimbSubsystem climbSubsystem;
+  private MagazineSubsystem magazineSubsystem;
+  private ShooterSubsystem shooterSubsystem;
+  private IntakeSubsystem intakeSubsystem;
   //   private final PowerDistHub powerDistHub = new PowerDistHub();
   private final AutoSwitch autoSwitch =
       new AutoSwitch(
@@ -124,6 +123,18 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    isEvent = eventFlag.get();
+    if (isEvent) {
+      System.out.println("Event Flag Removed - switching to log file");
+      System.setProperty(ContextInitializer.CONFIG_FILE_PROPERTY, "logback-event.xml");
+    }
+    driveSubsystem = new DriveSubsystem();
+    visionSubsystem = new VisionSubsystem();
+    turretSubsystem = new TurretSubsystem(visionSubsystem, driveSubsystem);
+    climbSubsystem = new ClimbSubsystem();
+    magazineSubsystem = new MagazineSubsystem(turretSubsystem);
+    shooterSubsystem = new ShooterSubsystem(magazineSubsystem, visionSubsystem);
+    intakeSubsystem = new IntakeSubsystem();
     // isEvent = eventFlag.get();
     // if(isEvent){
     //     System.out.println("Event Flag Removed - switching to log file");
