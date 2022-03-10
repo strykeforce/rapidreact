@@ -219,13 +219,13 @@ class HealthCheckCommand(val driveSubsystem : DriveSubsystem,
                 val statorCurrentRange = 0.375..1.0
 
                 positionTalon {
-                    encoderTarget = 0
+                    encoderTarget = -10_000
                     encoderGoodEnough = 100
                 }
 
                 positionTest {
-                    percentOutput = 0.2
-                    encoderChangeTarget = 25_000
+                    percentOutput = 0.3
+                    encoderChangeTarget = 20_000
                     encoderGoodEnough = 500
                     encoderTimeCount = 500
 
@@ -235,8 +235,8 @@ class HealthCheckCommand(val driveSubsystem : DriveSubsystem,
                 }
 
                 positionTest {
-                    percentOutput = -0.2
-                    encoderChangeTarget = 25_000
+                    percentOutput = -0.3
+                    encoderChangeTarget = 10_000
                     encoderGoodEnough = 500
                     encoderTimeCount = 500
 
@@ -285,7 +285,7 @@ class HealthCheckCommand(val driveSubsystem : DriveSubsystem,
 
                 positionTest {
                     percentOutput = 0.2
-                    encoderChangeTarget = 7000
+                    encoderChangeTarget = 5000
                     encoderGoodEnough = 500
                     encoderTimeCount = 500
 
@@ -295,7 +295,7 @@ class HealthCheckCommand(val driveSubsystem : DriveSubsystem,
 
                 positionTest {
                     percentOutput = -0.2
-                    encoderChangeTarget = 7000
+                    encoderChangeTarget = 5000
                     encoderGoodEnough = 500
                     encoderTimeCount = 500
 
