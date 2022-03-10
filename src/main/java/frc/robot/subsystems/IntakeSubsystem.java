@@ -2,9 +2,11 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.can.BaseTalon;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
+import java.util.List;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +30,10 @@ public class IntakeSubsystem extends MeasurableSubsystem {
   public void openLoopRotate(double percentOutput) {
     intakeFalcon.set(ControlMode.PercentOutput, percentOutput);
     logger.info("Intake motor turned on {}", percentOutput);
+  }
+
+  public List<BaseTalon> getTalons() {
+    return List.of(intakeFalcon);
   }
 
   @Override

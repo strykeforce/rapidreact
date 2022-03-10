@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.can.BaseTalon;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.ColorMatch;
 import com.revrobotics.ColorMatchResult;
@@ -16,6 +17,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.MagazineConstants;
 import frc.robot.subsystems.ShooterSubsystem.ShooterState;
 import frc.robot.subsystems.TurretSubsystem.TurretState;
+import java.util.List;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,6 +95,10 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   public void upperOpenLoopRotate(double percentOutput) {
     upperMagazineTalon.set(ControlMode.PercentOutput, percentOutput);
     logger.info("Upper magazine motor turned on {}", percentOutput);
+  }
+
+  public List<BaseTalon> getTalons() {
+    return List.of(lowerMagazineTalon, upperMagazineTalon);
   }
 
   public void lowerClosedLoopRotate(double speed) {
