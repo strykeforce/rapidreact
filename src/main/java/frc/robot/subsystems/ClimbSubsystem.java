@@ -454,7 +454,10 @@ public class ClimbSubsystem extends MeasurableSubsystem {
       case MID_RET_ST3:
         if (isFixedArmOpenLoopRetractFinished(currFixedArmState.setpoint)) {
           if (continueToHigh) {
-            logger.info("Fixed: {} -> IDLE, encoder: {}", currFixedArmState, fixedArmFalcon.getSelectedSensorPosition());
+            logger.info(
+                "Fixed: {} -> IDLE, encoder: {}",
+                currFixedArmState,
+                fixedArmFalcon.getSelectedSensorPosition());
             currFixedArmState = FixedArmState.IDLE;
             openLoopFixedArm(0.0);
             climbStateCounter++;

@@ -436,9 +436,9 @@ public final class Constants {
     public static final double kFMidExtTicks = -210_000;
     public static final double kFMidRetSt1Ticks = -135_000;
     public static final double kFMidRetSt2Ticks = -115_000;
-    public static final double kFMidRetSt3Ticks = -1_500;
+    public static final double kFMidRetSt3Ticks = -1_000;
     public static final double kHighPvtBck1Ticks = 5_500;
-    public static final double kPHighExtTicks = -197_000;
+    public static final double kPHighExtTicks = -205_000;
     public static final double kHighPvtFwd1Ticks = 3_200;
     public static final double kPHighRet1Ticks = -168_000;
     public static final double kHighPvtBck2Ticks = 4_500;
@@ -448,9 +448,9 @@ public final class Constants {
     public static final double kHighPvtBck3Ticks = -3_000;
     public static final double kPHighRet2Ticks = -120_000;
     public static final double kHighPvtFwd2Ticks = 750;
-    public static final double kFTvsRet1Ticks = -1_500;
+    public static final double kFTvsRet1Ticks = -1_000;
     public static final double kTvsPvtBck1Ticks = 5_500;
-    public static final double kPTvsExtTicks = -197_000;
+    public static final double kPTvsExtTicks = -205_000;
     public static final double kTvsPvtFwdTicks = 3_200;
     public static final double kPTvsRetTicks = -168_000;
     public static final double kTvsPvtBck2Ticks = 4_500;
