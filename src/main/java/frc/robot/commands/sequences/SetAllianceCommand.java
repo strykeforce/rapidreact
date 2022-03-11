@@ -1,11 +1,10 @@
 package frc.robot.commands.sequences;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.RobotContainer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SetAllianceCommand extends InstantCommand {
   public final Alliance alliance;
