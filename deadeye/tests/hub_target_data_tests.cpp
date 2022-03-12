@@ -45,4 +45,11 @@ TEST_CASE("maximum sized target data") {
   REQUIRE(htd_json.size() < TD_MAX_SIZE);
 }
 
+TEST_CASE("target data DrawMarkers works with no targets") {
+  TargetList empty_target_list;
+  HubTargetData htd{"Z0", 1, true, 0.0, 0.0, empty_target_list, 640};
+  cv::Mat preview{720, 1280};
+  htd.DrawMarkers(preview);
+}
+
 #pragma clang diagnostic pop
