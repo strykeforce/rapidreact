@@ -41,14 +41,20 @@ double HubTargetData::GetErrorPixels() const {
 }
 
 void HubTargetData::DrawMarkers(cv::Mat& preview) const {
+  // draw line down center of frame
+  int center = preview.cols / 2;
+  cv::line(preview, cv::Point{center, 0}, cv::Point{center, preview.rows},
+           CROSS_HAIR_COLOR);
+
   if (targets.empty()) return;
+
+  // draw target bounding boxes
   for (const auto& t : targets) {
     cv::Rect bb{t[0], t[1], t[2], t[3]};
     cv::rectangle(preview, bb, BB_COLOR, 2);
   }
-  int center = preview.cols / 2;
-  cv::line(preview, cv::Point{center, 0}, cv::Point{center, preview.rows},
-           CROSS_HAIR_COLOR);
+
+  // draw center aim point of targets
   cv::Point targets_center{static_cast<int>(GetErrorPixels()) + frame_x_center_,
                            targets[0][Y] + targets[0][H] / 2};
   cv::drawMarker(preview, targets_center, MARKER_COLOR);
