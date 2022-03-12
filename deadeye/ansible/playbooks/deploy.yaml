@@ -8,7 +8,7 @@
         state: stopped
         enabled: false
     - name: create deadeye directory
-      file:
+      ansible.builtin.file:
         path: "{{ deadeye_dir }}"
         state: directory
     - name: Sync remote repo from local
@@ -57,7 +57,7 @@
     - name: Set NetworkTables server in conf file
       ansible.builtin.lineinfile:
         path: /etc/opt/deadeye/deadeye.conf
-        regex: '^# DEADEYE_NT_SERVER='
+        regex: '^DEADEYE_NT_SERVER='
         line: DEADEYE_NT_SERVER={{ deadeye_nt_server }}
     - name: Install systemd unit
       ansible.builtin.template:
