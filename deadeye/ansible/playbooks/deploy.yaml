@@ -69,6 +69,7 @@
       ansible.builtin.systemd:
         name: NetworkManager-wait-online
         enabled: true
+      when: ansible_architecture == "aarch64"
     - name: Enable deadeyed systemd unit
       ansible.builtin.systemd:
         name: "{{ deadeye_service }}"
