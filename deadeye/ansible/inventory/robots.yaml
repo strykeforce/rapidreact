@@ -33,4 +33,5 @@ all:
     camera_4_pipeline:
     deadeye_build_type: Release
     deadeye_nt_server: 10.27.67.2
+    deadeye_stream_address: "{{ ansible_facts['default_ipv4']['address'] }}"
     deadeye_spdlog_level: info

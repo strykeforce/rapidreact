@@ -38,6 +38,7 @@
           - -DCMAKE_CXX_FLAGS_RELEASE=-Ofast -march=native -mtune=native -flto -ffat-lto-objects -DNDEBUG
           - -DDEADEYE_BUILD_TESTS=NO
           - -DDEADEYE_NT_SERVER={{ deadeye_nt_server }}
+          - -DDEADEYE_STREAM_ADDRESS={{ deadeye_stream_address }}
           - -DDEADEYE_UNIT_ID={{ deadeye_unit }}
           - -DDEADEYE_CAMERA0_PIPELINE={{ camera_0_pipeline }}
           - -DDEADEYE_CAMERA1_PIPELINE={{ camera_1_pipeline }}
