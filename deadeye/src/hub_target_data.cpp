@@ -41,6 +41,7 @@ double HubTargetData::GetErrorPixels() const {
 }
 
 void HubTargetData::DrawMarkers(cv::Mat& preview) const {
+  if (targets.empty()) return;
   for (const auto& t : targets) {
     cv::Rect bb{t[0], t[1], t[2], t[3]};
     cv::rectangle(preview, bb, BB_COLOR, 2);
