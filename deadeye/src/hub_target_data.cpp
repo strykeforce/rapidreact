@@ -24,10 +24,10 @@ const cv::Scalar CROSS_HAIR_COLOR{200, 200, 200};  // NOLINT
 const cv::Scalar MARKER_COLOR{255, 255, 255};      // NOLINT
 }  // namespace
 
-HubTargetData::HubTargetData(std::string id, int sn, bool valid,
+HubTargetData::HubTargetData(std::string_view id, int sn, bool valid,
                              double error_pixels, double range,
                              TargetList targets, int center)
-    : TargetData{std::move(id), sn, valid},
+    : TargetData{id, sn, valid},
       error_pixels{error_pixels},
       range{range},
       targets{std::move(targets)},

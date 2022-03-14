@@ -18,10 +18,10 @@ struct HubTargetData : public deadeye::TargetData {
   double range;
   int frame_x_center_;
 
-  HubTargetData(std::string id, int sn, bool valid, double error_pixels,
+  HubTargetData(std::string_view id, int sn, bool valid, double error_pixels,
                 double range, TargetList targets, int center);
 
-  double GetErrorPixels() const;
+  [[nodiscard]] double GetErrorPixels() const;
   void DrawMarkers(cv::Mat& preview) const override;
   [[nodiscard]] std::string Dump() const override;
   [[nodiscard]] std::string ToString() const override;
