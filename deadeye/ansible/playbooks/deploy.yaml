@@ -8,7 +8,7 @@
         state: stopped
         enabled: false
     - name: create deadeye directory
-      file:
+      ansible.builtin.file:
         path: "{{ deadeye_dir }}"
         state: directory
     - name: Sync remote repo from local
@@ -38,6 +38,7 @@
           - -DCMAKE_CXX_FLAGS_RELEASE=-Ofast -march=native -mtune=native -flto -ffat-lto-objects -DNDEBUG
           - -DDEADEYE_BUILD_TESTS=NO
           - -DDEADEYE_NT_SERVER={{ deadeye_nt_server }}
+          - -DDEADEYE_STREAM_ADDRESS={{ deadeye_stream_address }}
           - -DDEADEYE_UNIT_ID={{ deadeye_unit }}
           - -DDEADEYE_CAMERA0_PIPELINE={{ camera_0_pipeline }}
           - -DDEADEYE_CAMERA1_PIPELINE={{ camera_1_pipeline }}
@@ -53,13 +54,23 @@
           - /usr/bin/ninja
           - install
       when: deadeye_repo is changed
+    - name: Set NetworkTables server in conf file
+      ansible.builtin.lineinfile:
+        path: /etc/opt/deadeye/deadeye.conf
+        regex: '^DEADEYE_NT_SERVER='
+        line: DEADEYE_NT_SERVER={{ deadeye_nt_server }}
     - name: Install systemd unit
       ansible.builtin.template:
         src: ../files/{{ deadeye_service }}.j2
         dest: /etc/systemd/system/{{ deadeye_service }}
         mode: 0664
         owner: root
-    - name: Enable systemd unit
+    - name: Enable NetworkManager-wait-online systemd unit
+      ansible.builtin.systemd:
+        name: NetworkManager-wait-online
+        enabled: true
+      when: ansible_architecture == "aarch64"
+    - name: Enable deadeyed systemd unit
       ansible.builtin.systemd:
         name: "{{ deadeye_service }}"
         enabled: true

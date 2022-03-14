@@ -24,10 +24,10 @@ const cv::Scalar CROSS_HAIR_COLOR{200, 200, 200};  // NOLINT
 const cv::Scalar MARKER_COLOR{255, 255, 255};      // NOLINT
 }  // namespace
 
-HubTargetData::HubTargetData(std::string id, int sn, bool valid,
+HubTargetData::HubTargetData(std::string_view id, int sn, bool valid,
                              double error_pixels, double range,
                              TargetList targets, int center)
-    : TargetData{std::move(id), sn, valid},
+    : TargetData{id, sn, valid},
       error_pixels{error_pixels},
       range{range},
       targets{std::move(targets)},
@@ -41,14 +41,20 @@ double HubTargetData::GetErrorPixels() const {
 }
 
 void HubTargetData::DrawMarkers(cv::Mat& preview) const {
+  // draw line down center of frame
+  int center = preview.cols / 2;
+  cv::line(preview, cv::Point{center, 0}, cv::Point{center, preview.rows},
+           CROSS_HAIR_COLOR);
+
   if (targets.empty()) return;
+
+  // draw target bounding boxes
   for (const auto& t : targets) {
     cv::Rect bb{t[0], t[1], t[2], t[3]};
     cv::rectangle(preview, bb, BB_COLOR, 2);
   }
-  int center = preview.cols / 2;
-  cv::line(preview, cv::Point{center, 0}, cv::Point{center, preview.rows},
-           CROSS_HAIR_COLOR);
+
+  // draw center aim point of targets
   cv::Point targets_center{static_cast<int>(GetErrorPixels()) + frame_x_center_,
                            targets[0][Y] + targets[0][H] / 2};
   cv::drawMarker(preview, targets_center, MARKER_COLOR);
