@@ -249,6 +249,11 @@ public class ShooterSubsystem extends MeasurableSubsystem {
     currentState = ShooterState.STOP;
   }
 
+  public void setManualState() {
+    currentState = ShooterState.MANUAL_SHOOT;
+    logger.info("SetManualState ");
+  }
+
   @Override
   public void periodic() {
     switch (currentState) {
