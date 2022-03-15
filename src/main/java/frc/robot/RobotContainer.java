@@ -221,7 +221,7 @@ public class RobotContainer {
         .whenPressed(
             new ResetOdometryCommand(
                 driveSubsystem,
-                new Pose2d(new Translation2d(0.415, 7.42), Rotation2d.fromDegrees(0))));
+                new Pose2d(new Translation2d(0.415, 4.11), Rotation2d.fromDegrees(0)))); // Y:7.42
 
     // Auto Intake
     new JoystickButton(driveJoystick, Shoulder.LEFT_DOWN.id)
@@ -296,7 +296,7 @@ public class RobotContainer {
             new LowFenderShotCommand(turretSubsystem, shooterSubsystem, magazineSubsystem));
   }
 
-  private void configureManualClimbButtons() {
+  public void configureManualClimbButtons() {
     // Manual Climb
     // Rotating Arm
     LeftStickUp.whenActive(
