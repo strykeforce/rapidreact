@@ -292,7 +292,7 @@ public final class Constants {
     public static final double kMagazineEjectSpeed = -8000; // -0.5
 
     // State Machine Sequence Constants
-    public static final double kShootDelay = 0.7;
+    public static final double kShootDelay = 0.35;
     public static final double kEjectTimerDelay = 1.0;
     public static final double kShootUpperBeamStableCounts = 2;
 
