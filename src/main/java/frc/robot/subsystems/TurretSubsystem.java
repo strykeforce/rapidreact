@@ -278,6 +278,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
         setCruiseVelocity(false);
         if (targetData.isValid()) {
           logger.info("{} -> AIMING", currentState);
+          logger.info("targetData: {}", targetData);
           currentState = TurretState.AIMING;
           rotateTo(turret.getSelectedSensorPosition());
           // currentState = TurretState.IDLE;
@@ -308,7 +309,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
         targetData = visionSubsystem.getTargetData();
         if (!targetData.isValid()) {
           notValidTargetCount++;
-
+          logger.info("notValidTargetCount: {}", notValidTargetCount);
           if (notValidTargetCount > TurretConstants.kNotValidTargetCounts) {
             logger.info("{} -> SEEKING: {}", currentState, targetData);
             currentState = TurretState.SEEK_LEFT;

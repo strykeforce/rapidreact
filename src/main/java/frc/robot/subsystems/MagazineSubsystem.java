@@ -42,6 +42,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   private Timer ejectTimer = new Timer();
   private boolean ignoreColorSensor = false;
   private int shootUpperBeamStableCounts = 0;
+  private boolean isBeamBreakEnabled = false;
 
   public MagazineSubsystem(TurretSubsystem turretSubsystem) {
     this.turretSubsystem = turretSubsystem;
@@ -77,14 +78,18 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   }
 
   public void enableUpperBeamBreak(boolean enable) {
+    if (isBeamBreakEnabled != enable) {
+      logger.info("Enabling talon limit switch: {}", enable);
+    }
     if (enable) {
       upperMagazineTalon.configForwardLimitSwitchSource(
           LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
+      isBeamBreakEnabled = true;
     } else {
       upperMagazineTalon.configForwardLimitSwitchSource(
           LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled);
+      isBeamBreakEnabled = false;
     }
-    logger.info("Enabling talon limit switch: {}", enable);
   }
 
   public void lowerOpenLoopRotate(double percentOutput) {
@@ -217,6 +222,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     enableUpperBeamBreak(true);
     logger.info("Start indexing cargo");
     currMagazineState = MagazineState.WAIT_CARGO;
+    upperClosedLoopRotate(MagazineConstants.kUpperMagazineIntakeSpeed);
   }
 
   public void manualLowerMagazine(double lowerSpeed) {
@@ -276,6 +282,10 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     // }
   }
 
+  public void setManualState() {
+    currMagazineState = MagazineState.MANUAL_INTAKE;
+  }
+
   public MagazineState getCurrMagazineState() {
     return currMagazineState;
   }
@@ -298,7 +308,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
             lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIntakeSpeed);
           }
           // Checking if ball is in the top of the upper magazine
-          if (upperMagazineTalon.getMotorOutputPercent() == 0.0) {
+          if (upperMagazineTalon.getSelectedSensorVelocity() == 0.0) {
             upperClosedLoopRotate(MagazineConstants.kUpperMagazineIntakeSpeed);
           }
         }

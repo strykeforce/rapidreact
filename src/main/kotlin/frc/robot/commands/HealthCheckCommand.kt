@@ -26,6 +26,8 @@ class HealthCheckCommand(val driveSubsystem : DriveSubsystem,
             shooterSubsystem,
             turretSubsystem
         )
+        magazineSubsystem.setManualState()
+        shooterSubsystem.setManualState()
     }
 
     private lateinit var healthCheck : HealthCheck
@@ -197,14 +199,14 @@ class HealthCheckCommand(val driveSubsystem : DriveSubsystem,
                 }
 
                 timedTest {
-                    percentOutput = 1.0
+                    percentOutput = 0.8
                     supplyCurrentRange = volt12supplyCurrentRange
                     statorCurrentRange = volt12statorCurrentRange
                     speedRange = 3500..5000
                 }
 
                 timedTest {
-                    percentOutput = -1.0
+                    percentOutput = -0.8
                     supplyCurrentRange = volt12supplyCurrentRange
                     statorCurrentRange = volt12statorCurrentRange
                     speedRange = -5000..-3500
@@ -236,13 +238,17 @@ class HealthCheckCommand(val driveSubsystem : DriveSubsystem,
 
                 positionTest {
                     percentOutput = -0.3
-                    encoderChangeTarget = 10_000
+                    encoderChangeTarget = 20_000
                     encoderGoodEnough = 500
                     encoderTimeCount = 500
 
                     supplyCurrentRange
                     statorCurrentRange
                     speedRange = -750..-550
+                }
+                positionTalon {
+                    encoderTarget = 0
+                    encoderGoodEnough = 100
                 }
             }
             // shooter
@@ -315,5 +321,7 @@ class HealthCheckCommand(val driveSubsystem : DriveSubsystem,
     override fun end(interrupted: Boolean) {
         healthCheck.report()
         driveSubsystem.lockZero()
+        turretSubsystem.rotateTo(0.0)
+        shooterSubsystem.hoodClosedLoop(100.0)
     }
 }

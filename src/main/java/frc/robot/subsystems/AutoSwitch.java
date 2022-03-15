@@ -93,7 +93,8 @@ public class AutoSwitch {
             intakeSubsystem,
             driveSubsystem,
             "LeftCargo1Collect",
-            AutoConstants.kLeftStartYaw);
+            AutoConstants.kLeftStartYaw,
+            3.0);
       case 0x20:
         return new TwoCargoAuto(
             visionSubsystem,
@@ -103,7 +104,8 @@ public class AutoSwitch {
             intakeSubsystem,
             driveSubsystem,
             "MidCargo1Collect",
-            AutoConstants.kMidStartYaw);
+            AutoConstants.kMidStartYaw,
+            3.0);
       case 0x30:
         return new TwoCargoAuto(
             visionSubsystem,
@@ -113,7 +115,8 @@ public class AutoSwitch {
             intakeSubsystem,
             driveSubsystem,
             "RightCargo1Collect",
-            AutoConstants.kRightStartYaw);
+            AutoConstants.kRightStartYaw,
+            3.0);
       default:
         String msg = String.format("no auto command assigned for switch position %02X", switchPos);
         DriverStation.reportWarning(msg, false);
