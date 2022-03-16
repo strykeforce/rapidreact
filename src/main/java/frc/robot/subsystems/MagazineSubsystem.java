@@ -35,12 +35,14 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   private CargoColor[] storedCargoColors = new CargoColor[] {CargoColor.NONE, CargoColor.NONE};
   private CargoColor allianceCargoColor = CargoColor.NONE;
   private ColorMatch colorMatch = new ColorMatch();
-  private MagazineState currMagazineState = MagazineState.STOP;
+  private LowerMagazineState currLowerMagazineState = LowerMagazineState.STOP;
+  private UpperMagazineState currUpperMagazineState = UpperMagazineState.STOP;
   private final TurretSubsystem turretSubsystem;
   private ShooterSubsystem shooterSubsystem;
   private Timer shootTimer = new Timer();
   private Timer ejectTimer = new Timer();
   private boolean ignoreColorSensor = false;
+  private boolean continueToShoot = false;
   private int shootUpperBeamStableCounts = 0;
   private boolean isBeamBreakEnabled = false;
 
@@ -118,7 +120,8 @@ public class MagazineSubsystem extends MeasurableSubsystem {
 
   public void stopMagazine() {
     logger.info("Stopping Magazine");
-    currMagazineState = MagazineState.STOP;
+    currLowerMagazineState = LowerMagazineState.STOP;
+    currUpperMagazineState = UpperMagazineState.STOP;
     lowerMagazineTalon.set(ControlMode.PercentOutput, 0.0);
     upperMagazineTalon.set(ControlMode.Velocity, MagazineConstants.kUpperMagazineIntakeSpeed);
   }
@@ -181,12 +184,9 @@ public class MagazineSubsystem extends MeasurableSubsystem {
       currentCargoColor = allianceCargoColor;
     }
 
-    if (storedCargoColors[0] == CargoColor.NONE) {
-      storedCargoColors[0] = currentCargoColor;
-      logger.info("Added first cargo {}", currentCargoColor);
-    } else if (storedCargoColors[1] == CargoColor.NONE) {
+    if (storedCargoColors[1] == CargoColor.NONE) {
       storedCargoColors[1] = currentCargoColor;
-      logger.info("Added second cargo {}", currentCargoColor);
+      logger.info("Added cargo {}", currentCargoColor);
     } else {
       logger.error("Picked up third cargo {}, not recording", currentCargoColor);
     }
@@ -196,8 +196,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
 
   public void shotOneCargo() {
     logger.info("Shot {} cargo", storedCargoColors[0]);
-    storedCargoColors[0] = storedCargoColors[1];
-    storedCargoColors[1] = CargoColor.NONE;
+    storedCargoColors[0] = CargoColor.NONE;
   }
 
   public CargoColor getNextCargo() {
@@ -219,27 +218,34 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   }
 
   public void indexCargo() {
+    continueToShoot = false;
     enableUpperBeamBreak(true);
     logger.info("Start indexing cargo");
-    currMagazineState = MagazineState.WAIT_CARGO;
+    currLowerMagazineState = LowerMagazineState.WAIT_CARGO;
+    currUpperMagazineState = UpperMagazineState.EMPTY;
     upperClosedLoopRotate(MagazineConstants.kUpperMagazineIntakeSpeed);
   }
 
   public void manualLowerMagazine(double lowerSpeed) {
-    if (lowerSpeed == 0.0) currMagazineState = MagazineState.STOP;
-    else currMagazineState = MagazineState.MANUAL_INTAKE;
+    if (lowerSpeed == 0.0) currLowerMagazineState = LowerMagazineState.STOP;
+    else currLowerMagazineState = LowerMagazineState.MANUAL;
     lowerOpenLoopRotate(lowerSpeed);
   }
 
   public void manualUpperMagazine(double upperSpeed) {
-    if (upperSpeed == 0.0) currMagazineState = MagazineState.STOP;
-    else currMagazineState = MagazineState.MANUAL_INTAKE;
+    if (upperSpeed == 0.0) currUpperMagazineState = UpperMagazineState.STOP;
+    else currUpperMagazineState = UpperMagazineState.MANUAL;
     upperOpenLoopRotate(upperSpeed);
   }
 
   public void manualClosedLoopFullMagazine(double lowerSpeed, double upperSpeed) {
-    if (upperSpeed == 0.0 && lowerSpeed == 0.0) currMagazineState = MagazineState.STOP;
-    else currMagazineState = MagazineState.MANUAL_INTAKE;
+    if (upperSpeed == 0.0 && lowerSpeed == 0.0) {
+      currLowerMagazineState = LowerMagazineState.STOP;
+      currUpperMagazineState = UpperMagazineState.STOP;
+    } else {
+      currLowerMagazineState = LowerMagazineState.MANUAL;
+      currUpperMagazineState = UpperMagazineState.MANUAL;
+    }
 
     lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIntakeSpeed);
     upperClosedLoopRotate(MagazineConstants.kUpperMagazineIndexSpeed);
@@ -250,7 +256,8 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     lowerClosedLoopRotate(lowerSpeed);
     upperClosedLoopRotate(upperSpeed);
     clearCargoColors();
-    currMagazineState = MagazineState.MANUAL_INTAKE;
+    currLowerMagazineState = LowerMagazineState.MANUAL;
+    currUpperMagazineState = UpperMagazineState.MANUAL;
   }
 
   private void autoStopUpperMagazine(double speed) {
@@ -264,12 +271,12 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   }
 
   public boolean isMagazineFull() {
-    return currMagazineState == MagazineState.STOP;
+    return currLowerMagazineState == LowerMagazineState.WAIT_UPPER;
   }
 
   public void magazineInterrupted() {
-    currMagazineState = MagazineState.STOP;
-    logger.info("Magazine interrupted, switching state to stop");
+    currLowerMagazineState = LowerMagazineState.STOP;
+    logger.info("Magazine interrupted, switching lower state to stop");
   }
 
   public void shoot() {
@@ -277,159 +284,324 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     //   logger.info("Magazine empty, not shooting");
     //   currMagazineState = MagazineState.STOP;
     // } else {
-    logger.info("{} -> PAUSE}", currMagazineState);
-    currMagazineState = MagazineState.PAUSE;
+    // logger.info("{} -> PAUSE}", currMagazineState);
+    currUpperMagazineState = UpperMagazineState.EMPTY;
+    continueToShoot = true;
+    currLowerMagazineState = LowerMagazineState.WAIT_CARGO;
+    logger.info("lower {} -> WAIT_CARGO, upper {} -> EMPTY");
     // }
   }
 
   public void setManualState() {
-    currMagazineState = MagazineState.MANUAL_INTAKE;
+    currLowerMagazineState = LowerMagazineState.MANUAL;
+    currUpperMagazineState = UpperMagazineState.MANUAL;
   }
 
-  public MagazineState getCurrMagazineState() {
-    return currMagazineState;
+  
+  public LowerMagazineState getCurrLowerMagazineState() {
+    return currLowerMagazineState;
   }
+
+  public UpperMagazineState getCurrupperMagazineState() {
+    return currUpperMagazineState;
+  }
+
+  // FIXME
+  // @Override
+  // public void periodic() {
+  //   switch (currMagazineState) {
+  //     case MANUAL_INTAKE:
+  //       break;
+
+  //     case WAIT_CARGO:
+  //       // ACTUAL COMMENT check number of cargo
+  //       enableUpperBeamBreak(true);
+  //       if (storedCargoColors[0] != CargoColor.NONE && storedCargoColors[1] != CargoColor.NONE) {
+  //         logger.info("WAIT_CARGO -> STOP");
+  //         currMagazineState = MagazineState.STOP;
+  //         break;
+  //       } else if (storedCargoColors[0] != CargoColor.NONE) {
+  //         if (lowerMagazineTalon.getMotorOutputPercent() == 0.0) {
+  //           lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIntakeSpeed);
+  //         }
+  //         // ACTUAL COMMENT Checking if ball is in the top of the upper magazine
+  //         if (upperMagazineTalon.getSelectedSensorVelocity() == 0.0) {
+  //           upperClosedLoopRotate(MagazineConstants.kUpperMagazineIntakeSpeed);
+  //         }
+  //       }
+  //       // ACTUAL COMMENT Knowing when to read cargo color
+  //       if (isLowerBeamBroken()) {
+  //         currMagazineState = MagazineState.READ_CARGO;
+  //         lowerOpenLoopRotate(0.0);
+  //         logger.info("WAIT_CARGO -> READ_CARGO");
+  //       } else if (lowerMagazineTalon.getMotorOutputPercent() == 0.0) {
+  //         lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIntakeSpeed);
+  //       }
+
+  //       break;
+
+  //     case READ_CARGO:
+  //       // ACTUAL COMMENT Read cargo color, switch states depending on amount of cargo
+  //       CargoColor cargoColor = readCargoColor();
+  //       if (cargoColor != CargoColor.NONE) {
+  //         // ACTAUL COMMENT ignoreColorSensor || storedCargoColors[0]
+  //         if (cargoColor != allianceCargoColor && !ignoreColorSensor) {
+  //           lowerClosedLoopRotate(MagazineConstants.kMagazineEjectSpeed);
+  //           currMagazineState = MagazineState.EJECT_CARGO;
+  //           ejectTimer.reset();
+  //           ejectTimer.start();
+  //           logger.info("READ_CARGO -> EJECT_CARGO");
+  //           break;
+  //         } else if (storedCargoColors[1] != CargoColor.NONE) {
+  //           // ACTAUL COMMENT if (storedCargoColors[1] != allianceCargoColor && (!ignoreColorSensor)) {
+  //           // ACTAUL COMMENT storedCargoColors[1] != allianceColor
+  //           // ACTAUL COMMENT   lowerClosedLoopRotate(MagazineConstants.kMagazineEjectSpeed);
+  //           // ACTAUL COMMENT   currMagazineState = MagazineState.EJECT_CARGO;
+  //           // ACTAUL COMMENT   ejectTimer.reset();
+  //           // ACTAUL COMMENT   ejectTimer.start();
+  //           // ACTAUL COMMENT   logger.info("READ_CARGO -> EJECT_CARGO");
+  //           // ACTAUL COMMENT   break;
+  //           // ACTAUL COMMENT }
+  //           currMagazineState = MagazineState.STOP;
+  //           logger.info("READ_CARGO -> STOP");
+  //           break;
+  //         } else {
+  //           lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIntakeSpeed);
+  //           upperClosedLoopRotate(MagazineConstants.kUpperMagazineIntakeSpeed);
+  //           currMagazineState = MagazineState.INDEX_CARGO;
+  //           logger.info("READ_CARGO -> INDEX_CARGO");
+  //           break;
+  //         }
+  //       }
+  //       break;
+  // 
+  //     case INDEX_CARGO:
+  //       if (!isLowerBeamBroken()) {
+  //         enableUpperBeamBreak(true);
+  //         currMagazineState = MagazineState.WAIT_CARGO;
+  //         logger.info("INDEX_CARGO -> WAIT_CARGO");
+  //       }
+  //       break;
+
+  //     case EJECT_CARGO:
+  //       if (ejectTimer.hasElapsed(MagazineConstants.kEjectTimerDelay)) {
+  //         if (storedCargoColors[1] == CargoColor.NONE) {
+  //           storedCargoColors[0] = CargoColor.NONE;
+  //         } else {
+  //           storedCargoColors[1] = CargoColor.NONE;
+  //         }
+  //         currMagazineState = MagazineState.WAIT_CARGO;
+  //         lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIntakeSpeed);
+  //         logger.info("EJECT_CARGO -> WAIT_CARGO");
+  //       }
+  //       break;
+  //     case PAUSE:
+  //       if (shooterSubsystem.getCurrentState() == ShooterState.SHOOT
+  //           && (turretSubsystem.getState() == TurretState.TRACKING
+  //               || turretSubsystem.getState() == TurretState.FENDER_AIMED)) {
+  //         logger.info("PAUSE -> SHOOT");
+  //         enableUpperBeamBreak(false);
+  //         upperClosedLoopRotate(MagazineConstants.kUpperMagazineFeedSpeed);
+  //         currMagazineState = MagazineState.SHOOT;
+  //       }
+  //       break;
+  //     case SHOOT:
+  //       if (!isUpperBeamBroken()) shootUpperBeamStableCounts++;
+  //       else shootUpperBeamStableCounts = 0;
+
+  //       if (shootUpperBeamStableCounts > MagazineConstants.kShootUpperBeamStableCounts) {
+  //         currMagazineState = MagazineState.CARGO_SHOT;
+  //         shootTimer.reset();
+  //         shootTimer.start();
+  //         enableUpperBeamBreak(true);
+  //         lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIndexSpeed);
+  //         upperClosedLoopRotate(MagazineConstants.kUpperMagazineIndexSpeed);
+  //         shotOneCargo();
+  //         logger.info("SHOOT -> CARGO_SHOT");
+  //       }
+  //       break;
+  //     case CARGO_SHOT:
+  //       if (shootTimer.hasElapsed(MagazineConstants.kShootDelay)
+  //           && storedCargoColors[0] == CargoColor.NONE
+  //           && !ignoreColorSensor) {
+  //         currMagazineState = MagazineState.STOP;
+  //         logger.info("CARGO_SHOT -> STOP");
+  //         break;
+  //       } else if (shootTimer.hasElapsed(MagazineConstants.kShootDelay) && isUpperBeamBroken()) {
+  //         logger.info("CARGO_SHOT -> PAUSE");
+  //         currMagazineState = MagazineState.PAUSE;
+  //         enableUpperBeamBreak(true);
+  //         if (turretSubsystem.getState() == TurretState.FENDER_AIMED) {
+  //           shooterSubsystem.fenderShot();
+  //           turretSubsystem.fenderShot();
+  //         } else if (turretSubsystem.getState() == TurretState.TRACKING) {
+  //           shooterSubsystem.shoot();
+  //         }
+  //         lowerOpenLoopRotate(0.0);
+  //         break;
+  //       }
+  //       break;
+
+  //     case STOP:
+  //       if (lowerMagazineTalon.getMotorOutputPercent() != 0.0) {
+  //         stopMagazine();
+  //       }
+  //       break;
+  //   }
+  // }
 
   @Override
   public void periodic() {
-    switch (currMagazineState) {
-      case MANUAL_INTAKE:
-        break;
+    switch (currLowerMagazineState) {
+      case MANUAL:
+      break;
 
       case WAIT_CARGO:
-        // check number of cargo
-        enableUpperBeamBreak(true);
-        if (storedCargoColors[0] != CargoColor.NONE && storedCargoColors[1] != CargoColor.NONE) {
-          logger.info("WAIT_CARGO -> STOP");
-          currMagazineState = MagazineState.STOP;
-          break;
-        } else if (storedCargoColors[0] != CargoColor.NONE) {
+      // Check number of cargo
+      enableUpperBeamBreak(true);
+      if (storedCargoColors[0] != CargoColor.NONE && storedCargoColors[1] != CargoColor.NONE) {
+        logger.info("WAIT_CARGO -> WAIT_EMPTY");
+        currLowerMagazineState = LowerMagazineState.WAIT_EMPTY;
+        break;
+      } else if (storedCargoColors[0] != CargoColor.NONE) {
           if (lowerMagazineTalon.getMotorOutputPercent() == 0.0) {
             lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIntakeSpeed);
           }
-          // Checking if ball is in the top of the upper magazine
-          if (upperMagazineTalon.getSelectedSensorVelocity() == 0.0) {
-            upperClosedLoopRotate(MagazineConstants.kUpperMagazineIntakeSpeed);
-          }
         }
-        // Knowing when to read cargo color
-        if (isLowerBeamBroken()) {
-          currMagazineState = MagazineState.READ_CARGO;
-          lowerOpenLoopRotate(0.0);
-          logger.info("WAIT_CARGO -> READ_CARGO");
-        } else if (lowerMagazineTalon.getMotorOutputPercent() == 0.0) {
+      // Knowing when to read cargo color
+      if (isLowerBeamBroken()) {
+        currLowerMagazineState = LowerMagazineState.READ_CARGO;
+        lowerOpenLoopRotate(0.0);
+        logger.info("WAIT_CARGO -> READ_CARGO");
+      } else if (lowerMagazineTalon.getMotorOutputPercent() == 0.0) {
           lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIntakeSpeed);
         }
-
-        break;
+      break;
 
       case READ_CARGO:
         // Read cargo color, switch states depending on amount of cargo
-        CargoColor cargoColor = readCargoColor();
-        if (cargoColor != CargoColor.NONE) {
-          // ignoreColorSensor || storedCargoColors[0]
-          if (cargoColor != allianceCargoColor && !ignoreColorSensor) {
-            lowerClosedLoopRotate(MagazineConstants.kMagazineEjectSpeed);
-            currMagazineState = MagazineState.EJECT_CARGO;
-            ejectTimer.reset();
-            ejectTimer.start();
-            logger.info("READ_CARGO -> EJECT_CARGO");
-            break;
-          } else if (storedCargoColors[1] != CargoColor.NONE) {
-            // if (storedCargoColors[1] != allianceCargoColor && (!ignoreColorSensor)) {
-            // //storedCargoColors[1] != allianceColor
-            //   lowerClosedLoopRotate(MagazineConstants.kMagazineEjectSpeed);
-            //   currMagazineState = MagazineState.EJECT_CARGO;
-            //   ejectTimer.reset();
-            //   ejectTimer.start();
-            //   logger.info("READ_CARGO -> EJECT_CARGO");
-            //   break;
-            // }
-            currMagazineState = MagazineState.STOP;
-            logger.info("READ_CARGO -> STOP");
-            break;
-          } else {
-            lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIntakeSpeed);
-            upperClosedLoopRotate(MagazineConstants.kUpperMagazineIntakeSpeed);
-            currMagazineState = MagazineState.INDEX_CARGO;
-            logger.info("READ_CARGO -> INDEX_CARGO");
-            break;
-          }
-        }
-        break;
-
-      case INDEX_CARGO:
-        if (!isLowerBeamBroken()) {
-          enableUpperBeamBreak(true);
-          currMagazineState = MagazineState.WAIT_CARGO;
-          logger.info("INDEX_CARGO -> WAIT_CARGO");
-        }
-        break;
-
+      CargoColor cargoColor = readCargoColor();
+      if (cargoColor != CargoColor.NONE) {
+        // ignoreColorSensor || storedCargoColors[0]
+        if (cargoColor != allianceCargoColor && !ignoreColorSensor) {
+          lowerClosedLoopRotate(MagazineConstants.kMagazineEjectSpeed);
+          currLowerMagazineState = LowerMagazineState.EJECT_CARGO;
+          ejectTimer.reset();
+          ejectTimer.start();
+          logger.info("READ_CARGO -> EJECT_CARGO");
+          break;
+        } else if (currUpperMagazineState == UpperMagazineState.EMPTY) {
+                currLowerMagazineState = LowerMagazineState.WAIT_EMPTY;
+                logger.info("READ_CARGO -> WAIT_EMPTY");
+                lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIndexSpeed);
+                upperClosedLoopRotate(MagazineConstants.kUpperMagazineIndexSpeed);
+                break;
+              } else {
+                  currLowerMagazineState = LowerMagazineState.WAIT_UPPER;
+                  logger.info("READ_CARGO -> WAIT_UPPER");
+                  break;
+                }
+      }
+      break;
+      
       case EJECT_CARGO:
-        if (ejectTimer.hasElapsed(MagazineConstants.kEjectTimerDelay)) {
-          if (storedCargoColors[1] == CargoColor.NONE) {
-            storedCargoColors[0] = CargoColor.NONE;
-          } else {
-            storedCargoColors[1] = CargoColor.NONE;
-          }
-          currMagazineState = MagazineState.WAIT_CARGO;
-          lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIntakeSpeed);
-          logger.info("EJECT_CARGO -> WAIT_CARGO");
+      if (ejectTimer.hasElapsed(MagazineConstants.kEjectTimerDelay)) {
+        if (storedCargoColors[1] == CargoColor.NONE) {
+          storedCargoColors[0] = CargoColor.NONE;
+        } else {storedCargoColors[1] = CargoColor.NONE;}
+        currLowerMagazineState = LowerMagazineState.WAIT_CARGO;
+        lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIntakeSpeed);
+        logger.info("EJECT_CARGO -> WAIT_CARGO");
+      }
+      break;
+
+      case WAIT_UPPER:
+      if (currUpperMagazineState == UpperMagazineState.EMPTY) {
+        lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIndexSpeed);
+        upperClosedLoopRotate(MagazineConstants.kUpperMagazineIndexSpeed);
+        currLowerMagazineState = LowerMagazineState.WAIT_EMPTY;
+        logger.info("WAIT_UPPER -> WAIT_EMPTY");
+      }
+      break;
+
+      case WAIT_EMPTY:
+      if (!isLowerBeamBroken()) {
+        storedCargoColors[0] = storedCargoColors[1];
+        storedCargoColors[1] = CargoColor.NONE;
+        currLowerMagazineState = LowerMagazineState.WAIT_CARGO;
+        logger.info("WAIT_EMPTY -> WAIT_CARGO");
+      }
+      break;
+
+      case STOP:
+      break;
+    }
+
+    switch (currUpperMagazineState) {
+      case MANUAL:
+      break;
+
+      case SHOOT:
+      if (!isUpperBeamBroken()) shootUpperBeamStableCounts++;
+        else shootUpperBeamStableCounts = 0;
+
+        if (shootUpperBeamStableCounts > MagazineConstants.kShootUpperBeamStableCounts) {
+          currUpperMagazineState = UpperMagazineState.CARGO_SHOT;
+          shootTimer.reset();
+          shootTimer.start();
+          enableUpperBeamBreak(true);
+          upperClosedLoopRotate(MagazineConstants.kUpperMagazineIndexSpeed);
+          logger.info("SHOOT -> CARGO_SHOT");
         }
-        break;
+      break;
+
+      case CARGO_SHOT:
+      if (shootTimer.hasElapsed(MagazineConstants.kShootDelay)) {
+          currUpperMagazineState = UpperMagazineState.EMPTY;
+          logger.info("CARGO_SHOT -> EMPTY");
+          shotOneCargo();
+          upperClosedLoopRotate(0.0);
+          break;
+        }
+      break;
+
+      case EMPTY:
+      if (isUpperBeamBroken()) {
+        currUpperMagazineState = UpperMagazineState.WAIT_AIM;
+        logger.info("EMPTY -> WAIT_AIM");
+      }
+      break;
+
+      case WAIT_AIM:
+      if (continueToShoot) {
+        if (turretSubsystem.getState() == TurretState.FENDER_AIMED) {
+          shooterSubsystem.fenderShot();
+          turretSubsystem.fenderShot();
+          logger.info("CARGO_SHOT -> PAUSE");
+          currUpperMagazineState = UpperMagazineState.PAUSE;
+          enableUpperBeamBreak(true);
+        } else if (turretSubsystem.getState() == TurretState.TRACKING) {
+            shooterSubsystem.shoot();
+            logger.info("CARGO_SHOT -> PAUSE");
+           currUpperMagazineState = UpperMagazineState.PAUSE;
+            enableUpperBeamBreak(true);
+          }
+      }   
+      break;
+
       case PAUSE:
-        if (shooterSubsystem.getCurrentState() == ShooterState.SHOOT
+      if (shooterSubsystem.getCurrentState() == ShooterState.SHOOT
             && (turretSubsystem.getState() == TurretState.TRACKING
                 || turretSubsystem.getState() == TurretState.FENDER_AIMED)) {
           logger.info("PAUSE -> SHOOT");
           enableUpperBeamBreak(false);
           upperClosedLoopRotate(MagazineConstants.kUpperMagazineFeedSpeed);
-          currMagazineState = MagazineState.SHOOT;
-        }
-        break;
-      case SHOOT:
-        if (!isUpperBeamBroken()) shootUpperBeamStableCounts++;
-        else shootUpperBeamStableCounts = 0;
-
-        if (shootUpperBeamStableCounts > MagazineConstants.kShootUpperBeamStableCounts) {
-          currMagazineState = MagazineState.CARGO_SHOT;
-          shootTimer.reset();
-          shootTimer.start();
-          enableUpperBeamBreak(true);
-          lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIndexSpeed);
-          upperClosedLoopRotate(MagazineConstants.kUpperMagazineIndexSpeed);
-          shotOneCargo();
-          logger.info("SHOOT -> CARGO_SHOT");
-        }
-        break;
-      case CARGO_SHOT:
-        if (shootTimer.hasElapsed(MagazineConstants.kShootDelay)
-            && storedCargoColors[0] == CargoColor.NONE
-            && !ignoreColorSensor) {
-          currMagazineState = MagazineState.STOP;
-          logger.info("CARGO_SHOT -> STOP");
-          break;
-        } else if (shootTimer.hasElapsed(MagazineConstants.kShootDelay) && isUpperBeamBroken()) {
-          logger.info("CARGO_SHOT -> PAUSE");
-          currMagazineState = MagazineState.PAUSE;
-          enableUpperBeamBreak(true);
-          if (turretSubsystem.getState() == TurretState.FENDER_AIMED) {
-            shooterSubsystem.fenderShot();
-            turretSubsystem.fenderShot();
-          } else if (turretSubsystem.getState() == TurretState.TRACKING) {
-            shooterSubsystem.shoot();
-          }
-          lowerOpenLoopRotate(0.0);
-          break;
-        }
-        break;
+          currUpperMagazineState = UpperMagazineState.SHOOT;
+      }
+      break;
 
       case STOP:
-        if (lowerMagazineTalon.getMotorOutputPercent() != 0.0) {
-          stopMagazine();
-        }
-        break;
+      break;
     }
   }
 
@@ -461,12 +633,20 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     }
   }
 
-  public enum MagazineState {
-    MANUAL_INTAKE,
+  public enum LowerMagazineState {
+    MANUAL,
     WAIT_CARGO,
     READ_CARGO,
-    INDEX_CARGO,
+    WAIT_UPPER,
+    WAIT_EMPTY,
     EJECT_CARGO,
+    STOP;
+  }
+
+  public enum UpperMagazineState {
+    MANUAL,
+    EMPTY,
+    WAIT_AIM,
     SHOOT,
     CARGO_SHOT,
     PAUSE,
