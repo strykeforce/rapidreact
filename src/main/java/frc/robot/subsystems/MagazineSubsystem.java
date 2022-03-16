@@ -460,8 +460,8 @@ public class MagazineSubsystem extends MeasurableSubsystem {
       // Check number of cargo
       enableUpperBeamBreak(true);
       if (storedCargoColors[0] != CargoColor.NONE && storedCargoColors[1] != CargoColor.NONE) {
-        logger.info("WAIT_CARGO -> WAIT_EMPTY");
-        currLowerMagazineState = LowerMagazineState.WAIT_EMPTY;
+        logger.info("WAIT_CARGO -> WAIT_UPPER");
+        currLowerMagazineState = LowerMagazineState.WAIT_UPPER;
         break;
       } else if (storedCargoColors[0] != CargoColor.NONE) {
           if (lowerMagazineTalon.getMotorOutputPercent() == 0.0) {
