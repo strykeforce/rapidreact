@@ -264,10 +264,6 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   }
 
   public boolean isMagazineFull() {
-    return currMagazineState == MagazineState.STOP;
-  }
-
-  public boolean isMagazineActuallyFull() {
     return storedCargoColors[0] != CargoColor.NONE && storedCargoColors[1] != CargoColor.NONE; 
   }
 
