@@ -2,7 +2,6 @@ package frc.robot.commands.sequences.shooting;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.MagazineSubsystem;
-import frc.robot.subsystems.MagazineSubsystem.MagazineState;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.ShooterSubsystem.ShooterState;
 import frc.robot.subsystems.TurretSubsystem;
@@ -66,7 +65,7 @@ public class VisionShootCommand extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return magazineSubsystem.getCurrMagazineState() == MagazineState.STOP;
+    return magazineSubsystem.isMagazineEmpty() && !magazineSubsystem.isUpperBeamBroken();
   }
 
   @Override
