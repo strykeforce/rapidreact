@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
-import frc.robot.subsystems.MagazineSubsystem.MagazineState;
+import frc.robot.subsystems.MagazineSubsystem.LowerMagazineState;
 
 public class AutoIntakeCommand extends CommandBase {
   public final MagazineSubsystem magazineSubsystem;
@@ -26,12 +26,12 @@ public class AutoIntakeCommand extends CommandBase {
 
   @Override
   public void execute() {
-    if (magazineSubsystem.getCurrMagazineState() == MagazineState.EJECT_CARGO
+    if (magazineSubsystem.getCurrLowerMagazineState() == LowerMagazineState.EJECT_CARGO
         && !magazineReversed) {
       intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeEjectSpeed);
       magazineReversed = true;
     } else if (magazineReversed
-        && (magazineSubsystem.getCurrMagazineState() != MagazineState.EJECT_CARGO)) {
+        && (magazineSubsystem.getCurrLowerMagazineState() != LowerMagazineState.EJECT_CARGO)) {
       intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeSpeed);
       magazineReversed = false;
     }

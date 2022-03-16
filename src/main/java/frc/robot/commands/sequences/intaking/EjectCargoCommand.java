@@ -29,7 +29,7 @@ public class EjectCargoCommand extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return magazineSubsystem.getCurrMagazineState() == MagazineState.STOP;
+    return magazineSubsystem.isMagazineEmpty() && !magazineSubsystem.isUpperBeamBroken();
   }
 
   @Override
