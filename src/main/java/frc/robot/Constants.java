@@ -37,6 +37,8 @@ public final class Constants {
   public static final class DriveConstants {
     // Drive Constants
     public static final double kWheelDiameterInches = 3.0 * (571.0 / 500.0); // Actual/Odometry
+    public static final double kExpoScaleMoveFactor = 0.4;
+    public static final double kExpoScaleYawFactor = 0.4;
 
     // From: https://github.com/strykeforce/axis-config/
     public static final double kMaxSpeedMetersPerSecond = 3.889;
