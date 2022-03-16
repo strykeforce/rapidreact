@@ -48,6 +48,6 @@ public class AutoIntakeCommand extends CommandBase {
       magazineSubsystem.magazineInterrupted();
     }
 
-    intakeSubsystem.openLoopRotate(0.0);
+    intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeReverseSpeed);
   }
 }
