@@ -1,11 +1,5 @@
 package frc.robot.commands.drive;
 
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonObjectFormatVisitor;
-
-import org.opencv.core.Mat;
-import org.strykeforce.thirdcoast.util.ExpoScale;
-
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
@@ -13,20 +7,16 @@ import frc.robot.Constants.DashboardConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.DriveSubsystem;
+import org.strykeforce.thirdcoast.util.ExpoScale;
 
 public class DriveTeleopCommand extends CommandBase {
   private final Joystick joystick;
   private final DriveSubsystem driveSubsystem;
-  private final ExpoScale expoScaleMovement = new ExpoScale(DashboardConstants.kLeftStickDeadBand, DriveConstants.kExpoScaleMoveFactor);
-  private final ExpoScale expoScaleYaw = new ExpoScale(DashboardConstants.kRightStickDeadBand, DriveConstants.kExpoScaleYawFactor);
-  private double rawForward;
-  private double rawStrafe;
-  private double rawMagnitude;
-  private double rawAngle;
-  private double adjustedMag;
-  private double adjustedForward;
-  private double adjustedStrafe;
-  
+  private final ExpoScale expoScaleMovement =
+      new ExpoScale(DashboardConstants.kLeftStickDeadBand, DriveConstants.kExpoScaleMoveFactor);
+  private final ExpoScale expoScaleYaw =
+      new ExpoScale(DashboardConstants.kRightStickDeadBand, DriveConstants.kExpoScaleYawFactor);
+  private double[] adjustedValues = new double[3];
 
   public DriveTeleopCommand(Joystick driver, DriveSubsystem driveSubsystem) {
     addRequirements(driveSubsystem);
@@ -34,35 +24,29 @@ public class DriveTeleopCommand extends CommandBase {
     this.driveSubsystem = driveSubsystem;
   }
 
+  private double[] calcAdjustedValues(double rawForward, double rawStrafe, double rawYaw) {
+    double[] tempAdjustedValues = new double[3];
+    double rawAngle = Math.atan(rawForward / rawStrafe);
+    double adjustedMag =
+        expoScaleMovement.apply(Math.sqrt(Math.pow(rawForward, 2) + Math.pow(rawStrafe, 2)));
+    tempAdjustedValues[0] = Math.sin(rawAngle) * adjustedMag;
+    tempAdjustedValues[1] = Math.cos(rawAngle) * adjustedMag;
+    tempAdjustedValues[2] = expoScaleYaw.apply(rawYaw);
+    return tempAdjustedValues;
+  }
+
   @Override
   public void execute() {
-
-    rawForward = joystick.getRawAxis(RobotContainer.Axis.LEFT_X.id);
-    rawStrafe = joystick.getRawAxis(RobotContainer.Axis.LEFT_Y.id);
-    rawMagnitude = Math.sqrt(Math.pow(rawForward, 2)+Math.pow(rawStrafe,2));
-    rawAngle = Math.atan(rawForward/rawStrafe);
-    adjustedMag = expoScaleMovement.apply(rawMagnitude);
-    adjustedForward = Math.sin(rawAngle) * adjustedMag;
-    adjustedStrafe = Math.cos(rawAngle) * adjustedMag;
-    
-    
-
-
-
+    adjustedValues =
+        calcAdjustedValues(
+            joystick.getRawAxis(RobotContainer.Axis.LEFT_X.id),
+            joystick.getRawAxis(RobotContainer.Axis.LEFT_Y.id),
+            joystick.getRawAxis(RobotContainer.Axis.RIGHT_Y.id));
 
     driveSubsystem.drive(
-        DriveConstants.kMaxSpeedMetersPerSecond
-            * -MathUtil.applyDeadband(
-                joystick.getRawAxis(RobotContainer.Axis.LEFT_X.id),
-                DriveConstants.kDeadbandAllStick),
-        DriveConstants.kMaxSpeedMetersPerSecond
-            * -MathUtil.applyDeadband(
-                joystick.getRawAxis(RobotContainer.Axis.LEFT_Y.id),
-                DriveConstants.kDeadbandAllStick),
-        DriveConstants.kMaxOmega
-            * -MathUtil.applyDeadband(
-                joystick.getRawAxis(RobotContainer.Axis.RIGHT_Y.id),
-                DriveConstants.kDeadbandAllStick));
+        DriveConstants.kMaxSpeedMetersPerSecond * -adjustedValues[0],
+        DriveConstants.kMaxSpeedMetersPerSecond * -adjustedValues[1],
+        DriveConstants.kMaxOmega * -adjustedValues[2]);
   }
 
   @Override
