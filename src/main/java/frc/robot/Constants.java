@@ -616,6 +616,7 @@ public final class Constants {
     public static final int kIntakeFalconID = 20;
     public static final double kIntakeSpeed = 0.5;
     public static final double kIntakeEjectSpeed = -0.5;
+    public static final double kIntakeReverseSpeed = -0.2;
 
     public static TalonFXConfiguration getIntakeFalconConfig() {
       TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
