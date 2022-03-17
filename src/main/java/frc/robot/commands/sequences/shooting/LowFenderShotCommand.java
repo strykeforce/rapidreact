@@ -2,7 +2,6 @@ package frc.robot.commands.sequences.shooting;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.MagazineSubsystem;
-import frc.robot.subsystems.MagazineSubsystem.UpperMagazineState;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 

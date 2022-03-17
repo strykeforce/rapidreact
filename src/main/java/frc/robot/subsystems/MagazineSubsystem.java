@@ -278,8 +278,8 @@ public class MagazineSubsystem extends MeasurableSubsystem {
 
   public boolean isShootSequenceDone() {
     return isMagazineEmpty()
-    && !isUpperBeamBroken()
-    && getCurrUpperMagazineState() == UpperMagazineState.EMPTY;
+        && !isUpperBeamBroken()
+        && getCurrUpperMagazineState() == UpperMagazineState.EMPTY;
   }
 
   public boolean isMagazineFull() {
