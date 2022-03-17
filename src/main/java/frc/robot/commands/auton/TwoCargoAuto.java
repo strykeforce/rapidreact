@@ -27,11 +27,13 @@ public class TwoCargoAuto extends SequentialCommandGroup {
       IntakeSubsystem intakeSubsystem,
       DriveSubsystem driveSubsystem,
       String pathName,
-      Rotation2d gyroOffset) {
+      Rotation2d gyroOffset,
+      double delay) {
     addCommands(
         new ParallelCommandGroup(
             new PreloadCargoCommand(magazineSubsystem),
             new OffsetGyroCommand(driveSubsystem, gyroOffset)),
+        new WaitCommand(delay),
         new ParallelDeadlineGroup(
             new DriveAutonCommand(driveSubsystem, pathName), // deadline
             new ArmShooterCommandGroup(visionSubsystem, turretSubsystem, shooterSubsystem),

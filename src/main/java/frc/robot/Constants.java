@@ -206,7 +206,7 @@ public final class Constants {
     public static final int kTurretId = 50;
     public static final double kFastCruiseVelocity = 4_000;
     public static final double kSlowCruiseVelocity = 2_000;
-    public static final int kTurretZeroTicks = 756; // 1250
+    public static final int kTurretZeroTicks = 3349; // 1250
     public static final int kForwardLimit = 13_800; // 14
     public static final int kReverseLimit = -13_800; // 14
     public static final double kMaxStringPotZero = 100; // 2020 Robot
@@ -232,7 +232,7 @@ public final class Constants {
 
     // Close Enough & Stable Counts
     public static final int kCloseEnoughTicks = 40;
-    public static final Rotation2d kCloseEnoughTarget = Rotation2d.fromDegrees(1); // 1
+    public static final Rotation2d kCloseEnoughTarget = Rotation2d.fromDegrees(5); // 1
     public static final int kRotateByStableCounts = 3; // 3
 
     // Fender Shot Constants
@@ -255,7 +255,7 @@ public final class Constants {
       turretConfig.slot0.kI = 0.04;
       turretConfig.slot0.kD = 100;
       turretConfig.slot0.kF = 0.13;
-      turretConfig.slot0.integralZone = 100;
+      turretConfig.slot0.integralZone = 150; // 100
       turretConfig.slot0.maxIntegralAccumulator = 0;
       turretConfig.slot0.allowableClosedloopError = 15;
       turretConfig.voltageMeasurementFilter = 32;
@@ -436,9 +436,9 @@ public final class Constants {
     public static final double kFMidExtTicks = -210_000;
     public static final double kFMidRetSt1Ticks = -135_000;
     public static final double kFMidRetSt2Ticks = -115_000;
-    public static final double kFMidRetSt3Ticks = -2_500;
+    public static final double kFMidRetSt3Ticks = -1_500;
     public static final double kHighPvtBck1Ticks = 5_500;
-    public static final double kPHighExtTicks = -197_000;
+    public static final double kPHighExtTicks = -205_000;
     public static final double kHighPvtFwd1Ticks = 3_200;
     public static final double kPHighRet1Ticks = -168_000;
     public static final double kHighPvtBck2Ticks = 4_500;
@@ -448,9 +448,9 @@ public final class Constants {
     public static final double kHighPvtBck3Ticks = -3_000;
     public static final double kPHighRet2Ticks = -120_000;
     public static final double kHighPvtFwd2Ticks = 750;
-    public static final double kFTvsRet1Ticks = -2_500;
+    public static final double kFTvsRet1Ticks = -1_500;
     public static final double kTvsPvtBck1Ticks = 5_500;
-    public static final double kPTvsExtTicks = -197_000;
+    public static final double kPTvsExtTicks = -205_000;
     public static final double kTvsPvtFwdTicks = 3_200;
     public static final double kPTvsRetTicks = -168_000;
     public static final double kTvsPvtBck2Ticks = 4_500;
@@ -655,7 +655,7 @@ public final class Constants {
     public static final int kHoodZeroTicks = 1800;
     public static final int kForwardSoftLimts = 5800;
     public static final int kReverseSoftLimits = 100;
-    public static final int kZeroCheckTicks = 500; // FIXME
+    public static final int kZeroCheckTicks = 2_600; // 500
 
     // Arm Shooter Constants
     public static final double kKickerArmTicksP100ms = 4000;
@@ -674,11 +674,11 @@ public final class Constants {
     // Low Fender Shot Constants
     public static final double kKickerFenderLowTicksP100ms = 0; // 3000
     public static final double kShooterFenderLowTicksP100ms = 6500; // 4000
-    public static final double kHoodFenderLowTicks = 0;
+    public static final double kHoodFenderLowTicks = 2_600; // 0
 
     public static final int kStableCounts = 5; // FIX ME
-    public static final double kCloseEnoughTicksP100ms = 100;
-    public static final double kCloseEnoughTicks = 100;
+    public static final double kCloseEnoughTicksP100ms = 200; // 100
+    public static final double kCloseEnoughTicks = 150; // 100
 
     public static TalonFXConfiguration getShooterFalconConfig() {
       TalonFXConfiguration shooterConfig = new TalonFXConfiguration();

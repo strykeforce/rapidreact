@@ -203,7 +203,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
   }
 
   public void shoot() {
-    logger.info("SHOOT: {} -> ADJUSTING}", currentState);
+    logger.info("SHOOT: {} -> ADJUSTING", currentState);
     currentState = ShooterState.ADJUSTING;
     if (!magazineSubsystem.isNextCargoAlliance()) {
       shooterClosedLoop(
@@ -247,6 +247,11 @@ public class ShooterSubsystem extends MeasurableSubsystem {
   public void stop() {
     logger.info("{} -> STOP", currentState);
     currentState = ShooterState.STOP;
+  }
+
+  public void setManualState() {
+    currentState = ShooterState.MANUAL_SHOOT;
+    logger.info("SetManualState ");
   }
 
   @Override
