@@ -264,7 +264,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   }
 
   public boolean isMagazineFull() {
-    return storedCargoColors[0] != CargoColor.NONE && storedCargoColors[1] != CargoColor.NONE; 
+    return storedCargoColors[0] != CargoColor.NONE && storedCargoColors[1] != CargoColor.NONE;
   }
 
   public void magazineInterrupted() {
