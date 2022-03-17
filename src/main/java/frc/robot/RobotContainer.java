@@ -109,9 +109,9 @@ public class RobotContainer {
   private final XboxController xboxController = new XboxController(1);
 
   // Dashboard Widgets
-  private SuppliedValueWidget firstCargo;
-  private SuppliedValueWidget secondCargo;
-  private SuppliedValueWidget allianceColor;
+  private SuppliedValueWidget<Boolean> firstCargo;
+  private SuppliedValueWidget<Boolean> secondCargo;
+  private SuppliedValueWidget<Boolean> allianceColor;
   private Alliance alliance = Alliance.Invalid;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
