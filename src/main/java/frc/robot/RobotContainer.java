@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
@@ -93,14 +92,13 @@ import org.strykeforce.telemetry.TelemetryService;
  */
 public class RobotContainer {
   private boolean haveZeroedClimb = false;
-  private DigitalInput eventFlag = new DigitalInput(DashboardConstants.kLockoutBNCid);
-  private DriveSubsystem driveSubsystem;
-  private VisionSubsystem visionSubsystem;
-  private TurretSubsystem turretSubsystem;
-  private ClimbSubsystem climbSubsystem;
-  private MagazineSubsystem magazineSubsystem;
-  private ShooterSubsystem shooterSubsystem;
-  private IntakeSubsystem intakeSubsystem;
+  private final DriveSubsystem driveSubsystem;
+  private final VisionSubsystem visionSubsystem;
+  private final TurretSubsystem turretSubsystem;
+  private final ClimbSubsystem climbSubsystem;
+  private final MagazineSubsystem magazineSubsystem;
+  private final ShooterSubsystem shooterSubsystem;
+  private final IntakeSubsystem intakeSubsystem;
   //   private final PowerDistHub powerDistHub = new PowerDistHub();
   private final AutoSwitch autoSwitch;
   private final TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
@@ -116,6 +114,7 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    DigitalInput eventFlag = new DigitalInput(DashboardConstants.kLockoutBNCid);
     boolean isEvent = eventFlag.get();
     if (isEvent) {
       // must be set before the first call to  LoggerFactory.getLogger();
