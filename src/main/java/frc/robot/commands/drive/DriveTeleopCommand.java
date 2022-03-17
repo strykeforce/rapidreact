@@ -12,11 +12,10 @@ import org.strykeforce.thirdcoast.util.ExpoScale;
 public class DriveTeleopCommand extends CommandBase {
   private final Joystick joystick;
   private final DriveSubsystem driveSubsystem;
-  private final ExpoScale expoScaleMovement =
-      new ExpoScale(DashboardConstants.kLeftStickDeadBand, DriveConstants.kExpoScaleMoveFactor);
   private final ExpoScale expoScaleYaw =
       new ExpoScale(DashboardConstants.kRightStickDeadBand, DriveConstants.kExpoScaleYawFactor);
   private double[] adjustedValues = new double[3];
+  private final double vectorOffset = Math.sqrt(2)/(DriveConstants.kExpoScaleMoveFactor * Math.pow((Math.sqrt(2)-DriveConstants.kDeadbandAllStick), 3) + (1-DriveConstants.kExpoScaleMoveFactor) * (Math.sqrt(2) - DriveConstants.kDeadbandAllStick));
 
   public DriveTeleopCommand(Joystick driver, DriveSubsystem driveSubsystem) {
     addRequirements(driveSubsystem);
@@ -24,11 +23,22 @@ public class DriveTeleopCommand extends CommandBase {
     this.driveSubsystem = driveSubsystem;
   }
 
+  private double applyVectorDeadBand(double input) {
+    double y;
+
+    if (Math.abs(input) < DriveConstants.kDeadbandAllStick) {
+      return 0;
+    }
+
+    y = input > 0 ? input - DriveConstants.kDeadbandAllStick : input + DriveConstants.kDeadbandAllStick;
+    return (DriveConstants.kExpoScaleMoveFactor * Math.pow(y, 3) + (1 - DriveConstants.kExpoScaleMoveFactor) * y) * vectorOffset;
+  }
+
   private double[] calcAdjustedValues(double rawForward, double rawStrafe, double rawYaw) {
     double[] tempAdjustedValues = new double[3];
-    double rawAngle = Math.atan(rawForward / rawStrafe);
-    double adjustedMag =
-        expoScaleMovement.apply(Math.sqrt(Math.pow(rawForward, 2) + Math.pow(rawStrafe, 2)));
+    double rawAngle = Math.atan2(rawForward , rawStrafe);
+    double orgMag = (Math.sqrt(Math.pow(rawForward, 2) + Math.pow(rawStrafe, 2)));
+    double adjustedMag = applyVectorDeadBand(orgMag);
     tempAdjustedValues[0] = Math.sin(rawAngle) * adjustedMag;
     tempAdjustedValues[1] = Math.cos(rawAngle) * adjustedMag;
     tempAdjustedValues[2] = expoScaleYaw.apply(rawYaw);
@@ -57,12 +67,5 @@ public class DriveTeleopCommand extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     driveSubsystem.drive(0, 0, 0);
-  }
-
-  private double deadband(double stickValue) {
-    if (Math.abs(stickValue) <= Constants.DriveConstants.kDeadbandAllStick) {
-      return 0;
-    }
-    return stickValue;
   }
 }
