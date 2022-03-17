@@ -30,9 +30,7 @@ public class LowFenderShotCommand extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return magazineSubsystem.isMagazineEmpty()
-        && !magazineSubsystem.isUpperBeamBroken()
-        && magazineSubsystem.getCurrUpperMagazineState() == UpperMagazineState.EMPTY;
+    return magazineSubsystem.isShootSequenceDone();
   }
 
   @Override

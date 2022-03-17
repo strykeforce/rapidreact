@@ -276,6 +276,12 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     }
   }
 
+  public boolean isShootSequenceDone() {
+    return isMagazineEmpty()
+    && !isUpperBeamBroken()
+    && getCurrUpperMagazineState() == UpperMagazineState.EMPTY;
+  }
+
   public boolean isMagazineFull() {
     return storedCargoColors[0] != CargoColor.NONE && storedCargoColors[1] != CargoColor.NONE;
   }
