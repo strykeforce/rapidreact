@@ -206,7 +206,7 @@ public final class Constants {
     public static final int kTurretId = 50;
     public static final double kFastCruiseVelocity = 4_000;
     public static final double kSlowCruiseVelocity = 2_000;
-    public static final int kTurretZeroTicks = 3349; // 1250
+    public static final int kTurretZeroTicks = 1944; // 1250, 3349
     public static final int kForwardLimit = 13_800; // 14
     public static final int kReverseLimit = -13_800; // 14
     public static final double kMaxStringPotZero = 100; // 2020 Robot
@@ -292,7 +292,7 @@ public final class Constants {
     public static final double kMagazineEjectSpeed = -8000; // -0.5
 
     // State Machine Sequence Constants
-    public static final double kShootDelay = 0.7;
+    public static final double kShootDelay = 0.35; // .35
     public static final double kEjectTimerDelay = 1.0;
     public static final double kShootUpperBeamStableCounts = 2;
 
@@ -616,6 +616,7 @@ public final class Constants {
     public static final int kIntakeFalconID = 20;
     public static final double kIntakeSpeed = 0.5;
     public static final double kIntakeEjectSpeed = -0.5;
+    public static final double kIntakeReverseSpeed = -0.2;
 
     public static TalonFXConfiguration getIntakeFalconConfig() {
       TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
@@ -623,6 +624,7 @@ public final class Constants {
       intakeConfig.supplyCurrLimit.triggerThresholdCurrent = 15;
       intakeConfig.supplyCurrLimit.triggerThresholdTime = 0.5;
       intakeConfig.supplyCurrLimit.enable = true;
+      intakeConfig.openloopRamp = 0.5;
       intakeConfig.slot0.kP = 0.0;
       intakeConfig.slot0.kI = 0.0;
       intakeConfig.slot0.kD = 0.0;
@@ -657,8 +659,8 @@ public final class Constants {
     public static final int kZeroCheckTicks = 2_600; // 500
 
     // Arm Shooter Constants
-    public static final double kKickerArmTicksP100ms = 4000;
-    public static final double kShooterArmTicksP100ms = 4000;
+    public static final double kKickerArmTicksP100ms = 5500;
+    public static final double kShooterArmTicksP100ms = 5500;
 
     // Opponent Cargo Constants
     public static final double kKickerOpTicksP100ms = 4000;
@@ -676,7 +678,7 @@ public final class Constants {
     public static final double kHoodFenderLowTicks = 2_600; // 0
 
     public static final int kStableCounts = 5; // FIX ME
-    public static final double kCloseEnoughTicksP100ms = 200; // 100
+    public static final double kCloseEnoughTicksP100ms = 50; // 100
     public static final double kCloseEnoughTicks = 150; // 100
 
     public static TalonFXConfiguration getShooterFalconConfig() {

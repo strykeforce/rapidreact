@@ -1,6 +1,7 @@
 package frc.robot.commands.sequences.shooting;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.ShooterSubsystem.ShooterState;
@@ -15,6 +16,7 @@ public class VisionShootCommand extends CommandBase {
   private TurretSubsystem turretSubsystem;
   private MagazineSubsystem magazineSubsystem;
   private VisionSubsystem visionSubsystem;
+  private IntakeSubsystem intakeSubsystem;
   private boolean isArmed = false;
   private final boolean disableTrackingOnFinish;
   private final Logger logger = LoggerFactory.getLogger(VisionShootCommand.class);
@@ -24,13 +26,16 @@ public class VisionShootCommand extends CommandBase {
       TurretSubsystem turretSubsystem,
       MagazineSubsystem magazineSubsystem,
       VisionSubsystem visionSubsystem,
-      boolean disableTrackingOnFinish) {
-    addRequirements(shooterSubsystem, magazineSubsystem, turretSubsystem, visionSubsystem);
+      boolean disableTrackingOnFinish,
+      IntakeSubsystem intakeSubsystem) {
+    addRequirements(
+        shooterSubsystem, magazineSubsystem, turretSubsystem, visionSubsystem, intakeSubsystem);
     this.shooterSubsystem = shooterSubsystem;
     this.turretSubsystem = turretSubsystem;
     this.magazineSubsystem = magazineSubsystem;
     this.visionSubsystem = visionSubsystem;
     this.disableTrackingOnFinish = disableTrackingOnFinish;
+    this.intakeSubsystem = intakeSubsystem;
   }
 
   @Override
@@ -76,5 +81,6 @@ public class VisionShootCommand extends CommandBase {
     }
     shooterSubsystem.stop();
     magazineSubsystem.stopMagazine();
+    intakeSubsystem.openLoopRotate(0.0);
   }
 }
