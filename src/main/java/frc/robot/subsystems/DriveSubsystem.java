@@ -50,6 +50,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private State holoContInput = new State();
   private Rotation2d holoContAngle = new Rotation2d();
   private Double trajectoryActive = 0.0;
+  private double[] rawValues = new double[3];
+  private double[] adjustedValues = new double[3];
 
   public DriveSubsystem() {
 
@@ -124,6 +126,11 @@ public class DriveSubsystem extends MeasurableSubsystem {
       double yawRadiansPerSec,
       Boolean isFieldOriented) {
     swerveDrive.move(forwardMetersPerSec, strafeMetersPerSec, yawRadiansPerSec, isFieldOriented);
+  }
+
+  public void setJoystickValues(double[] adj, double[] raw) {
+    adjustedValues = adj;
+    rawValues = raw;
   }
 
   @Override
@@ -315,6 +322,12 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure("Wheel 2 Angle", () -> getSwerveModuleStates()[2].angle.getDegrees()),
         new Measure("Wheel 2 Speed", () -> getSwerveModuleStates()[2].speedMetersPerSecond),
         new Measure("Wheel 3 Angle", () -> getSwerveModuleStates()[3].angle.getDegrees()),
-        new Measure("Wheel 3 Speed", () -> getSwerveModuleStates()[3].speedMetersPerSecond));
+        new Measure("Wheel 3 Speed", () -> getSwerveModuleStates()[3].speedMetersPerSecond),
+        new Measure("rawFwd", () -> rawValues[0]),
+        new Measure("rawStr", () -> rawValues[1]),
+        new Measure("rawYaw", () -> rawValues[2]),
+        new Measure("adjFwd", () -> adjustedValues[0]),
+        new Measure("adjStr", () -> adjustedValues[1]),
+        new Measure("adjYaw", () -> adjustedValues[2]));
   }
 }
