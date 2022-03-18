@@ -624,6 +624,7 @@ public final class Constants {
       intakeConfig.supplyCurrLimit.triggerThresholdCurrent = 15;
       intakeConfig.supplyCurrLimit.triggerThresholdTime = 0.5;
       intakeConfig.supplyCurrLimit.enable = true;
+      intakeConfig.openloopRamp = 0.5;
       intakeConfig.slot0.kP = 0.0;
       intakeConfig.slot0.kI = 0.0;
       intakeConfig.slot0.kD = 0.0;
