@@ -37,8 +37,6 @@ public final class Constants {
   public static final class DriveConstants {
     // Drive Constants
     public static final double kWheelDiameterInches = 3.0 * (571.0 / 500.0); // Actual/Odometry
-    public static final double kExpoScaleMoveFactor = 0.4;
-    public static final double kExpoScaleYawFactor = 0.4;
 
     // From: https://github.com/strykeforce/axis-config/
     public static final double kMaxSpeedMetersPerSecond = 3.889;
@@ -75,6 +73,10 @@ public final class Constants {
     // Teleop Drive Constants
     public static final double kDeadbandXLock = 0.2;
     public static final double kDeadbandAllStick = 0.10;
+    public static final double kExpoScaleMoveFactor = 0.4;
+    public static final double kExpoScaleYawFactor = 0.4;
+    public static final double kRateLimitYaw = 0.3;
+    public static final double kRateLimitMove = 0.3;
     public static final double kCloseEnoughTicks = 10.0;
 
     // Climb Limits
