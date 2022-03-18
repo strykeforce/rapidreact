@@ -232,7 +232,12 @@ public class RobotContainer {
     new JoystickButton(driveJoystick, Shoulder.RIGHT_DOWN.id)
         .whenPressed(
             new VisionShootCommand(
-                shooterSubsystem, turretSubsystem, magazineSubsystem, visionSubsystem, true));
+                shooterSubsystem,
+                turretSubsystem,
+                magazineSubsystem,
+                visionSubsystem,
+                true,
+                intakeSubsystem));
 
     // Auto Climb
     new JoystickButton(driveJoystick, Trim.LEFT_X_POS.id)
@@ -280,19 +285,23 @@ public class RobotContainer {
 
     // Eject Opponent Cargo
     new JoystickButton(xboxController, XboxController.Button.kA.value)
-        .whenPressed(new EjectCargoCommand(turretSubsystem, shooterSubsystem, magazineSubsystem));
+        .whenPressed(
+            new EjectCargoCommand(
+                turretSubsystem, shooterSubsystem, magazineSubsystem, intakeSubsystem));
     new JoystickButton(xboxController, XboxController.Button.kA.value)
         .whenReleased(new StopShooterCommand(shooterSubsystem));
 
     // High Fender Shot
     new JoystickButton(xboxController, XboxController.Button.kRightBumper.value)
         .whenPressed(
-            new HighFenderShotCommand(turretSubsystem, shooterSubsystem, magazineSubsystem));
+            new HighFenderShotCommand(
+                turretSubsystem, shooterSubsystem, magazineSubsystem, intakeSubsystem));
 
     // Low Fender Shot
     new JoystickButton(xboxController, XboxController.Button.kLeftBumper.value)
         .whenPressed(
-            new LowFenderShotCommand(turretSubsystem, shooterSubsystem, magazineSubsystem));
+            new LowFenderShotCommand(
+                turretSubsystem, shooterSubsystem, magazineSubsystem, intakeSubsystem));
   }
 
   public void configureManualClimbButtons() {
