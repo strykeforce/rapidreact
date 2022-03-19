@@ -717,6 +717,7 @@ public class ClimbSubsystem extends MeasurableSubsystem {
           openLoopPivotArm(currPivotArmState.speed);
           shoulderState = ShoulderState.IDLE;
           climbStateCounter++;
+          enablePivotRatchet(true);
         }
         break;
       case TVS_PVT_FWD1:
