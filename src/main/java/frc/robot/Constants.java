@@ -72,7 +72,7 @@ public final class Constants {
 
     // Teleop Drive Constants
     public static final double kDeadbandXLock = 0.2;
-    public static final double kDeadbandAllStick = 0.10;
+    public static final double kDeadbandAllStick = 0.075;
     public static final double kCloseEnoughTicks = 10.0;
     public static final double kRateLimitFwdStr = 2;
     public static final double kRateLimitYaw = 3;
@@ -150,6 +150,7 @@ public final class Constants {
       driveConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
       driveConfig.velocityMeasurementWindow = 64;
       driveConfig.voltageCompSaturation = 12;
+      driveConfig.neutralDeadband = 0.01;
       return driveConfig;
     }
 
