@@ -544,20 +544,20 @@ public class ClimbSubsystem extends MeasurableSubsystem {
         }
         break;
       case MID_RET_ST2:
-      if (isPivotArmOpenLoopRetractFinished(currPivotArmState.setpoint)) {
-        logger.info("Pivot: {} -> MID_RET_ST3", currPivotArmState);
-        currPivotArmState = PivotArmState.MID_RET_ST3;
-        openLoopPivotArm(currPivotArmState.speed);
-        climbStateCounter++;
-      }
+        if (isPivotArmOpenLoopRetractFinished(currPivotArmState.setpoint)) {
+          logger.info("Pivot: {} -> MID_RET_ST3", currPivotArmState);
+          currPivotArmState = PivotArmState.MID_RET_ST3;
+          openLoopPivotArm(currPivotArmState.speed);
+          climbStateCounter++;
+        }
         break;
       case MID_RET_ST3:
-      if (isPivotArmOpenLoopRetractFinished(currPivotArmState.setpoint)) {
-        logger.info("Pivot: {} -> MID_RET_ST4", currPivotArmState);
-        currPivotArmState = PivotArmState.MID_RET_ST4;
-        openLoopPivotArm(currPivotArmState.speed);
-        climbStateCounter++;
-      }
+        if (isPivotArmOpenLoopRetractFinished(currPivotArmState.setpoint)) {
+          logger.info("Pivot: {} -> MID_RET_ST4", currPivotArmState);
+          currPivotArmState = PivotArmState.MID_RET_ST4;
+          openLoopPivotArm(currPivotArmState.speed);
+          climbStateCounter++;
+        }
         break;
       case MID_RET_ST4:
         if (isPivotArmOpenLoopRetractFinished(currPivotArmState.setpoint)) {
@@ -608,12 +608,12 @@ public class ClimbSubsystem extends MeasurableSubsystem {
         }
         break;
       case HIGH_EXT_ST2:
-      if (isPivotArmOpenLoopExtendFinished(currPivotArmState.setpoint)) {
-        logger.info("Pivot: {} -> HIGH_EXT_ST3", currPivotArmState);
-        currPivotArmState = PivotArmState.HIGH_EXT_ST3;
-        openLoopPivotArm(currPivotArmState.speed);
-        climbStateCounter++;
-      }
+        if (isPivotArmOpenLoopExtendFinished(currPivotArmState.setpoint)) {
+          logger.info("Pivot: {} -> HIGH_EXT_ST3", currPivotArmState);
+          currPivotArmState = PivotArmState.HIGH_EXT_ST3;
+          openLoopPivotArm(currPivotArmState.speed);
+          climbStateCounter++;
+        }
         break;
       case HIGH_EXT_ST3:
         if (isPivotArmOpenLoopExtendFinished(currPivotArmState.setpoint)) {
