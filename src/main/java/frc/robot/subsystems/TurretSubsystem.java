@@ -197,7 +197,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
     return currentState;
   }
   // change back to private
-  public void setSeekAngle(boolean seekLeft) {
+  public void setSeekAngleLeft(boolean seekLeft) {
     Pose2d pose = driveSubsystem.getPoseMeters();
     Translation2d deltaPosition = TurretConstants.kHubPositionMeters.minus(pose.getTranslation());
     Rotation2d seekingAngle = new Rotation2d(deltaPosition.getX(), deltaPosition.getY());
@@ -216,7 +216,20 @@ public class TurretSubsystem extends MeasurableSubsystem {
     logger.info("Seeking angle is at: {}", seekingAngle);
   }
 
-  private void setCruiseVelocity(boolean isFast) {
+  private void seekCenter() {
+    Pose2d pose = driveSubsystem.getPoseMeters();
+    Translation2d deltaPosition = TurretConstants.kHubPositionMeters.minus(pose.getTranslation());
+    Rotation2d seekingAngle = new Rotation2d(deltaPosition.getX(), deltaPosition.getY());
+    logger.info("Pose: {}, Delta pose: {}, seek angle: {}", pose, deltaPosition, seekingAngle);
+    seekingAngle = seekingAngle.minus(pose.getRotation());
+    seekingAngle = seekingAngle.plus(TurretConstants.kTurretRobotOffset); // plus
+
+    rotateTo(seekingAngle); // getNonWrappedSetpoint
+
+    logger.info("Center seek angle is at: {}", seekingAngle);
+  }
+
+  private void setCruiseVelocityFast(boolean isFast) {
     if (isFast) {
       if (cruiseVelocity != kFastCruiseVelocity) {
         cruiseVelocity = kFastCruiseVelocity;
@@ -238,7 +251,13 @@ public class TurretSubsystem extends MeasurableSubsystem {
     logger.info("Started tracking target");
     currentState = TurretState.SEEK_LEFT;
     seekingCount = 0;
-    setSeekAngle(true);
+    setSeekAngleLeft(true);
+  }
+
+  public void odometryAim() {
+    logger.info("Tracking target with odometry");
+    currentState = TurretState.ODOM_ADJUSTING;
+    seekCenter();
   }
 
   public void stopTrackingTarget() {
@@ -275,7 +294,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
         // fall through
       case SEEK_RIGHT:
         targetData = visionSubsystem.getTargetData();
-        setCruiseVelocity(false);
+        setCruiseVelocityFast(false);
         if (targetData.isValid()) {
           logger.info("{} -> AIMING", currentState);
           logger.info("targetData: {}", targetData);
@@ -292,11 +311,11 @@ public class TurretSubsystem extends MeasurableSubsystem {
             break;
           }
           if (currentState == TurretState.SEEK_LEFT) {
-            setSeekAngle(false);
+            setSeekAngleLeft(false);
             logger.info("{} -> SEEK_RIGHT", currentState);
             currentState = TurretState.SEEK_RIGHT;
           } else {
-            setSeekAngle(true);
+            setSeekAngleLeft(true);
             logger.info("{} -> LEFT", currentState);
             currentState = TurretState.SEEK_LEFT;
           }
@@ -305,7 +324,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
       case AIMING:
         // fall through
       case TRACKING:
-        setCruiseVelocity(true);
+        setCruiseVelocityFast(true);
         targetData = visionSubsystem.getTargetData();
         if (!targetData.isValid()) {
           notValidTargetCount++;
@@ -314,7 +333,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
             logger.info("{} -> SEEKING: {}", currentState, targetData);
             currentState = TurretState.SEEK_LEFT;
             seekingCount = 0;
-            setSeekAngle(true);
+            setSeekAngleLeft(true);
             break;
           }
           // If not valid but < not valid counts just hold last position
@@ -352,20 +371,30 @@ public class TurretSubsystem extends MeasurableSubsystem {
         currentState = nextState;
         break;
       case WRAPPING:
-        setCruiseVelocity(true);
+        setCruiseVelocityFast(true);
         if (isTurretAtTarget()) {
           currentState = TurretState.AIMING;
           logger.info("WRAPPING-> AIMING");
         }
         break;
       case FENDER_ADJUSTING:
-        setCruiseVelocity(true);
+        setCruiseVelocityFast(true);
         if (isTurretAtTarget()) {
           currentState = TurretState.FENDER_AIMED;
           logger.info("FENDER_ADJUSTING -> FENDER_AIMED");
         }
         break;
       case FENDER_AIMED:
+        // indicator for other subsystems
+        break;
+      case ODOM_ADJUSTING:
+        setCruiseVelocityFast(true);
+        if (isTurretAtTarget()) {
+          currentState = TurretState.ODOM_AIMED;
+          logger.info("ODOM_ADJUSTING -> ODOM_AIMED");
+        }
+        break;
+      case ODOM_AIMED:
         // indicator for other subsystems
         break;
       case IDLE:
@@ -384,6 +413,8 @@ public class TurretSubsystem extends MeasurableSubsystem {
     IDLE,
     FENDER_ADJUSTING,
     FENDER_AIMED,
+    ODOM_ADJUSTING,
+    ODOM_AIMED,
     WRAPPING;
   }
 }
