@@ -337,15 +337,15 @@ public class RobotContainer {
             .addBoolean(
                 "First Cargo", () -> magazineSubsystem.getAllCargoColors()[0] != CargoColor.NONE)
             .withProperties(Map.of("colorWhenFalse", "black"))
-            .withSize(2, 2)
+            .withSize(2, 1)
             .withPosition(5, 0);
     secondCargo =
         Shuffleboard.getTab("Match")
             .addBoolean(
                 "Second Cargo", () -> magazineSubsystem.getAllCargoColors()[1] != CargoColor.NONE)
             .withProperties(Map.of("colorWhenFalse", "black"))
-            .withPosition(5, 2)
-            .withSize(2, 2);
+            .withPosition(5, 1)
+            .withSize(2, 1);
 
     allianceColor =
         Shuffleboard.getTab("Match")
