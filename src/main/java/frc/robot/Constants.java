@@ -220,7 +220,7 @@ public final class Constants {
     public static final double kWrapRange = 1;
 
     // Rotate Under Vision Constants
-    public static final double kRotateByInitialKp = -0.4; // 0.4
+    public static final double kRotateByInitialKp = -0.95; // -0.4 old: 0.4
     public static final double kRotateByFinalKp = -0.95; // 0.95
     public static final int kNotValidTargetCounts = 5; // how many frames to wait before seeking
 
