@@ -191,10 +191,13 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public void resetOdometry(Pose2d pose) {
     swerveDrive.resetOdometry(pose);
+    logger.info("reset odometry with: {}", pose);
+  }
+
+  public void resetHolonomicController() {
     xController.reset();
     yController.reset();
-    omegaController.reset(pose.getRotation().getRadians());
-    logger.info("reset odometry with: {}", pose);
+    omegaController.reset(getGyroRotation2d().getRadians());
   }
 
   public Pose2d getPoseMeters() {

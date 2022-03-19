@@ -224,7 +224,7 @@ public class RobotContainer {
 
     // Auto Intake
     new JoystickButton(driveJoystick, Shoulder.LEFT_DOWN.id)
-        .whenPressed(new AutoIntakeCommand(magazineSubsystem, intakeSubsystem));
+        .whenPressed(new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, false));
     new JoystickButton(driveJoystick, Shoulder.LEFT_DOWN.id)
         .whenReleased(new IntakeOpenLoopCommand(intakeSubsystem, 0.0));
 
@@ -257,7 +257,7 @@ public class RobotContainer {
 
     // Auto Intake
     new JoystickButton(xboxController, XboxController.Button.kY.value)
-        .toggleWhenPressed(new AutoIntakeCommand(magazineSubsystem, intakeSubsystem));
+        .toggleWhenPressed(new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, false));
 
     // Eject Cargo Reverse
     new JoystickButton(xboxController, XboxController.Button.kBack.value)
@@ -417,7 +417,8 @@ public class RobotContainer {
     // Drive Commands
     ShuffleboardLayout driveCommands = pitTab.getLayout("Drive", BuiltInLayouts.kGrid);
     driveCommands.add("LockZero", new LockZeroCommand(driveSubsystem));
-    driveCommands.add("OdometryTuning", new DriveAutonCommand(driveSubsystem, "straightPath"));
+    driveCommands.add(
+        "OdometryTuning", new DriveAutonCommand(driveSubsystem, "straightPath", true));
 
     // SmartDashboard.putNumber("Pit/Drive/PoseX", 8.42);
     // SmartDashboard.putNumber("Pit/Drive/PoseY", 7.89);
