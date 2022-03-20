@@ -206,7 +206,7 @@ public final class Constants {
     public static final int kTurretId = 50;
     public static final double kFastCruiseVelocity = 4_000;
     public static final double kSlowCruiseVelocity = 2_000;
-    public static final int kTurretZeroTicks = 1944; // 1250, 3349
+    public static final int kTurretZeroTicks = 1110; // 1250, 1194
     public static final int kForwardLimit = 13_800; // 14
     public static final int kReverseLimit = -13_800; // 14
     public static final double kMaxStringPotZero = 100; // 2020 Robot
@@ -214,7 +214,7 @@ public final class Constants {
 
     // Ticks -> Degrees/Radians
     public static final double kTurretTicksPerDegree =
-        120.522; // 114.653     0.01745329 57.2957877856 72.404
+        107.27; // 114.653     0.01745329 57.2957877856 72.404 120.522
     public static final double kTurretTicksPerRadian = 6905.414; // 6569.133
     public static final double kTurretMidpoint = 13_000;
     public static final double kWrapRange = 1;
@@ -223,6 +223,9 @@ public final class Constants {
     public static final double kRotateByInitialKp = -0.95; // -0.4 old: 0.4
     public static final double kRotateByFinalKp = -0.95; // 0.95
     public static final int kNotValidTargetCounts = 5; // how many frames to wait before seeking
+    public static final double kFYawSlow = -0.05;
+    public static final double kFYawMedium = -0.08;
+    public static final double kFYawFast = -0.12;
 
     // Seek Constants
     public static final Translation2d kHubPositionMeters = new Translation2d(8.23, 4.11); // meters

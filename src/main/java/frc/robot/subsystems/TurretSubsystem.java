@@ -72,7 +72,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
     return List.of(turret);
   }
 
-  public boolean rotateBy(Rotation2d errorRotation2d) {
+  public boolean visionRotateBy(Rotation2d errorRotation2d) {
     Rotation2d currentTurretPose =
         new Rotation2d(-turret.getSelectedSensorPosition() / kTurretTicksPerRadian);
     Rotation2d horizontalAngleCorrection =
@@ -98,6 +98,13 @@ public class TurretSubsystem extends MeasurableSubsystem {
     // }
     // rotateTo(targetAngleRadians * -kTurretTicksPerRadian);
     return false;
+  }
+
+  public void rotateBy(Rotation2d deltaRotation) {
+    Rotation2d currentAngle =
+        new Rotation2d(-turret.getSelectedSensorPosition() / kTurretTicksPerRadian);
+    Rotation2d targetAngle = currentAngle.plus(deltaRotation);
+    rotateTo(targetAngle);
   }
 
   public Rotation2d getRotation2d() {
@@ -214,6 +221,30 @@ public class TurretSubsystem extends MeasurableSubsystem {
     rotateTo(seekingAngle); // getNonWrappedSetpoint
 
     logger.info("Seeking angle is at: {}", seekingAngle);
+  }
+
+  public void seekCenter() {
+    Pose2d pose = driveSubsystem.getPoseMeters();
+    Translation2d deltaPosition = TurretConstants.kHubPositionMeters.minus(pose.getTranslation());
+    Rotation2d seekAngle = new Rotation2d(deltaPosition.getX(), deltaPosition.getY());
+    seekAngle = seekAngle.minus(pose.getRotation());
+    seekAngle = seekAngle.plus(TurretConstants.kTurretRobotOffset);
+    logger.info(
+        "Seek Center Angle: pose: {}, deltaPos: {}, seekAngle:{}", pose, deltaPosition, seekAngle);
+    rotateTo(seekAngle);
+  }
+
+  public void updateOpenLoopFeedFwd() {
+    currentState = TurretState.IDLE;
+    double[] driveVel = driveSubsystem.getDriveVelocity();
+    double kF = 0.0;
+    if (Math.abs(driveVel[2]) < 0.25) kF = 0.0;
+    else if (Math.abs(driveVel[2]) < 0.6) kF = TurretConstants.kFYawSlow;
+    else if (Math.abs(driveVel[2]) < 2.0) kF = TurretConstants.kFYawMedium;
+    else kF = TurretConstants.kFYawFast;
+
+    Rotation2d deltaRotation = new Rotation2d(driveVel[2] * kF);
+    rotateBy(deltaRotation);
   }
 
   private void setCruiseVelocity(boolean isFast) {
@@ -340,7 +371,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
           nextState = TurretState.AIMING;
           rotateKp = TurretConstants.kRotateByInitialKp;
         }
-        if (rotateBy(errorRotation2d.times(rotateKp))) {
+        if (visionRotateBy(errorRotation2d.times(rotateKp))) {
           logger.info("{} -> WRAPPING", currentState);
           currentState = TurretState.WRAPPING;
           break;
