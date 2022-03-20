@@ -205,7 +205,9 @@ public final class Constants {
     // Talon Constants
     public static final int kTurretId = 50;
     public static final double kFastCruiseVelocity = 4_000;
-    public static final double kSlowCruiseVelocity = 2_000;
+    public static final double kSlowCruiseVelocity = 2_000; // 2000
+    public static final double kFastAccel = 20_000;
+    public static final double kSlowAccel = 10_000;
     public static final int kTurretZeroTicks = 1110; // 1250, 1194
     public static final int kForwardLimit = 13_800; // 14
     public static final int kReverseLimit = -13_800; // 14
@@ -215,13 +217,13 @@ public final class Constants {
     // Ticks -> Degrees/Radians
     public static final double kTurretTicksPerDegree =
         107.27; // 114.653     0.01745329 57.2957877856 72.404 120.522
-    public static final double kTurretTicksPerRadian = 6905.414; // 6569.133
-    public static final double kTurretMidpoint = 13_000;
+    public static final double kTurretTicksPerRadian = 6146.47; // 6569.133 6905.414
+    // public static final double kTurretMidpoint = 13_000;
     public static final double kWrapRange = 1;
 
     // Rotate Under Vision Constants
-    public static final double kRotateByInitialKp = -0.95; // -0.4 old: 0.4
-    public static final double kRotateByFinalKp = -0.95; // 0.95
+    public static final double kRotateByInitialKp = -0.5; // -0.4 old: 0.4
+    public static final double kRotateByFinalKp = -0.5; // 0.95
     public static final int kNotValidTargetCounts = 5; // how many frames to wait before seeking
     public static final double kFYawSlow = -0.05;
     public static final double kFYawMedium = -0.08;
@@ -264,7 +266,7 @@ public final class Constants {
       turretConfig.voltageMeasurementFilter = 32;
       turretConfig.voltageCompSaturation = 12;
       turretConfig.motionCruiseVelocity = kFastCruiseVelocity; // 4_000
-      turretConfig.motionAcceleration = 20_000;
+      turretConfig.motionAcceleration = kFastAccel;
       turretConfig.forwardLimitSwitchNormal = LimitSwitchNormal.Disabled;
       turretConfig.reverseLimitSwitchNormal = LimitSwitchNormal.Disabled;
       turretConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
