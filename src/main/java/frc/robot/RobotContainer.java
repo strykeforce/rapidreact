@@ -77,8 +77,8 @@ import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
-import frc.robot.subsystems.OdometryTestSubsystem;
 import frc.robot.subsystems.MagazineSubsystem.CargoColor;
+import frc.robot.subsystems.OdometryTestSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
@@ -131,6 +131,7 @@ public class RobotContainer {
     magazineSubsystem = new MagazineSubsystem(turretSubsystem);
     shooterSubsystem = new ShooterSubsystem(magazineSubsystem, visionSubsystem);
     intakeSubsystem = new IntakeSubsystem();
+    odometryTestSubsystem = new OdometryTestSubsystem();
     autoSwitch =
         new AutoSwitch(
             driveSubsystem,
