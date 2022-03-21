@@ -41,6 +41,7 @@ import frc.robot.commands.climb.ZeroClimbCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.LockZeroCommand;
+import frc.robot.commands.drive.OdoDriveSet;
 import frc.robot.commands.drive.ResetOdometryCommand;
 import frc.robot.commands.drive.XLockCommand;
 import frc.robot.commands.drive.ZeroGyroCommand;
@@ -76,6 +77,7 @@ import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
+import frc.robot.subsystems.OdometryTestSubsystem;
 import frc.robot.subsystems.MagazineSubsystem.CargoColor;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
@@ -99,6 +101,7 @@ public class RobotContainer {
   private final MagazineSubsystem magazineSubsystem;
   private final ShooterSubsystem shooterSubsystem;
   private final IntakeSubsystem intakeSubsystem;
+  private final OdometryTestSubsystem odometryTestSubsystem;
   //   private final PowerDistHub powerDistHub = new PowerDistHub();
   private final AutoSwitch autoSwitch;
   private final TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
@@ -172,6 +175,7 @@ public class RobotContainer {
     intakeSubsystem.registerWith(telemetryService);
     visionSubsystem.registerWith(telemetryService);
     climbSubsystem.registerWith(telemetryService);
+    odometryTestSubsystem.registerWith(telemetryService);
     telemetryService.start();
   }
 
@@ -409,6 +413,10 @@ public class RobotContainer {
     ShuffleboardLayout driveCommands = pitTab.getLayout("Drive", BuiltInLayouts.kGrid);
     driveCommands.add("LockZero", new LockZeroCommand(driveSubsystem));
     driveCommands.add("OdometryTuning", new DriveAutonCommand(driveSubsystem, "straightPath"));
+    driveCommands.add("SetOdometry: 1", new OdoDriveSet(odometryTestSubsystem, 1));
+    driveCommands.add("SetOdometry: 2", new OdoDriveSet(odometryTestSubsystem, 2));
+    driveCommands.add("SetOdometry: 3", new OdoDriveSet(odometryTestSubsystem, 3));
+    driveCommands.add("SetOdometry: 4", new OdoDriveSet(odometryTestSubsystem, 4));
 
     // SmartDashboard.putNumber("Pit/Drive/PoseX", 8.42);
     // SmartDashboard.putNumber("Pit/Drive/PoseY", 7.89);
