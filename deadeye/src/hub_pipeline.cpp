@@ -59,5 +59,5 @@ std::unique_ptr<TargetData> HubPipeline::ProcessContours(
 }
 
 std::string HubPipeline::ToString() const {
-  return fmt::format("HubPipeline<{}, {}>", id_, capture_type_);
+  return fmt::format("HubPipeline<{}>", id_);
 }
