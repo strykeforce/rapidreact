@@ -13,6 +13,12 @@ public class OdometryTestSubsystem extends MeasurableSubsystem {
     odometryPos = pos;
   }
 
+  //Position Coordinates of odometry tape sections
+  //Pos 1: (0.46, 4.11)
+  //Pos 2: (7.0, 0.46)
+  //Pos 3: (5.0, 7.77)
+  //Pos 4: (12.2, 6.83)
+
   @Override
   public Set<Measure> getMeasures() {
     return Set.of(new Measure("My Measure", () -> odometryPos));

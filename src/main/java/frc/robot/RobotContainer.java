@@ -225,7 +225,7 @@ public class RobotContainer {
         .whenPressed(
             new ResetOdometryCommand(
                 driveSubsystem,
-                new Pose2d(new Translation2d(0.415, 4.11), Rotation2d.fromDegrees(0)))); // Y:7.42
+                new Pose2d(new Translation2d(0.46, 4.11), Rotation2d.fromDegrees(0)))); // Y:7.42
 
     // Auto Intake
     new JoystickButton(driveJoystick, Shoulder.LEFT_DOWN.id)
