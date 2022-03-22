@@ -70,7 +70,9 @@ import frc.robot.commands.shooter.StopShooterCommand;
 import frc.robot.commands.turret.CheckSeekAngleCommand;
 import frc.robot.commands.turret.OpenLoopTurretCommand;
 import frc.robot.commands.turret.RotateToCommand;
+import frc.robot.commands.turret.SeekCenterOdometryCommand;
 import frc.robot.commands.turret.TurretAimCommandGroup;
+import frc.robot.commands.turret.TurretFeedFwdTuneCommand;
 import frc.robot.subsystems.AutoSwitch;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
@@ -214,6 +216,11 @@ public class RobotContainer {
         .whenReleased(new OpenLoopTurretCommand(turretSubsystem, 0.0));
     new JoystickButton(driveJoystick, Trim.RIGHT_Y_POS.id)
         .whenPressed(new CheckSeekAngleCommand(turretSubsystem));
+    new JoystickButton(driveJoystick, Button.HAMBURGER.id)
+        .whenPressed(
+            new SequentialCommandGroup(
+                new SeekCenterOdometryCommand(turretSubsystem),
+                new TurretFeedFwdTuneCommand(turretSubsystem)));
 
     // Drive Practice Odometry Reset
     new JoystickButton(driveJoystick, Trim.LEFT_Y_NEG.id)
@@ -221,6 +228,11 @@ public class RobotContainer {
             new ResetOdometryCommand(
                 driveSubsystem,
                 new Pose2d(new Translation2d(0.415, 4.11), Rotation2d.fromDegrees(0)))); // Y:7.42
+    new JoystickButton(driveJoystick, Trim.LEFT_Y_POS.id)
+        .whenPressed(
+            new ResetOdometryCommand(
+                driveSubsystem,
+                new Pose2d(new Translation2d(4.8525, 8.0821), Rotation2d.fromDegrees(0.0))));
 
     // Auto Intake
     new JoystickButton(driveJoystick, Shoulder.LEFT_DOWN.id)
