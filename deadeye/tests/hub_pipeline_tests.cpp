@@ -51,7 +51,7 @@ TEST_CASE("HubPipeline processes test image 1-1.jpg") {
   filter_t aspect{0, 20.0};
 
   FilterConfig filter_config{area, solidity, aspect};
-  LogConfig log_config;
+  FrameLogConfig log_config;
 
   json j;
 
@@ -108,7 +108,7 @@ TEST_CASE("targets are sorted by upper-left x-coord") {
   filter_t aspect{0, 20.0};
 
   FilterConfig filter_config{area, solidity, aspect};
-  LogConfig log_config;
+  FrameLogConfig log_config;
 
   PipelineConfig pipeline_config{0, hue, sat, val, filter_config, log_config};
 
@@ -147,7 +147,7 @@ TEST_CASE("HubTargetData doesn't exceed maximum payload size") {
   filter_t aspect{0, 20.0};
 
   FilterConfig filter_config{area, solidity, aspect};
-  LogConfig log_config;
+  FrameLogConfig log_config;
 
   json j;
 

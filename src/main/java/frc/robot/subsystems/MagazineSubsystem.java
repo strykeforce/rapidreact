@@ -139,6 +139,12 @@ public class MagazineSubsystem extends MeasurableSubsystem {
 
   public Color getColor() {
     lastColor = colorSensor.getColor();
+    if (lastColor.red == 0 && lastColor.green == 0 && lastColor.blue == 0) {
+      ignoreColorSensor = true;
+      logger.warn("Color sensor error. Diasbling color sensor.");
+      if (allianceCargoColor == CargoColor.BLUE) lastColor = MagazineConstants.kBlueCargo;
+      else lastColor = MagazineConstants.kRedCargo;
+    }
     // lastColor = new Color(0, 0, 0);
     return lastColor;
   }

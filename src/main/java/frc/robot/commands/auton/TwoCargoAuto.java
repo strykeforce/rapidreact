@@ -39,6 +39,11 @@ public class TwoCargoAuto extends SequentialCommandGroup {
             new ArmShooterCommandGroup(visionSubsystem, turretSubsystem, shooterSubsystem),
             new AutoIntakeCommand(magazineSubsystem, intakeSubsystem)),
         new VisionShootCommand(
-            shooterSubsystem, turretSubsystem, magazineSubsystem, visionSubsystem, true));
+            shooterSubsystem,
+            turretSubsystem,
+            magazineSubsystem,
+            visionSubsystem,
+            true,
+            intakeSubsystem));
   }
 }

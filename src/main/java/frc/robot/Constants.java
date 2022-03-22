@@ -72,8 +72,10 @@ public final class Constants {
 
     // Teleop Drive Constants
     public static final double kDeadbandXLock = 0.2;
-    public static final double kDeadbandAllStick = 0.10;
+    public static final double kDeadbandAllStick = 0.075;
     public static final double kCloseEnoughTicks = 10.0;
+    public static final double kRateLimitFwdStr = 2;
+    public static final double kRateLimitYaw = 3;
 
     // Climb Limits
     public static final double kMaxFwdStrStickClimb = 0.2 * kMaxSpeedMetersPerSecond;
@@ -148,6 +150,7 @@ public final class Constants {
       driveConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
       driveConfig.velocityMeasurementWindow = 64;
       driveConfig.voltageCompSaturation = 12;
+      driveConfig.neutralDeadband = 0.01;
       return driveConfig;
     }
 
@@ -205,8 +208,10 @@ public final class Constants {
     // Talon Constants
     public static final int kTurretId = 50;
     public static final double kFastCruiseVelocity = 4_000;
-    public static final double kSlowCruiseVelocity = 2_000;
-    public static final int kTurretZeroTicks = 3349; // 1250
+    public static final double kSlowCruiseVelocity = 2_000; // 2000
+    public static final double kFastAccel = 20_000;
+    public static final double kSlowAccel = 10_000;
+    public static final int kTurretZeroTicks = 1_161; // 1250, 1194
     public static final int kForwardLimit = 13_800; // 14
     public static final int kReverseLimit = -13_800; // 14
     public static final double kMaxStringPotZero = 100; // 2020 Robot
@@ -214,15 +219,18 @@ public final class Constants {
 
     // Ticks -> Degrees/Radians
     public static final double kTurretTicksPerDegree =
-        120.522; // 114.653     0.01745329 57.2957877856 72.404
-    public static final double kTurretTicksPerRadian = 6905.414; // 6569.133
-    public static final double kTurretMidpoint = 13_000;
+        107.27; // 114.653     0.01745329 57.2957877856 72.404 120.522
+    public static final double kTurretTicksPerRadian = 6146.47; // 6569.133 6905.414
+    // public static final double kTurretMidpoint = 13_000;
     public static final double kWrapRange = 1;
 
     // Rotate Under Vision Constants
-    public static final double kRotateByInitialKp = -0.4; // 0.4
-    public static final double kRotateByFinalKp = -0.95; // 0.95
+    public static final double kRotateByInitialKp = -0.5; // -0.4 old: 0.4
+    public static final double kRotateByFinalKp = -0.5; // 0.95
     public static final int kNotValidTargetCounts = 5; // how many frames to wait before seeking
+    public static final double kFYawSlow = -0.05;
+    public static final double kFYawMedium = -0.08;
+    public static final double kFYawFast = -0.12;
 
     // Seek Constants
     public static final Translation2d kHubPositionMeters = new Translation2d(8.23, 4.11); // meters
@@ -261,7 +269,7 @@ public final class Constants {
       turretConfig.voltageMeasurementFilter = 32;
       turretConfig.voltageCompSaturation = 12;
       turretConfig.motionCruiseVelocity = kFastCruiseVelocity; // 4_000
-      turretConfig.motionAcceleration = 20_000;
+      turretConfig.motionAcceleration = kFastAccel;
       turretConfig.forwardLimitSwitchNormal = LimitSwitchNormal.Disabled;
       turretConfig.reverseLimitSwitchNormal = LimitSwitchNormal.Disabled;
       turretConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
@@ -292,7 +300,7 @@ public final class Constants {
     public static final double kMagazineEjectSpeed = -8000; // -0.5
 
     // State Machine Sequence Constants
-    public static final double kShootDelay = 0.7;
+    public static final double kShootDelay = 0.35; // .35
     public static final double kEjectTimerDelay = 1.0;
     public static final double kShootUpperBeamStableCounts = 2;
 
@@ -614,8 +622,9 @@ public final class Constants {
 
   public static final class IntakeConstants {
     public static final int kIntakeFalconID = 20;
-    public static final double kIntakeSpeed = 0.5;
+    public static final double kIntakeSpeed = 0.4;
     public static final double kIntakeEjectSpeed = -0.5;
+    public static final double kIntakeReverseSpeed = -0.2;
 
     public static TalonFXConfiguration getIntakeFalconConfig() {
       TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
@@ -623,6 +632,7 @@ public final class Constants {
       intakeConfig.supplyCurrLimit.triggerThresholdCurrent = 15;
       intakeConfig.supplyCurrLimit.triggerThresholdTime = 0.5;
       intakeConfig.supplyCurrLimit.enable = true;
+      intakeConfig.openloopRamp = 0.5;
       intakeConfig.slot0.kP = 0.0;
       intakeConfig.slot0.kI = 0.0;
       intakeConfig.slot0.kD = 0.0;
@@ -657,8 +667,8 @@ public final class Constants {
     public static final int kZeroCheckTicks = 2_600; // 500
 
     // Arm Shooter Constants
-    public static final double kKickerArmTicksP100ms = 4000;
-    public static final double kShooterArmTicksP100ms = 4000;
+    public static final double kKickerArmTicksP100ms = 5500;
+    public static final double kShooterArmTicksP100ms = 5500;
 
     // Opponent Cargo Constants
     public static final double kKickerOpTicksP100ms = 4000;
@@ -676,7 +686,7 @@ public final class Constants {
     public static final double kHoodFenderLowTicks = 2_600; // 0
 
     public static final int kStableCounts = 5; // FIX ME
-    public static final double kCloseEnoughTicksP100ms = 200; // 100
+    public static final double kCloseEnoughTicksP100ms = 50; // 100
     public static final double kCloseEnoughTicks = 150; // 100
 
     public static TalonFXConfiguration getShooterFalconConfig() {
