@@ -276,9 +276,9 @@ public class TurretSubsystem extends MeasurableSubsystem {
     // currentState = TurretState.SEEK_LEFT;
     seekingCount = 0;
     // setSeekAngle(true);
-    setCruiseVelocityFast(true);
-    seekCenter();
-    currentState = TurretState.SEEK_CENTER;
+    setCruiseVelocityFast(false); // true
+    // seekCenter();
+    currentState = TurretState.AIMING; // SEEK_CENTER
   }
 
   public void stopTrackingTarget() {
