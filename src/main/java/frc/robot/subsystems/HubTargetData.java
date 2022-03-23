@@ -68,6 +68,10 @@ public class HubTargetData extends TargetListTargetData {
     return (maxX + minX) / 2.0 - kFrameCenter;
   }
 
+  public double getErrorPixelsJetson() {
+    return errorPixels;
+  }
+
   /**
    * Return the angle from the center of the Hub target group to the center of the camera frame. You
    * should check {@link #isValid()} before calling this method.
