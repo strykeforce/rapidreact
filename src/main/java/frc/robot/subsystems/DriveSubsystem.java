@@ -50,6 +50,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private State holoContInput = new State();
   private Rotation2d holoContAngle = new Rotation2d();
   private Double trajectoryActive = 0.0;
+  private final double[] lastVelocity = new double[3];
 
   public DriveSubsystem() {
 
@@ -114,6 +115,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public void drive(
       double forwardMetersPerSec, double strafeMetersPerSec, double yawRadiansPerSec) {
+    lastVelocity[0] = forwardMetersPerSec;
+    lastVelocity[1] = strafeMetersPerSec;
+    lastVelocity[2] = yawRadiansPerSec;
     swerveDrive.drive(forwardMetersPerSec, strafeMetersPerSec, yawRadiansPerSec, true);
   }
 
@@ -123,7 +127,14 @@ public class DriveSubsystem extends MeasurableSubsystem {
       double strafeMetersPerSec,
       double yawRadiansPerSec,
       Boolean isFieldOriented) {
+    lastVelocity[0] = forwardMetersPerSec;
+    lastVelocity[1] = strafeMetersPerSec;
+    lastVelocity[2] = yawRadiansPerSec;
     swerveDrive.move(forwardMetersPerSec, strafeMetersPerSec, yawRadiansPerSec, isFieldOriented);
+  }
+
+  public double[] getDriveVelocity() {
+    return lastVelocity;
   }
 
   @Override
@@ -318,6 +329,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure("Wheel 2 Angle", () -> getSwerveModuleStates()[2].angle.getDegrees()),
         new Measure("Wheel 2 Speed", () -> getSwerveModuleStates()[2].speedMetersPerSecond),
         new Measure("Wheel 3 Angle", () -> getSwerveModuleStates()[3].angle.getDegrees()),
-        new Measure("Wheel 3 Speed", () -> getSwerveModuleStates()[3].speedMetersPerSecond));
+        new Measure("Wheel 3 Speed", () -> getSwerveModuleStates()[3].speedMetersPerSecond),
+        new Measure("FWD Vel", () -> lastVelocity[0]),
+        new Measure("STR Vel", () -> lastVelocity[1]),
+        new Measure("YAW Vel", () -> lastVelocity[2]));
   }
 }
