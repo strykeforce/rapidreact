@@ -70,6 +70,7 @@ public class VisionShootAutoCommand extends CommandBase {
       isArmed = true;
     } else if (!isArmed && turretSubsystem.getState() == TurretState.IDLE) {
       logger.info("Seek failed falling back to manual shoot, Width: {}", widthPixels);
+      turretSubsystem.odometryAim();
       shooterSubsystem.manualShoot(widthPixels);
       magazineSubsystem.shoot();
     }

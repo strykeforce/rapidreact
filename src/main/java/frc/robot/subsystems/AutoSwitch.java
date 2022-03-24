@@ -95,7 +95,7 @@ public class AutoSwitch {
             "LeftCargo1Collect",
             AutoConstants.kLeftStartYaw,
             3.0,
-            323.0); // FIXME
+            230.0); // FIXME
       case 0x20:
         return new TwoCargoAuto(
             visionSubsystem,
@@ -107,7 +107,7 @@ public class AutoSwitch {
             "MidCargo1Collect",
             AutoConstants.kMidStartYaw,
             3.0,
-            323.0); // FIXME
+            226.0); // FIXME
       case 0x30:
         return new TwoCargoAuto(
             visionSubsystem,
@@ -119,7 +119,7 @@ public class AutoSwitch {
             "RightCargo1Collect",
             AutoConstants.kRightStartYaw,
             3.0,
-            323.0); // FIXME
+            243.0); // FIXME
       default:
         String msg = String.format("no auto command assigned for switch position %02X", switchPos);
         DriverStation.reportWarning(msg, false);
