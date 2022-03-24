@@ -212,8 +212,8 @@ public final class Constants {
     public static final double kFastAccel = 20_000;
     public static final double kSlowAccel = 10_000;
     public static final int kTurretZeroTicks = 1_161; // 1250, 1194
-    public static final int kForwardLimit = 13_800; // 14
-    public static final int kReverseLimit = -13_800; // 14
+    public static final int kForwardLimit = 20_000; // 13_800 14
+    public static final int kReverseLimit = -20_000; // 13_800 14
     public static final double kMaxStringPotZero = 100; // 2020 Robot
     public static final double kMinStringPotZero = 0; // 2020 Robot
 
@@ -223,6 +223,8 @@ public final class Constants {
     public static final double kTurretTicksPerRadian = 6146.47; // 6569.133 6905.414
     // public static final double kTurretMidpoint = 13_000;
     public static final double kWrapRange = 1;
+    public static final Rotation2d kOverlapAngle = Rotation2d.fromDegrees(6);
+    public static final double kWrapTicks = 20_000;
 
     // Rotate Under Vision Constants
     public static final double kRotateByInitialKp = -0.5; // -0.4 old: 0.4
