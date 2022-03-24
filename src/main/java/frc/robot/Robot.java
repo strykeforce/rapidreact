@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.sequences.SetAllianceCommand;
 import frc.robot.commands.vision.DisableVisionCommand;
-import frc.robot.commands.vision.EnableVisionCommand;
+import frc.robot.commands.vision.TurnOnDeadeyeCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +49,7 @@ public class Robot extends TimedRobot {
     haveAlliance = false;
 
     CommandScheduler.getInstance()
-        .schedule(new EnableVisionCommand(m_robotContainer.getVisionSubsystem()));
+        .schedule(new TurnOnDeadeyeCommand(m_robotContainer.getVisionSubsystem()));
 
     Shuffleboard.getTab("Match")
         .add("SetAllianceRed", new SetAllianceCommand(Alliance.Red, m_robotContainer))
