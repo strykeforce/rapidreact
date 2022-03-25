@@ -232,7 +232,7 @@ public class RobotContainer {
 
     // Auto Intake
     new JoystickButton(driveJoystick, Shoulder.LEFT_DOWN.id)
-        .whenPressed(new AutoIntakeCommand(magazineSubsystem, intakeSubsystem));
+        .whenPressed(new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, false));
     new JoystickButton(driveJoystick, Shoulder.LEFT_DOWN.id)
         .whenReleased(new IntakeOpenLoopCommand(intakeSubsystem, 0.0));
 
@@ -265,7 +265,7 @@ public class RobotContainer {
 
     // Auto Intake
     new JoystickButton(xboxController, XboxController.Button.kY.value)
-        .toggleWhenPressed(new AutoIntakeCommand(magazineSubsystem, intakeSubsystem));
+        .toggleWhenPressed(new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, false));
 
     // Eject Cargo Reverse
     new JoystickButton(xboxController, XboxController.Button.kBack.value)
@@ -434,7 +434,7 @@ public class RobotContainer {
         pitTab.getLayout("Drive", BuiltInLayouts.kGrid).withSize(2, 3).withPosition(7, 0);
     driveCommands.add("LockZero", new LockZeroCommand(driveSubsystem)).withPosition(0, 0);
     driveCommands
-        .add("OdometryTuning", new DriveAutonCommand(driveSubsystem, "straightPath"))
+        .add("OdometryTuning", new DriveAutonCommand(driveSubsystem, "straightPath", true))
         .withPosition(0, 1);
     driveCommands
         .add("SetOdometry: 1", new OdometryTestSetPosition(odometryTestSubsystem, 1))

@@ -304,11 +304,16 @@ public class TurretSubsystem extends MeasurableSubsystem {
   public void trackTarget() {
     logger.info("Started tracking target");
     // currentState = TurretState.SEEK_LEFT;
-    seekingCount = 0;
     // setSeekAngle(true);
     setCruiseVelocityFast(true);
     seekCenter();
     currentState = TurretState.SEEK_CENTER;
+  }
+
+  public void odometryAim() {
+    logger.info("Tracking target with odometry");
+    currentState = TurretState.ODOM_ADJUSTING;
+    seekCenter();
   }
 
   public void stopTrackingTarget() {
@@ -456,6 +461,16 @@ public class TurretSubsystem extends MeasurableSubsystem {
       case FENDER_AIMED:
         // indicator for other subsystems
         break;
+      case ODOM_ADJUSTING:
+        setCruiseVelocityFast(true);
+        if (isTurretAtTarget()) {
+          currentState = TurretState.ODOM_AIMED;
+          logger.info("ODOM_ADJUSTING -> ODOM_AIMED");
+        }
+        break;
+      case ODOM_AIMED:
+        // indicator for other subsystems
+        break;
       case IDLE:
         // do nothing
         break;
@@ -473,6 +488,8 @@ public class TurretSubsystem extends MeasurableSubsystem {
     IDLE,
     FENDER_ADJUSTING,
     FENDER_AIMED,
+    ODOM_ADJUSTING,
+    ODOM_AIMED,
     WRAPPING;
   }
 }
