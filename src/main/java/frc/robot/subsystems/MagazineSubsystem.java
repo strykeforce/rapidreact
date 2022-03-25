@@ -38,6 +38,8 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   private LowerMagazineState currLowerMagazineState = LowerMagazineState.STOP;
   private UpperMagazineState currUpperMagazineState = UpperMagazineState.STOP;
   private final TurretSubsystem turretSubsystem;
+  private final VisionSubsystem visionSubsystem;
+  private final DriveSubsystem driveSubsystem;
   private ShooterSubsystem shooterSubsystem;
   private Timer shootTimer = new Timer();
   private Timer ejectTimer = new Timer();
@@ -46,8 +48,13 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   private int shootUpperBeamStableCounts = 0;
   private boolean isBeamBreakEnabled = false;
 
-  public MagazineSubsystem(TurretSubsystem turretSubsystem) {
+  public MagazineSubsystem(
+      TurretSubsystem turretSubsystem,
+      VisionSubsystem visionSubsystem,
+      DriveSubsystem driveSubsystem) {
     this.turretSubsystem = turretSubsystem;
+    this.visionSubsystem = visionSubsystem;
+    this.driveSubsystem = driveSubsystem;
     colorSensor = new ColorSensorV3(Port.kMXP);
 
     lowerMagazineTalon = new TalonSRX(MagazineConstants.kLowerMagazineTalonID);
@@ -463,6 +470,8 @@ public class MagazineSubsystem extends MeasurableSubsystem {
             currUpperMagazineState = UpperMagazineState.PAUSE;
           } else if (turretSubsystem.getState() == TurretState.TRACKING) {
             logger.info("WAIT_AIM -> PAUSE");
+            visionSubsystem.getVisionOdometry(
+                turretSubsystem.getTurretRotation2d(), driveSubsystem.getGyroRotation2d());
             shooterSubsystem.shoot();
             currUpperMagazineState = UpperMagazineState.PAUSE;
           }

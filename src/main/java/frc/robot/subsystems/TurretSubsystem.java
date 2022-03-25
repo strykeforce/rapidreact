@@ -212,6 +212,11 @@ public class TurretSubsystem extends MeasurableSubsystem {
     telemetryService.register(turret);
   }
 
+  public Rotation2d getTurretRotation2d() {
+    return Rotation2d.fromDegrees(
+        turret.getSelectedSensorPosition() * TurretConstants.kTurretTicksPerRadian);
+  }
+
   public void zeroTurret() {
     // double stringPotPosition = turret.getSensorCollection().getAnalogInRaw();
     if (!turret.getSensorCollection().isFwdLimitSwitchClosed()) {

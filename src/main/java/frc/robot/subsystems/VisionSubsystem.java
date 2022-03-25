@@ -1,6 +1,9 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import frc.robot.Constants.TurretConstants;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -91,5 +94,25 @@ public class VisionSubsystem extends MeasurableSubsystem
   private double getValid() {
     var td = targetData;
     return td.isValid() ? 1.0 : 0.0;
+  }
+
+  public Pose2d getVisionOdometry(Rotation2d turretAngle, Rotation2d gyroAngle) {
+    Rotation2d errorRadians = new Rotation2d(getErrorRadians());
+    Rotation2d calcAngle =
+        turretAngle.plus(gyroAngle).plus(TurretConstants.kTurretRobotOffset).minus(errorRadians);
+    double distance = getTargetsDistanceGround();
+    double x, y;
+    y = Math.abs(-4.121 + distance * Math.sin(calcAngle.getRadians()));
+    x = Math.abs(-8.23 + distance * Math.cos(calcAngle.getRadians()));
+    logger.info(
+        "VISIONODOM: turretAngle: {}, gyroAngle: {}, calcAngle: {}, errorRadians: {}, distance: {}, X: {}, Y: {}",
+        turretAngle,
+        gyroAngle,
+        calcAngle,
+        errorRadians,
+        distance,
+        x,
+        y);
+    return new Pose2d(x, y, gyroAngle);
   }
 }
