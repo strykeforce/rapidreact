@@ -41,7 +41,7 @@ import frc.robot.commands.climb.ZeroClimbCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.LockZeroCommand;
-import frc.robot.commands.drive.OdoDriveSet;
+import frc.robot.commands.drive.OdometryTestSetPosition;
 import frc.robot.commands.drive.ResetOdometryCommand;
 import frc.robot.commands.drive.XLockCommand;
 import frc.robot.commands.drive.ZeroGyroCommand;
@@ -434,13 +434,24 @@ public class RobotContainer {
     //     "Pit/Magazine/ClearCargoColor", new PitClearCargoColor(magazineSubsystem));
 
     // Drive Commands
-    ShuffleboardLayout driveCommands = pitTab.getLayout("Drive", BuiltInLayouts.kGrid).withSize(2, 3).withPosition(7, 0);
+    ShuffleboardLayout driveCommands =
+        pitTab.getLayout("Drive", BuiltInLayouts.kGrid).withSize(2, 3).withPosition(7, 0);
     driveCommands.add("LockZero", new LockZeroCommand(driveSubsystem)).withPosition(0, 0);
-    driveCommands.add("OdometryTuning", new DriveAutonCommand(driveSubsystem, "straightPath")).withPosition(0, 1);
-    driveCommands.add("SetOdometry: 1", new OdoDriveSet(odometryTestSubsystem, 1)).withPosition(0, 2);
-    driveCommands.add("SetOdometry: 2", new OdoDriveSet(odometryTestSubsystem, 2)).withPosition(1, 0);
-    driveCommands.add("SetOdometry: 3", new OdoDriveSet(odometryTestSubsystem, 3)).withPosition(1, 1);
-    driveCommands.add("SetOdometry: 4", new OdoDriveSet(odometryTestSubsystem, 4)).withPosition(1, 2);
+    driveCommands
+        .add("OdometryTuning", new DriveAutonCommand(driveSubsystem, "straightPath"))
+        .withPosition(0, 1);
+    driveCommands
+        .add("SetOdometry: 1", new OdometryTestSetPosition(odometryTestSubsystem, 1))
+        .withPosition(0, 2);
+    driveCommands
+        .add("SetOdometry: 2", new OdometryTestSetPosition(odometryTestSubsystem, 2))
+        .withPosition(1, 0);
+    driveCommands
+        .add("SetOdometry: 3", new OdometryTestSetPosition(odometryTestSubsystem, 3))
+        .withPosition(1, 1);
+    driveCommands
+        .add("SetOdometry: 4", new OdometryTestSetPosition(odometryTestSubsystem, 4))
+        .withPosition(1, 2);
 
     // SmartDashboard.putNumber("Pit/Drive/PoseX", 8.42);
     // SmartDashboard.putNumber("Pit/Drive/PoseY", 7.89);
