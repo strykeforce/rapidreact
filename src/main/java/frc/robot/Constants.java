@@ -173,7 +173,7 @@ public final class Constants {
 
     // Old 2020 Constants
     public static final double kMinContourAreaSize = 100;
-    public static final double kVerticalFov = 48.8;
+    public static final double kVerticalFov = 0.6056; // 48.8 (34.7 degrees)
     public static final double kHorizonFov = 1.012; // 50.8 //146 //radians 1.012 // deg 57.999
     public static final double kHorizonRes = 640; // 1280
     public static final double kTargetWidthIn = 5;
@@ -227,8 +227,8 @@ public final class Constants {
     public static final double kWrapTicks = 20_000;
 
     // Rotate Under Vision Constants
-    public static final double kRotateByInitialKp = -0.9; // -0.4 old: 0.4
-    public static final double kRotateByFinalKp = -0.9; // 0.95
+    public static final double kRotateByInitialKp = -0.4; // -0.4 old: 0.4
+    public static final double kRotateByFinalKp = -0.4; // 0.95
     public static final int kNotValidTargetCounts = 5; // how many frames to wait before seeking
     public static final double kFYawSlow = -0.05;
     public static final double kFYawMedium = -0.08;
