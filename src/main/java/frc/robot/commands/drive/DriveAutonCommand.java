@@ -16,13 +16,16 @@ public class DriveAutonCommand extends CommandBase {
   private final Timer timer = new Timer();
   private static final Logger logger = LoggerFactory.getLogger(DriveAutonCommand.class);
   private final Rotation2d robotHeading;
+  private final boolean resetOdometry;
 
-  public DriveAutonCommand(DriveSubsystem driveSubsystem, String trajectoryName) {
+  public DriveAutonCommand(
+      DriveSubsystem driveSubsystem, String trajectoryName, boolean resetOdometry) {
     addRequirements(driveSubsystem);
     this.driveSubsystem = driveSubsystem;
     PathData pathdata = driveSubsystem.generateTrajectory(trajectoryName);
     trajectory = pathdata.trajectory;
     robotHeading = pathdata.targetYaw;
+    this.resetOdometry = resetOdometry;
     timer.start();
   }
 
@@ -30,8 +33,10 @@ public class DriveAutonCommand extends CommandBase {
   public void initialize() {
     driveSubsystem.setEnableHolo(true);
     Pose2d initialPose = trajectory.getInitialPose();
-    driveSubsystem.resetOdometry(
-        new Pose2d(initialPose.getTranslation(), driveSubsystem.getGyroRotation2d()));
+    if (resetOdometry)
+      driveSubsystem.resetOdometry(
+          new Pose2d(initialPose.getTranslation(), driveSubsystem.getGyroRotation2d()));
+    driveSubsystem.resetHolonomicController();
     driveSubsystem.grapherTrajectoryActive(true);
     timer.reset();
     logger.info("Begin Trajectory");
