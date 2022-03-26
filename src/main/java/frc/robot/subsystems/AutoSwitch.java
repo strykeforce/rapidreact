@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.commands.auton.ThreeCargoAuto;
 import frc.robot.commands.auton.TwoCargoAuto;
 import frc.robot.commands.drive.DriveAutonCommand;
 import java.util.ArrayList;
@@ -94,9 +95,33 @@ public class AutoSwitch {
             driveSubsystem,
             "LeftCargo1Collect",
             AutoConstants.kLeftStartYaw,
+            0.0,
+            230.0); // FIXME
+      case 0x11:
+        return new TwoCargoAuto(
+            visionSubsystem,
+            turretSubsystem,
+            shooterSubsystem,
+            magazineSubsystem,
+            intakeSubsystem,
+            driveSubsystem,
+            "LeftCargo1Collect",
+            AutoConstants.kLeftStartYaw,
             3.0,
             230.0); // FIXME
       case 0x20:
+        return new TwoCargoAuto(
+            visionSubsystem,
+            turretSubsystem,
+            shooterSubsystem,
+            magazineSubsystem,
+            intakeSubsystem,
+            driveSubsystem,
+            "MidCargo1Collect",
+            AutoConstants.kMidStartYaw,
+            0.0,
+            226.0); // FIXME
+      case 0x21:
         return new TwoCargoAuto(
             visionSubsystem,
             turretSubsystem,
@@ -118,12 +143,37 @@ public class AutoSwitch {
             driveSubsystem,
             "RightCargo1Collect",
             AutoConstants.kRightStartYaw,
+            0.0,
+            243.0); // FIXME
+      case 0x31:
+        return new TwoCargoAuto(
+            visionSubsystem,
+            turretSubsystem,
+            shooterSubsystem,
+            magazineSubsystem,
+            intakeSubsystem,
+            driveSubsystem,
+            "RightCargo1Collect",
+            AutoConstants.kRightStartYaw,
             3.0,
+            243.0); // FIXME
+      case 0x32:
+        return new ThreeCargoAuto(
+            visionSubsystem,
+            turretSubsystem,
+            shooterSubsystem,
+            magazineSubsystem,
+            intakeSubsystem,
+            driveSubsystem,
+            "RightCargo1Collect",
+            "RightCargo2Collect",
+            AutoConstants.kRightStartYaw,
+            0.0,
             243.0); // FIXME
       default:
         String msg = String.format("no auto command assigned for switch position %02X", switchPos);
         DriverStation.reportWarning(msg, false);
-        return new DriveAutonCommand(driveSubsystem, "DefaultPath", true);
+        return new DriveAutonCommand(driveSubsystem, "DefaultPath", true, false);
     }
   }
 }

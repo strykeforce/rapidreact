@@ -439,7 +439,7 @@ public class RobotContainer {
         pitTab.getLayout("Drive", BuiltInLayouts.kGrid).withSize(2, 3).withPosition(7, 0);
     driveCommands.add("LockZero", new LockZeroCommand(driveSubsystem)).withPosition(0, 0);
     driveCommands
-        .add("OdometryTuning", new DriveAutonCommand(driveSubsystem, "straightPath", true))
+        .add("OdometryTuning", new DriveAutonCommand(driveSubsystem, "straightPath", true, false))
         .withPosition(0, 1);
     driveCommands
         .add("SetOdometry: 1", new OdometryTestSetPosition(odometryTestSubsystem, 1))
