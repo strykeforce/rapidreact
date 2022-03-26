@@ -5,6 +5,7 @@ import static frc.robot.Constants.VisionConstants.kHorizonFov;
 import com.squareup.moshi.JsonReader;
 import com.squareup.moshi.JsonWriter;
 import edu.wpi.first.math.geometry.Rotation2d;
+import frc.robot.Constants.VisionConstants;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -80,7 +81,7 @@ public class HubTargetData extends TargetListTargetData {
    * @throws IndexOutOfBoundsException if the list of targets is empty
    */
   public double getErrorRadians() {
-    return -kHorizonFov * getErrorPixels() / (kFrameCenter * 2);
+    return -VisionConstants.kVerticalFov * getErrorPixels() / (kFrameCenter * 2);
   }
 
   /**
