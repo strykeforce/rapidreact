@@ -657,9 +657,9 @@ public final class Constants {
       SupplyCurrentLimitConfiguration supplyCurrentLimitConfig =
           new SupplyCurrentLimitConfiguration();
 
-      supplyCurrentLimitConfig.currentLimit = 10.0;
-      supplyCurrentLimitConfig.triggerThresholdCurrent = 20.0;
-      supplyCurrentLimitConfig.triggerThresholdTime = 0.5;
+      supplyCurrentLimitConfig.currentLimit = 5.0;
+      supplyCurrentLimitConfig.triggerThresholdCurrent = 10.0;
+      supplyCurrentLimitConfig.triggerThresholdTime = 1.0;
       supplyCurrentLimitConfig.enable = true;
 
       return supplyCurrentLimitConfig;
@@ -674,19 +674,23 @@ public final class Constants {
       intakeConfig.forwardLimitSwitchSource = LimitSwitchSource.Deactivated;
       intakeConfig.reverseLimitSwitchSource = LimitSwitchSource.Deactivated;
 
-      intakeConfig.slot0.kP = 0.0;
+      intakeConfig.slot0.kP = 1.0;
       intakeConfig.slot0.kI = 0.0;
-      intakeConfig.slot0.kD = 0.0;
-      intakeConfig.slot0.kF = 0.0;
+      intakeConfig.slot0.kD = 15.0;
+      intakeConfig.slot0.kF = 0.13;
       intakeConfig.slot0.integralZone = 0;
       intakeConfig.slot0.allowableClosedloopError = 0;
       intakeConfig.slot0.maxIntegralAccumulator = 0;
-      intakeConfig.motionCruiseVelocity = 0;
-      intakeConfig.motionAcceleration = 0;
+      intakeConfig.motionCruiseVelocity = 6000;
+      intakeConfig.motionAcceleration = 80000;
       intakeConfig.velocityMeasurementWindow = 64;
       intakeConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
       intakeConfig.voltageCompSaturation = 12;
       intakeConfig.voltageMeasurementFilter = 32;
+      intakeConfig.forwardSoftLimitEnable = false;
+      intakeConfig.forwardSoftLimitThreshold = 25000;
+      intakeConfig.reverseSoftLimitEnable = false;
+      intakeConfig.reverseSoftLimitThreshold = 25000;
 
       return intakeConfig;
     }
