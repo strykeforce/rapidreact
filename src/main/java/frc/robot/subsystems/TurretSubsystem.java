@@ -305,9 +305,9 @@ public class TurretSubsystem extends MeasurableSubsystem {
     logger.info("Started tracking target");
     // currentState = TurretState.SEEK_LEFT;
     // setSeekAngle(true);
-    setCruiseVelocityFast(true);
+    setCruiseVelocityFast(true); // true
     seekCenter();
-    currentState = TurretState.SEEK_CENTER;
+    currentState = TurretState.SEEK_CENTER; // SEEK_CENTER
   }
 
   public void odometryAim() {

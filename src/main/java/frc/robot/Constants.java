@@ -208,9 +208,9 @@ public final class Constants {
     // Talon Constants
     public static final int kTurretId = 50;
     public static final double kFastCruiseVelocity = 4_000;
-    public static final double kSlowCruiseVelocity = 2_000; // 2000
+    public static final double kSlowCruiseVelocity = 4_000; // 2000
     public static final double kFastAccel = 20_000;
-    public static final double kSlowAccel = 10_000;
+    public static final double kSlowAccel = 20_000;
     public static final int kTurretZeroTicks = 1_161; // 1250, 1194
     public static final int kForwardLimit = 20_000; // 13_800 14
     public static final int kReverseLimit = -20_000; // 13_800 14
@@ -227,8 +227,8 @@ public final class Constants {
     public static final double kWrapTicks = 20_000;
 
     // Rotate Under Vision Constants
-    public static final double kRotateByInitialKp = -0.5; // -0.4 old: 0.4
-    public static final double kRotateByFinalKp = -0.5; // 0.95
+    public static final double kRotateByInitialKp = -0.9; // -0.4 old: 0.4
+    public static final double kRotateByFinalKp = -0.9; // 0.95
     public static final int kNotValidTargetCounts = 5; // how many frames to wait before seeking
     public static final double kFYawSlow = -0.05;
     public static final double kFYawMedium = -0.08;
