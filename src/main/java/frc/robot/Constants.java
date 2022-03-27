@@ -173,7 +173,7 @@ public final class Constants {
 
     // Old 2020 Constants
     public static final double kMinContourAreaSize = 100;
-    public static final double kVerticalFov = 48.8;
+    public static final double kVerticalFov = 0.6056; // 48.8 (34.7 degrees)
     public static final double kHorizonFov = 1.012; // 50.8 //146 //radians 1.012 // deg 57.999
     public static final double kHorizonRes = 640; // 1280
     public static final double kTargetWidthIn = 5;
@@ -208,9 +208,9 @@ public final class Constants {
     // Talon Constants
     public static final int kTurretId = 50;
     public static final double kFastCruiseVelocity = 4_000;
-    public static final double kSlowCruiseVelocity = 2_000; // 2000
+    public static final double kSlowCruiseVelocity = 4_000; // 2000
     public static final double kFastAccel = 20_000;
-    public static final double kSlowAccel = 10_000;
+    public static final double kSlowAccel = 20_000;
     public static final int kTurretZeroTicks = 1_161; // 1250, 1194
     public static final int kForwardLimit = 20_000; // 13_800 14
     public static final int kReverseLimit = -20_000; // 13_800 14

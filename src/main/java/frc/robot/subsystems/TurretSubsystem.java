@@ -198,20 +198,6 @@ public class TurretSubsystem extends MeasurableSubsystem {
     return turretStableCounts >= Constants.ShooterConstants.kStableCounts;
   }
 
-  @Override
-  public @NotNull Set<Measure> getMeasures() {
-    return Set.of(
-        new Measure("isRotationFinished", () -> isRotationFinished() ? 1.0 : 0.0),
-        new Measure("TurretAtTarget", () -> isTurretAtTarget() ? 1.0 : 0.0),
-        new Measure("rotateKp", this::getRotateByKp));
-  }
-
-  @Override
-  public void registerWith(@NotNull TelemetryService telemetryService) {
-    super.registerWith(telemetryService);
-    telemetryService.register(turret);
-  }
-
   public void zeroTurret() {
     // double stringPotPosition = turret.getSensorCollection().getAnalogInRaw();
     if (!turret.getSensorCollection().isFwdLimitSwitchClosed()) {
@@ -305,14 +291,15 @@ public class TurretSubsystem extends MeasurableSubsystem {
     logger.info("Started tracking target");
     // currentState = TurretState.SEEK_LEFT;
     // setSeekAngle(true);
-    setCruiseVelocityFast(true);
+    setCruiseVelocityFast(true); // true
     seekCenter();
-    currentState = TurretState.SEEK_CENTER;
+    currentState = TurretState.SEEK_CENTER; // SEEK_CENTER
   }
 
   public void odometryAim() {
     logger.info("Tracking target with odometry");
     currentState = TurretState.ODOM_ADJUSTING;
+    setCruiseVelocityFast(true);
     seekCenter();
   }
 
@@ -368,7 +355,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
         // fall through
       case SEEK_RIGHT:
         targetData = visionSubsystem.getTargetData();
-        setCruiseVelocityFast(false);
+        // setCruiseVelocityFast(false);
         if (targetData.isValid()) {
           logger.info("{} -> AIMING", currentState);
           logger.info("targetData: {}", targetData);
@@ -399,16 +386,16 @@ public class TurretSubsystem extends MeasurableSubsystem {
       case AIMING:
         // fall through
       case TRACKING:
-        setCruiseVelocityFast(false);
+        // setCruiseVelocityFast(false);
         targetData = visionSubsystem.getTargetData();
         if (!targetData.isValid()) {
           notValidTargetCount++;
           logger.info("notValidTargetCount: {}", notValidTargetCount);
           if (notValidTargetCount > TurretConstants.kNotValidTargetCounts) {
-            logger.info("{} -> SEEKING: {}", currentState, targetData);
-            currentState = TurretState.SEEK_LEFT;
+            logger.info("{} -> SEEK_CENTER: {}", currentState, targetData);
+            currentState = TurretState.SEEK_CENTER;
             seekingCount = 0;
-            setSeekAngleLeft(true);
+            seekCenter();
             break;
           }
           // If not valid but < not valid counts just hold last position
@@ -441,6 +428,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
         if (visionRotateBy(errorRotation2d.times(rotateKp))) {
           logger.info("{} -> WRAPPING", currentState);
           currentState = TurretState.WRAPPING;
+          setCruiseVelocityFast(true);
           break;
         }
         break;
@@ -462,7 +450,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
         // indicator for other subsystems
         break;
       case ODOM_ADJUSTING:
-        setCruiseVelocityFast(true);
+        // setCruiseVelocityFast(true);
         if (isTurretAtTarget()) {
           currentState = TurretState.ODOM_AIMED;
           logger.info("ODOM_ADJUSTING -> ODOM_AIMED");
@@ -477,6 +465,21 @@ public class TurretSubsystem extends MeasurableSubsystem {
       default:
         break;
     }
+  }
+
+  @Override
+  public @NotNull Set<Measure> getMeasures() {
+    return Set.of(
+        new Measure("isRotationFinished", () -> isRotationFinished() ? 1.0 : 0.0),
+        new Measure("TurretAtTarget", () -> isTurretAtTarget() ? 1.0 : 0.0),
+        new Measure("rotateKp", this::getRotateByKp),
+        new Measure("state", () -> currentState.ordinal()));
+  }
+
+  @Override
+  public void registerWith(@NotNull TelemetryService telemetryService) {
+    super.registerWith(telemetryService);
+    telemetryService.register(turret);
   }
 
   public enum TurretState {

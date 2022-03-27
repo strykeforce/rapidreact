@@ -74,6 +74,7 @@ import frc.robot.commands.turret.DeadeyeLatencyTestCommandGroup;
 import frc.robot.commands.turret.OpenLoopTurretCommand;
 import frc.robot.commands.turret.RotateToCommand;
 import frc.robot.commands.turret.TurretAimCommandGroup;
+import frc.robot.commands.vision.EnableVisionCommand;
 import frc.robot.subsystems.AutoSwitch;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
@@ -221,8 +222,12 @@ public class RobotContainer {
         .whenReleased(new OpenLoopTurretCommand(turretSubsystem, 0.0));
     new JoystickButton(driveJoystick, Trim.RIGHT_Y_POS.id)
         .whenPressed(new CheckSeekAngleCommand(turretSubsystem));
+
     new JoystickButton(driveJoystick, Button.HAMBURGER.id)
         .whenPressed(new DeadeyeLatencyTestCommandGroup(visionSubsystem, turretSubsystem));
+
+    new JoystickButton(driveJoystick, Trim.LEFT_Y_POS.id)
+        .whenPressed(new EnableVisionCommand(visionSubsystem));
 
     // Drive Practice Odometry Reset
     new JoystickButton(driveJoystick, Trim.LEFT_Y_NEG.id)
