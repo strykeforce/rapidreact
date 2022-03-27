@@ -625,13 +625,18 @@ public final class Constants {
   public static final class IntakeConstants {
     public static final int kIntakeFalconID = 20;
     public static final int kIntakeExtendTalonID = 21;
-    public static final int kIntakeZeroTicks = 1800; // FIXME insert actual value
+
     public static final double kIntakeSpeed = 0.4;
     public static final double kIntakeEjectSpeed = -0.5;
     public static final double kIntakeReverseSpeed = -0.2;
+
+    public static final int kIntakeZeroTicks = 2800; // FIXME insert actual value
+    public static final int kZeroStableCounts = 3;
+    public static final int kZeroStableBand = 20;
+
     public static final double kCloseEnoughTicks = 150;
-    public static final double kIntakeExtendPos = 0.0; // FIXME insert actual value
-    public static final double kIntakeRetractPos = 0.0; // FIXME insert actual value
+    public static final double kIntakeExtendPos = 14_000; // FIXME insert actual value
+    public static final double kIntakeRetractPos = 0; // FIXME insert actual value
 
     public static TalonFXConfiguration getIntakeFalconConfig() {
       TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
@@ -679,18 +684,21 @@ public final class Constants {
       intakeConfig.slot0.kD = 15.0;
       intakeConfig.slot0.kF = 0.13;
       intakeConfig.slot0.integralZone = 0;
-      intakeConfig.slot0.allowableClosedloopError = 0;
       intakeConfig.slot0.maxIntegralAccumulator = 0;
-      intakeConfig.motionCruiseVelocity = 6000;
-      intakeConfig.motionAcceleration = 80000;
+      intakeConfig.slot0.allowableClosedloopError = 0;
+      intakeConfig.motionCruiseVelocity = 6_000;
+      intakeConfig.motionAcceleration = 80_000;
+
       intakeConfig.velocityMeasurementWindow = 64;
       intakeConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
+
       intakeConfig.voltageCompSaturation = 12;
       intakeConfig.voltageMeasurementFilter = 32;
-      intakeConfig.forwardSoftLimitEnable = false;
-      intakeConfig.forwardSoftLimitThreshold = 25000;
-      intakeConfig.reverseSoftLimitEnable = false;
-      intakeConfig.reverseSoftLimitThreshold = 25000;
+
+      intakeConfig.forwardSoftLimitEnable = true;
+      intakeConfig.forwardSoftLimitThreshold = 16_000;
+      intakeConfig.reverseSoftLimitEnable = true;
+      intakeConfig.reverseSoftLimitThreshold = 0;
 
       return intakeConfig;
     }

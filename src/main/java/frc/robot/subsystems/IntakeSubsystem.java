@@ -20,6 +20,9 @@ public class IntakeSubsystem extends MeasurableSubsystem {
   private TalonFX intakeFalcon;
   private TalonSRX intakeExtendTalon;
   private double intakeSetPointTicks;
+  private int lastAbsPos = Integer.MAX_VALUE;
+  private int zeroStableCounts = 0;
+  private boolean didZero = false;
 
   public IntakeSubsystem() {
     intakeFalcon = new TalonFX(IntakeConstants.kIntakeFalconID);
@@ -33,23 +36,31 @@ public class IntakeSubsystem extends MeasurableSubsystem {
     intakeExtendTalon.configFactoryDefault(Constants.kTalonConfigTimeout);
     intakeExtendTalon.configAllSettings(
         IntakeConstants.getIntakeExtendTalonConfig(), Constants.kTalonConfigTimeout);
+    intakeExtendTalon.configSupplyCurrentLimit(
+        IntakeConstants.getIntakeExtendCurrentLimit(), Constants.kTalonConfigTimeout);
     intakeExtendTalon.enableVoltageCompensation(true);
     intakeExtendTalon.setNeutralMode(NeutralMode.Brake);
 
     zeroIntake();
-    intakeRetractClosedLoop();
   }
 
   public void zeroIntake() {
     int absPos = intakeExtendTalon.getSensorCollection().getPulseWidthPosition() & 0xFFF;
-    // inverted because absolute and relative encoders are out of phase
-    int offset = absPos - IntakeConstants.kIntakeZeroTicks;
-    intakeExtendTalon.setSelectedSensorPosition(offset);
-    logger.info(
-        "Intake zeroed; offset: {} zeroTicks: {} absPosition: {}",
-        offset,
-        IntakeConstants.kIntakeZeroTicks,
-        absPos);
+    if (Math.abs(absPos - lastAbsPos) <= IntakeConstants.kZeroStableBand) zeroStableCounts++;
+    else zeroStableCounts = 0;
+    lastAbsPos = absPos;
+
+    if (zeroStableCounts > IntakeConstants.kZeroStableCounts) {
+      int offset = absPos - IntakeConstants.kIntakeZeroTicks;
+      intakeExtendTalon.setSelectedSensorPosition(offset);
+      logger.info(
+          "Intake zeroed; offset: {} zeroTicks: {} absPosition: {}",
+          offset,
+          IntakeConstants.kIntakeZeroTicks,
+          absPos);
+      didZero = true;
+      retractClosedLoop();
+    }
   }
 
   public void openLoopRotate(double percentOutput) {
@@ -57,13 +68,13 @@ public class IntakeSubsystem extends MeasurableSubsystem {
     logger.info("Intake falcon turned on {}", percentOutput);
   }
 
-  public void intakeExtendClosedLoop() {
+  public void extendClosedLoop() {
     intakeExtendTalon.set(ControlMode.MotionMagic, IntakeConstants.kIntakeExtendPos);
     intakeSetPointTicks = IntakeConstants.kIntakeExtendPos;
     logger.info("Intake is extending to {}", IntakeConstants.kIntakeExtendPos);
   }
 
-  public void intakeRetractClosedLoop() {
+  public void retractClosedLoop() {
     intakeExtendTalon.set(ControlMode.MotionMagic, IntakeConstants.kIntakeRetractPos);
     intakeSetPointTicks = IntakeConstants.kIntakeRetractPos;
     logger.info("Intake is retracting to {}", IntakeConstants.kIntakeRetractPos);
@@ -74,8 +85,13 @@ public class IntakeSubsystem extends MeasurableSubsystem {
         < IntakeConstants.kCloseEnoughTicks);
   }
 
+  @Override
+  public void periodic() {
+    if (!didZero) zeroIntake();
+  }
+
   public List<BaseTalon> getTalons() {
-    return List.of(intakeFalcon, intakeExtendTalon);
+    return List.of(intakeFalcon);
   }
 
   @Override
