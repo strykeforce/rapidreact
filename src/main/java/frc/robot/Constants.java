@@ -72,8 +72,10 @@ public final class Constants {
 
     // Teleop Drive Constants
     public static final double kDeadbandXLock = 0.2;
-    public static final double kDeadbandAllStick = 0.10;
+    public static final double kDeadbandAllStick = 0.075;
     public static final double kCloseEnoughTicks = 10.0;
+    public static final double kRateLimitFwdStr = 2;
+    public static final double kRateLimitYaw = 3;
 
     // Climb Limits
     public static final double kMaxFwdStrStickClimb = 0.2 * kMaxSpeedMetersPerSecond;
@@ -148,6 +150,7 @@ public final class Constants {
       driveConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
       driveConfig.velocityMeasurementWindow = 64;
       driveConfig.voltageCompSaturation = 12;
+      driveConfig.neutralDeadband = 0.01;
       return driveConfig;
     }
 
@@ -170,7 +173,7 @@ public final class Constants {
 
     // Old 2020 Constants
     public static final double kMinContourAreaSize = 100;
-    public static final double kVerticalFov = 48.8;
+    public static final double kVerticalFov = 0.6056; // 48.8 (34.7 degrees)
     public static final double kHorizonFov = 1.012; // 50.8 //146 //radians 1.012 // deg 57.999
     public static final double kHorizonRes = 640; // 1280
     public static final double kTargetWidthIn = 5;
@@ -205,24 +208,31 @@ public final class Constants {
     // Talon Constants
     public static final int kTurretId = 50;
     public static final double kFastCruiseVelocity = 4_000;
-    public static final double kSlowCruiseVelocity = 2_000;
-    public static final int kTurretZeroTicks = 1944; // 1250, 3349
-    public static final int kForwardLimit = 13_800; // 14
-    public static final int kReverseLimit = -13_800; // 14
+    public static final double kSlowCruiseVelocity = 4_000; // 2000
+    public static final double kFastAccel = 20_000;
+    public static final double kSlowAccel = 20_000;
+    public static final int kTurretZeroTicks = 1_161; // 1250, 1194
+    public static final int kForwardLimit = 20_000; // 13_800 14
+    public static final int kReverseLimit = -20_000; // 13_800 14
     public static final double kMaxStringPotZero = 100; // 2020 Robot
     public static final double kMinStringPotZero = 0; // 2020 Robot
 
     // Ticks -> Degrees/Radians
     public static final double kTurretTicksPerDegree =
-        120.522; // 114.653     0.01745329 57.2957877856 72.404
-    public static final double kTurretTicksPerRadian = 6905.414; // 6569.133
-    public static final double kTurretMidpoint = 13_000;
+        107.27; // 114.653     0.01745329 57.2957877856 72.404 120.522
+    public static final double kTurretTicksPerRadian = 6146.47; // 6569.133 6905.414
+    // public static final double kTurretMidpoint = 13_000;
     public static final double kWrapRange = 1;
+    public static final Rotation2d kOverlapAngle = Rotation2d.fromDegrees(6);
+    public static final double kWrapTicks = 20_000;
 
     // Rotate Under Vision Constants
-    public static final double kRotateByInitialKp = -0.4; // 0.4
-    public static final double kRotateByFinalKp = -0.95; // 0.95
+    public static final double kRotateByInitialKp = -0.4; // -0.4 old: 0.4
+    public static final double kRotateByFinalKp = -0.4; // 0.95
     public static final int kNotValidTargetCounts = 5; // how many frames to wait before seeking
+    public static final double kFYawSlow = -0.05;
+    public static final double kFYawMedium = -0.08;
+    public static final double kFYawFast = -0.12;
 
     // Seek Constants
     public static final Translation2d kHubPositionMeters = new Translation2d(8.23, 4.11); // meters
@@ -261,7 +271,7 @@ public final class Constants {
       turretConfig.voltageMeasurementFilter = 32;
       turretConfig.voltageCompSaturation = 12;
       turretConfig.motionCruiseVelocity = kFastCruiseVelocity; // 4_000
-      turretConfig.motionAcceleration = 20_000;
+      turretConfig.motionAcceleration = kFastAccel;
       turretConfig.forwardLimitSwitchNormal = LimitSwitchNormal.Disabled;
       turretConfig.reverseLimitSwitchNormal = LimitSwitchNormal.Disabled;
       turretConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
@@ -606,9 +616,19 @@ public final class Constants {
 
   public static final class IntakeConstants {
     public static final int kIntakeFalconID = 20;
-    public static final double kIntakeSpeed = 0.5;
+    public static final int kIntakeExtendTalonID = 21;
+
+    public static final double kIntakeSpeed = 0.4;
     public static final double kIntakeEjectSpeed = -0.5;
     public static final double kIntakeReverseSpeed = -0.2;
+
+    public static final int kIntakeZeroTicks = 2800; // FIXME insert actual value
+    public static final int kZeroStableCounts = 3;
+    public static final int kZeroStableBand = 20;
+
+    public static final double kCloseEnoughTicks = 150;
+    public static final double kIntakeExtendPos = 14_000; // FIXME insert actual value
+    public static final double kIntakeRetractPos = 0; // FIXME insert actual value
 
     public static TalonFXConfiguration getIntakeFalconConfig() {
       TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
@@ -627,6 +647,51 @@ public final class Constants {
       intakeConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
       intakeConfig.velocityMeasurementWindow = 64;
       intakeConfig.voltageCompSaturation = 12;
+      return intakeConfig;
+    }
+
+    public static SupplyCurrentLimitConfiguration getIntakeExtendCurrentLimit() {
+      SupplyCurrentLimitConfiguration supplyCurrentLimitConfig =
+          new SupplyCurrentLimitConfiguration();
+
+      supplyCurrentLimitConfig.currentLimit = 5.0;
+      supplyCurrentLimitConfig.triggerThresholdCurrent = 10.0;
+      supplyCurrentLimitConfig.triggerThresholdTime = 1.0;
+      supplyCurrentLimitConfig.enable = true;
+
+      return supplyCurrentLimitConfig;
+    }
+
+    public static TalonSRXConfiguration getIntakeExtendTalonConfig() {
+      TalonSRXConfiguration intakeConfig = new TalonSRXConfiguration();
+
+      intakeConfig.primaryPID.selectedFeedbackCoefficient = 1.0;
+      intakeConfig.auxiliaryPID.selectedFeedbackSensor = FeedbackDevice.None;
+
+      intakeConfig.forwardLimitSwitchSource = LimitSwitchSource.Deactivated;
+      intakeConfig.reverseLimitSwitchSource = LimitSwitchSource.Deactivated;
+
+      intakeConfig.slot0.kP = 1.0;
+      intakeConfig.slot0.kI = 0.0;
+      intakeConfig.slot0.kD = 15.0;
+      intakeConfig.slot0.kF = 0.13;
+      intakeConfig.slot0.integralZone = 0;
+      intakeConfig.slot0.maxIntegralAccumulator = 0;
+      intakeConfig.slot0.allowableClosedloopError = 0;
+      intakeConfig.motionCruiseVelocity = 6_000;
+      intakeConfig.motionAcceleration = 80_000;
+
+      intakeConfig.velocityMeasurementWindow = 64;
+      intakeConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
+
+      intakeConfig.voltageCompSaturation = 12;
+      intakeConfig.voltageMeasurementFilter = 32;
+
+      intakeConfig.forwardSoftLimitEnable = true;
+      intakeConfig.forwardSoftLimitThreshold = 16_000;
+      intakeConfig.reverseSoftLimitEnable = true;
+      intakeConfig.reverseSoftLimitThreshold = 0;
+
       return intakeConfig;
     }
   }

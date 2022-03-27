@@ -139,6 +139,12 @@ public class MagazineSubsystem extends MeasurableSubsystem {
 
   public Color getColor() {
     lastColor = colorSensor.getColor();
+    if (lastColor.red == 0 && lastColor.green == 0 && lastColor.blue == 0) {
+      ignoreColorSensor = true;
+      logger.warn("Color sensor error. Diasbling color sensor.");
+      if (allianceCargoColor == CargoColor.BLUE) lastColor = MagazineConstants.kBlueCargo;
+      else lastColor = MagazineConstants.kRedCargo;
+    }
     // lastColor = new Color(0, 0, 0);
     return lastColor;
   }
@@ -459,6 +465,9 @@ public class MagazineSubsystem extends MeasurableSubsystem {
             logger.info("WAIT_AIM -> PAUSE");
             shooterSubsystem.shoot();
             currUpperMagazineState = UpperMagazineState.PAUSE;
+          } else if (turretSubsystem.getState() == TurretState.ODOM_AIMED) {
+            logger.info("WAIT_AIM -> PAUSE");
+            currUpperMagazineState = UpperMagazineState.PAUSE;
           }
         }
         break;
@@ -466,7 +475,8 @@ public class MagazineSubsystem extends MeasurableSubsystem {
       case PAUSE:
         if (shooterSubsystem.getCurrentState() == ShooterState.SHOOT
             && (turretSubsystem.getState() == TurretState.TRACKING
-                || turretSubsystem.getState() == TurretState.FENDER_AIMED)) {
+                || turretSubsystem.getState() == TurretState.FENDER_AIMED
+                || turretSubsystem.getState() == TurretState.ODOM_AIMED)) {
           logger.info("PAUSE -> SHOOT");
           enableUpperBeamBreak(false);
           upperClosedLoopRotate(MagazineConstants.kUpperMagazineFeedSpeed);

@@ -14,9 +14,11 @@ public class DeadeyeLatencyTestCommandGroup extends SequentialCommandGroup {
       VisionSubsystem visionSubsystem, TurretSubsystem turretSubsystem) {
     addCommands(
         new EnableVisionCommand(visionSubsystem),
-        new WaitCommand(0.5),
-        new RotateToCommand(turretSubsystem, Rotation2d.fromDegrees(0)),
-        new RotateToCommand(turretSubsystem, Rotation2d.fromDegrees(83.0)),
+        new WaitCommand(10.0),
+        new RotateToCommand(turretSubsystem, Rotation2d.fromDegrees(90.0)),
+        new RotateToCommand(turretSubsystem, Rotation2d.fromDegrees(-90.0)),
+        // new RotateToCommand(turretSubsystem, Rotation2d.fromDegrees(90.0)),
+        // new RotateToCommand(turretSubsystem, Rotation2d.fromDegrees(-90.0)),
         new DisableVisionCommand(visionSubsystem));
   }
 }
