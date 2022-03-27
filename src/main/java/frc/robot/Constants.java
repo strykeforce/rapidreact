@@ -445,12 +445,12 @@ public final class Constants {
     // Climb States -> Desired Endpoint in Ticks
     public static final double kFMidExtTicks = -215_000;
     public static final double kPMidExtTicks = -198_000;
-    public static final double kPMidRetST1Ticks = -66_000;
-    public static final double kPMidRetST2Ticks = -66_000;
-    public static final double kPMidRetST3Ticks = -66_000;
+    public static final double kPMidRetST1Ticks = -145_000;
+    public static final double kPMidRetST2Ticks = -130_000;
+    public static final double kPMidRetST3Ticks = -76_000;
     public static final double kPMidRetST4Ticks = -66_000;
     public static final double kHighPvtFwdTicks = -6_850;
-    public static final double kPHighRetST1Ticks = -3_500;
+    public static final double kPHighRetST1Ticks = -13_500;
     public static final double kPHighRetST2Ticks = -3_500;
     public static final double kHighPvtBk1Ticks = -5_000;
     public static final double kPHighExtST1Ticks = -66_000;
@@ -473,17 +473,17 @@ public final class Constants {
     // Climb States -> Desired Open Loop or Close Loop Speed
     public static final double kFMidExtSpeed = -0.8;
     public static final double kPMidExtSpeed = -0.8;
-    public static final double kPMidRetST1Speed = 0.5;
-    public static final double kPMidRetST2Speed = 0.5;
-    public static final double kPMidRetST3Speed = 0.5;
-    public static final double kPMidRetST4Speed = 0.5;
-    public static final double kHighPvtFwdSpeed = 500;
-    public static final double kPHighRetST1Speed = 0.5;
-    public static final double kPHighRetST2Speed = 0.5;
-    public static final double kHighPvtBk1Speed = 500;
-    public static final double kPHighExtST1Speed = -0.5;
-    public static final double kPHighExtST2Speed = -0.5;
-    public static final double kPHighExtST3Speed = -0.5;
+    public static final double kPMidRetST1Speed = 0.7;
+    public static final double kPMidRetST2Speed = 0.18;
+    public static final double kPMidRetST3Speed = 0.6;
+    public static final double kPMidRetST4Speed = 0.3;
+    public static final double kHighPvtFwdSpeed = 700;
+    public static final double kPHighRetST1Speed = 0.6;
+    public static final double kPHighRetST2Speed = 0.3;
+    public static final double kHighPvtBk1Speed = 1_000;
+    public static final double kPHighExtST1Speed = -0.15;
+    public static final double kPHighExtST2Speed = -0.15;
+    public static final double kPHighExtST3Speed = -0.15;
     public static final double kFHighRetST1Speed = 0.5;
     public static final double kFHighRetST2Speed = 0.5;
     public static final double kHighPvtBk2Speed = 500;
@@ -606,9 +606,9 @@ public final class Constants {
       ShoulderConfig.voltageCompSaturation = 12;
       ShoulderConfig.voltageMeasurementFilter = 32;
       ShoulderConfig.forwardSoftLimitEnable = true;
-      ShoulderConfig.forwardSoftLimitThreshold = 9500;
+      ShoulderConfig.forwardSoftLimitThreshold = 7000;
       ShoulderConfig.reverseSoftLimitEnable = true;
-      ShoulderConfig.reverseSoftLimitThreshold = -6000;
+      ShoulderConfig.reverseSoftLimitThreshold = -7000;
 
       return ShoulderConfig;
     }
