@@ -624,9 +624,19 @@ public final class Constants {
 
   public static final class IntakeConstants {
     public static final int kIntakeFalconID = 20;
+    public static final int kIntakeExtendTalonID = 21;
+
     public static final double kIntakeSpeed = 0.4;
     public static final double kIntakeEjectSpeed = -0.5;
     public static final double kIntakeReverseSpeed = -0.2;
+
+    public static final int kIntakeZeroTicks = 2800; // FIXME insert actual value
+    public static final int kZeroStableCounts = 3;
+    public static final int kZeroStableBand = 20;
+
+    public static final double kCloseEnoughTicks = 150;
+    public static final double kIntakeExtendPos = 14_000; // FIXME insert actual value
+    public static final double kIntakeRetractPos = 0; // FIXME insert actual value
 
     public static TalonFXConfiguration getIntakeFalconConfig() {
       TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
@@ -645,6 +655,51 @@ public final class Constants {
       intakeConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
       intakeConfig.velocityMeasurementWindow = 64;
       intakeConfig.voltageCompSaturation = 12;
+      return intakeConfig;
+    }
+
+    public static SupplyCurrentLimitConfiguration getIntakeExtendCurrentLimit() {
+      SupplyCurrentLimitConfiguration supplyCurrentLimitConfig =
+          new SupplyCurrentLimitConfiguration();
+
+      supplyCurrentLimitConfig.currentLimit = 5.0;
+      supplyCurrentLimitConfig.triggerThresholdCurrent = 10.0;
+      supplyCurrentLimitConfig.triggerThresholdTime = 1.0;
+      supplyCurrentLimitConfig.enable = true;
+
+      return supplyCurrentLimitConfig;
+    }
+
+    public static TalonSRXConfiguration getIntakeExtendTalonConfig() {
+      TalonSRXConfiguration intakeConfig = new TalonSRXConfiguration();
+
+      intakeConfig.primaryPID.selectedFeedbackCoefficient = 1.0;
+      intakeConfig.auxiliaryPID.selectedFeedbackSensor = FeedbackDevice.None;
+
+      intakeConfig.forwardLimitSwitchSource = LimitSwitchSource.Deactivated;
+      intakeConfig.reverseLimitSwitchSource = LimitSwitchSource.Deactivated;
+
+      intakeConfig.slot0.kP = 1.0;
+      intakeConfig.slot0.kI = 0.0;
+      intakeConfig.slot0.kD = 15.0;
+      intakeConfig.slot0.kF = 0.13;
+      intakeConfig.slot0.integralZone = 0;
+      intakeConfig.slot0.maxIntegralAccumulator = 0;
+      intakeConfig.slot0.allowableClosedloopError = 0;
+      intakeConfig.motionCruiseVelocity = 6_000;
+      intakeConfig.motionAcceleration = 80_000;
+
+      intakeConfig.velocityMeasurementWindow = 64;
+      intakeConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
+
+      intakeConfig.voltageCompSaturation = 12;
+      intakeConfig.voltageMeasurementFilter = 32;
+
+      intakeConfig.forwardSoftLimitEnable = true;
+      intakeConfig.forwardSoftLimitThreshold = 16_000;
+      intakeConfig.reverseSoftLimitEnable = true;
+      intakeConfig.reverseSoftLimitThreshold = 0;
+
       return intakeConfig;
     }
   }
