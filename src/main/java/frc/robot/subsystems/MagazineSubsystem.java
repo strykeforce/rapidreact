@@ -470,9 +470,11 @@ public class MagazineSubsystem extends MeasurableSubsystem {
             currUpperMagazineState = UpperMagazineState.PAUSE;
           } else if (turretSubsystem.getState() == TurretState.TRACKING) {
             logger.info("WAIT_AIM -> PAUSE");
-            visionSubsystem.getVisionOdometry(
-                turretSubsystem.getTurretRotation2d(), driveSubsystem.getGyroRotation2d());
             shooterSubsystem.shoot();
+            visionSubsystem.getVisionOdometry(
+                turretSubsystem.getTurretRotation2d(),
+                driveSubsystem.getGyroRotation2d(),
+                shooterSubsystem.getLastLookupDistance());
             currUpperMagazineState = UpperMagazineState.PAUSE;
           }
         }

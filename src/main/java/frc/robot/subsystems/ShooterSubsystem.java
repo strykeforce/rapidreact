@@ -29,6 +29,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
   private ShooterState currentState = ShooterState.STOP;
   private double shooterSetPointTicks, kickerSetpointTicks, hoodSetPointTicks;
   private String[][] lookupTable;
+  private double lastLookupDistance = 0.0;
 
   public ShooterSubsystem(MagazineSubsystem magazineSubsystem, VisionSubsystem visionSubsystem) {
     this.magazineSubsystem = magazineSubsystem;
@@ -211,9 +212,14 @@ public class ShooterSubsystem extends MeasurableSubsystem {
       hoodClosedLoop(ShooterConstants.kHoodOpTicks);
     } else {
       double[] shootSolution = getShootSolution();
+      lastLookupDistance = shootSolution[4];
       shooterClosedLoop(shootSolution[0], shootSolution[1]);
       hoodClosedLoop(shootSolution[2]);
     }
+  }
+
+  public double getLastLookupDistance() {
+    return lastLookupDistance;
   }
 
   public void fenderShot() {

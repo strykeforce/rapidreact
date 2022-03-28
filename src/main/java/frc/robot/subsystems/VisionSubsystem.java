@@ -101,11 +101,12 @@ public class VisionSubsystem extends MeasurableSubsystem
     return td.isValid() ? 1.0 : 0.0;
   }
 
-  public Pose2d getVisionOdometry(Rotation2d turretAngle, Rotation2d gyroAngle) {
+  public Pose2d getVisionOdometry(
+      Rotation2d turretAngle, Rotation2d gyroAngle, double distanceInches) {
     Rotation2d errorRadians = new Rotation2d(getErrorRadians());
     Rotation2d calcAngle =
         turretAngle.plus(gyroAngle).plus(TurretConstants.kTurretRobotOffset).minus(errorRadians);
-    double distanceMeters = getTargetsDistanceGround() * 0.0254;
+    double distanceMeters = distanceInches * 0.0254;
     double x, y;
     y = Math.abs(-4.121 + distanceMeters * Math.sin(calcAngle.getRadians()));
     x = Math.abs(-8.23 + distanceMeters * Math.cos(calcAngle.getRadians()));
