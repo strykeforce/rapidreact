@@ -423,7 +423,7 @@ public final class Constants {
     public static final double kFixedRatchetOn = 0.5;
     public static final double kPivotRatchetOff = 0.0;
     public static final double kFixedRatchetOff = 0.0;
-    public static final double kDisengageRatchetSpeed = 0.2;
+    public static final double kDisengageRatchetSpeed = 0.25;
     public static final double kDisengageRatchetTicks = 100;
     public static final double kDisengageRatchetServoTimer = 0.2;
 
@@ -451,22 +451,24 @@ public final class Constants {
     public static final double kPMidRetST4Ticks = -66_000;
     public static final double kHighPvtFwdTicks = -6_850;
     public static final double kPHighRetST1Ticks = -13_500;
-    public static final double kPHighRetST2Ticks = -3_500;
+    public static final double kPHighRetST2Ticks = -4_000;
     public static final double kHighPvtBk1Ticks = -5_000;
-    public static final double kPHighExtST1Ticks = -66_000;
-    public static final double kPHighExtST2Ticks = -66_000;
+    public static final double kPHighExtST1Ticks = -45_000;
+    public static final double kPHighExtST2Ticks = -55_000;
     public static final double kPHighExtST3Ticks = -66_000;
-    public static final double kFHighRetST1Ticks = -100_000;
-    public static final double kFHighRetST2Ticks = -100_000;
+    public static final double kFHighRetST1Ticks = -170_000;
+    public static final double kFHighRetST2Ticks = -90_000;
+    public static final double kTvsDelay = 0.5;
     public static final double kHighPvtBk2Ticks = 1_500;
+    public static final double kPHighRet2Ticks = -55_000;
     public static final double kPTvsExtTicks = -198_000;
-    public static final double kFTvsRetST1Ticks = -500;
+    public static final double kFTvsRetST1Ticks = -20_000;
     public static final double kFTvsRetST2Ticks = -500;
     public static final double kTvsPvtBkTicks = 6_000;
-    public static final double kPTvsRetST1Ticks = -160_000;
+    public static final double kPTvsRetST1Ticks = -175_000;
     public static final double kPTvsRetST2Ticks = -160_000;
     public static final double kTvsPvtFwd1Ticks = 3_700;
-    public static final double kFTvsExtST1Ticks = -150_000;
+    public static final double kFTvsExtST1Ticks = -110_000;
     public static final double kFTvsExtST2Ticks = -150_000;
     public static final double kTvsPvtFwd2Ticks = 2_450;
 
@@ -481,30 +483,31 @@ public final class Constants {
     public static final double kPHighRetST1Speed = 0.6;
     public static final double kPHighRetST2Speed = 0.3;
     public static final double kHighPvtBk1Speed = 1_000;
-    public static final double kPHighExtST1Speed = -0.15;
+    public static final double kPHighExtST1Speed = -0.35;
     public static final double kPHighExtST2Speed = -0.15;
-    public static final double kPHighExtST3Speed = -0.15;
-    public static final double kFHighRetST1Speed = 0.5;
-    public static final double kFHighRetST2Speed = 0.5;
-    public static final double kHighPvtBk2Speed = 500;
+    public static final double kPHighExtST3Speed = -0.05;
+    public static final double kFHighRetST1Speed = 0.3;
+    public static final double kFHighRetST2Speed = 0.4;
+    public static final double kHighPvtBk2Speed = 1_000;
+    public static final double kPHighRet2Speed = 0.6;
     public static final double kPTvsExtSpeed = -0.8;
-    public static final double kFTvsRetST1Speed = 0.5;
-    public static final double kFTvsRetST2Speed = 0.5;
-    public static final double kTvsPvtBkSpeed = 500;
-    public static final double kPTvsRetST1Speed = 0.5;
-    public static final double kPTvsRetST2Speed = 0.5;
-    public static final double kTvsPvtFwd1Speed = 500;
-    public static final double kFTvsExtST1Speed = -0.5;
-    public static final double kFTvsExtST2Speed = -0.5;
-    public static final double kTvsPvtFwd2Speed = 500;
+    public static final double kFTvsRetST1Speed = 0.6;
+    public static final double kFTvsRetST2Speed = 0.3;
+    public static final double kTvsPvtBkSpeed = 1_000;
+    public static final double kPTvsRetST1Speed = 0.3;
+    public static final double kPTvsRetST2Speed = 0.15;
+    public static final double kTvsPvtFwd1Speed = 1_000;
+    public static final double kFTvsExtST1Speed = -0.4;
+    public static final double kFTvsExtST2Speed = -0.1;
+    public static final double kTvsPvtFwd2Speed = 1_000;
 
     // Pivot Arm Falcon Config
     public static SupplyCurrentLimitConfiguration getPivotArmSupplyCurrentLimit() {
-      return new SupplyCurrentLimitConfiguration(true, 80, 90, 0.1);
+      return new SupplyCurrentLimitConfiguration(true, 100, 120, 1.0);
     }
 
     public static StatorCurrentLimitConfiguration getPivotArmStatorCurrentLimit() {
-      return new StatorCurrentLimitConfiguration(true, 100, 120, 0.1);
+      return new StatorCurrentLimitConfiguration(true, 130, 150, 1.0);
     }
 
     public static TalonFXConfiguration getPivotArmFalconConfig() {
@@ -540,11 +543,11 @@ public final class Constants {
 
     // Fixed Arm Falcon Config
     public static SupplyCurrentLimitConfiguration getFixedArmSupplyCurrentLimit() {
-      return new SupplyCurrentLimitConfiguration(true, 80, 90, 0.1);
+      return new SupplyCurrentLimitConfiguration(true, 100, 120, 1.0);
     }
 
     public static StatorCurrentLimitConfiguration getFixedArmStatorCurrentLimit() {
-      return new StatorCurrentLimitConfiguration(true, 100, 120, 0.1);
+      return new StatorCurrentLimitConfiguration(true, 130, 150, 1.0);
     }
 
     public static TalonFXConfiguration getFixedArmFalconConfig() {
