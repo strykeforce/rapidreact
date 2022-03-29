@@ -57,7 +57,6 @@ import frc.robot.commands.sequences.climb.HighClimbCommandGroup;
 import frc.robot.commands.sequences.climb.MidClimbCommandGroup;
 import frc.robot.commands.sequences.climb.TraverseClimbCommandGroup;
 import frc.robot.commands.sequences.intaking.AutoIntakeCommand;
-import frc.robot.commands.sequences.intaking.EjectCargoCommand;
 import frc.robot.commands.sequences.intaking.ExtendIntakeCommand;
 import frc.robot.commands.sequences.shooting.ArmShooterCommandGroup;
 import frc.robot.commands.sequences.shooting.HighFenderShotCommand;
@@ -68,8 +67,6 @@ import frc.robot.commands.sequences.shooting.VisionShootCommand;
 import frc.robot.commands.shooter.HoodClosedLoopCommand;
 import frc.robot.commands.shooter.HoodOpenLoopCommand;
 import frc.robot.commands.shooter.ShooterOpenLoopCommand;
-import frc.robot.commands.shooter.StopShooterCommand;
-import frc.robot.commands.turret.CheckSeekAngleCommand;
 import frc.robot.commands.turret.DeadeyeLatencyTestCommandGroup;
 import frc.robot.commands.turret.OpenLoopTurretCommand;
 import frc.robot.commands.turret.RotateToCommand;
@@ -220,8 +217,6 @@ public class RobotContainer {
         .whenPressed(new OpenLoopTurretCommand(turretSubsystem, -0.3));
     new JoystickButton(driveJoystick, Trim.RIGHT_X_NEG.id)
         .whenReleased(new OpenLoopTurretCommand(turretSubsystem, 0.0));
-    new JoystickButton(driveJoystick, Trim.RIGHT_Y_POS.id)
-        .whenPressed(new CheckSeekAngleCommand(turretSubsystem));
 
     new JoystickButton(driveJoystick, Button.HAMBURGER.id)
         .whenPressed(new DeadeyeLatencyTestCommandGroup(visionSubsystem, turretSubsystem));
@@ -298,12 +293,14 @@ public class RobotContainer {
                 intakeSubsystem));
 
     // Eject Opponent Cargo
+    // new JoystickButton(xboxController, XboxController.Button.kA.value)
+    //     .whenPressed(
+    //         new EjectCargoCommand(
+    //             turretSubsystem, shooterSubsystem, magazineSubsystem, intakeSubsystem));
+    // new JoystickButton(xboxController, XboxController.Button.kA.value)
+    //     .whenReleased(new StopShooterCommand(shooterSubsystem));
     new JoystickButton(xboxController, XboxController.Button.kA.value)
-        .whenPressed(
-            new EjectCargoCommand(
-                turretSubsystem, shooterSubsystem, magazineSubsystem, intakeSubsystem));
-    new JoystickButton(xboxController, XboxController.Button.kA.value)
-        .whenReleased(new StopShooterCommand(shooterSubsystem));
+        .toggleWhenPressed(new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, false, false));
 
     // High Fender Shot
     new JoystickButton(xboxController, XboxController.Button.kRightBumper.value)
