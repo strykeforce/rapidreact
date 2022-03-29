@@ -631,7 +631,7 @@ public final class Constants {
 
     public static final double kCloseEnoughTicks = 150;
     public static final double kIntakeExtendPos = 14_000; // FIXME insert actual value
-    public static final double kIntakeRetractPos = 0; // FIXME insert actual value
+    public static final double kIntakeRetractPos = 200; // FIXME insert actual value
 
     public static TalonFXConfiguration getIntakeFalconConfig() {
       TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
@@ -707,9 +707,9 @@ public final class Constants {
     public static final String kLookupTablePath = "/home/lvuser/deploy/LookupTable.csv";
 
     // Lookup Table Constants
-    public static final double kLookupMinPixel = 160;
-    public static final double kLookupMaxPixel = 380;
-    public static final double kNumRows = 221;
+    public static final double kLookupMinPixel = 134;
+    public static final double kLookupMaxPixel = 414;
+    public static final double kNumRows = 281;
     public static final double kLookupRes = 1.0;
 
     // Hood Encoder Constants
