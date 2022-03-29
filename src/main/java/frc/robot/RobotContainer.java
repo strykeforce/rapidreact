@@ -57,7 +57,7 @@ import frc.robot.commands.sequences.climb.HighClimbCommandGroup;
 import frc.robot.commands.sequences.climb.MidClimbCommandGroup;
 import frc.robot.commands.sequences.climb.TraverseClimbCommandGroup;
 import frc.robot.commands.sequences.intaking.AutoIntakeCommand;
-import frc.robot.commands.sequences.intaking.EjectCargoCommand;
+import frc.robot.commands.sequences.intaking.ExtendIntakeCommand;
 import frc.robot.commands.sequences.shooting.ArmShooterCommandGroup;
 import frc.robot.commands.sequences.shooting.HighFenderShotCommand;
 import frc.robot.commands.sequences.shooting.LowFenderShotCommand;
@@ -67,8 +67,6 @@ import frc.robot.commands.sequences.shooting.VisionShootCommand;
 import frc.robot.commands.shooter.HoodClosedLoopCommand;
 import frc.robot.commands.shooter.HoodOpenLoopCommand;
 import frc.robot.commands.shooter.ShooterOpenLoopCommand;
-import frc.robot.commands.shooter.StopShooterCommand;
-import frc.robot.commands.turret.CheckSeekAngleCommand;
 import frc.robot.commands.turret.DeadeyeLatencyTestCommandGroup;
 import frc.robot.commands.turret.OpenLoopTurretCommand;
 import frc.robot.commands.turret.RotateToCommand;
@@ -219,8 +217,6 @@ public class RobotContainer {
         .whenPressed(new OpenLoopTurretCommand(turretSubsystem, -0.3));
     new JoystickButton(driveJoystick, Trim.RIGHT_X_NEG.id)
         .whenReleased(new OpenLoopTurretCommand(turretSubsystem, 0.0));
-    new JoystickButton(driveJoystick, Trim.RIGHT_Y_POS.id)
-        .whenPressed(new CheckSeekAngleCommand(turretSubsystem));
 
     new JoystickButton(driveJoystick, Button.HAMBURGER.id)
         .whenPressed(new DeadeyeLatencyTestCommandGroup(visionSubsystem, turretSubsystem));
@@ -237,7 +233,7 @@ public class RobotContainer {
 
     // Auto Intake
     new JoystickButton(driveJoystick, Shoulder.LEFT_DOWN.id)
-        .whenPressed(new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, false));
+        .whenPressed(new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, false, false));
     new JoystickButton(driveJoystick, Shoulder.LEFT_DOWN.id)
         .whenReleased(new IntakeOpenLoopCommand(intakeSubsystem, 0.0));
 
@@ -270,7 +266,7 @@ public class RobotContainer {
 
     // Auto Intake
     new JoystickButton(xboxController, XboxController.Button.kY.value)
-        .toggleWhenPressed(new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, false));
+        .toggleWhenPressed(new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, false, true));
 
     // Eject Cargo Reverse
     new JoystickButton(xboxController, XboxController.Button.kBack.value)
@@ -297,12 +293,14 @@ public class RobotContainer {
                 intakeSubsystem));
 
     // Eject Opponent Cargo
+    // new JoystickButton(xboxController, XboxController.Button.kA.value)
+    //     .whenPressed(
+    //         new EjectCargoCommand(
+    //             turretSubsystem, shooterSubsystem, magazineSubsystem, intakeSubsystem));
+    // new JoystickButton(xboxController, XboxController.Button.kA.value)
+    //     .whenReleased(new StopShooterCommand(shooterSubsystem));
     new JoystickButton(xboxController, XboxController.Button.kA.value)
-        .whenPressed(
-            new EjectCargoCommand(
-                turretSubsystem, shooterSubsystem, magazineSubsystem, intakeSubsystem));
-    new JoystickButton(xboxController, XboxController.Button.kA.value)
-        .whenReleased(new StopShooterCommand(shooterSubsystem));
+        .toggleWhenPressed(new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, false, false));
 
     // High Fender Shot
     new JoystickButton(xboxController, XboxController.Button.kRightBumper.value)
@@ -483,15 +481,15 @@ public class RobotContainer {
             new HoodClosedLoopCommand(shooterSubsystem, ShooterConstants.kZeroCheckTicks))
         .withPosition(0, 2);
 
-    // SmartDashboard.putNumber(DashboardConstants.kPitShooterSetpointTicks, 0.0);
-    // SmartDashboard.putNumber(DashboardConstants.kPitKickerSetpointTicks, 0.0);
+    SmartDashboard.putNumber(DashboardConstants.kPitShooterSetpointTicks, 0.0);
+    SmartDashboard.putNumber(DashboardConstants.kPitKickerSetpointTicks, 0.0);
     // SmartDashboard.putData(
     //     "Pit/Shooter/shooterStart", new PitShooterClosedLoopCommand(shooterSubsystem));
     // SmartDashboard.putData(
     //     "Pit/Shooter/shooterStop", new ShooterOpenLoopCommand(shooterSubsystem, 0.0));
 
     // // Hood Commands
-    // SmartDashboard.putNumber(DashboardConstants.kPitHoodSetpointTicks, 0.0);
+    SmartDashboard.putNumber(DashboardConstants.kPitHoodSetpointTicks, 0.0);
     // SmartDashboard.putData("Pit/Hood/hoodStart", new PitHoodClosedLoopCommand(shooterSubsystem));
     // SmartDashboard.putData("Pit/Hood/hoodStop", new HoodOpenLoopCommand(shooterSubsystem, 0.0));
 
@@ -536,6 +534,10 @@ public class RobotContainer {
         .add("REV", new IntakeOpenLoopCommand(intakeSubsystem, IntakeConstants.kIntakeEjectSpeed))
         .withPosition(0, 1);
     intakeCommands.add("Stop", new IntakeOpenLoopCommand(intakeSubsystem, 0.0)).withPosition(0, 2);
+    intakeCommands.add("Extend", new ExtendIntakeCommand(intakeSubsystem, true)).withPosition(0, 3);
+    intakeCommands
+        .add("Retract", new ExtendIntakeCommand(intakeSubsystem, false))
+        .withPosition(0, 4);
 
     // SmartDashboard.putData("Pit/Intake/Start", new PitIntakeOpenLoopCommand(intakeSubsystem));
     // SmartDashboard.putData("Pit/Intake/Stop", new IntakeOpenLoopCommand(intakeSubsystem, 0.0));

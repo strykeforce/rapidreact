@@ -11,13 +11,18 @@ public class AutoIntakeCommand extends CommandBase {
   public final IntakeSubsystem intakeSubsystem;
   public boolean magazineReversed = false;
   public boolean isAuton;
+  public boolean intakeExtend;
 
   public AutoIntakeCommand(
-      MagazineSubsystem magazineSubsystem, IntakeSubsystem intakeSubsystem, boolean isAuton) {
+      MagazineSubsystem magazineSubsystem,
+      IntakeSubsystem intakeSubsystem,
+      boolean isAuton,
+      boolean intakeExtend) {
     addRequirements(magazineSubsystem, intakeSubsystem);
     this.magazineSubsystem = magazineSubsystem;
     this.intakeSubsystem = intakeSubsystem;
     this.isAuton = isAuton;
+    this.intakeExtend = intakeExtend;
   }
 
   @Override
@@ -25,6 +30,8 @@ public class AutoIntakeCommand extends CommandBase {
     magazineSubsystem.indexCargo();
     intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeSpeed);
     magazineReversed = false;
+    if (intakeExtend) intakeSubsystem.extendClosedLoop();
+    else intakeSubsystem.retractClosedLoop();
   }
 
   @Override
@@ -42,7 +49,8 @@ public class AutoIntakeCommand extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return magazineSubsystem.isMagazineFull();
+    return magazineSubsystem.isMagazineFull()
+        && magazineSubsystem.getCurrLowerMagazineState() == LowerMagazineState.WAIT_UPPER;
   }
 
   @Override
@@ -53,5 +61,6 @@ public class AutoIntakeCommand extends CommandBase {
     } else if (!interrupted) {
       intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeReverseSpeed);
     }
+    intakeSubsystem.retractClosedLoop();
   }
 }

@@ -38,7 +38,7 @@ public class TwoCargoAuto extends SequentialCommandGroup {
         new ParallelDeadlineGroup(
             new DriveAutonCommand(driveSubsystem, pathName, true, false), // deadline
             new ArmShooterCommandGroup(visionSubsystem, turretSubsystem, shooterSubsystem),
-            new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, true)),
+            new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, true, true)),
         new VisionShootAutoCommand(
             shooterSubsystem,
             turretSubsystem,
