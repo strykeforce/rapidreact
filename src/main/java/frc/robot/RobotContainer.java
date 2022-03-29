@@ -153,7 +153,7 @@ public class RobotContainer {
     configureDriverButtonBindings();
     configureOperatorButtonBindings();
     configureMatchDashboard();
-    configureManualClimbButtons();
+    // configureManualClimbButtons();
   }
 
   public VisionSubsystem getVisionSubsystem() {
@@ -484,15 +484,15 @@ public class RobotContainer {
             new HoodClosedLoopCommand(shooterSubsystem, ShooterConstants.kZeroCheckTicks))
         .withPosition(0, 2);
 
-    // SmartDashboard.putNumber(DashboardConstants.kPitShooterSetpointTicks, 0.0);
-    // SmartDashboard.putNumber(DashboardConstants.kPitKickerSetpointTicks, 0.0);
+    SmartDashboard.putNumber(DashboardConstants.kPitShooterSetpointTicks, 0.0);
+    SmartDashboard.putNumber(DashboardConstants.kPitKickerSetpointTicks, 0.0);
     // SmartDashboard.putData(
     //     "Pit/Shooter/shooterStart", new PitShooterClosedLoopCommand(shooterSubsystem));
     // SmartDashboard.putData(
     //     "Pit/Shooter/shooterStop", new ShooterOpenLoopCommand(shooterSubsystem, 0.0));
 
     // // Hood Commands
-    // SmartDashboard.putNumber(DashboardConstants.kPitHoodSetpointTicks, 0.0);
+    SmartDashboard.putNumber(DashboardConstants.kPitHoodSetpointTicks, 0.0);
     // SmartDashboard.putData("Pit/Hood/hoodStart", new PitHoodClosedLoopCommand(shooterSubsystem));
     // SmartDashboard.putData("Pit/Hood/hoodStop", new HoodOpenLoopCommand(shooterSubsystem, 0.0));
 
