@@ -17,9 +17,9 @@ import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
-public class ThreeCargoAuto extends SequentialCommandGroup {
+public class FiveCargoAuto extends SequentialCommandGroup {
 
-  public ThreeCargoAuto(
+  public FiveCargoAuto(
       VisionSubsystem visionSubsystem,
       TurretSubsystem turretSubsystem,
       ShooterSubsystem shooterSubsystem,
@@ -28,10 +28,13 @@ public class ThreeCargoAuto extends SequentialCommandGroup {
       DriveSubsystem driveSubsystem,
       String path1Name,
       String path2Name,
+      String path3Name,
       Rotation2d gyroOffset,
       double delay,
       double widthPixels1,
-      double widthPixels2) {
+      double widthPixels2,
+      double widthPixels3) {
+
     addCommands(
         new ParallelCommandGroup(
             new PreloadCargoCommand(magazineSubsystem),
@@ -58,8 +61,12 @@ public class ThreeCargoAuto extends SequentialCommandGroup {
             turretSubsystem,
             magazineSubsystem,
             visionSubsystem,
-            true,
+            false,
             intakeSubsystem,
-            widthPixels2));
+            widthPixels2),
+        new ParallelDeadlineGroup(
+            new DriveAutonCommand(driveSubsystem, path3Name, false, true),
+            new ArmShooterCommandGroup(visionSubsystem, turretSubsystem, shooterSubsystem),
+            new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, true, true)));
   }
 }

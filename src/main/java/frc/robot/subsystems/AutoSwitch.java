@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.commands.auton.FiveCargoAuto;
 import frc.robot.commands.auton.ThreeCargoAuto;
 import frc.robot.commands.auton.TwoCargoAuto;
 import frc.robot.commands.drive.DriveAutonCommand;
@@ -144,7 +145,7 @@ public class AutoSwitch {
             "RightCargo1Collect",
             AutoConstants.kRightStartYaw,
             0.0,
-            243.0); // FIXME
+            248.0); // FIXME
       case 0x31:
         return new TwoCargoAuto(
             visionSubsystem,
@@ -156,7 +157,7 @@ public class AutoSwitch {
             "RightCargo1Collect",
             AutoConstants.kRightStartYaw,
             3.0,
-            243.0); // FIXME
+            248.0); // FIXME
       case 0x32:
         return new ThreeCargoAuto(
             visionSubsystem,
@@ -169,7 +170,24 @@ public class AutoSwitch {
             "RightCargo2Collect",
             AutoConstants.kRightStartYaw,
             0.0,
-            243.0); // FIXME
+            248.0,
+            247.0); // FIXME
+      case 0x34:
+        return new FiveCargoAuto(
+            visionSubsystem,
+            turretSubsystem,
+            shooterSubsystem,
+            magazineSubsystem,
+            intakeSubsystem,
+            driveSubsystem,
+            "RightCargo1Collect",
+            "RightCargo2Collect",
+            "RightCargo3Collect",
+            AutoConstants.kRightStartYaw,
+            0.0,
+            248.0,
+            247.0,
+            230.0);
       default:
         String msg = String.format("no auto command assigned for switch position %02X", switchPos);
         DriverStation.reportWarning(msg, false);

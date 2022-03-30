@@ -310,13 +310,12 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     // logger.info("{} -> PAUSE}", currMagazineState);
     enableUpperBeamBreak(true);
     logger.info("Shooting Cargo");
-    logger.info(
-        "lower {} -> WAIT_CARGO, upper {} -> EMPTY",
-        currLowerMagazineState,
-        currUpperMagazineState);
+    if (currLowerMagazineState == LowerMagazineState.STOP) {
+      logger.info("lower {} -> WAIT_CARGO", currLowerMagazineState);
+    }
+    logger.info("upper {} -> EMPTY", currUpperMagazineState);
     currUpperMagazineState = UpperMagazineState.EMPTY;
     continueToShoot = true;
-    currLowerMagazineState = LowerMagazineState.WAIT_CARGO;
     // }
   }
 

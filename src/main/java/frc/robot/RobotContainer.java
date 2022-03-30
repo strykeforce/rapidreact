@@ -67,7 +67,6 @@ import frc.robot.commands.sequences.shooting.VisionShootCommand;
 import frc.robot.commands.shooter.HoodClosedLoopCommand;
 import frc.robot.commands.shooter.HoodOpenLoopCommand;
 import frc.robot.commands.shooter.ShooterOpenLoopCommand;
-import frc.robot.commands.turret.DeadeyeLatencyTestCommandGroup;
 import frc.robot.commands.turret.OpenLoopTurretCommand;
 import frc.robot.commands.turret.RotateToCommand;
 import frc.robot.commands.turret.TurretAimCommandGroup;
@@ -219,7 +218,7 @@ public class RobotContainer {
         .whenReleased(new OpenLoopTurretCommand(turretSubsystem, 0.0));
 
     new JoystickButton(driveJoystick, Button.HAMBURGER.id)
-        .whenPressed(new DeadeyeLatencyTestCommandGroup(visionSubsystem, turretSubsystem));
+        .whenPressed(new DriveAutonCommand(driveSubsystem, "straightPath", true, true));
 
     new JoystickButton(driveJoystick, Trim.LEFT_Y_POS.id)
         .whenPressed(new EnableVisionCommand(visionSubsystem));
