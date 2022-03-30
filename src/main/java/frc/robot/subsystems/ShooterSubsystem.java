@@ -309,7 +309,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
 
   @Override
   public Set<Measure> getMeasures() {
-    return Set.of();
+    return Set.of(new Measure("Shooter State", () -> currentState.ordinal()));
   }
 
   public enum ShooterState {
