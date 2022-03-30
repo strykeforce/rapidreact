@@ -187,7 +187,7 @@ public class AutoSwitch {
             0.0,
             248.0,
             247.0,
-            230.0);
+            138.0);
       default:
         String msg = String.format("no auto command assigned for switch position %02X", switchPos);
         DriverStation.reportWarning(msg, false);

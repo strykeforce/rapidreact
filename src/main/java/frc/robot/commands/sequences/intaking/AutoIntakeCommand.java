@@ -28,7 +28,8 @@ public class AutoIntakeCommand extends CommandBase {
   @Override
   public void initialize() {
     magazineSubsystem.indexCargo();
-    intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeSpeed);
+    intakeSubsystem.openLoopRotate(
+        isAuton ? IntakeConstants.kIntakeSpeedAuto : IntakeConstants.kIntakeSpeed);
     magazineReversed = false;
     if (intakeExtend) intakeSubsystem.extendClosedLoop();
     else intakeSubsystem.retractClosedLoop();
@@ -42,7 +43,8 @@ public class AutoIntakeCommand extends CommandBase {
       magazineReversed = true;
     } else if (magazineReversed
         && (magazineSubsystem.getCurrLowerMagazineState() != LowerMagazineState.EJECT_CARGO)) {
-      intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeSpeed);
+      intakeSubsystem.openLoopRotate(
+          isAuton ? IntakeConstants.kIntakeSpeedAuto : IntakeConstants.kIntakeSpeed);
       magazineReversed = false;
     }
   }
@@ -61,6 +63,6 @@ public class AutoIntakeCommand extends CommandBase {
     } else if (!interrupted) {
       intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeReverseSpeed);
     }
-    intakeSubsystem.retractClosedLoop();
+    if (!isAuton) intakeSubsystem.retractClosedLoop();
   }
 }

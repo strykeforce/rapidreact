@@ -11,7 +11,7 @@ import frc.robot.subsystems.VisionSubsystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class VisionShootAutoCommand extends CommandBase {
+public class VisionShootNoIsFinishedCommand extends CommandBase {
   private ShooterSubsystem shooterSubsystem;
   private TurretSubsystem turretSubsystem;
   private MagazineSubsystem magazineSubsystem;
@@ -20,9 +20,9 @@ public class VisionShootAutoCommand extends CommandBase {
   private boolean isArmed = false;
   private double widthPixels;
   private final boolean disableTrackingOnFinish;
-  private final Logger logger = LoggerFactory.getLogger(VisionShootAutoCommand.class);
+  private final Logger logger = LoggerFactory.getLogger(VisionShootNoIsFinishedCommand.class);
 
-  public VisionShootAutoCommand(
+  public VisionShootNoIsFinishedCommand(
       ShooterSubsystem shooterSubsystem,
       TurretSubsystem turretSubsystem,
       MagazineSubsystem magazineSubsystem,
@@ -30,21 +30,19 @@ public class VisionShootAutoCommand extends CommandBase {
       boolean disableTrackingOnFinish,
       IntakeSubsystem intakeSubsystem,
       double widthPixels) {
-    addRequirements(
-        shooterSubsystem, magazineSubsystem, turretSubsystem, visionSubsystem, intakeSubsystem);
+    addRequirements(shooterSubsystem, turretSubsystem, magazineSubsystem, visionSubsystem);
     this.shooterSubsystem = shooterSubsystem;
     this.turretSubsystem = turretSubsystem;
     this.magazineSubsystem = magazineSubsystem;
     this.visionSubsystem = visionSubsystem;
-    this.disableTrackingOnFinish = disableTrackingOnFinish;
     this.intakeSubsystem = intakeSubsystem;
+    this.disableTrackingOnFinish = disableTrackingOnFinish;
     this.widthPixels = widthPixels;
   }
 
   @Override
   public void initialize() {
-    // Check if Shooter Already Armed and Turret locked on
-    logger.info("Shooting Auto...");
+    logger.info("Shoot No Is Finished");
     if (turretSubsystem.getState() == TurretState.TRACKING) {
       isArmed = true;
       shooterSubsystem.shoot();
@@ -66,9 +64,8 @@ public class VisionShootAutoCommand extends CommandBase {
         && turretSubsystem.getState() == TurretState.TRACKING) {
       shooterSubsystem.shoot();
       magazineSubsystem.shoot();
-      isArmed = true;
     } else if (!isArmed && turretSubsystem.getState() == TurretState.IDLE) {
-      logger.info("Seek failed falling back to manual shoot, Width: {}", widthPixels);
+      logger.info("Seek Failed: falling back to manual, width: {}", widthPixels);
       turretSubsystem.odometryAim();
       shooterSubsystem.manualShoot(widthPixels);
       magazineSubsystem.shoot();
@@ -77,7 +74,7 @@ public class VisionShootAutoCommand extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return magazineSubsystem.isShootSequenceDone();
+    return false;
   }
 
   @Override

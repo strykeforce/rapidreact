@@ -619,7 +619,8 @@ public final class Constants {
 
   public static final class IntakeConstants {
     public static final int kIntakeFalconID = 20;
-    public static final double kIntakeSpeed = 0.5; // 0.4
+    public static final double kIntakeSpeedAuto = 0.5;
+    public static final double kIntakeSpeed = 0.4; // 0.4
     public static final int kIntakeExtendTalonID = 21;
 
     public static final double kIntakeEjectSpeed = -0.5;
@@ -752,15 +753,15 @@ public final class Constants {
       shooterConfig.statorCurrLimit.triggerThresholdTime = 0.001;
       shooterConfig.statorCurrLimit.enable = true;
       shooterConfig.slot0.kP = 0.2;
-      shooterConfig.slot0.kI = 0.0035;
+      shooterConfig.slot0.kI = 0.0035; // 0.0035
       shooterConfig.slot0.kD = 2.0;
       shooterConfig.slot0.kF = 0.0465;
-      shooterConfig.slot0.integralZone = 200;
+      shooterConfig.slot0.integralZone = 150;
       shooterConfig.slot0.maxIntegralAccumulator = 20_000;
       shooterConfig.slot0.allowableClosedloopError = 0;
       shooterConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_20Ms;
       shooterConfig.velocityMeasurementWindow = 16;
-      shooterConfig.voltageCompSaturation = 0;
+      shooterConfig.voltageCompSaturation = 12;
       shooterConfig.voltageMeasurementFilter = 32;
       shooterConfig.peakOutputForward = 1.0;
       shooterConfig.peakOutputReverse = -0.1;
@@ -779,15 +780,15 @@ public final class Constants {
       kickerConfig.statorCurrLimit.triggerThresholdTime = 0.001;
       kickerConfig.statorCurrLimit.enable = true;
       kickerConfig.slot0.kP = 0.2;
-      kickerConfig.slot0.kI = 0.0035;
+      kickerConfig.slot0.kI = 0.0035; // 0.0035
       kickerConfig.slot0.kD = 0.5;
       kickerConfig.slot0.kF = 0.0472;
-      kickerConfig.slot0.integralZone = 200;
+      kickerConfig.slot0.integralZone = 150;
       kickerConfig.slot0.maxIntegralAccumulator = 20_000;
       kickerConfig.slot0.allowableClosedloopError = 0;
       kickerConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_20Ms;
       kickerConfig.velocityMeasurementWindow = 16;
-      kickerConfig.voltageCompSaturation = 0;
+      kickerConfig.voltageCompSaturation = 12;
       kickerConfig.voltageMeasurementFilter = 32;
       kickerConfig.peakOutputForward = 1.0;
       kickerConfig.peakOutputReverse = -0.1;

@@ -18,6 +18,7 @@ public class DriveAutonCommand extends CommandBase {
   private final Rotation2d robotHeading;
   private final boolean resetOdometry;
   private boolean lastPath;
+  private String trajectoryName;
 
   public DriveAutonCommand(
       DriveSubsystem driveSubsystem,
@@ -31,6 +32,7 @@ public class DriveAutonCommand extends CommandBase {
     trajectory = pathdata.trajectory;
     robotHeading = pathdata.targetYaw;
     this.resetOdometry = resetOdometry;
+    this.trajectoryName = trajectoryName;
     timer.start();
   }
 
@@ -44,7 +46,7 @@ public class DriveAutonCommand extends CommandBase {
     driveSubsystem.resetHolonomicController();
     driveSubsystem.grapherTrajectoryActive(true);
     timer.reset();
-    logger.info("Begin Trajectory");
+    logger.info("Begin Trajectory: {}", trajectoryName);
   }
 
   @Override
@@ -68,6 +70,6 @@ public class DriveAutonCommand extends CommandBase {
       driveSubsystem.drive(0, 0, 0);
     }
     driveSubsystem.grapherTrajectoryActive(false);
-    logger.info("End Trajectory: {}", timer.get());
+    logger.info("End Trajectory {}: {}", trajectoryName, timer.get());
   }
 }

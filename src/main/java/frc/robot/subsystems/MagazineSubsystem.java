@@ -236,6 +236,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     currLowerMagazineState = LowerMagazineState.WAIT_CARGO;
     currUpperMagazineState = UpperMagazineState.EMPTY;
     upperClosedLoopRotate(MagazineConstants.kUpperMagazineIntakeSpeed);
+    lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIntakeSpeed);
   }
 
   public void manualLowerMagazine(double lowerSpeed) {
@@ -312,6 +313,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     logger.info("Shooting Cargo");
     if (currLowerMagazineState == LowerMagazineState.STOP) {
       logger.info("lower {} -> WAIT_CARGO", currLowerMagazineState);
+      lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIntakeSpeed);
     }
     logger.info("upper {} -> EMPTY", currUpperMagazineState);
     currUpperMagazineState = UpperMagazineState.EMPTY;
@@ -347,9 +349,9 @@ public class MagazineSubsystem extends MeasurableSubsystem {
           lowerOpenLoopRotate(0.0);
           break;
         } else if (storedCargoColors[1] == CargoColor.NONE) {
-          if (lowerMagazineTalon.getMotorOutputPercent() == 0.0) {
-            lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIntakeSpeed);
-          }
+          // if (lowerMagazineTalon.getMotorOutputPercent() == 0.0) {
+          //   lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIntakeSpeed);
+          // }
         }
         // Knowing when to read cargo color
         if (isLowerBeamBroken()) {
@@ -501,7 +503,9 @@ public class MagazineSubsystem extends MeasurableSubsystem {
         new Measure("red", () -> lastColor.red),
         new Measure("blue", () -> lastColor.blue),
         new Measure("green", () -> lastColor.green),
-        new Measure("Proximity", () -> lastProximity));
+        new Measure("Proximity", () -> lastProximity),
+        new Measure("Lower Mag State", () -> currLowerMagazineState.ordinal()),
+        new Measure("Upper Mag State", () -> currUpperMagazineState.ordinal()));
   }
 
   public enum CargoColor {
