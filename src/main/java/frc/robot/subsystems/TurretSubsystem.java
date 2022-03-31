@@ -66,7 +66,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
     turret.enableCurrentLimit(false);
     turret.enableVoltageCompensation(true);
     turret.configSupplyCurrentLimit(Constants.TurretConstants.getSupplyCurrentLimitConfig());
-    turret.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 10); // FIXME
+    // turret.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 10); // FIXME
     //    turret.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 5);
   }
 
