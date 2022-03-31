@@ -1,24 +1,27 @@
 {
   "camera": "A0",
-  "server": "10.27.67.2",
-  "date": "2022-03-31T10:56:28.669454",
+  "server": "10.27.67.10",
+  "date": "2022-03-31T11:02:17.914890",
   "capture": {
     "config": {
+      "flipMethod": 3,
       "saturation": 2,
-      "ispDigitalGainRange": "1 2",
       "gainRange": "1 4",
-      "exposure": 0.05
+      "ispDigitalGainRange": "1 2",
+      "exposure": 0.05,
+      "captureWidth": 1280,
+      "captureHeight": 720
     },
     "fps": 60,
-    "h": 720,
+    "h": 1280,
     "type": "jetson",
-    "w": 1280
+    "w": 720
   },
   "pipeline": {
     "config": {},
     "filter": {
       "area": [
-        0.0001,
+        0.0002,
         0.01
       ],
       "aspect": [
@@ -38,13 +41,13 @@
       "fps": 1,
       "mount": true,
       "path": "/var/opt/deadeye",
-      "type": "capture"
+      "type": "four_up"
     },
     "sat": [
       200,
       255
     ],
-    "sn": 100,
+    "sn": 319,
     "val": [
       151,
       255
