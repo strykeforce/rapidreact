@@ -519,6 +519,17 @@ public class ClimbSubsystem extends MeasurableSubsystem {
           isClimbDone = true;
         }
         break;
+      case MID_FIN_RET:
+        if (isFixedArmOpenLoopRetractFinished(currFixedArmState.setpoint)) {
+          logger.info("Finished mid climb");
+          shoulderState = ShoulderState.IDLE;
+          currFixedArmState = FixedArmState.IDLE;
+          currPivotArmState = PivotArmState.IDLE;
+          openLoopFixedArm(0.0);
+          openLoopPivotArm(0.0);
+          isClimbDone = true;
+        }
+        break;
     }
     switch (currPivotArmState) {
       case IDLE:
@@ -610,13 +621,19 @@ public class ClimbSubsystem extends MeasurableSubsystem {
             currPivotArmState = PivotArmState.IDLE;
             openLoopPivotArm(0.0);
           } else {
-            logger.info("Finished mid climb");
-            shoulderState = ShoulderState.IDLE;
-            currFixedArmState = FixedArmState.IDLE;
+            logger.info(
+                "Fixed: {} -> MID_FIN_RET, Shoulder: {} -> MID_FIN_PVT_BK",
+                currFixedArmState,
+                shoulderState);
+            currFixedArmState = FixedArmState.MID_FIN_RET;
+            openLoopFixedArm(currFixedArmState.speed);
+            enableFixedRatchet(true);
+            shoulderState = ShoulderState.MID_FIN_PVT_Bk;
+            setShoulderCruise(shoulderState.cruiseVel);
+            rotateShoulder(shoulderState.setpoint);
             currPivotArmState = PivotArmState.IDLE;
-            openLoopFixedArm(0.0);
             openLoopPivotArm(0.0);
-            isClimbDone = true;
+            climbStateCounter++;
           }
         }
         break;
@@ -783,7 +800,13 @@ public class ClimbSubsystem extends MeasurableSubsystem {
       case TVS_PVT_FWD2:
         if (isShoulderFinished()) {
           logger.info("Shoulder: {} -> IDLE", shoulderState);
-          shoulderState = shoulderState.IDLE;
+          shoulderState = ShoulderState.IDLE;
+        }
+        break;
+      case MID_FIN_PVT_Bk:
+        if (isShoulderFinished()) {
+          logger.info("Shoulder: {} -> IDLE", shoulderState);
+          shoulderState = ShoulderState.IDLE;
         }
         break;
     }
@@ -801,7 +824,8 @@ public class ClimbSubsystem extends MeasurableSubsystem {
     TVS_RET_ST1(ClimbConstants.kFTvsRetST1Ticks, false, ClimbConstants.kFTvsRetST1Speed),
     TVS_RET_ST2(ClimbConstants.kFTvsRetST2Ticks, false, ClimbConstants.kFTvsRetST2Speed),
     TVS_EXT_ST1(ClimbConstants.kFTvsExtST1Ticks, true, ClimbConstants.kFTvsExtST1Speed),
-    TVS_EXT_ST2(ClimbConstants.kFTvsExtST2Ticks, true, ClimbConstants.kFTvsExtST2Speed);
+    TVS_EXT_ST2(ClimbConstants.kFTvsExtST2Ticks, true, ClimbConstants.kFTvsExtST2Speed),
+    MID_FIN_RET(ClimbConstants.kFMidFinRetTicks, false, ClimbConstants.kFMidFinRetSpeed);
 
     public final double setpoint;
     public final boolean isExtend;
@@ -854,7 +878,8 @@ public class ClimbSubsystem extends MeasurableSubsystem {
     HIGH_PVT_BK2(ClimbConstants.kHighPvtBk2Ticks, ClimbConstants.kHighPvtBk2Speed),
     TVS_PVT_BK(ClimbConstants.kTvsPvtBkTicks, ClimbConstants.kTvsPvtBkSpeed),
     TVS_PVT_FWD1(ClimbConstants.kTvsPvtFwd1Ticks, ClimbConstants.kTvsPvtFwd1Speed),
-    TVS_PVT_FWD2(ClimbConstants.kTvsPvtFwd2Ticks, ClimbConstants.kTvsPvtFwd2Speed);
+    TVS_PVT_FWD2(ClimbConstants.kTvsPvtFwd2Ticks, ClimbConstants.kTvsPvtFwd2Speed),
+    MID_FIN_PVT_Bk(ClimbConstants.kMidFinPvtBkTicks, ClimbConstants.kMidFinPvtBkSpeed);
 
     public final double setpoint;
     public final double cruiseVel;
