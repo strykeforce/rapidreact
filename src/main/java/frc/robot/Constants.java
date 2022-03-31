@@ -471,6 +471,8 @@ public final class Constants {
     public static final double kFTvsExtST1Ticks = -110_000;
     public static final double kFTvsExtST2Ticks = -150_000;
     public static final double kTvsPvtFwd2Ticks = 2_450;
+    public static final double kFMidFinRetTicks = -75_000;
+    public static final double kMidFinPvtBkTicks = 1_000;
 
     // Climb States -> Desired Open Loop or Close Loop Speed
     public static final double kFMidExtSpeed = -0.8;
@@ -483,7 +485,7 @@ public final class Constants {
     public static final double kPHighRetST1Speed = 0.6;
     public static final double kPHighRetST2Speed = 0.3;
     public static final double kHighPvtBk1Speed = 1_000;
-    public static final double kPHighExtST1Speed = -0.35;
+    public static final double kPHighExtST1Speed = -0.25; // 0.35
     public static final double kPHighExtST2Speed = -0.15;
     public static final double kPHighExtST3Speed = -0.05;
     public static final double kFHighRetST1Speed = 0.3;
@@ -500,6 +502,8 @@ public final class Constants {
     public static final double kFTvsExtST1Speed = -0.4;
     public static final double kFTvsExtST2Speed = -0.1;
     public static final double kTvsPvtFwd2Speed = 1_000;
+    public static final double kFMidFinRetSpeed = 0.5;
+    public static final double kMidFinPvtBkSpeed = 1_000;
 
     // Pivot Arm Falcon Config
     public static SupplyCurrentLimitConfiguration getPivotArmSupplyCurrentLimit() {
@@ -729,14 +733,14 @@ public final class Constants {
     public static final double kHoodOpTicks = 5800;
 
     // High Fender Shot Constants
-    public static final double kKickerFenderHighTicksP100ms = 2000;
-    public static final double kShooterFenderHighTicksP100ms = 10000;
+    public static final double kKickerFenderHighTicksP100ms = 1_900; // 3000 2000
+    public static final double kShooterFenderHighTicksP100ms = 9_900; // 9000 10000
     public static final double kHoodFenderHighTicks = 0;
 
     // Low Fender Shot Constants
     public static final double kKickerFenderLowTicksP100ms = 0; // 3000
-    public static final double kShooterFenderLowTicksP100ms = 6500; // 4000
-    public static final double kHoodFenderLowTicks = 2_600; // 0
+    public static final double kShooterFenderLowTicksP100ms = 6_000; // 4000
+    public static final double kHoodFenderLowTicks = 4_000; // 0
 
     public static final int kStableCounts = 5; // FIX ME
     public static final double kCloseEnoughTicksP100ms = 50; // 100
