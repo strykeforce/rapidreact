@@ -1,24 +1,27 @@
 {
   "camera": "A0",
-  "server": "10.27.67.2",
-  "date": "2022-03-09T16:46:06.950619",
+  "server": "10.27.67.10",
+  "date": "2022-03-30T22:52:00.000000",
   "capture": {
     "config": {
+      "flipMethod": 3,
       "saturation": 2,
-      "ispDigitalGainRange": "1 2",
       "gainRange": "1 4",
-      "exposure": 0.05
+      "ispDigitalGainRange": "1 2",
+      "exposure": 0.05,
+      "captureWidth": 1280,
+      "captureHeight": 720
     },
     "fps": 60,
-    "h": 720,
+    "h": 1280,
     "type": "jetson",
-    "w": 1280
+    "w": 720
   },
   "pipeline": {
     "config": {},
     "filter": {
       "area": [
-        0.0001,
+        0.0002,
         0.01
       ],
       "aspect": [
@@ -44,7 +47,7 @@
       200,
       255
     ],
-    "sn": 29,
+    "sn": 318,
     "val": [
       151,
       255
