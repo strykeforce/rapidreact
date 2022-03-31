@@ -398,7 +398,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
 
       case WAIT_UPPER:
         if (currUpperMagazineState == UpperMagazineState.EMPTY
-            || currUpperMagazineState == UpperMagazineState.CARGO_SHOT) {
+            || currUpperMagazineState == UpperMagazineState.CARGO_SHOT && !isUpperBeamBroken()) {
           logger.info("WAIT_UPPER -> WAIT_EMPTY");
           lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIndexSpeed);
           upperClosedLoopRotate(MagazineConstants.kUpperMagazineIndexSpeed);

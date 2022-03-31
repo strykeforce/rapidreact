@@ -9,7 +9,6 @@ import static frc.robot.Constants.TurretConstants.kTurretZeroTicks;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.BaseTalon;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -66,7 +65,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
     turret.enableCurrentLimit(false);
     turret.enableVoltageCompensation(true);
     turret.configSupplyCurrentLimit(Constants.TurretConstants.getSupplyCurrentLimitConfig());
-    turret.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 10); // FIXME
+    // turret.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 10); // FIXME
     //    turret.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 5);
   }
 
