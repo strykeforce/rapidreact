@@ -54,42 +54,42 @@ class HealthCheckCommand(val driveSubsystem : DriveSubsystem,
                     percentOutput = 0.25
                     supplyCurrentRange = volt3supplyCurrentRange
                     statorCurrentRange = volt3statorCurrentRange
-                    speedRange = 215..250
+                    speedRange = 230..260
                 }
 
                 timedTest {
                     percentOutput = -0.25
                     supplyCurrentRange = volt3supplyCurrentRange
                     statorCurrentRange = volt3statorCurrentRange
-                    speedRange = -250..-215
+                    speedRange = -260..-230
                 }
 
                 timedTest {
                     percentOutput = 0.5
                     supplyCurrentRange = volt6supplyCurrentRange
                     statorCurrentRange = volt6statorCurrentRange
-                    speedRange = 475..535
+                    speedRange = 510..550
                 }
 
                 timedTest {
                     percentOutput = -0.5
                     supplyCurrentRange = volt6supplyCurrentRange
                     statorCurrentRange = volt6statorCurrentRange
-                    speedRange = -535..-475
+                    speedRange = -550..-510
                 }
 
                 timedTest {
                     percentOutput = 0.75
                     supplyCurrentRange = volt9supplyCurrentRange
                     statorCurrentRange = volt9statorCurrentRange
-                    speedRange = 750..820
+                    speedRange = 780..840
                 }
 
                 timedTest {
                     percentOutput = -0.75
                     supplyCurrentRange = volt9supplyCurrentRange
                     statorCurrentRange = volt9statorCurrentRange
-                    speedRange = -820..-750
+                    speedRange = -840..-780
                 }
             }
             // drive
@@ -100,9 +100,9 @@ class HealthCheckCommand(val driveSubsystem : DriveSubsystem,
                     module.driveTalon
                 }
 
-                val volt3supplyCurrentRange = 0.5..1.125
-                val volt6supplyCurrentRange = 1.0..2.0
-                val volt9supplyCurrentRange = 2.5..5.0
+                val volt3supplyCurrentRange = 0.25..0.75
+                val volt6supplyCurrentRange = 0.5..1.1
+                val volt9supplyCurrentRange = 3.5..4.75
 
                 val volt3statorCurrentRange = 0.5..1.125
                 val volt6statorCurrentRange = 1.0..2.0
@@ -112,42 +112,42 @@ class HealthCheckCommand(val driveSubsystem : DriveSubsystem,
                     percentOutput = 0.25
                     supplyCurrentRange = volt3supplyCurrentRange
                     statorCurrentRange = volt3statorCurrentRange
-                    speedRange = 8500..9500
+                    speedRange = 5425..5575
                 }
 
                 timedTest {
                     percentOutput = -0.25
                     supplyCurrentRange = volt3supplyCurrentRange
                     statorCurrentRange = volt3statorCurrentRange
-                    speedRange = -9500..-8500
+                    speedRange = -5575..-5425
                 }
 
                 timedTest {
                     percentOutput = 0.5
                     supplyCurrentRange = volt6supplyCurrentRange
                     statorCurrentRange = volt6statorCurrentRange
-                    speedRange = 17200..19500
+                    speedRange = 10925..11150
                 }
 
                 timedTest {
                     percentOutput = -0.5
                     supplyCurrentRange = volt6supplyCurrentRange
                     statorCurrentRange = volt6statorCurrentRange
-                    speedRange = -19500..-17200
+                    speedRange = -11150..-10925
                 }
 
                 timedTest {
                     percentOutput = 1.0
                     supplyCurrentRange = volt9supplyCurrentRange
                     statorCurrentRange = volt9statorCurrentRange
-                    speedRange = 34750..39500
+                    speedRange = 21350..21800
                 }
 
                 timedTest {
                     percentOutput = -1.0
                     supplyCurrentRange = volt9supplyCurrentRange
                     statorCurrentRange = volt9statorCurrentRange
-                    speedRange = -39500..-34750
+                    speedRange = -21800..-21350
                 }
             }
             // intake

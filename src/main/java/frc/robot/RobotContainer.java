@@ -274,6 +274,8 @@ public class RobotContainer {
     // Auto Intake
     new JoystickButton(xboxController, XboxController.Button.kY.value)
         .toggleWhenPressed(new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, false, true));
+    LeftTriggerDown.whileActiveOnce(new ExtendIntakeCommand(intakeSubsystem, true));
+    RightTriggerDown.whileActiveOnce(new ExtendIntakeCommand(intakeSubsystem, false));
 
     // Eject Cargo Reverse
     new JoystickButton(xboxController, XboxController.Button.kBack.value)
