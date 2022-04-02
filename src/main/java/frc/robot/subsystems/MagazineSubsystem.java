@@ -482,6 +482,8 @@ public class MagazineSubsystem extends MeasurableSubsystem {
           enableUpperBeamBreak(false);
           upperClosedLoopRotate(MagazineConstants.kUpperMagazineFeedSpeed);
           currUpperMagazineState = UpperMagazineState.SHOOT;
+        } else if (turretSubsystem.getState() == TurretState.TRACKING) {
+          shooterSubsystem.shoot();
         }
         break;
 

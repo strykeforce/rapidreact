@@ -183,6 +183,7 @@ public class AutoSwitch {
             "RightCargo1Collect",
             "RightCargo2Collect",
             "RightCargo3Collect",
+            "RightCargo3Shoot",
             AutoConstants.kRightStartYaw,
             0.0,
             248.0,

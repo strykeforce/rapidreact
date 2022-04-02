@@ -1,6 +1,6 @@
 max_velocity = 2.0 #m/s
 max_acceleration = 2.0 #m/s
-start_velocity = 2.0 #m/s
+start_velocity = 2.0 #m/s FIX ME
 end_velocity = 0.0 #m/s
 is_reversed = false
 target_yaw = -135.0 #degrees
