@@ -402,7 +402,11 @@ public class TurretSubsystem extends MeasurableSubsystem {
         } else {
           notValidTargetCount = 0;
         }
-        errorRotation2d = targetData.getErrorRotation2d();
+        if (targetData.isValid()) {
+          errorRotation2d = targetData.getErrorRotation2d();
+        } else {
+          errorRotation2d = Rotation2d.fromDegrees(0);
+        }
 
         if (Math.abs(errorRotation2d.getRadians())
             < TurretConstants.kCloseEnoughTarget.getRadians()) {

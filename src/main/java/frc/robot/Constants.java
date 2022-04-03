@@ -304,6 +304,7 @@ public final class Constants {
     // State Machine Sequence Constants
     public static final double kShootDelay = 0.35; // .35
     public static final double kEjectTimerDelay = 1.0;
+    public static final double kReadTimerDelay = 0.5;
     public static final double kShootUpperBeamStableCounts = 2;
 
     // Lower Magazine Talon Config
@@ -461,7 +462,7 @@ public final class Constants {
     public static final double kTvsDelay = 0.5;
     public static final double kHighPvtBk2Ticks = 1_500;
     public static final double kPHighRet2Ticks = -55_000;
-    public static final double kPTvsExtTicks = -198_000;
+    public static final double kPTvsExtTicks = -205_000; // -198_000
     public static final double kFTvsRetST1Ticks = -20_000;
     public static final double kFTvsRetST2Ticks = -500;
     public static final double kTvsPvtBkTicks = 6_000;

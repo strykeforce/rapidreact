@@ -163,14 +163,14 @@ class HealthCheckCommand(val driveSubsystem : DriveSubsystem,
                     percentOutput = 0.5
                     supplyCurrentRange = volt6supplyCurrentRange
                     statorCurrentRange = volt6statorCurrentRange
-                    speedRange = 3500..4500
+                    speedRange = 10850..11000
                 }
 
                 timedTest {
                     percentOutput = -0.5
                     supplyCurrentRange = volt6supplyCurrentRange
                     statorCurrentRange = volt6statorCurrentRange
-                    speedRange = -4500..-3500
+                    speedRange = -11000..-10850
                 }
             }
             // magazine
@@ -178,8 +178,8 @@ class HealthCheckCommand(val driveSubsystem : DriveSubsystem,
                 name = "Magazine Tests"
                 talons = magazineSubsystem.talons
 
-                val volt6supplyCurrentRange = 1.0..4.0
-                val volt12supplyCurrentRange = 13.0..17.0
+                val volt6supplyCurrentRange = 3.5..4.2
+                val volt12supplyCurrentRange = 6.5..7.0
 
                 val volt6statorCurrentRange = 1.0..4.0
                 val volt12statorCurrentRange = 13.0..17.0
@@ -188,28 +188,28 @@ class HealthCheckCommand(val driveSubsystem : DriveSubsystem,
                     percentOutput = 0.5
                     supplyCurrentRange = volt6supplyCurrentRange
                     statorCurrentRange = volt6statorCurrentRange
-                    speedRange = 2000..3000
+                    speedRange = 6000..6050
                 }
 
                 timedTest {
                     percentOutput = -0.5
                     supplyCurrentRange = volt6supplyCurrentRange
                     statorCurrentRange = volt6statorCurrentRange
-                    speedRange = -3000..-2000
+                    speedRange = -5400..-5100
                 }
 
                 timedTest {
                     percentOutput = 0.8
                     supplyCurrentRange = volt12supplyCurrentRange
                     statorCurrentRange = volt12statorCurrentRange
-                    speedRange = 3500..5000
+                    speedRange = 10300..10700
                 }
 
                 timedTest {
                     percentOutput = -0.8
                     supplyCurrentRange = volt12supplyCurrentRange
                     statorCurrentRange = volt12statorCurrentRange
-                    speedRange = -5000..-3500
+                    speedRange = -9400..-8500
                 }
             }
             // turret

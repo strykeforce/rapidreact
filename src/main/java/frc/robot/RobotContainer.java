@@ -127,7 +127,7 @@ public class RobotContainer {
     visionSubsystem = new VisionSubsystem();
     turretSubsystem = new TurretSubsystem(visionSubsystem, driveSubsystem);
     climbSubsystem = new ClimbSubsystem();
-    magazineSubsystem = new MagazineSubsystem(turretSubsystem);
+    magazineSubsystem = new MagazineSubsystem(turretSubsystem, visionSubsystem);
     shooterSubsystem = new ShooterSubsystem(magazineSubsystem, visionSubsystem);
     intakeSubsystem = new IntakeSubsystem();
     odometryTestSubsystem = new OdometryTestSubsystem();

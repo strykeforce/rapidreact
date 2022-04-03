@@ -189,6 +189,23 @@ public class AutoSwitch {
             248.0,
             247.0,
             138.0);
+      case 0x35:
+        return new FiveCargoAuto(
+            visionSubsystem,
+            turretSubsystem,
+            shooterSubsystem,
+            magazineSubsystem,
+            intakeSubsystem,
+            driveSubsystem,
+            "RightCargo1Collect",
+            "BlueRightCargo2Collect",
+            "BlueRightCargo3Collect",
+            "BlueRightCargo3Shoot",
+            AutoConstants.kRightStartYaw,
+            0.0,
+            248.0,
+            247.0,
+            138.0);
       default:
         String msg = String.format("no auto command assigned for switch position %02X", switchPos);
         DriverStation.reportWarning(msg, false);
