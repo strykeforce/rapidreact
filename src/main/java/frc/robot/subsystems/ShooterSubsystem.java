@@ -207,8 +207,10 @@ public class ShooterSubsystem extends MeasurableSubsystem {
   }
 
   public void shoot() {
-    logger.info("SHOOT: {} -> ADJUSTING", currentState);
-    currentState = ShooterState.ADJUSTING;
+    if (currentState != ShooterState.SHOOT) {
+      logger.info("SHOOT: {} -> ADJUSTING", currentState);
+      currentState = ShooterState.ADJUSTING;
+    }
     if (!magazineSubsystem.isNextCargoAlliance()) {
       shooterClosedLoop(
           ShooterConstants.kKickerOpTicksP100ms, ShooterConstants.kShooterOpTicksP100ms);

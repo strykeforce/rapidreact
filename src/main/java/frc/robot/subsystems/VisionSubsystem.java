@@ -99,6 +99,10 @@ public class VisionSubsystem extends MeasurableSubsystem
     return td.testGetTargetsPixelWidth();
   }
 
+  public boolean isValid() {
+    return targetData.isValid();
+  }
+
   private double getValid() {
     var td = targetData;
     return td.isValid() ? 1.0 : 0.0;

@@ -510,13 +510,20 @@ public class ClimbSubsystem extends MeasurableSubsystem {
           // logger.info("Fixed: {} -> IDLE", currFixedArmState);
           // currFixedArmState = FixedArmState.IDLE;
           // openLoopFixedArm(0.0);
-          logger.info("Finished traverse climb");
-          shoulderState = ShoulderState.IDLE;
+          logger.info(
+              "Fixed: {} -> TVS_RET2, Pivot: {} -> TVS_RET2", currFixedArmState, currPivotArmState);
+          currFixedArmState = FixedArmState.TVS_RET2;
+          currPivotArmState = PivotArmState.TVS_RET2;
+          openLoopFixedArm(currFixedArmState.speed);
+          openLoopPivotArm(currPivotArmState.speed);
+          climbStateCounter++;
+        }
+        break;
+      case TVS_RET2:
+        if (isFixedArmOpenLoopRetractFinished(currFixedArmState.setpoint)) {
+          logger.info("fixed: {} -> idle", currFixedArmState);
           currFixedArmState = FixedArmState.IDLE;
-          currPivotArmState = PivotArmState.IDLE;
           openLoopFixedArm(0.0);
-          openLoopPivotArm(0.0);
-          isClimbDone = true;
         }
         break;
       case MID_FIN_RET:
@@ -722,6 +729,17 @@ public class ClimbSubsystem extends MeasurableSubsystem {
           climbStateCounter++;
         }
         break;
+      case TVS_RET2:
+        if (isPivotArmOpenLoopRetractFinished(currPivotArmState.setpoint)) {
+          logger.info("Finished traverse climb");
+          shoulderState = ShoulderState.IDLE;
+          currFixedArmState = FixedArmState.IDLE;
+          currPivotArmState = PivotArmState.IDLE;
+          openLoopFixedArm(0.0);
+          openLoopPivotArm(0.0);
+          isClimbDone = true;
+        }
+        break;
     }
     switch (shoulderState) {
       case IDLE:
@@ -825,6 +843,7 @@ public class ClimbSubsystem extends MeasurableSubsystem {
     TVS_RET_ST2(ClimbConstants.kFTvsRetST2Ticks, false, ClimbConstants.kFTvsRetST2Speed),
     TVS_EXT_ST1(ClimbConstants.kFTvsExtST1Ticks, true, ClimbConstants.kFTvsExtST1Speed),
     TVS_EXT_ST2(ClimbConstants.kFTvsExtST2Ticks, true, ClimbConstants.kFTvsExtST2Speed),
+    TVS_RET2(ClimbConstants.kFTvsRet2Ticks, false, ClimbConstants.kFTvsRet2Speed),
     MID_FIN_RET(ClimbConstants.kFMidFinRetTicks, false, ClimbConstants.kFMidFinRetSpeed);
 
     public final double setpoint;
@@ -856,7 +875,8 @@ public class ClimbSubsystem extends MeasurableSubsystem {
     HIGH_RET2(ClimbConstants.kPHighRet2Ticks, false, ClimbConstants.kPHighRet2Speed),
     TVS_EXT(ClimbConstants.kPTvsExtTicks, true, ClimbConstants.kPTvsExtSpeed),
     TVS_RET_ST1(ClimbConstants.kPTvsRetST1Ticks, false, ClimbConstants.kPTvsRetST1Speed),
-    TVS_RET_ST2(ClimbConstants.kPTvsRetST2Ticks, false, ClimbConstants.kPTvsRetST2Speed);
+    TVS_RET_ST2(ClimbConstants.kPTvsRetST2Ticks, false, ClimbConstants.kPTvsRetST2Speed),
+    TVS_RET2(ClimbConstants.kPTvsRet2Ticks, false, ClimbConstants.kPTvsRet2Speed);
 
     public final double setpoint;
     public final boolean isExtend;

@@ -209,8 +209,8 @@ public final class Constants {
     public static final int kTurretId = 50;
     public static final double kFastCruiseVelocity = 4_000;
     public static final double kSlowCruiseVelocity = 4_000; // 2000
-    public static final double kFastAccel = 20_000;
-    public static final double kSlowAccel = 20_000;
+    public static final double kFastAccel = 15_000; // 20_000
+    public static final double kSlowAccel = 15_000; // 20_000
     public static final int kTurretZeroTicks = 1_161; // 1250, 1194
     public static final int kForwardLimit = 20_000; // 13_800 14
     public static final int kReverseLimit = -20_000; // 13_800 14
@@ -304,6 +304,7 @@ public final class Constants {
     // State Machine Sequence Constants
     public static final double kShootDelay = 0.35; // .35
     public static final double kEjectTimerDelay = 1.0;
+    public static final double kReadTimerDelay = 0.5;
     public static final double kShootUpperBeamStableCounts = 2;
 
     // Lower Magazine Talon Config
@@ -461,7 +462,7 @@ public final class Constants {
     public static final double kTvsDelay = 0.5;
     public static final double kHighPvtBk2Ticks = 1_500;
     public static final double kPHighRet2Ticks = -55_000;
-    public static final double kPTvsExtTicks = -198_000;
+    public static final double kPTvsExtTicks = -205_000; // -198_000
     public static final double kFTvsRetST1Ticks = -20_000;
     public static final double kFTvsRetST2Ticks = -500;
     public static final double kTvsPvtBkTicks = 6_000;
@@ -471,6 +472,8 @@ public final class Constants {
     public static final double kFTvsExtST1Ticks = -110_000;
     public static final double kFTvsExtST2Ticks = -150_000;
     public static final double kTvsPvtFwd2Ticks = 2_450;
+    public static final double kFTvsRet2Ticks = -20_000;
+    public static final double kPTvsRet2Ticks = -60_000;
     public static final double kFMidFinRetTicks = -75_000;
     public static final double kMidFinPvtBkTicks = 1_000;
 
@@ -502,6 +505,8 @@ public final class Constants {
     public static final double kFTvsExtST1Speed = -0.4;
     public static final double kFTvsExtST2Speed = -0.1;
     public static final double kTvsPvtFwd2Speed = 1_000;
+    public static final double kFTvsRet2Speed = 0.5;
+    public static final double kPTvsRet2Speed = 0.3;
     public static final double kFMidFinRetSpeed = 0.5;
     public static final double kMidFinPvtBkSpeed = 1_000;
 
@@ -636,7 +641,7 @@ public final class Constants {
 
     public static final double kCloseEnoughTicks = 150;
     public static final double kIntakeExtendPos = 14_000; // FIXME insert actual value
-    public static final double kIntakeRetractPos = 200; // FIXME insert actual value
+    public static final double kIntakeRetractPos = 2_000; // FIXME insert actual value
 
     public static TalonFXConfiguration getIntakeFalconConfig() {
       TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
@@ -733,14 +738,14 @@ public final class Constants {
     public static final double kHoodOpTicks = 5800;
 
     // High Fender Shot Constants
-    public static final double kKickerFenderHighTicksP100ms = 1_900; // 3000 2000
-    public static final double kShooterFenderHighTicksP100ms = 9_900; // 9000 10000
+    public static final double kKickerFenderHighTicksP100ms = 2_000; // 1900
+    public static final double kShooterFenderHighTicksP100ms = 10_000; // 9900
     public static final double kHoodFenderHighTicks = 0;
 
     // Low Fender Shot Constants
-    public static final double kKickerFenderLowTicksP100ms = 0; // 3000
-    public static final double kShooterFenderLowTicksP100ms = 6_000; // 4000
-    public static final double kHoodFenderLowTicks = 4_000; // 0
+    public static final double kKickerFenderLowTicksP100ms = 0; // 0
+    public static final double kShooterFenderLowTicksP100ms = 6_500; // 6000
+    public static final double kHoodFenderLowTicks = 2_600; // 4000
 
     public static final int kStableCounts = 5; // FIX ME
     public static final double kCloseEnoughTicksP100ms = 50; // 100

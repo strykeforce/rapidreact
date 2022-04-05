@@ -30,6 +30,7 @@ public class FiveCargoAuto extends SequentialCommandGroup {
       String path1Name,
       String path2Name,
       String path3Name,
+      String path4Name,
       Rotation2d gyroOffset,
       double delay,
       double widthPixels1,
@@ -69,6 +70,7 @@ public class FiveCargoAuto extends SequentialCommandGroup {
             new DriveAutonCommand(driveSubsystem, path3Name, false, true),
             new ArmShooterCommandGroup(visionSubsystem, turretSubsystem, shooterSubsystem),
             new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, true, true)),
+        new DriveAutonCommand(driveSubsystem, path4Name, false, true),
         new VisionShootNoIsFinishedCommand(
             shooterSubsystem,
             turretSubsystem,
