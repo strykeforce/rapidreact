@@ -4,50 +4,65 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
-import frc.robot.subsystems.MagazineSubsystem.MagazineState;
+import frc.robot.subsystems.MagazineSubsystem.LowerMagazineState;
 
 public class AutoIntakeCommand extends CommandBase {
   public final MagazineSubsystem magazineSubsystem;
   public final IntakeSubsystem intakeSubsystem;
   public boolean magazineReversed = false;
+  public boolean isAuton;
+  public boolean intakeExtend;
 
-  public AutoIntakeCommand(MagazineSubsystem magazineSubsystem, IntakeSubsystem intakeSubsystem) {
+  public AutoIntakeCommand(
+      MagazineSubsystem magazineSubsystem,
+      IntakeSubsystem intakeSubsystem,
+      boolean isAuton,
+      boolean intakeExtend) {
     addRequirements(magazineSubsystem, intakeSubsystem);
     this.magazineSubsystem = magazineSubsystem;
     this.intakeSubsystem = intakeSubsystem;
+    this.isAuton = isAuton;
+    this.intakeExtend = intakeExtend;
   }
 
   @Override
   public void initialize() {
     magazineSubsystem.indexCargo();
-    intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeSpeed);
+    intakeSubsystem.openLoopRotate(
+        isAuton ? IntakeConstants.kIntakeSpeedAuto : IntakeConstants.kIntakeSpeed);
     magazineReversed = false;
+    if (intakeExtend) intakeSubsystem.extendClosedLoop();
+    else intakeSubsystem.retractClosedLoop();
   }
 
   @Override
   public void execute() {
-    if (magazineSubsystem.getCurrMagazineState() == MagazineState.EJECT_CARGO
+    if (magazineSubsystem.getCurrLowerMagazineState() == LowerMagazineState.EJECT_CARGO
         && !magazineReversed) {
       intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeEjectSpeed);
       magazineReversed = true;
     } else if (magazineReversed
-        && (magazineSubsystem.getCurrMagazineState() != MagazineState.EJECT_CARGO)) {
-      intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeSpeed);
+        && (magazineSubsystem.getCurrLowerMagazineState() != LowerMagazineState.EJECT_CARGO)) {
+      intakeSubsystem.openLoopRotate(
+          isAuton ? IntakeConstants.kIntakeSpeedAuto : IntakeConstants.kIntakeSpeed);
       magazineReversed = false;
     }
   }
 
   @Override
   public boolean isFinished() {
-    return magazineSubsystem.isMagazineFull();
+    return magazineSubsystem.isMagazineFull()
+        && magazineSubsystem.getCurrLowerMagazineState() == LowerMagazineState.WAIT_UPPER;
   }
 
   @Override
   public void end(boolean interrupted) {
-    if (interrupted) {
+    if (interrupted && !isAuton) {
       magazineSubsystem.magazineInterrupted();
+      intakeSubsystem.openLoopRotate(0.0);
+    } else if (!interrupted) {
+      intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeReverseSpeed);
     }
-
-    intakeSubsystem.openLoopRotate(0.0);
+    if (!isAuton) intakeSubsystem.retractClosedLoop();
   }
 }

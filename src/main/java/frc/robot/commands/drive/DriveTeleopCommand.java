@@ -1,5 +1,7 @@
 package frc.robot.commands.drive;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.DriveConstants;
@@ -23,6 +25,9 @@ public class DriveTeleopCommand extends CommandBase {
                   * Math.pow((Math.sqrt(2) - DriveConstants.kDeadbandAllStick), 3)
               + (1 - DriveConstants.kExpoScaleMoveFactor)
                   * (Math.sqrt(2) - DriveConstants.kDeadbandAllStick));
+  private final SlewRateLimiter fwdLimiter = new SlewRateLimiter(DriveConstants.kRateLimitFwdStr);
+  private final SlewRateLimiter strLimiter = new SlewRateLimiter(DriveConstants.kRateLimitFwdStr);
+  private final SlewRateLimiter yawLimiter = new SlewRateLimiter(DriveConstants.kRateLimitYaw);
 
   public DriveTeleopCommand(Joystick driver, DriveSubsystem driveSubsystem) {
     addRequirements(driveSubsystem);
@@ -43,10 +48,21 @@ public class DriveTeleopCommand extends CommandBase {
             joystick.getRawAxis(RobotContainer.Axis.RIGHT_Y.id));
 
     driveSubsystem.drive(
-        DriveConstants.kMaxSpeedMetersPerSecond * -adjustedValues[0],
-        DriveConstants.kMaxSpeedMetersPerSecond * -adjustedValues[1],
-        DriveConstants.kMaxOmega * -adjustedValues[2]);
-    driveSubsystem.setJoystickValues(adjustedValues, rawValues);
+        -DriveConstants.kMaxSpeedMetersPerSecond
+            * fwdLimiter.calculate(
+                MathUtil.applyDeadband(
+                    joystick.getRawAxis(RobotContainer.Axis.LEFT_X.id),
+                    DriveConstants.kDeadbandAllStick)),
+        -DriveConstants.kMaxSpeedMetersPerSecond
+            * strLimiter.calculate(
+                MathUtil.applyDeadband(
+                    joystick.getRawAxis(RobotContainer.Axis.LEFT_Y.id),
+                    DriveConstants.kDeadbandAllStick)),
+        -DriveConstants.kMaxOmega
+            * yawLimiter.calculate(
+                MathUtil.applyDeadband(
+                    joystick.getRawAxis(RobotContainer.Axis.RIGHT_Y.id),
+                    DriveConstants.kDeadbandAllStick)));
   }
 
   @Override
@@ -80,7 +96,6 @@ public class DriveTeleopCommand extends CommandBase {
     double rawAngle = Math.atan2(rawForward, rawStrafe);
     double orgMag = (Math.sqrt(Math.pow(rawForward, 2) + Math.pow(rawStrafe, 2)));
     double adjustedMag = applyVectorDeadBand(orgMag);
-    adjustedMag = rateLimitMove.apply(adjustedMag);
     tempAdjustedValues[0] = Math.sin(rawAngle) * adjustedMag;
     tempAdjustedValues[1] = Math.cos(rawAngle) * adjustedMag;
     tempAdjustedValues[2] = rateLimitYaw.apply(expoScaleYaw.apply(rawYaw));

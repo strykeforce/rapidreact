@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.sequences.SetAllianceCommand;
 import frc.robot.commands.vision.DisableVisionCommand;
-import frc.robot.commands.vision.EnableVisionCommand;
+import frc.robot.commands.vision.TurnOnDeadeyeCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +49,7 @@ public class Robot extends TimedRobot {
     haveAlliance = false;
 
     CommandScheduler.getInstance()
-        .schedule(new EnableVisionCommand(m_robotContainer.getVisionSubsystem()));
+        .schedule(new TurnOnDeadeyeCommand(m_robotContainer.getVisionSubsystem()));
 
     Shuffleboard.getTab("Match")
         .add("SetAllianceRed", new SetAllianceCommand(Alliance.Red, m_robotContainer))
@@ -89,6 +89,7 @@ public class Robot extends TimedRobot {
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
+    logger.info("Disabled Init");
     CommandScheduler.getInstance()
         .schedule(
             new DisableVisionCommand(m_robotContainer.getVisionSubsystem())
@@ -103,6 +104,7 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    logger.info("Auto Init");
     Command autoCommand = m_robotContainer.getAutoSwitch().getAutoCommand();
     if (autoCommand != null) {
       autoCommand.schedule();
@@ -116,8 +118,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    m_robotContainer.zeroClimb();
     logger.info("TeleopInit");
+    m_robotContainer.zeroClimb();
   }
 
   /** This function is called periodically during operator control. */

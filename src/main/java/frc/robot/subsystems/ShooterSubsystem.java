@@ -100,6 +100,10 @@ public class ShooterSubsystem extends MeasurableSubsystem {
 
   private double[] getShootSolution() {
     double widthPixels = visionSubsystem.getTargetPixelWidth();
+    return getShootSolution(widthPixels);
+  }
+
+  private double[] getShootSolution(double widthPixels) {
     int index = 0;
     double[] shootSolution = new double[3];
     if (widthPixels < ShooterConstants.kLookupMinPixel) {
@@ -203,8 +207,10 @@ public class ShooterSubsystem extends MeasurableSubsystem {
   }
 
   public void shoot() {
-    logger.info("SHOOT: {} -> ADJUSTING", currentState);
-    currentState = ShooterState.ADJUSTING;
+    if (currentState != ShooterState.SHOOT) {
+      logger.info("SHOOT: {} -> ADJUSTING", currentState);
+      currentState = ShooterState.ADJUSTING;
+    }
     if (!magazineSubsystem.isNextCargoAlliance()) {
       shooterClosedLoop(
           ShooterConstants.kKickerOpTicksP100ms, ShooterConstants.kShooterOpTicksP100ms);
@@ -214,6 +220,14 @@ public class ShooterSubsystem extends MeasurableSubsystem {
       shooterClosedLoop(shootSolution[0], shootSolution[1]);
       hoodClosedLoop(shootSolution[2]);
     }
+  }
+
+  public void manualShoot(double widthPixels) {
+    logger.info("No vision: SHOOT: {} -> ADJUSTING", currentState);
+    currentState = ShooterState.ADJUSTING;
+    double[] shootSolution = getShootSolution(widthPixels);
+    shooterClosedLoop(shootSolution[0], shootSolution[1]);
+    hoodClosedLoop(shootSolution[2]);
   }
 
   public void fenderShot() {
@@ -297,7 +311,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
 
   @Override
   public Set<Measure> getMeasures() {
-    return Set.of();
+    return Set.of(new Measure("Shooter State", () -> currentState.ordinal()));
   }
 
   public enum ShooterState {

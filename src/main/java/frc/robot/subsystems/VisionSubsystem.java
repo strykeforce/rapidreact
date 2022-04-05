@@ -34,13 +34,18 @@ public class VisionSubsystem extends MeasurableSubsystem
     return targetData;
   }
 
-  public void enable() {
+  public void turnOnDeadeye() {
     deadeye.setEnabled(true);
+    logger.info("Vision is turned on");
+  }
+
+  public void enable() {
+    deadeye.setLightEnabled(true);
     logger.info("enabled vision system");
   }
 
   public void disable() {
-    deadeye.setEnabled(false);
+    deadeye.setLightEnabled(false);
     logger.info("disabled vision system");
   }
 
@@ -48,6 +53,7 @@ public class VisionSubsystem extends MeasurableSubsystem
   public @NotNull Set<Measure> getMeasures() {
     return Set.of(
         new Measure("Error Pixels", this::getErrorPixels),
+        new Measure("Error Pixels Jetson", this::getErrorPixelsJetson),
         new Measure("Error Radians", this::getErrorRadians),
         new Measure("Error Degrees", this::getErrorDegrees),
         new Measure("Target Data Valid", this::getValid),
@@ -61,6 +67,11 @@ public class VisionSubsystem extends MeasurableSubsystem
   private double getErrorPixels() {
     var td = targetData;
     return td.isValid() ? td.getErrorPixels() : 2767.0;
+  }
+
+  private double getErrorPixelsJetson() {
+    var td = targetData;
+    return td.isValid() ? td.getErrorPixelsJetson() : 2767.0;
   }
 
   private double getErrorRadians() {
@@ -86,6 +97,10 @@ public class VisionSubsystem extends MeasurableSubsystem
   public double getTargetPixelWidth() {
     var td = targetData;
     return td.testGetTargetsPixelWidth();
+  }
+
+  public boolean isValid() {
+    return targetData.isValid();
   }
 
   private double getValid() {

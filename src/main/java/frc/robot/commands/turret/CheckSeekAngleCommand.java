@@ -13,6 +13,6 @@ public class CheckSeekAngleCommand extends InstantCommand {
 
   @Override
   public void initialize() {
-    turretSubsystem.setSeekAngle(true);
+    turretSubsystem.setSeekAngleLeft(true);
   }
 }

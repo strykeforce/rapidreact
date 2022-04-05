@@ -8,13 +8,17 @@ import frc.robot.commands.climb.InitiateClimbCommand;
 import frc.robot.commands.drive.DriveClimbCommand;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.TurretSubsystem;
 
 public class MidClimbCommandGroup extends SequentialCommandGroup {
   public MidClimbCommandGroup(
-      ClimbSubsystem climbSubsystem, DriveSubsystem driveSubsystem, Joystick driveJoystick) {
+      ClimbSubsystem climbSubsystem,
+      DriveSubsystem driveSubsystem,
+      Joystick driveJoystick,
+      TurretSubsystem turretSubsystem) {
     addCommands(
         new ParallelCommandGroup(
-            new InitiateClimbCommand(climbSubsystem),
+            new InitiateClimbCommand(climbSubsystem, turretSubsystem),
             new DriveClimbCommand(driveSubsystem, driveJoystick, climbSubsystem)),
         new AutoMidClimbCommand(climbSubsystem));
   }

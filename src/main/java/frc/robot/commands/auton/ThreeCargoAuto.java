@@ -17,26 +17,40 @@ import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
-public class TwoCargoAuto extends SequentialCommandGroup {
+public class ThreeCargoAuto extends SequentialCommandGroup {
 
-  public TwoCargoAuto(
+  public ThreeCargoAuto(
       VisionSubsystem visionSubsystem,
       TurretSubsystem turretSubsystem,
       ShooterSubsystem shooterSubsystem,
       MagazineSubsystem magazineSubsystem,
       IntakeSubsystem intakeSubsystem,
       DriveSubsystem driveSubsystem,
-      String pathName,
+      String path1Name,
+      String path2Name,
       Rotation2d gyroOffset,
       double delay,
-      double widthPixels) {
+      double widthPixels1,
+      double widthPixels2) {
     addCommands(
         new ParallelCommandGroup(
             new PreloadCargoCommand(magazineSubsystem),
             new OffsetGyroCommand(driveSubsystem, gyroOffset)),
         new WaitCommand(delay),
         new ParallelDeadlineGroup(
-            new DriveAutonCommand(driveSubsystem, pathName, true, false), // deadline
+            new DriveAutonCommand(driveSubsystem, path1Name, true, false), // deadline
+            new ArmShooterCommandGroup(visionSubsystem, turretSubsystem, shooterSubsystem),
+            new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, true, true)),
+        new VisionShootAutoCommand(
+            shooterSubsystem,
+            turretSubsystem,
+            magazineSubsystem,
+            visionSubsystem,
+            false,
+            intakeSubsystem,
+            widthPixels1),
+        new ParallelDeadlineGroup(
+            new DriveAutonCommand(driveSubsystem, path2Name, false, true),
             new ArmShooterCommandGroup(visionSubsystem, turretSubsystem, shooterSubsystem),
             new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, true, true)),
         new VisionShootAutoCommand(
@@ -46,6 +60,6 @@ public class TwoCargoAuto extends SequentialCommandGroup {
             visionSubsystem,
             true,
             intakeSubsystem,
-            widthPixels));
+            widthPixels2));
   }
 }

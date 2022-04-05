@@ -50,8 +50,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private State holoContInput = new State();
   private Rotation2d holoContAngle = new Rotation2d();
   private Double trajectoryActive = 0.0;
-  private double[] rawValues = new double[3];
-  private double[] adjustedValues = new double[3];
+  private final double[] lastVelocity = new double[3];
 
   public DriveSubsystem() {
 
@@ -116,6 +115,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public void drive(
       double forwardMetersPerSec, double strafeMetersPerSec, double yawRadiansPerSec) {
+    lastVelocity[0] = forwardMetersPerSec;
+    lastVelocity[1] = strafeMetersPerSec;
+    lastVelocity[2] = yawRadiansPerSec;
     swerveDrive.drive(forwardMetersPerSec, strafeMetersPerSec, yawRadiansPerSec, true);
   }
 
@@ -125,12 +127,14 @@ public class DriveSubsystem extends MeasurableSubsystem {
       double strafeMetersPerSec,
       double yawRadiansPerSec,
       Boolean isFieldOriented) {
+    lastVelocity[0] = forwardMetersPerSec;
+    lastVelocity[1] = strafeMetersPerSec;
+    lastVelocity[2] = yawRadiansPerSec;
     swerveDrive.move(forwardMetersPerSec, strafeMetersPerSec, yawRadiansPerSec, isFieldOriented);
   }
 
-  public void setJoystickValues(double[] adj, double[] raw) {
-    adjustedValues = adj;
-    rawValues = raw;
+  public double[] getDriveVelocity() {
+    return lastVelocity;
   }
 
   @Override
@@ -198,10 +202,13 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public void resetOdometry(Pose2d pose) {
     swerveDrive.resetOdometry(pose);
+    logger.info("reset odometry with: {}", pose);
+  }
+
+  public void resetHolonomicController() {
     xController.reset();
     yController.reset();
-    omegaController.reset(pose.getRotation().getRadians());
-    logger.info("reset odometry with: {}", pose);
+    omegaController.reset(getGyroRotation2d().getRadians());
   }
 
   public Pose2d getPoseMeters() {
@@ -323,11 +330,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure("Wheel 2 Speed", () -> getSwerveModuleStates()[2].speedMetersPerSecond),
         new Measure("Wheel 3 Angle", () -> getSwerveModuleStates()[3].angle.getDegrees()),
         new Measure("Wheel 3 Speed", () -> getSwerveModuleStates()[3].speedMetersPerSecond),
-        new Measure("rawFwd", () -> rawValues[0]),
-        new Measure("rawStr", () -> rawValues[1]),
-        new Measure("rawYaw", () -> rawValues[2]),
-        new Measure("adjFwd", () -> adjustedValues[0]),
-        new Measure("adjStr", () -> adjustedValues[1]),
-        new Measure("adjYaw", () -> adjustedValues[2]));
+        new Measure("FWD Vel", () -> lastVelocity[0]),
+        new Measure("STR Vel", () -> lastVelocity[1]),
+        new Measure("YAW Vel", () -> lastVelocity[2]));
   }
 }
