@@ -57,7 +57,7 @@ public final class Constants {
 
     public static final double kExpoScaleMoveFactor = 0.4;
     public static final double kRateLimitMove = 0.3;
-    public static double kExpoScaleYawFactor = 0.4;
+    public static final double kExpoScaleYawFactor = 0.4;
 
     static {
       // logger.debug("kMaxOmega = {}", kMaxOmega);

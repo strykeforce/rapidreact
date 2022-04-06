@@ -8,7 +8,6 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.DriveSubsystem;
 import org.strykeforce.thirdcoast.util.ExpoScale;
-import org.strykeforce.thirdcoast.util.RateLimit;
 
 public class DriveTeleopCommand extends CommandBase {
   private final Joystick joystick;
@@ -16,8 +15,8 @@ public class DriveTeleopCommand extends CommandBase {
   private double[] rawValues = new double[3];
   private final ExpoScale expoScaleYaw =
       new ExpoScale(DriveConstants.kDeadbandAllStick, DriveConstants.kExpoScaleYawFactor);
-  private final RateLimit rateLimitYaw = new RateLimit(DriveConstants.kRateLimitYaw);
-  private final RateLimit rateLimitMove = new RateLimit(DriveConstants.kRateLimitMove);
+  // private final RateLimit rateLimitYaw = new RateLimit(DriveConstants.kRateLimitYaw);
+  // private final RateLimit rateLimitMove = new RateLimit(DriveConstants.kRateLimitMove);
   private double[] adjustedValues = new double[3];
   private final double vectorOffset =
       Math.sqrt(2)
@@ -98,7 +97,7 @@ public class DriveTeleopCommand extends CommandBase {
     double adjustedMag = applyVectorDeadBand(orgMag);
     tempAdjustedValues[0] = Math.sin(rawAngle) * adjustedMag;
     tempAdjustedValues[1] = Math.cos(rawAngle) * adjustedMag;
-    tempAdjustedValues[2] = rateLimitYaw.apply(expoScaleYaw.apply(rawYaw));
+    tempAdjustedValues[2] = expoScaleYaw.apply(rawYaw);
 
     return tempAdjustedValues;
   }
