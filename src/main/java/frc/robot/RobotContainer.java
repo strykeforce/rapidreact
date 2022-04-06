@@ -376,8 +376,13 @@ public class RobotContainer {
 
     Shuffleboard.getTab("Match")
         .addBoolean("IgnoreColorSensor", () -> magazineSubsystem.isColorSensorIgnored())
-        .withSize(2, 2)
+        .withSize(2, 1)
         .withPosition(3, 0);
+
+    Shuffleboard.getTab("Match")
+        .addBoolean("VisionNotWorking", () -> !visionSubsystem.visionIsWorking)
+        .withSize(2, 1)
+        .withPosition(3, 1);
 
     Shuffleboard.getTab("Match")
         .add("EstopClimb", new EmergencyStopClimbCommand(climbSubsystem))

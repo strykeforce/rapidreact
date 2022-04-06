@@ -27,7 +27,12 @@ public class ShooterSubsystem extends MeasurableSubsystem {
   private final VisionSubsystem visionSubsystem;
   private boolean highFender;
   private ShooterState currentState = ShooterState.STOP;
-  private double shooterSetPointTicks, kickerSetpointTicks, hoodSetPointTicks;
+  private double shooterSetPointTicks,
+      kickerSetpointTicks,
+      hoodSetPointTicks,
+      logShooterTicks,
+      logKickerTicks,
+      logHoodTicks;
   private String[][] lookupTable;
 
   public ShooterSubsystem(MagazineSubsystem magazineSubsystem, VisionSubsystem visionSubsystem) {
@@ -166,13 +171,27 @@ public class ShooterSubsystem extends MeasurableSubsystem {
     kickerFalcon.set(ControlMode.Velocity, kickerSpeed);
     shooterSetPointTicks = shooterSpeed;
     kickerSetpointTicks = kickerSpeed;
-    logger.info("Kicker at {} speed, Shooter at {} speed", kickerSpeed, shooterSpeed);
+    logShooterTicks = shooterSpeed;
+    logKickerTicks = kickerSpeed;
+  }
+
+  public void logShotSol() {
+    logger.info(
+        "Kicker setpoint {}, Shooter setpoint {}, Hood setpoint {}",
+        logKickerTicks,
+        logShooterTicks,
+        logHoodTicks);
+    logger.info(
+        "Kicker at {} speed, Shooter at {} speed, Hood at {} pos",
+        kickerFalcon.getSelectedSensorVelocity(),
+        shooterFalcon.getSelectedSensorVelocity(),
+        hoodTalon.getSelectedSensorPosition());
   }
 
   public void hoodClosedLoop(double hoodPos) {
     hoodTalon.set(ControlMode.MotionMagic, hoodPos);
     hoodSetPointTicks = hoodPos;
-    logger.info("Hood is moving to {}", hoodPos);
+    logHoodTicks = hoodSetPointTicks;
   }
 
   public boolean isShooterAtSpeed() {
@@ -220,6 +239,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
       shooterClosedLoop(shootSolution[0], shootSolution[1]);
       hoodClosedLoop(shootSolution[2]);
     }
+    logShotSol();
   }
 
   public void manualShoot(double widthPixels) {
@@ -287,7 +307,8 @@ public class ShooterSubsystem extends MeasurableSubsystem {
         }
         break;
       case ARMED:
-        // Just indicates that it is ready to shoot for other classes
+        double[] shootSolution = getShootSolution();
+        shooterClosedLoop(shootSolution[0], shootSolution[1]);
         break;
       case ADJUSTING:
         if (isHoodAtPos() && isShooterAtSpeed()) {
