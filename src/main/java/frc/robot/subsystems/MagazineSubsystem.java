@@ -87,7 +87,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
 
   public void enableUpperBeamBreak(boolean enableUpper) {
     if (isBeamBreakEnabled != enableUpper) {
-      logger.info("Enabling talon limit switch: {}", enableUpper);
+      logger.info("Enabling upper talon limit switch: {}", enableUpper);
     }
     if (enableUpper) {
       upperMagazineTalon.configForwardLimitSwitchSource(
@@ -102,7 +102,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
 
   public void enableLowerBeamBreak(boolean enableLower) {
     if (isBeamBreakEnabled != enableLower) {
-      logger.info("Enabling talon limit switch: {}", enableLower);
+      logger.info("Enabling lower talon limit switch: {}", enableLower);
     }
     if (enableLower) {
       lowerMagazineFalcon.configForwardLimitSwitchSource(
@@ -516,6 +516,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
                 || turretSubsystem.getState() == TurretState.FENDER_AIMED
                 || turretSubsystem.getState() == TurretState.ODOM_AIMED)) {
           logger.info("PAUSE -> SHOOT");
+          shooterSubsystem.logShotSol();
           enableUpperBeamBreak(false);
           upperClosedLoopRotate(MagazineConstants.kUpperMagazineFeedSpeed);
           currUpperMagazineState = UpperMagazineState.SHOOT;
