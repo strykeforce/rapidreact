@@ -2,7 +2,7 @@ import edu.wpi.first.gradlerio.deploy.roborio.RoboRIO
 
 plugins {
     id "java"
-    id "org.jetbrains.kotlin.jvm" version "1.6.10"
+    id "org.jetbrains.kotlin.jvm" version "1.6.20"
     id "edu.wpi.first.GradleRIO" version "2022.4.1"
     id "com.diffplug.spotless" version "6.2.0"
     id "idea"
@@ -75,13 +75,13 @@ dependencies {
     simulationRelease wpi.sim.enableRelease()
 
         //Logging
-    implementation "ch.qos.logback:logback-classic:1.2.10"
+    implementation 'ch.qos.logback:logback-classic:1.2.11'
     implementation 'io.github.microutils:kotlin-logging:2.1.21'
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib"
-    implementation "org.jetbrains.kotlinx:kotlinx-html-jvm:0.7.+"
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.6.20'
+    implementation 'org.jetbrains.kotlinx:kotlinx-html-jvm:0.7.3'
 
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13.2'
 }
 
 // Simulation configuration (e.g. environment variables).
