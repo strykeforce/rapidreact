@@ -335,8 +335,10 @@ public class MagazineSubsystem extends MeasurableSubsystem {
       enableLowerBeamBreak(true);
       lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIntakeSpeed);
     }
-    logger.info("upper {} -> EMPTY", currUpperMagazineState);
-    currUpperMagazineState = UpperMagazineState.EMPTY;
+    if (currUpperMagazineState == UpperMagazineState.STOP) {
+      logger.info("upper {} -> EMPTY", currUpperMagazineState);
+      currUpperMagazineState = UpperMagazineState.EMPTY;
+    }
     continueToShoot = true;
     // }
   }
