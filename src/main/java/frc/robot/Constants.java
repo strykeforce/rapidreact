@@ -323,8 +323,8 @@ public final class Constants {
       return supplyCurrentLimitConfig;
     }
 
-    public static TalonSRXConfiguration getLowerMagazineTalonConfig() {
-      TalonSRXConfiguration magazineConfig = new TalonSRXConfiguration();
+    public static TalonFXConfiguration getLowerMagazineTalonConfig() {
+      TalonFXConfiguration magazineConfig = new TalonFXConfiguration();
 
       magazineConfig.primaryPID.selectedFeedbackCoefficient = 1.0;
       magazineConfig.auxiliaryPID.selectedFeedbackSensor = FeedbackDevice.None;

@@ -120,6 +120,7 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     logger.info("TeleopInit");
     m_robotContainer.zeroClimb();
+    m_robotContainer.startAutoIntake();
   }
 
   /** This function is called periodically during operator control. */

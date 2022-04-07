@@ -64,6 +64,7 @@ import frc.robot.commands.sequences.shooting.LowFenderShotCommand;
 import frc.robot.commands.sequences.shooting.PitShooterTuneCommandGroup;
 import frc.robot.commands.sequences.shooting.StopShooterCommandGroup;
 import frc.robot.commands.sequences.shooting.VisionShootCommand;
+import frc.robot.commands.sequences.shooting.VisionShootCommandGroup;
 import frc.robot.commands.shooter.HoodClosedLoopCommand;
 import frc.robot.commands.shooter.HoodOpenLoopCommand;
 import frc.robot.commands.shooter.ShooterOpenLoopCommand;
@@ -127,9 +128,9 @@ public class RobotContainer {
     visionSubsystem = new VisionSubsystem();
     turretSubsystem = new TurretSubsystem(visionSubsystem, driveSubsystem);
     climbSubsystem = new ClimbSubsystem();
-    magazineSubsystem = new MagazineSubsystem(turretSubsystem, visionSubsystem);
-    shooterSubsystem = new ShooterSubsystem(magazineSubsystem, visionSubsystem);
     intakeSubsystem = new IntakeSubsystem();
+    magazineSubsystem = new MagazineSubsystem(turretSubsystem, visionSubsystem, intakeSubsystem);
+    shooterSubsystem = new ShooterSubsystem(magazineSubsystem, visionSubsystem);
     odometryTestSubsystem = new OdometryTestSubsystem();
     autoSwitch =
         new AutoSwitch(
@@ -154,6 +155,9 @@ public class RobotContainer {
 
   public VisionSubsystem getVisionSubsystem() {
     return visionSubsystem;
+  }
+  public void startAutoIntake() {
+      new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, false, true);
   }
 
   public AutoSwitch getAutoSwitch() {
@@ -239,7 +243,7 @@ public class RobotContainer {
     // Vision Shoot
     new JoystickButton(driveJoystick, Shoulder.RIGHT_DOWN.id)
         .whenPressed(
-            new VisionShootCommand(
+            new VisionShootCommandGroup(
                 shooterSubsystem,
                 turretSubsystem,
                 magazineSubsystem,
@@ -284,7 +288,8 @@ public class RobotContainer {
         .whenReleased(
             new ParallelCommandGroup(
                 new IntakeOpenLoopCommand(intakeSubsystem, 0.0),
-                new StopMagazineCommand(magazineSubsystem)));
+                new StopMagazineCommand(magazineSubsystem),
+                new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, false, true)));
 
     // Arm Shooter
     new JoystickButton(xboxController, XboxController.Button.kB.value)
