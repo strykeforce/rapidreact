@@ -174,6 +174,10 @@ public final class Constants {
     // + is left
     public static final double kHorizAngleCorrectionDegrees = 0.0; // 2.5 degrees
 
+    // Vision test for failure const
+    public static final double kTimeForVisionCheck = 1.0;
+    public static final int kNumOfVisionChecks = 10;
+
     // Old 2020 Constants
     public static final double kMinContourAreaSize = 100;
     public static final double kVerticalFov = 0.6056; // 48.8 (34.7 degrees)

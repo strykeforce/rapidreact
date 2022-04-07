@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.Timer;
+import frc.robot.Constants.VisionConstants;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -16,8 +18,14 @@ public class VisionSubsystem extends MeasurableSubsystem
   private final Deadeye<HubTargetData> deadeye;
   private volatile HubTargetData targetData = new HubTargetData();
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
+  private int numOfSerialChanges = 0;
+  private int lastSerialNum = -1;
+  private Timer visionCheckTime = new Timer();
+  private boolean isVisionWorking = true;
 
   public VisionSubsystem() {
+    visionCheckTime.reset();
+    visionCheckTime.start();
     NetworkTableInstance networkTableInstance = NetworkTableInstance.create();
     networkTableInstance.startClient("10.27.67.10");
     deadeye = new Deadeye<>("A0", HubTargetData.class, networkTableInstance);
@@ -106,5 +114,32 @@ public class VisionSubsystem extends MeasurableSubsystem
   private double getValid() {
     var td = targetData;
     return td.isValid() ? 1.0 : 0.0;
+  }
+
+  private void resetVisionCheckSystem() {
+    visionCheckTime.reset();
+    visionCheckTime.start();
+    numOfSerialChanges = 0;
+  }
+
+  public boolean isVisionWorking() {
+    return !isVisionWorking;
+  }
+
+  @Override
+  public void periodic() {
+    if (lastSerialNum != targetData.serial) {
+      numOfSerialChanges++;
+      lastSerialNum = targetData.serial;
+    }
+    if (visionCheckTime.hasElapsed(VisionConstants.kTimeForVisionCheck)) {
+      if (numOfSerialChanges < VisionConstants.kNumOfVisionChecks) {
+        logger.error("Deadeye is NOT working");
+        isVisionWorking = false;
+      } else {
+        isVisionWorking = true;
+      }
+      resetVisionCheckSystem();
+    }
   }
 }
