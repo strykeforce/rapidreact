@@ -55,10 +55,6 @@ public final class Constants {
     public static final double kDriveGearRatio =
         (kDriveMotorOutputGear / kDriveInputGear) * (kBevelInputGear / kBevelOutputGear);
 
-    public static final double kExpoScaleMoveFactor = 0.4;
-    public static final double kRateLimitMove = 0.3;
-    public static final double kExpoScaleYawFactor = 0.4;
-
     static {
       // logger.debug("kMaxOmega = {}", kMaxOmega);
     }
@@ -78,8 +74,11 @@ public final class Constants {
     public static final double kDeadbandXLock = 0.2;
     public static final double kDeadbandAllStick = 0.075;
     public static final double kCloseEnoughTicks = 10.0;
-    public static final double kRateLimitFwdStr = 2;
-    public static final double kRateLimitYaw = 3;
+    public static final double kRateLimitFwdStr = 3.5; // 2
+    public static final double kRateLimitYaw = 3; // 3
+    public static final double kExpoScaleMoveFactor = 0.6; // .6
+    // public static final double kRateLimitMove = 0.3;
+    public static final double kExpoScaleYawFactor = 0.75;
 
     // Climb Limits
     public static final double kMaxFwdStrStickClimb = 0.2 * kMaxSpeedMetersPerSecond;
