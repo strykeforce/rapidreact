@@ -32,7 +32,9 @@ public class ShooterSubsystem extends MeasurableSubsystem {
       hoodSetPointTicks,
       logShooterTicks,
       logKickerTicks,
-      logHoodTicks;
+      logHoodTicks,
+      oldWidthPixels,
+      oldIndex;
   private String[][] lookupTable;
 
   public ShooterSubsystem(MagazineSubsystem magazineSubsystem, VisionSubsystem visionSubsystem) {
@@ -134,17 +136,13 @@ public class ShooterSubsystem extends MeasurableSubsystem {
       //         (Math.round(widthPixels / ShooterConstants.kLookupRes)
       //             + 1
       //             - ShooterConstants.kLookupMinPixel);
-      logger.info("Selected Index: {}, widthPixels: {}", index, widthPixels);
+      oldIndex = index;
+      oldWidthPixels = widthPixels;
     }
 
     shootSolution[0] = Double.parseDouble(lookupTable[index][2]);
     shootSolution[1] = Double.parseDouble(lookupTable[index][3]);
     shootSolution[2] = Double.parseDouble(lookupTable[index][4]);
-    logger.info(
-        "Kicker Speed: {} Shooter Speed: {} Hood Pos: {}",
-        shootSolution[0],
-        shootSolution[1],
-        shootSolution[2]);
     return shootSolution;
   }
 
@@ -186,6 +184,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
         kickerFalcon.getSelectedSensorVelocity(),
         shooterFalcon.getSelectedSensorVelocity(),
         hoodTalon.getSelectedSensorPosition());
+    logger.info("Selected Index: {}, widthPixels: {}", oldIndex, oldWidthPixels);
   }
 
   public void hoodClosedLoop(double hoodPos) {
@@ -239,7 +238,6 @@ public class ShooterSubsystem extends MeasurableSubsystem {
       shooterClosedLoop(shootSolution[0], shootSolution[1]);
       hoodClosedLoop(shootSolution[2]);
     }
-    logShotSol();
   }
 
   public void manualShoot(double widthPixels) {
@@ -307,8 +305,10 @@ public class ShooterSubsystem extends MeasurableSubsystem {
         }
         break;
       case ARMED:
-        double[] shootSolution = getShootSolution();
-        shooterClosedLoop(shootSolution[0], shootSolution[1]);
+        if (visionSubsystem.isValid()) {
+          double[] shootSolution = getShootSolution();
+          shooterClosedLoop(shootSolution[0], shootSolution[1]);
+        }
         break;
       case ADJUSTING:
         if (isHoodAtPos() && isShooterAtSpeed()) {

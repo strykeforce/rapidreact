@@ -397,7 +397,7 @@ public class RobotContainer {
         .withPosition(3, 0);
 
     Shuffleboard.getTab("Match")
-        .addBoolean("VisionNotWorking", () -> !visionSubsystem.visionIsWorking)
+        .addBoolean("VisionNotWorking", () -> visionSubsystem.isVisionWorking)
         .withSize(2, 1)
         .withPosition(3, 1);
 

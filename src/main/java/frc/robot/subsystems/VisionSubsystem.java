@@ -20,10 +20,11 @@ public class VisionSubsystem extends MeasurableSubsystem
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
   private int numOfSerialChanges = 0;
   private int lastSerialNum = -1;
-  private Timer visionCheckTime;
-  public boolean visionIsWorking = false;
+  private Timer visionCheckTime = new Timer();
+  public boolean isVisionWorking = true;
 
   public VisionSubsystem() {
+    visionCheckTime.reset();
     visionCheckTime.start();
     NetworkTableInstance networkTableInstance = NetworkTableInstance.create();
     networkTableInstance.startClient("10.27.67.10");
@@ -130,12 +131,9 @@ public class VisionSubsystem extends MeasurableSubsystem
     if (visionCheckTime.hasElapsed(VisionConstants.kTimeForVisionCheck)) {
       if (numOfSerialChanges < VisionConstants.kNumOfVisionChecks) {
         logger.error("Deadeye is NOT working");
-        visionIsWorking = false;
-        resetVisionCheckSystem();
+        isVisionWorking = false;
       }
-      if (numOfSerialChanges >= VisionConstants.kNumOfVisionChecks) {
-        resetVisionCheckSystem();
-      }
+      resetVisionCheckSystem();
     }
   }
 }
