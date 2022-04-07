@@ -74,7 +74,7 @@ public class DriveTeleopCommand extends CommandBase {
     driveSubsystem.drive(0, 0, 0);
   }
 
-  private double applyVectorDeadBand(double input) {
+  private double applyExpoScaling(double input) {
     double y;
 
     if (Math.abs(input) < DriveConstants.kDeadbandAllStick) {
@@ -85,6 +85,7 @@ public class DriveTeleopCommand extends CommandBase {
         input > 0
             ? input - DriveConstants.kDeadbandAllStick
             : input + DriveConstants.kDeadbandAllStick;
+
     return (DriveConstants.kExpoScaleMoveFactor * Math.pow(y, 3)
             + (1 - DriveConstants.kExpoScaleMoveFactor) * y)
         * vectorOffset;
@@ -94,7 +95,7 @@ public class DriveTeleopCommand extends CommandBase {
     double[] tempAdjustedValues = new double[3];
     double rawAngle = Math.atan2(rawForward, rawStrafe);
     double orgMag = (Math.sqrt(Math.pow(rawForward, 2) + Math.pow(rawStrafe, 2)));
-    double adjustedMag = applyVectorDeadBand(orgMag);
+    double adjustedMag = applyExpoScaling(orgMag);
     tempAdjustedValues[0] = Math.sin(rawAngle) * adjustedMag;
     tempAdjustedValues[1] = Math.cos(rawAngle) * adjustedMag;
     tempAdjustedValues[2] = expoScaleYaw.apply(rawYaw);
