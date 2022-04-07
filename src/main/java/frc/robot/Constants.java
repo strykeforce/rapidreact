@@ -38,6 +38,11 @@ public final class Constants {
     // Drive Constants
     public static final double kWheelDiameterInches = 3.0 * (571.0 / 500.0); // Actual/Odometry
 
+    // velocity stable
+    public static final double kForwardThreshold = 0.1; // meters per second
+    public static final double kStrafeThreshold = 0.1; // meters per second
+    public static final double kGyroRateThreshold = 2.0; // degrees per second
+
     // From: https://github.com/strykeforce/axis-config/
     public static final double kMaxSpeedMetersPerSecond = 3.889;
     public static final double kRobotWidth = 0.625;
@@ -182,6 +187,8 @@ public final class Constants {
     public static final double kDistanceThreshold = 200;
     public static final int kStableRange = 20;
     public static final int kStableCounts = 5;
+    public static final int kPixelWidthStableCounts = 4; // FIXME
+    public static final int kPixelWidthChangeThreshold = 2; // FIXME
     public static final double kCenteredRange = 2;
     public static final double kLostLimit = 30;
     public static final String kTablePath = "/home/lvuser/deploy/Lookup_Table.csv";

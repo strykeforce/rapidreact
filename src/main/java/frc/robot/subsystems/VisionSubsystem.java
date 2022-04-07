@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
+import frc.robot.Constants.VisionConstants;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -16,6 +17,8 @@ public class VisionSubsystem extends MeasurableSubsystem
   private final Deadeye<HubTargetData> deadeye;
   private volatile HubTargetData targetData = new HubTargetData();
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
+  private int pixelWidthStableCount = 0;
+  private int previousPixelWidth = 0;
 
   public VisionSubsystem() {
     NetworkTableInstance networkTableInstance = NetworkTableInstance.create();
@@ -84,6 +87,7 @@ public class VisionSubsystem extends MeasurableSubsystem
     return td.isValid() ? Math.toDegrees(td.getErrorRadians()) : 2767.0;
   }
 
+  // not used
   public double getTargetsDistancePixel() {
     var td = targetData;
     return td.isValid() ? td.testGetTargetsPixelWidth() : 2767.0;
@@ -94,7 +98,7 @@ public class VisionSubsystem extends MeasurableSubsystem
     return td.isValid() ? td.getGroundDistance() : 2767.0;
   }
 
-  public double getTargetPixelWidth() {
+  public int getTargetPixelWidth() {
     var td = targetData;
     return td.testGetTargetsPixelWidth();
   }
@@ -106,5 +110,17 @@ public class VisionSubsystem extends MeasurableSubsystem
   private double getValid() {
     var td = targetData;
     return td.isValid() ? 1.0 : 0.0;
+  }
+
+  public boolean isPixelWidthStable() {
+    var pixelWidth = getTargetPixelWidth();
+    if (Math.abs(pixelWidth - previousPixelWidth) <= VisionConstants.kPixelWidthChangeThreshold) {
+      pixelWidthStableCount++;
+    } else {
+      pixelWidthStableCount = 0;
+    }
+    previousPixelWidth = pixelWidth;
+
+    return pixelWidthStableCount >= VisionConstants.kPixelWidthStableCounts;
   }
 }

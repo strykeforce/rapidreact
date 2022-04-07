@@ -51,6 +51,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private Rotation2d holoContAngle = new Rotation2d();
   private Double trajectoryActive = 0.0;
   private final double[] lastVelocity = new double[3];
+  private final double[] previousVelocity = new double[3];
 
   public DriveSubsystem() {
 
@@ -213,6 +214,24 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public Pose2d getPoseMeters() {
     return swerveDrive.getPoseMeters();
+  }
+
+  public double getGyroRate() {
+    return swerveDrive.getGyroRate();
+  }
+
+  public boolean isVelocityStable() {
+    double gyroRate = swerveDrive.getGyroRate();
+    boolean stable =
+        Math.abs(previousVelocity[0] - lastVelocity[0]) <= DriveConstants.kForwardThreshold
+            && Math.abs(previousVelocity[1] - lastVelocity[1]) <= DriveConstants.kStrafeThreshold
+            && Math.abs(previousVelocity[2] - gyroRate) <= DriveConstants.kGyroRateThreshold;
+
+    previousVelocity[0] = lastVelocity[0];
+    previousVelocity[1] = lastVelocity[1];
+    previousVelocity[2] = gyroRate;
+
+    return stable;
   }
 
   // Trajectory TOML Parsing
