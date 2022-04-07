@@ -21,7 +21,7 @@ public class VisionSubsystem extends MeasurableSubsystem
   private int numOfSerialChanges = 0;
   private int lastSerialNum = -1;
   private Timer visionCheckTime = new Timer();
-  public boolean isVisionWorking = true;
+  private boolean isVisionWorking = true;
 
   public VisionSubsystem() {
     visionCheckTime.reset();
@@ -122,6 +122,10 @@ public class VisionSubsystem extends MeasurableSubsystem
     numOfSerialChanges = 0;
   }
 
+  public boolean isVisionWorking() {
+    return !isVisionWorking;
+  }
+
   @Override
   public void periodic() {
     if (lastSerialNum != targetData.serial) {
@@ -132,6 +136,8 @@ public class VisionSubsystem extends MeasurableSubsystem
       if (numOfSerialChanges < VisionConstants.kNumOfVisionChecks) {
         logger.error("Deadeye is NOT working");
         isVisionWorking = false;
+      } else {
+        isVisionWorking = true;
       }
       resetVisionCheckSystem();
     }
