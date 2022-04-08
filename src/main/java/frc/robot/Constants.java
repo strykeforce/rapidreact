@@ -194,8 +194,8 @@ public final class Constants {
     public static final double kDistanceThreshold = 200;
     public static final int kStableRange = 20;
     public static final int kStableCounts = 5;
-    public static final int kPixelWidthStableCounts = 4; // FIXME
-    public static final int kPixelWidthChangeThreshold = 2; // FIXME
+    public static final int kPixelWidthStableCounts = 2; // FIXME
+    public static final int kPixelWidthChangeThreshold = 3; // FIXME
     public static final double kCenteredRange = 2;
     public static final double kLostLimit = 30;
     public static final String kTablePath = "/home/lvuser/deploy/Lookup_Table.csv";

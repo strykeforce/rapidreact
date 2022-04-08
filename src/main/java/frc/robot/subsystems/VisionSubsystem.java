@@ -69,7 +69,8 @@ public class VisionSubsystem extends MeasurableSubsystem
         new Measure("Target Data Valid", this::getValid),
         new Measure("Test Pixel Width", this::getTargetsDistancePixel),
         new Measure("Test Ground Distance", this::getTargetsDistanceGround),
-        new Measure("Target Data SN", () -> targetData.serial));
+        new Measure("Target Data SN", () -> targetData.serial),
+        new Measure("Is vision stable", () -> getPixelWidthStable()));
   }
 
   // these private getters are for the grapher and prevent a data race that can occur if targetData
@@ -120,6 +121,9 @@ public class VisionSubsystem extends MeasurableSubsystem
   }
 
   public boolean isPixelWidthStable() {
+    if (!isValid()) {
+      return false;
+    }
     var pixelWidth = getTargetPixelWidth();
     if (Math.abs(pixelWidth - previousPixelWidth) <= VisionConstants.kPixelWidthChangeThreshold) {
       pixelWidthStableCount++;
@@ -129,6 +133,10 @@ public class VisionSubsystem extends MeasurableSubsystem
     previousPixelWidth = pixelWidth;
 
     return pixelWidthStableCount >= VisionConstants.kPixelWidthStableCounts;
+  }
+
+  private double getPixelWidthStable() {
+    return isPixelWidthStable() ? 1.0 : 0.0;
   }
 
   private void resetVisionCheckSystem() {

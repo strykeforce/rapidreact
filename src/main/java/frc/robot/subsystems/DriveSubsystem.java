@@ -50,8 +50,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private State holoContInput = new State();
   private Rotation2d holoContAngle = new Rotation2d();
   private Double trajectoryActive = 0.0;
-  private final double[] lastVelocity = new double[3];
-  private final double[] previousVelocity = new double[3];
+  private double[] lastVelocity = new double[3];
+  private double[] previousVelocity = new double[3];
+  private double prevGyroRate = 0.0;
+  private boolean fwdStable, strStable, yawStable;
 
   public DriveSubsystem() {
 
@@ -222,16 +224,32 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public boolean isVelocityStable() {
     double gyroRate = swerveDrive.getGyroRate();
-    boolean stable =
-        Math.abs(previousVelocity[0] - lastVelocity[0]) <= DriveConstants.kForwardThreshold
-            && Math.abs(previousVelocity[1] - lastVelocity[1]) <= DriveConstants.kStrafeThreshold
-            && Math.abs(previousVelocity[2] - gyroRate) <= DriveConstants.kGyroRateThreshold;
+    fwdStable = Math.abs(previousVelocity[0] - lastVelocity[0]) <= DriveConstants.kForwardThreshold;
+    strStable = Math.abs(previousVelocity[1] - lastVelocity[1]) <= DriveConstants.kStrafeThreshold;
+    yawStable = Math.abs(prevGyroRate - gyroRate) <= DriveConstants.kGyroRateThreshold;
+    boolean stable = fwdStable && strStable && yawStable;
 
     previousVelocity[0] = lastVelocity[0];
     previousVelocity[1] = lastVelocity[1];
-    previousVelocity[2] = gyroRate;
+    prevGyroRate = gyroRate;
 
     return stable;
+  }
+
+  private double getVelocityStable() {
+    return isVelocityStable() ? 1.0 : 0.0;
+  }
+
+  private double getFwdStable() {
+    return fwdStable ? 1.0 : 0.0;
+  }
+
+  private double getStrStable() {
+    return strStable ? 1.0 : 0.0;
+  }
+
+  private double getYawStable() {
+    return yawStable ? 1.0 : 0.0;
   }
 
   // Trajectory TOML Parsing
@@ -352,6 +370,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure("FWD Vel", () -> lastVelocity[0]),
         new Measure("STR Vel", () -> lastVelocity[1]),
         new Measure("YAW Vel", () -> lastVelocity[2]),
-        new Measure("Gyro Rate", () -> getGyroRate()));
+        new Measure("Gyro Rate", () -> getGyroRate()),
+        new Measure("Velocity Stable", () -> getVelocityStable()),
+        new Measure("YawStable", () -> getYawStable()),
+        new Measure("strStable", () -> getStrStable()),
+        new Measure("FwdStable", () -> getFwdStable()));
   }
 }
