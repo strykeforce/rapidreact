@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Constants;
 import frc.robot.Constants.MagazineConstants;
-import frc.robot.commands.sequences.intaking.AutoIntakeCommand;
 import frc.robot.subsystems.ShooterSubsystem.ShooterState;
 import frc.robot.subsystems.TurretSubsystem.TurretState;
 import java.util.List;
@@ -51,7 +50,10 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   private int shootUpperBeamStableCounts = 0;
   private boolean isBeamBreakEnabled = false;
 
-  public MagazineSubsystem(TurretSubsystem turretSubsystem, VisionSubsystem visionSubsystem, IntakeSubsystem intakeSubsystem) {
+  public MagazineSubsystem(
+      TurretSubsystem turretSubsystem,
+      VisionSubsystem visionSubsystem,
+      IntakeSubsystem intakeSubsystem) {
     this.turretSubsystem = turretSubsystem;
     this.visionSubsystem = visionSubsystem;
     this.intakeSubsystem = intakeSubsystem;

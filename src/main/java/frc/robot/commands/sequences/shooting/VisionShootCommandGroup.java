@@ -9,20 +9,24 @@ import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
+public class VisionShootCommandGroup extends SequentialCommandGroup {
 
-
-public class VisionShootCommandGroup extends SequentialCommandGroup{
-
-    public VisionShootCommandGroup(MagazineSubsystem magazineSubsystem, IntakeSubsystem intakeSubsystem, ShooterSubsystem shooterSubsystem, TurretSubsystem turretSubsystem, VisionSubsystem visionSubsystem) {
-        addCommands(
-            new VisionShootCommand(shooterSubsystem, turretSubsystem, magazineSubsystem, visionSubsystem, true, intakeSubsystem),
-            new ScheduleCommand(
-                new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, false, false)
-            ));
-    }
-
-    public VisionShootCommandGroup(ShooterSubsystem shooterSubsystem, TurretSubsystem turretSubsystem,
-            MagazineSubsystem magazineSubsystem, VisionSubsystem visionSubsystem, boolean b,
-            IntakeSubsystem intakeSubsystem) {
-    }
+  public VisionShootCommandGroup(
+      ShooterSubsystem shooterSubsystem,
+      TurretSubsystem turretSubsystem,
+      MagazineSubsystem magazineSubsystem,
+      VisionSubsystem visionSubsystem,
+      boolean disableTrackingOnFinish,
+      IntakeSubsystem intakeSubsystem) {
+    addCommands(
+        new VisionShootCommand(
+            shooterSubsystem,
+            turretSubsystem,
+            magazineSubsystem,
+            visionSubsystem,
+            disableTrackingOnFinish,
+            intakeSubsystem),
+        new ScheduleCommand(
+            new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, false, false)));
+  }
 }
