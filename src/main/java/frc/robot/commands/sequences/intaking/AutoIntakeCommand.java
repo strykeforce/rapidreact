@@ -57,10 +57,7 @@ public class AutoIntakeCommand extends CommandBase {
 
   @Override
   public void end(boolean interrupted) {
-    if (interrupted && !isAuton) {
-      magazineSubsystem.magazineInterrupted();
-      intakeSubsystem.openLoopRotate(0.0);
-    } else if (!interrupted) {
+    if (!interrupted) {
       intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeReverseSpeed);
     }
     if (!isAuton) intakeSubsystem.retractClosedLoop();

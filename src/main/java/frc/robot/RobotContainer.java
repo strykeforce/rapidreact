@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SuppliedValueWidget;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -64,7 +64,7 @@ import frc.robot.commands.sequences.shooting.HighFenderShotCommand;
 import frc.robot.commands.sequences.shooting.LowFenderShotCommand;
 import frc.robot.commands.sequences.shooting.PitShooterTuneCommandGroup;
 import frc.robot.commands.sequences.shooting.StopShooterCommandGroup;
-import frc.robot.commands.sequences.shooting.VisionShootCommand;
+import frc.robot.commands.sequences.shooting.VisionShootCommandGroup;
 import frc.robot.commands.shooter.HoodClosedLoopCommand;
 import frc.robot.commands.shooter.HoodOpenLoopCommand;
 import frc.robot.commands.shooter.ShooterOpenLoopCommand;
@@ -128,9 +128,9 @@ public class RobotContainer {
     visionSubsystem = new VisionSubsystem();
     turretSubsystem = new TurretSubsystem(visionSubsystem, driveSubsystem);
     climbSubsystem = new ClimbSubsystem();
-    magazineSubsystem = new MagazineSubsystem(turretSubsystem, visionSubsystem);
-    shooterSubsystem = new ShooterSubsystem(magazineSubsystem, visionSubsystem);
     intakeSubsystem = new IntakeSubsystem();
+    magazineSubsystem = new MagazineSubsystem(turretSubsystem, visionSubsystem, intakeSubsystem);
+    shooterSubsystem = new ShooterSubsystem(magazineSubsystem, visionSubsystem);
     odometryTestSubsystem = new OdometryTestSubsystem();
     autoSwitch =
         new AutoSwitch(
@@ -155,6 +155,10 @@ public class RobotContainer {
 
   public VisionSubsystem getVisionSubsystem() {
     return visionSubsystem;
+  }
+
+  public Command startAutoIntake() {
+    return new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, false, false);
   }
 
   public AutoSwitch getAutoSwitch() {
@@ -240,7 +244,7 @@ public class RobotContainer {
     // Vision Shoot
     new JoystickButton(driveJoystick, Shoulder.RIGHT_DOWN.id)
         .whenPressed(
-            new VisionShootCommand(
+            new VisionShootCommandGroup(
                 shooterSubsystem,
                 turretSubsystem,
                 magazineSubsystem,
@@ -300,10 +304,7 @@ public class RobotContainer {
     new JoystickButton(xboxController, XboxController.Button.kBack.value)
         .whenPressed(new ManualEjectCargoReverseCommand(magazineSubsystem, intakeSubsystem));
     new JoystickButton(xboxController, XboxController.Button.kBack.value)
-        .whenReleased(
-            new ParallelCommandGroup(
-                new IntakeOpenLoopCommand(intakeSubsystem, 0.0),
-                new StopMagazineCommand(magazineSubsystem)));
+        .whenReleased(new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, false, false));
 
     // Arm Shooter
     new JoystickButton(xboxController, XboxController.Button.kB.value)
