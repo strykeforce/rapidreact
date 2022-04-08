@@ -51,9 +51,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private Rotation2d holoContAngle = new Rotation2d();
   private Double trajectoryActive = 0.0;
   private double[] lastVelocity = new double[3];
-  private double[] previousVelocity = new double[3];
-  private double prevGyroRate = 0.0;
-  private boolean fwdStable, strStable, yawStable;
+  private boolean fwdStable, strStable, yawStable, velStable;
 
   public DriveSubsystem() {
 
@@ -143,6 +141,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   @Override
   public void periodic() {
     swerveDrive.periodic();
+    isVelocityStable();
   }
 
   public void resetGyro() {
@@ -224,20 +223,17 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public boolean isVelocityStable() {
     double gyroRate = swerveDrive.getGyroRate();
-    fwdStable = Math.abs(previousVelocity[0] - lastVelocity[0]) <= DriveConstants.kForwardThreshold;
-    strStable = Math.abs(previousVelocity[1] - lastVelocity[1]) <= DriveConstants.kStrafeThreshold;
-    yawStable = Math.abs(prevGyroRate - gyroRate) <= DriveConstants.kGyroRateThreshold;
+    fwdStable = Math.abs(lastVelocity[0]) <= DriveConstants.kForwardThreshold;
+    strStable = Math.abs(lastVelocity[1]) <= DriveConstants.kStrafeThreshold;
+    yawStable = Math.abs(gyroRate) <= DriveConstants.kGyroRateThreshold;
     boolean stable = fwdStable && strStable && yawStable;
-
-    previousVelocity[0] = lastVelocity[0];
-    previousVelocity[1] = lastVelocity[1];
-    prevGyroRate = gyroRate;
+    velStable = stable;
 
     return stable;
   }
 
   private double getVelocityStable() {
-    return isVelocityStable() ? 1.0 : 0.0;
+    return velStable ? 1.0 : 0.0;
   }
 
   private double getFwdStable() {

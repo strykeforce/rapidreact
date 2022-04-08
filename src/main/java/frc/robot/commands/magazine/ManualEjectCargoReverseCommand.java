@@ -20,7 +20,7 @@ public class ManualEjectCargoReverseCommand extends InstantCommand {
   @Override
   public void initialize() {
     magazineSubsystem.manualEjectCargoReverse(
-        MagazineConstants.kMagazineEjectSpeed, MagazineConstants.kMagazineEjectSpeed);
+        MagazineConstants.kLowerMagazineEjectSpeed, MagazineConstants.kUpperMagazineEjectSpeed);
     intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeEjectSpeed);
   }
 }

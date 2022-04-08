@@ -41,7 +41,7 @@ public final class Constants {
     // velocity stable
     public static final double kForwardThreshold = 0.1; // meters per second
     public static final double kStrafeThreshold = 0.1; // meters per second
-    public static final double kGyroRateThreshold = 2.0; // degrees per second
+    public static final double kGyroRateThreshold = 0.5; // degrees per second
 
     // From: https://github.com/strykeforce/axis-config/
     public static final double kMaxSpeedMetersPerSecond = 3.889;
@@ -307,16 +307,17 @@ public final class Constants {
         new Color(0.5, 0.25, 0.25); // FIXME need to get real color
     public static final Color kNoCargo = new Color(0.25, 0.5, 0.25); // FIXME need to get real color
 
-    // Speed Constants
-    public static final double kLowerMagazineIntakeSpeed = 8000; // 0.5
+    // Speed Constants (lower max = 20_000)
+    public static final double kLowerMagazineIntakeSpeed = 12_400; // 8000
     public static final double kUpperMagazineIntakeSpeed = 2000;
     public static final double kUpperMagazineFeedSpeed = 2000; // 0.25
-    public static final double kLowerMagazineIndexSpeed = 8000; // 0.35
+    public static final double kLowerMagazineIndexSpeed = 15_000; // 12_400
     public static final double kUpperMagazineIndexSpeed = 2000;
-    public static final double kMagazineEjectSpeed = -8000; // -0.5
+    public static final double kLowerMagazineEjectSpeed = -12_400; // -0.5
+    public static final double kUpperMagazineEjectSpeed = -8000;
 
     // State Machine Sequence Constants
-    public static final double kShootDelay = 0.35; // .35
+    public static final double kShootDelay = 0.2; // .35
     public static final double kEjectTimerDelay = 1.0;
     public static final double kReadTimerDelay = 0.5;
     public static final double kShootUpperBeamStableCounts = 2;
