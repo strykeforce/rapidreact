@@ -19,6 +19,7 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.TurretConstants;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Set;
@@ -131,6 +132,17 @@ public class DriveSubsystem extends MeasurableSubsystem {
     lastVelocity[1] = strafeMetersPerSec;
     lastVelocity[2] = yawRadiansPerSec;
     swerveDrive.move(forwardMetersPerSec, strafeMetersPerSec, yawRadiansPerSec, isFieldOriented);
+  }
+
+  public double feedForwardAngle() {
+    Translation2d deltaGoal =
+        TurretConstants.kHubPositionMeters.minus(getPoseMeters().getTranslation());
+    double angleGoal = Math.atan2(deltaGoal.getY(), deltaGoal.getX());
+    double angleTangent = angleGoal - 90.0;
+    double angleVelocity = Math.atan2(lastVelocity[1], lastVelocity[0]);
+    double tangentVelocity =
+        Math.hypot(lastVelocity[0], lastVelocity[1]) * Math.cos(angleTangent - angleVelocity);
+    return tangentVelocity;
   }
 
   public double[] getDriveVelocity() {
@@ -332,6 +344,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure("Wheel 3 Speed", () -> getSwerveModuleStates()[3].speedMetersPerSecond),
         new Measure("FWD Vel", () -> lastVelocity[0]),
         new Measure("STR Vel", () -> lastVelocity[1]),
-        new Measure("YAW Vel", () -> lastVelocity[2]));
+        new Measure("YAW Vel", () -> lastVelocity[2]),
+        new Measure("FeadForwardTangent", () -> feedForwardAngle()));
   }
 }

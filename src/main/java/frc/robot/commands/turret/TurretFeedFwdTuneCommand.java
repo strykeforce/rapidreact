@@ -13,7 +13,7 @@ public class TurretFeedFwdTuneCommand extends CommandBase {
 
   @Override
   public void execute() {
-    turretSubsystem.updateOpenLoopFeedFwd();
+    // turretSubsystem.updateOpenLoopFeedFwd();
   }
 
   @Override

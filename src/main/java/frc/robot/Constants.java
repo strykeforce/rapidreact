@@ -237,9 +237,8 @@ public final class Constants {
     public static final double kRotateByInitialKp = -0.4; // -0.4 old: 0.4
     public static final double kRotateByFinalKp = -0.4; // 0.95
     public static final int kNotValidTargetCounts = 5; // how many frames to wait before seeking
-    public static final double kFYawSlow = -0.05;
-    public static final double kFYawMedium = -0.08;
-    public static final double kFYawFast = -0.12;
+    public static final double kFYaw = 0.0;
+    public static final double kFTangentVelocity = 0.0;
 
     // Seek Constants
     public static final Translation2d kHubPositionMeters = new Translation2d(8.23, 4.11); // meters

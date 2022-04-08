@@ -251,18 +251,13 @@ public class TurretSubsystem extends MeasurableSubsystem {
     rotateTo(seekAngle);
   }
 
-  public void updateOpenLoopFeedFwd() {
-    currentState = TurretState.IDLE;
-    double[] driveVel = driveSubsystem.getDriveVelocity();
-    double kF = 0.0;
-    if (Math.abs(driveVel[2]) < 0.25) kF = 0.0;
-    else if (Math.abs(driveVel[2]) < 0.6) kF = TurretConstants.kFYawSlow;
-    else if (Math.abs(driveVel[2]) < 2.0) kF = TurretConstants.kFYawMedium;
-    else kF = TurretConstants.kFYawFast;
-
-    Rotation2d deltaRotation = new Rotation2d(driveVel[2] * kF);
-    rotateBy(deltaRotation);
-  }
+  // public void updateOpenLoopFeedFwd() {
+  //   currentState = TurretState.IDLE;
+  //   double[] driveVel = driveSubsystem.getDriveVelocity();
+  //   double kF = TurretConstants.kFYaw;
+  //   Rotation2d deltaRotation = new Rotation2d(driveSubsystem.gyroRate * kF);
+  //   rotateBy(deltaRotation);
+  // }
 
   private void setCruiseVelocityFast(boolean isFast) {
     if (isFast) {
