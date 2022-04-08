@@ -53,9 +53,10 @@ public class MagazineSubsystem extends MeasurableSubsystem {
 
   public MagazineSubsystem(
       TurretSubsystem turretSubsystem,
-      VisionSubsystem visionSubsystem, DriveSubsystem driveSubsystem,
+      VisionSubsystem visionSubsystem,
+      DriveSubsystem driveSubsystem,
       IntakeSubsystem intakeSubsystem) {
-        this.driveSubsystem = driveSubsystem;
+    this.driveSubsystem = driveSubsystem;
     this.turretSubsystem = turretSubsystem;
     this.visionSubsystem = visionSubsystem;
     this.intakeSubsystem = intakeSubsystem;
