@@ -79,8 +79,11 @@ public final class Constants {
     public static final double kDeadbandXLock = 0.2;
     public static final double kDeadbandAllStick = 0.075;
     public static final double kCloseEnoughTicks = 10.0;
-    public static final double kRateLimitFwdStr = 2;
-    public static final double kRateLimitYaw = 3;
+    public static final double kRateLimitFwdStr = 3.5; // 2
+    public static final double kRateLimitYaw = 3; // 3
+    public static final double kExpoScaleMoveFactor = 0.6; // .6
+    // public static final double kRateLimitMove = 0.3;
+    public static final double kExpoScaleYawFactor = 0.75;
 
     // Climb Limits
     public static final double kMaxFwdStrStickClimb = 0.2 * kMaxSpeedMetersPerSecond;
@@ -175,6 +178,10 @@ public final class Constants {
     // Actual 2022 Constants
     // + is left
     public static final double kHorizAngleCorrectionDegrees = 0.0; // 2.5 degrees
+
+    // Vision test for failure const
+    public static final double kTimeForVisionCheck = 1.0;
+    public static final int kNumOfVisionChecks = 10;
 
     // Old 2020 Constants
     public static final double kMinContourAreaSize = 100;
