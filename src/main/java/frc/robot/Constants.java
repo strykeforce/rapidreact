@@ -266,6 +266,10 @@ public final class Constants {
     public static final Rotation2d kFenderAlliance = Rotation2d.fromDegrees(0.0);
     public static final Rotation2d kFenderOpponent = Rotation2d.fromDegrees(90.0);
 
+    // Geyser Shot Constants
+    public static Rotation2d kGeyserBallOnePosition = Rotation2d.fromDegrees(90); // FIXME
+    public static Rotation2d kGeyserBallTwoPosition = Rotation2d.fromDegrees(95); // FIXME
+
     // Talon Constants
     public static SupplyCurrentLimitConfiguration getSupplyCurrentLimitConfig() {
       return new SupplyCurrentLimitConfiguration(true, 10, 30, 0.5);
@@ -775,6 +779,12 @@ public final class Constants {
     public static final double kKickerFenderLowTicksP100ms = 0; // 0
     public static final double kShooterFenderLowTicksP100ms = 6_500; // 6000
     public static final double kHoodFenderLowTicks = 2_600; // 4000
+
+    // Geyser Shot Constants
+    public static double kShooterGeyserTicksP100ms = 12_000;
+    public static double kKickerGeyserTicksP100ms = 5_500;
+    public static double kHoodGeyserBallOneTicks = 0;
+    public static double kHoodGeyserBallTwoTicks = 0;
 
     public static final double kShooterManualEjectTicksP100ms = -5_000;
     public static final double kKickerManualEjectTicksP100ms = -5_000;
