@@ -114,7 +114,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
 
   private double[] getShootSolution(double widthPixels) {
     int index = 0;
-    double[] shootSolution = new double[3];
+    double[] shootSolution = new double[4];
     if (widthPixels < ShooterConstants.kLookupMinPixel) {
       logger.warn(
           "Pixel width {} is less than min pixel in table, using {}",
@@ -145,6 +145,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
     shootSolution[0] = Double.parseDouble(lookupTable[index][2]);
     shootSolution[1] = Double.parseDouble(lookupTable[index][3]);
     shootSolution[2] = Double.parseDouble(lookupTable[index][4]);
+    shootSolution[3] = Double.parseDouble(lookupTable[index][0]);
     return shootSolution;
   }
 
@@ -237,7 +238,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
       hoodClosedLoop(ShooterConstants.kHoodOpTicks);
     } else {
       double[] shootSolution = getShootSolution();
-      lastLookupDistance = shootSolution[4];
+      lastLookupDistance = shootSolution[3];
       shooterClosedLoop(shootSolution[0], shootSolution[1]);
       hoodClosedLoop(shootSolution[2]);
     }

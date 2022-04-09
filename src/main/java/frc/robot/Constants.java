@@ -209,6 +209,7 @@ public final class Constants {
     public static final int kHoodIndex = 3;
     public static final double kTapeHeightIn = 101.625; // in
     public static final double kUpperHubRadiusIn = 26.6875;
+    public static final double kLookupTableToLensOffset = 0.4959;
     // + is further along track and lower
     public static final int kHoodInchesCorrectionR1 = 13; // 8-15 feet (was 20)
     public static final int kHoodInchesCorrectionR2 = 13; // 15-19 feet (old 10)

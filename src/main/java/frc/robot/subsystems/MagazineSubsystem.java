@@ -536,10 +536,6 @@ public class MagazineSubsystem extends MeasurableSubsystem {
               && visionSubsystem.isValid()) {
             logger.info("WAIT_AIM -> PAUSE");
             shooterSubsystem.shoot();
-            visionSubsystem.getVisionOdometry(
-                turretSubsystem.getTurretRotation2d(),
-                driveSubsystem.getGyroRotation2d(),
-                shooterSubsystem.getLastLookupDistance());
             currUpperMagazineState = UpperMagazineState.PAUSE;
           } else if (turretSubsystem.getState() == TurretState.ODOM_AIMED
               || turretSubsystem.getState() == TurretState.GEYSER_AIMED) {
@@ -559,6 +555,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
             logger.info("PAUSE -> TIMED_FEED");
             currUpperMagazineState = UpperMagazineState.TIMED_FEED;
             currLowerMagazineState = LowerMagazineState.TIMED_FEED;
+            shooterSubsystem.logShotSol();
             enableUpperBeamBreak(false);
             enableLowerBeamBreak(false);
             upperClosedLoopRotate(MagazineConstants.kUpperMagazineFeedSpeed);
@@ -568,6 +565,10 @@ public class MagazineSubsystem extends MeasurableSubsystem {
           } else {
             logger.info("PAUSE -> SHOOT");
             shooterSubsystem.logShotSol();
+            visionSubsystem.getVisionOdometry(
+                turretSubsystem.getTurretRotation2d(),
+                driveSubsystem.getGyroRotation2d(),
+                shooterSubsystem.getLastLookupDistance());
             enableUpperBeamBreak(false);
             upperClosedLoopRotate(MagazineConstants.kUpperMagazineFeedSpeed);
             currUpperMagazineState = UpperMagazineState.SHOOT;
