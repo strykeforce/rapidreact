@@ -329,19 +329,15 @@ public class TurretSubsystem extends MeasurableSubsystem {
     currentState = TurretState.GEYSER_ADJUSTING;
     if (isBallOne) {
       rotateTo(TurretConstants.kGeyserBallOnePosition);
-      logger.info("Geyser Shot: Ball One");
+      logger.info("Geyser Shot: Starting Ball One Sequence");
     } else {
       rotateTo(TurretConstants.kGeyserBallTwoPosition);
-      logger.info("Geyser Shot: Ball Two");
+      logger.info("Geyser Shot: Starting Ball Two Sequence");
     }
   }
 
   public void fenderShot() {
     fenderShot(lastDoRotate);
-  }
-
-  public void geyserShot() {
-    geyserShot(!isBallOne);
   }
 
   @Override

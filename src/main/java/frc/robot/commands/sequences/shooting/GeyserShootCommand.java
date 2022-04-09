@@ -6,13 +6,13 @@ import frc.robot.subsystems.MagazineSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 
-public class GeyserShotCommand extends CommandBase {
+public class GeyserShootCommand extends CommandBase {
   public final TurretSubsystem turretSubsystem;
   public final ShooterSubsystem shooterSubsystem;
   public final MagazineSubsystem magazineSubsystem;
   public final IntakeSubsystem intakeSubsystem;
 
-  public GeyserShotCommand(
+  public GeyserShootCommand(
       TurretSubsystem turretSubsystem,
       ShooterSubsystem shooterSubsystem,
       MagazineSubsystem magazineSubsystem,

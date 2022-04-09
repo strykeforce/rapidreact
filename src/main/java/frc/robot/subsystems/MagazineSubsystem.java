@@ -509,6 +509,9 @@ public class MagazineSubsystem extends MeasurableSubsystem {
         if (shootTimer.hasElapsed(MagazineConstants.kShootDelay)) {
           logger.info("CARGO_SHOT -> EMPTY");
           currUpperMagazineState = UpperMagazineState.EMPTY;
+          if (turretSubsystem.getState() == TurretState.GEYSER_AIMED) {
+            turretSubsystem.geyserShot(false);
+          }
           if (isMagazineEmpty()) upperClosedLoopRotate(0.0);
           break;
         }
@@ -534,13 +537,9 @@ public class MagazineSubsystem extends MeasurableSubsystem {
             logger.info("WAIT_AIM -> PAUSE");
             shooterSubsystem.shoot();
             currUpperMagazineState = UpperMagazineState.PAUSE;
-          } else if (turretSubsystem.getState() == TurretState.ODOM_AIMED) {
+          } else if (turretSubsystem.getState() == TurretState.ODOM_AIMED
+              || turretSubsystem.getState() == TurretState.GEYSER_AIMED) {
             logger.info("WAIT_AIM -> PAUSE");
-            currUpperMagazineState = UpperMagazineState.PAUSE;
-          } else if (turretSubsystem.getState() == TurretState.GEYSER_AIMED) {
-            logger.info("WAIT_AIM -> PAUSE");
-            shooterSubsystem.geyserShot();
-            turretSubsystem.geyserShot();
             currUpperMagazineState = UpperMagazineState.PAUSE;
           }
         }
@@ -549,10 +548,6 @@ public class MagazineSubsystem extends MeasurableSubsystem {
       case PAUSE:
         // Vision Shoot
         if (shooterSubsystem.getCurrentState() == ShooterState.SHOOT
-            && (turretSubsystem.getState() == TurretState.TRACKING
-                || turretSubsystem.getState() == TurretState.FENDER_AIMED
-                || turretSubsystem.getState() == TurretState.ODOM_AIMED
-                || turretSubsystem.getState() == TurretState.GEYSER_AIMED)) {
             && turretSubsystem.getState() == TurretState.TRACKING
             && visionSubsystem.isPixelWidthStable()
             && driveSubsystem.isVelocityStable()) {
@@ -576,7 +571,8 @@ public class MagazineSubsystem extends MeasurableSubsystem {
           // Fender Shot || Odometry Aim
         } else if (shooterSubsystem.getCurrentState() == ShooterState.SHOOT
             && (turretSubsystem.getState() == TurretState.FENDER_AIMED
-                || turretSubsystem.getState() == TurretState.ODOM_AIMED)) {
+                || turretSubsystem.getState() == TurretState.ODOM_AIMED
+                || turretSubsystem.getState() == TurretState.GEYSER_AIMED)) {
           logger.info("PAUSE -> SHOOT");
           enableUpperBeamBreak(false);
           upperClosedLoopRotate(MagazineConstants.kUpperMagazineFeedSpeed);

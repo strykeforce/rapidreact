@@ -17,6 +17,7 @@ public class UpperAndLowerMagazineClosedLoopTuningCommand extends InstantCommand
   @Override
   public void initialize() {
     magazineSubsystem.enableUpperBeamBreak(false);
+    magazineSubsystem.enableLowerBeamBreak(false);
     magazineSubsystem.manualClosedLoopFullMagazine(
         MagazineConstants.kLowerMagazineIntakeSpeed,
         SmartDashboard.getNumber(
