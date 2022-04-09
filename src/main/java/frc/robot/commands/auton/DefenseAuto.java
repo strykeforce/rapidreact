@@ -6,9 +6,11 @@ import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.OffsetGyroCommand;
+import frc.robot.commands.magazine.IgnoreColorSensorCommand;
 import frc.robot.commands.magazine.PreloadCargoCommand;
 import frc.robot.commands.sequences.intaking.AutoIntakeCommand;
 import frc.robot.commands.sequences.shooting.ArmShooterCommandGroup;
+import frc.robot.commands.sequences.shooting.GeyserShootCommand;
 import frc.robot.commands.sequences.shooting.VisionShootAutoCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -17,16 +19,18 @@ import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
-public class TwoCargoAuto extends SequentialCommandGroup {
+public class DefenseAuto extends SequentialCommandGroup {
 
-  public TwoCargoAuto(
+  public DefenseAuto(
       VisionSubsystem visionSubsystem,
       TurretSubsystem turretSubsystem,
       ShooterSubsystem shooterSubsystem,
       MagazineSubsystem magazineSubsystem,
       IntakeSubsystem intakeSubsystem,
       DriveSubsystem driveSubsystem,
-      String pathName,
+      String path1Name,
+      String path2Name,
+      String path3Name,
       Rotation2d gyroOffset,
       double delay,
       double widthPixels) {
@@ -36,7 +40,7 @@ public class TwoCargoAuto extends SequentialCommandGroup {
             new OffsetGyroCommand(driveSubsystem, gyroOffset)),
         new WaitCommand(delay),
         new ParallelDeadlineGroup(
-            new DriveAutonCommand(driveSubsystem, pathName, true, false), // deadline
+            new DriveAutonCommand(driveSubsystem, path1Name, true, true), // deadline
             new ArmShooterCommandGroup(visionSubsystem, turretSubsystem, shooterSubsystem),
             new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, true, true)),
         new VisionShootAutoCommand(
@@ -46,6 +50,22 @@ public class TwoCargoAuto extends SequentialCommandGroup {
             visionSubsystem,
             true,
             intakeSubsystem,
-            widthPixels));
+            widthPixels),
+        new IgnoreColorSensorCommand(magazineSubsystem, true),
+        new ParallelDeadlineGroup(
+            new DriveAutonCommand(driveSubsystem, path2Name, false, true),
+            new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, true, true)),
+        new WaitCommand(0.5),
+        new ParallelDeadlineGroup(
+            new DriveAutonCommand(driveSubsystem, path3Name, false, true),
+            new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, true, true)),
+        new IgnoreColorSensorCommand(magazineSubsystem, false),
+        new WaitMatchTimeCommand(2.0),
+        new GeyserShootCommand(
+            turretSubsystem, shooterSubsystem, magazineSubsystem, intakeSubsystem)
+
+        // TODO: Add functionality to shoot state machine to "Geyser Shot"
+
+        );
   }
 }

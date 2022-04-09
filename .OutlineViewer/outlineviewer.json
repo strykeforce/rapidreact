@@ -1,7 +1,16 @@
 {
+  "Deadeye": {
+    "A": {
+      "0": {
+        "open": true
+      },
+      "open": true
+    },
+    "open": true
+  },
   "NetworkTables Settings": {
     "mode": "Client",
-    "serverTeam": "10.27.67.2"
+    "serverTeam": "10.27.67.10"
   },
   "Preferences": {
     "SwerveDrive": {

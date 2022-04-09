@@ -5,6 +5,7 @@ import static frc.robot.Constants.VisionConstants.kHorizonFov;
 import com.squareup.moshi.JsonReader;
 import com.squareup.moshi.JsonWriter;
 import edu.wpi.first.math.geometry.Rotation2d;
+import frc.robot.Constants.VisionConstants;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -68,6 +69,10 @@ public class HubTargetData extends TargetListTargetData {
     return (maxX + minX) / 2.0 - kFrameCenter;
   }
 
+  public double getErrorPixelsJetson() {
+    return errorPixels;
+  }
+
   /**
    * Return the angle from the center of the Hub target group to the center of the camera frame. You
    * should check {@link #isValid()} before calling this method.
@@ -76,7 +81,7 @@ public class HubTargetData extends TargetListTargetData {
    * @throws IndexOutOfBoundsException if the list of targets is empty
    */
   public double getErrorRadians() {
-    return -kHorizonFov * getErrorPixels() / (kFrameCenter * 2);
+    return -VisionConstants.kVerticalFov * getErrorPixels() / (kFrameCenter * 2);
   }
 
   /**
@@ -94,8 +99,8 @@ public class HubTargetData extends TargetListTargetData {
     return (kFrameCenter - Math.abs(getErrorPixels())) / kFrameCenter;
   }
 
-  public double testGetTargetsPixelWidth() {
-    double pixelWidth;
+  public int testGetTargetsPixelWidth() {
+    int pixelWidth;
 
     if (targets.size() % 2 == 1) {
       Rect leftTarget = targets.get((targets.size() - 1) / 2 - 1);

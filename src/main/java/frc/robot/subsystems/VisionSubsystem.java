@@ -3,7 +3,9 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.TurretConstants;
+import frc.robot.Constants.VisionConstants;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -19,8 +21,16 @@ public class VisionSubsystem extends MeasurableSubsystem
   private final Deadeye<HubTargetData> deadeye;
   private volatile HubTargetData targetData = new HubTargetData();
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
+  private int pixelWidthStableCount = 0;
+  private int previousPixelWidth = 0;
+  private int numOfSerialChanges = 0;
+  private int lastSerialNum = -1;
+  private Timer visionCheckTime = new Timer();
+  private boolean isVisionWorking = true;
 
   public VisionSubsystem() {
+    visionCheckTime.reset();
+    visionCheckTime.start();
     NetworkTableInstance networkTableInstance = NetworkTableInstance.create();
     networkTableInstance.startClient("10.27.67.10");
     deadeye = new Deadeye<>("A0", HubTargetData.class, networkTableInstance);
@@ -56,6 +66,7 @@ public class VisionSubsystem extends MeasurableSubsystem
   public @NotNull Set<Measure> getMeasures() {
     return Set.of(
         new Measure("Error Pixels", this::getErrorPixels),
+        new Measure("Error Pixels Jetson", this::getErrorPixelsJetson),
         new Measure("Error Radians", this::getErrorRadians),
         new Measure("Error Degrees", this::getErrorDegrees),
         new Measure("Target Data Valid", this::getValid),
@@ -71,6 +82,11 @@ public class VisionSubsystem extends MeasurableSubsystem
     return td.isValid() ? td.getErrorPixels() : 2767.0;
   }
 
+  private double getErrorPixelsJetson() {
+    var td = targetData;
+    return td.isValid() ? td.getErrorPixelsJetson() : 2767.0;
+  }
+
   private double getErrorRadians() {
     var td = targetData;
     return td.isValid() ? td.getErrorRadians() : 2767.0;
@@ -81,6 +97,7 @@ public class VisionSubsystem extends MeasurableSubsystem
     return td.isValid() ? Math.toDegrees(td.getErrorRadians()) : 2767.0;
   }
 
+  // not used
   public double getTargetsDistancePixel() {
     var td = targetData;
     return td.isValid() ? td.testGetTargetsPixelWidth() : 2767.0;
@@ -91,9 +108,13 @@ public class VisionSubsystem extends MeasurableSubsystem
     return td.isValid() ? td.getGroundDistance() : 2767.0;
   }
 
-  public double getTargetPixelWidth() {
+  public int getTargetPixelWidth() {
     var td = targetData;
     return td.testGetTargetsPixelWidth();
+  }
+
+  public boolean isValid() {
+    return targetData.isValid();
   }
 
   private double getValid() {
@@ -120,5 +141,51 @@ public class VisionSubsystem extends MeasurableSubsystem
         x,
         y);
     return new Pose2d(x, y, gyroAngle);
+  }
+
+  public boolean isPixelWidthStable() {
+    if (!isValid()) {
+      return false;
+    }
+    var pixelWidth = getTargetPixelWidth();
+    if (Math.abs(pixelWidth - previousPixelWidth) <= VisionConstants.kPixelWidthChangeThreshold) {
+      pixelWidthStableCount++;
+    } else {
+      pixelWidthStableCount = 0;
+    }
+    previousPixelWidth = pixelWidth;
+
+    return pixelWidthStableCount >= VisionConstants.kPixelWidthStableCounts;
+  }
+
+  private double getPixelWidthStable() {
+    return isPixelWidthStable() ? 1.0 : 0.0;
+  }
+
+  private void resetVisionCheckSystem() {
+    visionCheckTime.reset();
+    visionCheckTime.start();
+    numOfSerialChanges = 0;
+  }
+
+  public boolean isVisionWorking() {
+    return !isVisionWorking;
+  }
+
+  @Override
+  public void periodic() {
+    if (lastSerialNum != targetData.serial) {
+      numOfSerialChanges++;
+      lastSerialNum = targetData.serial;
+    }
+    if (visionCheckTime.hasElapsed(VisionConstants.kTimeForVisionCheck)) {
+      if (numOfSerialChanges < VisionConstants.kNumOfVisionChecks) {
+        logger.error("Deadeye is NOT working");
+        isVisionWorking = false;
+      } else {
+        isVisionWorking = true;
+      }
+      resetVisionCheckSystem();
+    }
   }
 }

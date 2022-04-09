@@ -10,18 +10,29 @@ public class AutoIntakeCommand extends CommandBase {
   public final MagazineSubsystem magazineSubsystem;
   public final IntakeSubsystem intakeSubsystem;
   public boolean magazineReversed = false;
+  public boolean isAuton;
+  public boolean intakeExtend;
 
-  public AutoIntakeCommand(MagazineSubsystem magazineSubsystem, IntakeSubsystem intakeSubsystem) {
+  public AutoIntakeCommand(
+      MagazineSubsystem magazineSubsystem,
+      IntakeSubsystem intakeSubsystem,
+      boolean isAuton,
+      boolean intakeExtend) {
     addRequirements(magazineSubsystem, intakeSubsystem);
     this.magazineSubsystem = magazineSubsystem;
     this.intakeSubsystem = intakeSubsystem;
+    this.isAuton = isAuton;
+    this.intakeExtend = intakeExtend;
   }
 
   @Override
   public void initialize() {
     magazineSubsystem.indexCargo();
-    intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeSpeed);
+    intakeSubsystem.openLoopRotate(
+        isAuton ? IntakeConstants.kIntakeSpeedAuto : IntakeConstants.kIntakeSpeed);
     magazineReversed = false;
+    if (intakeExtend) intakeSubsystem.extendClosedLoop();
+    else intakeSubsystem.retractClosedLoop();
   }
 
   @Override
@@ -32,23 +43,23 @@ public class AutoIntakeCommand extends CommandBase {
       magazineReversed = true;
     } else if (magazineReversed
         && (magazineSubsystem.getCurrLowerMagazineState() != LowerMagazineState.EJECT_CARGO)) {
-      intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeSpeed);
+      intakeSubsystem.openLoopRotate(
+          isAuton ? IntakeConstants.kIntakeSpeedAuto : IntakeConstants.kIntakeSpeed);
       magazineReversed = false;
     }
   }
 
   @Override
   public boolean isFinished() {
-    return magazineSubsystem.isMagazineFull();
+    return magazineSubsystem.isMagazineFull()
+        && magazineSubsystem.getCurrLowerMagazineState() == LowerMagazineState.WAIT_UPPER;
   }
 
   @Override
   public void end(boolean interrupted) {
-    if (interrupted) {
-      magazineSubsystem.magazineInterrupted();
-      intakeSubsystem.openLoopRotate(0.0);
-    } else {
+    if (!interrupted) {
       intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeReverseSpeed);
     }
+    if (!isAuton) intakeSubsystem.retractClosedLoop();
   }
 }

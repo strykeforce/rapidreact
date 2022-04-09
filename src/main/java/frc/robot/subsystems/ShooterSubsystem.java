@@ -26,8 +26,16 @@ public class ShooterSubsystem extends MeasurableSubsystem {
   private final MagazineSubsystem magazineSubsystem;
   private final VisionSubsystem visionSubsystem;
   private boolean highFender;
+  private boolean isBallOne;
   private ShooterState currentState = ShooterState.STOP;
-  private double shooterSetPointTicks, kickerSetpointTicks, hoodSetPointTicks;
+  private double shooterSetPointTicks,
+      kickerSetpointTicks,
+      hoodSetPointTicks,
+      logShooterTicks,
+      logKickerTicks,
+      logHoodTicks,
+      oldWidthPixels,
+      oldIndex;
   private String[][] lookupTable;
   private double lastLookupDistance = 0.0;
 
@@ -101,6 +109,10 @@ public class ShooterSubsystem extends MeasurableSubsystem {
 
   private double[] getShootSolution() {
     double widthPixels = visionSubsystem.getTargetPixelWidth();
+    return getShootSolution(widthPixels);
+  }
+
+  private double[] getShootSolution(double widthPixels) {
     int index = 0;
     double[] shootSolution = new double[3];
     if (widthPixels < ShooterConstants.kLookupMinPixel) {
@@ -126,17 +138,13 @@ public class ShooterSubsystem extends MeasurableSubsystem {
       //         (Math.round(widthPixels / ShooterConstants.kLookupRes)
       //             + 1
       //             - ShooterConstants.kLookupMinPixel);
-      logger.info("Selected Index: {}, widthPixels: {}", index, widthPixels);
+      oldIndex = index;
+      oldWidthPixels = widthPixels;
     }
 
     shootSolution[0] = Double.parseDouble(lookupTable[index][2]);
     shootSolution[1] = Double.parseDouble(lookupTable[index][3]);
     shootSolution[2] = Double.parseDouble(lookupTable[index][4]);
-    logger.info(
-        "Kicker Speed: {} Shooter Speed: {} Hood Pos: {}",
-        shootSolution[0],
-        shootSolution[1],
-        shootSolution[2]);
     return shootSolution;
   }
 
@@ -163,13 +171,28 @@ public class ShooterSubsystem extends MeasurableSubsystem {
     kickerFalcon.set(ControlMode.Velocity, kickerSpeed);
     shooterSetPointTicks = shooterSpeed;
     kickerSetpointTicks = kickerSpeed;
-    logger.info("Kicker at {} speed, Shooter at {} speed", kickerSpeed, shooterSpeed);
+    logShooterTicks = shooterSpeed;
+    logKickerTicks = kickerSpeed;
+  }
+
+  public void logShotSol() {
+    logger.info(
+        "Kicker setpoint {}, Shooter setpoint {}, Hood setpoint {}",
+        logKickerTicks,
+        logShooterTicks,
+        logHoodTicks);
+    logger.info(
+        "Kicker at {} speed, Shooter at {} speed, Hood at {} pos",
+        kickerFalcon.getSelectedSensorVelocity(),
+        shooterFalcon.getSelectedSensorVelocity(),
+        hoodTalon.getSelectedSensorPosition());
+    logger.info("Selected Index: {}, widthPixels: {}", oldIndex, oldWidthPixels);
   }
 
   public void hoodClosedLoop(double hoodPos) {
     hoodTalon.set(ControlMode.MotionMagic, hoodPos);
     hoodSetPointTicks = hoodPos;
-    logger.info("Hood is moving to {}", hoodPos);
+    logHoodTicks = hoodSetPointTicks;
   }
 
   public boolean isShooterAtSpeed() {
@@ -204,8 +227,10 @@ public class ShooterSubsystem extends MeasurableSubsystem {
   }
 
   public void shoot() {
-    logger.info("SHOOT: {} -> ADJUSTING", currentState);
-    currentState = ShooterState.ADJUSTING;
+    if (currentState != ShooterState.SHOOT) {
+      logger.info("SHOOT: {} -> ADJUSTING", currentState);
+      currentState = ShooterState.ADJUSTING;
+    }
     if (!magazineSubsystem.isNextCargoAlliance()) {
       shooterClosedLoop(
           ShooterConstants.kKickerOpTicksP100ms, ShooterConstants.kShooterOpTicksP100ms);
@@ -220,6 +245,14 @@ public class ShooterSubsystem extends MeasurableSubsystem {
 
   public double getLastLookupDistance() {
     return lastLookupDistance;
+  }
+
+  public void manualShoot(double widthPixels) {
+    logger.info("No vision: SHOOT: {} -> ADJUSTING", currentState);
+    currentState = ShooterState.ADJUSTING;
+    double[] shootSolution = getShootSolution(widthPixels);
+    shooterClosedLoop(shootSolution[0], shootSolution[1]);
+    hoodClosedLoop(shootSolution[2]);
   }
 
   public void fenderShot() {
@@ -248,6 +281,23 @@ public class ShooterSubsystem extends MeasurableSubsystem {
       hoodClosedLoop(ShooterConstants.kHoodFenderLowTicks);
       logger.info("Low Fender Shot");
     }
+  }
+
+  public void geyserShot(boolean isBallOne) {
+    this.isBallOne = isBallOne;
+    logger.info("GEYSER_SHOT: {} -> ADJUSTING", currentState);
+    currentState = ShooterState.ADJUSTING;
+    shooterClosedLoop(
+        ShooterConstants.kKickerGeyserTicksP100ms, ShooterConstants.kShooterGeyserTicksP100ms);
+    if (isBallOne) {
+      hoodClosedLoop(ShooterConstants.kHoodGeyserBallTwoTicks);
+    } else {
+      hoodClosedLoop(ShooterConstants.kHoodGeyserBallTwoTicks);
+    }
+  }
+
+  public void geyserShot() {
+    geyserShot(!isBallOne);
   }
 
   public void stop() {
@@ -279,7 +329,10 @@ public class ShooterSubsystem extends MeasurableSubsystem {
         }
         break;
       case ARMED:
-        // Just indicates that it is ready to shoot for other classes
+        if (visionSubsystem.isValid()) {
+          double[] shootSolution = getShootSolution();
+          shooterClosedLoop(shootSolution[0], shootSolution[1]);
+        }
         break;
       case ADJUSTING:
         if (isHoodAtPos() && isShooterAtSpeed()) {
@@ -303,7 +356,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
 
   @Override
   public Set<Measure> getMeasures() {
-    return Set.of();
+    return Set.of(new Measure("Shooter State", () -> currentState.ordinal()));
   }
 
   public enum ShooterState {

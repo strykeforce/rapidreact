@@ -9,7 +9,6 @@ import static frc.robot.Constants.TurretConstants.kTurretZeroTicks;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.BaseTalon;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -40,6 +39,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
   private double targetTurretPosition = 0;
   private double cruiseVelocity = kFastCruiseVelocity;
   private boolean lastDoRotate = false;
+  private boolean isBallOne = true;
 
   private int trackingStableCount;
   private int
@@ -66,7 +66,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
     turret.enableCurrentLimit(false);
     turret.enableVoltageCompensation(true);
     turret.configSupplyCurrentLimit(Constants.TurretConstants.getSupplyCurrentLimitConfig());
-    turret.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 10); // FIXME
+    // turret.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 10); // FIXME
     //    turret.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 5);
   }
 
@@ -198,20 +198,6 @@ public class TurretSubsystem extends MeasurableSubsystem {
     return turretStableCounts >= Constants.ShooterConstants.kStableCounts;
   }
 
-  @Override
-  public @NotNull Set<Measure> getMeasures() {
-    return Set.of(
-        new Measure("isRotationFinished", () -> isRotationFinished() ? 1.0 : 0.0),
-        new Measure("TurretAtTarget", () -> isTurretAtTarget() ? 1.0 : 0.0),
-        new Measure("rotateKp", this::getRotateByKp));
-  }
-
-  @Override
-  public void registerWith(@NotNull TelemetryService telemetryService) {
-    super.registerWith(telemetryService);
-    telemetryService.register(turret);
-  }
-
   public Rotation2d getTurretRotation2d() {
     return new Rotation2d(
         turret.getSelectedSensorPosition() / -TurretConstants.kTurretTicksPerRadian);
@@ -309,11 +295,17 @@ public class TurretSubsystem extends MeasurableSubsystem {
   public void trackTarget() {
     logger.info("Started tracking target");
     // currentState = TurretState.SEEK_LEFT;
-    seekingCount = 0;
     // setSeekAngle(true);
+    setCruiseVelocityFast(true); // true
+    seekCenter();
+    currentState = TurretState.SEEK_CENTER; // SEEK_CENTER
+  }
+
+  public void odometryAim() {
+    logger.info("Tracking target with odometry");
+    currentState = TurretState.ODOM_ADJUSTING;
     setCruiseVelocityFast(true);
     seekCenter();
-    currentState = TurretState.SEEK_CENTER;
   }
 
   public void stopTrackingTarget() {
@@ -322,7 +314,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
   }
 
   public void fenderShot(boolean doRotate) {
-    logger.info("{} -> FENDER_ADJUSTING}", currentState);
+    logger.info("{} -> FENDER_ADJUSTING", currentState);
     currentState = TurretState.FENDER_ADJUSTING;
     lastDoRotate = doRotate;
     if (magazineSubsystem.isNextCargoAlliance() || (!doRotate)) {
@@ -334,6 +326,18 @@ public class TurretSubsystem extends MeasurableSubsystem {
     } else {
       rotateTo(TurretConstants.kFenderOpponent);
       logger.info("Fender Shot: Opponent Cargo");
+    }
+  }
+
+  public void geyserShot(boolean isBallOne) {
+    logger.info("{} -> GEYSER_ADJUSTING", currentState);
+    currentState = TurretState.GEYSER_ADJUSTING;
+    if (isBallOne) {
+      rotateTo(TurretConstants.kGeyserBallOnePosition);
+      logger.info("Geyser Shot: Starting Ball One Sequence");
+    } else {
+      rotateTo(TurretConstants.kGeyserBallTwoPosition);
+      logger.info("Geyser Shot: Starting Ball Two Sequence");
     }
   }
 
@@ -368,7 +372,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
         // fall through
       case SEEK_RIGHT:
         targetData = visionSubsystem.getTargetData();
-        setCruiseVelocityFast(false);
+        // setCruiseVelocityFast(false);
         if (targetData.isValid()) {
           logger.info("{} -> AIMING", currentState);
           logger.info("targetData: {}", targetData);
@@ -399,16 +403,16 @@ public class TurretSubsystem extends MeasurableSubsystem {
       case AIMING:
         // fall through
       case TRACKING:
-        setCruiseVelocityFast(false);
+        // setCruiseVelocityFast(false);
         targetData = visionSubsystem.getTargetData();
         if (!targetData.isValid()) {
           notValidTargetCount++;
           logger.info("notValidTargetCount: {}", notValidTargetCount);
           if (notValidTargetCount > TurretConstants.kNotValidTargetCounts) {
-            logger.info("{} -> SEEKING: {}", currentState, targetData);
-            currentState = TurretState.SEEK_LEFT;
+            logger.info("{} -> SEEK_CENTER: {}", currentState, targetData);
+            currentState = TurretState.SEEK_CENTER;
             seekingCount = 0;
-            setSeekAngleLeft(true);
+            seekCenter();
             break;
           }
           // If not valid but < not valid counts just hold last position
@@ -416,7 +420,11 @@ public class TurretSubsystem extends MeasurableSubsystem {
         } else {
           notValidTargetCount = 0;
         }
-        errorRotation2d = targetData.getErrorRotation2d();
+        if (targetData.isValid()) {
+          errorRotation2d = targetData.getErrorRotation2d();
+        } else {
+          errorRotation2d = Rotation2d.fromDegrees(0);
+        }
 
         if (Math.abs(errorRotation2d.getRadians())
             < TurretConstants.kCloseEnoughTarget.getRadians()) {
@@ -441,6 +449,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
         if (visionRotateBy(errorRotation2d.times(rotateKp))) {
           logger.info("{} -> WRAPPING", currentState);
           currentState = TurretState.WRAPPING;
+          setCruiseVelocityFast(true);
           break;
         }
         break;
@@ -461,12 +470,46 @@ public class TurretSubsystem extends MeasurableSubsystem {
       case FENDER_AIMED:
         // indicator for other subsystems
         break;
+      case ODOM_ADJUSTING:
+        // setCruiseVelocityFast(true);
+        if (isTurretAtTarget()) {
+          currentState = TurretState.ODOM_AIMED;
+          logger.info("ODOM_ADJUSTING -> ODOM_AIMED");
+        }
+        break;
+      case ODOM_AIMED:
+        // indicator for other subsystems
+        break;
+      case GEYSER_ADJUSTING:
+        if (isTurretAtTarget()) {
+          currentState = TurretState.GEYSER_AIMED;
+          logger.info("GEYSER_ADJUSTING -> GEYSER_AIMED");
+        }
+        break;
+      case GEYSER_AIMED:
+        // indicator for other subsystems
+        break;
       case IDLE:
         // do nothing
         break;
       default:
         break;
     }
+  }
+
+  @Override
+  public @NotNull Set<Measure> getMeasures() {
+    return Set.of(
+        new Measure("isRotationFinished", () -> isRotationFinished() ? 1.0 : 0.0),
+        new Measure("TurretAtTarget", () -> isTurretAtTarget() ? 1.0 : 0.0),
+        new Measure("rotateKp", this::getRotateByKp),
+        new Measure("state", () -> currentState.ordinal()));
+  }
+
+  @Override
+  public void registerWith(@NotNull TelemetryService telemetryService) {
+    super.registerWith(telemetryService);
+    telemetryService.register(turret);
   }
 
   public enum TurretState {
@@ -478,6 +521,10 @@ public class TurretSubsystem extends MeasurableSubsystem {
     IDLE,
     FENDER_ADJUSTING,
     FENDER_AIMED,
-    WRAPPING;
+    ODOM_ADJUSTING,
+    ODOM_AIMED,
+    WRAPPING,
+    GEYSER_ADJUSTING,
+    GEYSER_AIMED;
   }
 }
