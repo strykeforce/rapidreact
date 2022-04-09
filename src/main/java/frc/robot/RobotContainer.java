@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SuppliedValueWidget;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -57,7 +58,6 @@ import frc.robot.commands.sequences.climb.HighClimbCommandGroup;
 import frc.robot.commands.sequences.climb.MidClimbCommandGroup;
 import frc.robot.commands.sequences.climb.TraverseClimbCommandGroup;
 import frc.robot.commands.sequences.intaking.AutoIntakeCommand;
-import frc.robot.commands.sequences.intaking.AutoIntakeCommandGroup;
 import frc.robot.commands.sequences.intaking.ExtendIntakeCommand;
 import frc.robot.commands.sequences.shooting.ArmShooterCommandGroup;
 import frc.robot.commands.sequences.shooting.HighFenderShotCommand;
@@ -69,6 +69,7 @@ import frc.robot.commands.sequences.shooting.VisionTimedShootCommandGroup;
 import frc.robot.commands.shooter.HoodClosedLoopCommand;
 import frc.robot.commands.shooter.HoodOpenLoopCommand;
 import frc.robot.commands.shooter.ShooterOpenLoopCommand;
+import frc.robot.commands.shooter.StopShooterCommand;
 import frc.robot.commands.turret.OpenLoopTurretCommand;
 import frc.robot.commands.turret.RotateToCommand;
 import frc.robot.commands.turret.TurretAimCommandGroup;
@@ -299,23 +300,20 @@ public class RobotContainer {
                 true,
                 intakeSubsystem));
     new JoystickButton(xboxController, XboxController.Button.kY.value)
-        .toggleWhenPressed(
-            new AutoIntakeCommandGroup(
-                magazineSubsystem,
-                intakeSubsystem,
-                visionSubsystem,
-                turretSubsystem,
-                shooterSubsystem,
-                false,
-                true));
+        .toggleWhenPressed(new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, false, true));
     LeftTriggerDown.whileActiveOnce(new ExtendIntakeCommand(intakeSubsystem, true));
     RightTriggerDown.whileActiveOnce(new ExtendIntakeCommand(intakeSubsystem, false));
 
     // Eject Cargo Reverse
     new JoystickButton(xboxController, XboxController.Button.kBack.value)
-        .whenPressed(new ManualEjectCargoReverseCommand(magazineSubsystem, intakeSubsystem));
+        .whenPressed(
+            new ManualEjectCargoReverseCommand(
+                magazineSubsystem, intakeSubsystem, shooterSubsystem));
     new JoystickButton(xboxController, XboxController.Button.kBack.value)
-        .whenReleased(new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, false, false));
+        .whenReleased(
+            new ParallelCommandGroup(
+                new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, false, false),
+                new StopShooterCommand(shooterSubsystem)));
 
     // Arm Shooter
     new JoystickButton(xboxController, XboxController.Button.kB.value)

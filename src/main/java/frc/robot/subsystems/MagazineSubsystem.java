@@ -582,8 +582,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
         if (timedShootTimer.hasElapsed(MagazineConstants.kTimedShootTimerDelay)) {
           logger.info("TIMED_FEED -> EMPTY");
           currUpperMagazineState = UpperMagazineState.EMPTY;
-          shotOneCargo();
-          shotOneCargo();
+          clearCargoColors();
           enableUpperBeamBreak(true);
         }
         break;

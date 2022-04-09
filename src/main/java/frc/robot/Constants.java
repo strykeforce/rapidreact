@@ -776,6 +776,9 @@ public final class Constants {
     public static final double kShooterFenderLowTicksP100ms = 6_500; // 6000
     public static final double kHoodFenderLowTicks = 2_600; // 4000
 
+    public static final double kShooterManualEjectTicksP100ms = -5_000;
+    public static final double kKickerManualEjectTicksP100ms = -5_000;
+
     public static final int kStableCounts = 5; // FIX ME
     public static final double kCloseEnoughTicksP100ms = 50; // 100
     public static final double kCloseEnoughTicks = 150; // 100
