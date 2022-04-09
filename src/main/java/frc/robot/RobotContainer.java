@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SuppliedValueWidget;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -63,10 +64,12 @@ import frc.robot.commands.sequences.shooting.HighFenderShotCommand;
 import frc.robot.commands.sequences.shooting.LowFenderShotCommand;
 import frc.robot.commands.sequences.shooting.PitShooterTuneCommandGroup;
 import frc.robot.commands.sequences.shooting.StopShooterCommandGroup;
-import frc.robot.commands.sequences.shooting.VisionShootCommand;
+import frc.robot.commands.sequences.shooting.VisionShootCommandGroup;
+import frc.robot.commands.sequences.shooting.VisionTimedShootCommandGroup;
 import frc.robot.commands.shooter.HoodClosedLoopCommand;
 import frc.robot.commands.shooter.HoodOpenLoopCommand;
 import frc.robot.commands.shooter.ShooterOpenLoopCommand;
+import frc.robot.commands.shooter.StopShooterCommand;
 import frc.robot.commands.turret.OpenLoopTurretCommand;
 import frc.robot.commands.turret.RotateToCommand;
 import frc.robot.commands.turret.TurretAimCommandGroup;
@@ -127,9 +130,10 @@ public class RobotContainer {
     visionSubsystem = new VisionSubsystem();
     turretSubsystem = new TurretSubsystem(visionSubsystem, driveSubsystem);
     climbSubsystem = new ClimbSubsystem();
-    magazineSubsystem = new MagazineSubsystem(turretSubsystem, visionSubsystem);
-    shooterSubsystem = new ShooterSubsystem(magazineSubsystem, visionSubsystem);
     intakeSubsystem = new IntakeSubsystem();
+    magazineSubsystem =
+        new MagazineSubsystem(turretSubsystem, visionSubsystem, driveSubsystem, intakeSubsystem);
+    shooterSubsystem = new ShooterSubsystem(magazineSubsystem, visionSubsystem);
     odometryTestSubsystem = new OdometryTestSubsystem();
     autoSwitch =
         new AutoSwitch(
@@ -154,6 +158,10 @@ public class RobotContainer {
 
   public VisionSubsystem getVisionSubsystem() {
     return visionSubsystem;
+  }
+
+  public Command startAutoIntake() {
+    return new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, false, false);
   }
 
   public AutoSwitch getAutoSwitch() {
@@ -239,7 +247,7 @@ public class RobotContainer {
     // Vision Shoot
     new JoystickButton(driveJoystick, Shoulder.RIGHT_DOWN.id)
         .whenPressed(
-            new VisionShootCommand(
+            new VisionShootCommandGroup(
                 shooterSubsystem,
                 turretSubsystem,
                 magazineSubsystem,
@@ -272,6 +280,25 @@ public class RobotContainer {
         .whenReleased(new ZeroClimbCommand(climbSubsystem));
 
     // Auto Intake
+    // new JoystickButton(xboxController, XboxController.Button.kA.value)
+    //     .toggleWhenPressed(
+    //         new AutoIntakeCommandGroup(
+    //             magazineSubsystem,
+    //             intakeSubsystem,
+    //             visionSubsystem,
+    //             turretSubsystem,
+    //             shooterSubsystem,
+    //             false,
+    //             false));
+    new JoystickButton(xboxController, XboxController.Button.kA.value)
+        .whenPressed(
+            new VisionTimedShootCommandGroup(
+                shooterSubsystem,
+                turretSubsystem,
+                magazineSubsystem,
+                visionSubsystem,
+                true,
+                intakeSubsystem));
     new JoystickButton(xboxController, XboxController.Button.kY.value)
         .toggleWhenPressed(new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, false, true));
     LeftTriggerDown.whileActiveOnce(new ExtendIntakeCommand(intakeSubsystem, true));
@@ -279,12 +306,14 @@ public class RobotContainer {
 
     // Eject Cargo Reverse
     new JoystickButton(xboxController, XboxController.Button.kBack.value)
-        .whenPressed(new ManualEjectCargoReverseCommand(magazineSubsystem, intakeSubsystem));
+        .whenPressed(
+            new ManualEjectCargoReverseCommand(
+                magazineSubsystem, intakeSubsystem, shooterSubsystem));
     new JoystickButton(xboxController, XboxController.Button.kBack.value)
         .whenReleased(
             new ParallelCommandGroup(
-                new IntakeOpenLoopCommand(intakeSubsystem, 0.0),
-                new StopMagazineCommand(magazineSubsystem)));
+                new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, false, false),
+                new StopShooterCommand(shooterSubsystem)));
 
     // Arm Shooter
     new JoystickButton(xboxController, XboxController.Button.kB.value)
@@ -308,8 +337,6 @@ public class RobotContainer {
     //             turretSubsystem, shooterSubsystem, magazineSubsystem, intakeSubsystem));
     // new JoystickButton(xboxController, XboxController.Button.kA.value)
     //     .whenReleased(new StopShooterCommand(shooterSubsystem));
-    new JoystickButton(xboxController, XboxController.Button.kA.value)
-        .toggleWhenPressed(new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, false, false));
 
     // High Fender Shot
     new JoystickButton(xboxController, XboxController.Button.kRightBumper.value)
@@ -376,8 +403,13 @@ public class RobotContainer {
 
     Shuffleboard.getTab("Match")
         .addBoolean("IgnoreColorSensor", () -> magazineSubsystem.isColorSensorIgnored())
-        .withSize(2, 2)
+        .withSize(2, 1)
         .withPosition(3, 0);
+
+    Shuffleboard.getTab("Match")
+        .addBoolean("VisionNotWorking", () -> visionSubsystem.isVisionWorking())
+        .withSize(2, 1)
+        .withPosition(3, 1);
 
     Shuffleboard.getTab("Match")
         .add("EstopClimb", new EmergencyStopClimbCommand(climbSubsystem))

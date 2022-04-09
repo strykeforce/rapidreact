@@ -23,6 +23,7 @@ public class IntakeSubsystem extends MeasurableSubsystem {
   private int lastAbsPos = Integer.MAX_VALUE;
   private int zeroStableCounts = 0;
   private boolean didZero = false;
+  private boolean isIntakeExtended = false;
 
   public IntakeSubsystem() {
     intakeFalcon = new TalonFX(IntakeConstants.kIntakeFalconID);
@@ -71,13 +72,19 @@ public class IntakeSubsystem extends MeasurableSubsystem {
   public void extendClosedLoop() {
     intakeExtendTalon.set(ControlMode.MotionMagic, IntakeConstants.kIntakeExtendPos);
     intakeSetPointTicks = IntakeConstants.kIntakeExtendPos;
+    isIntakeExtended = true;
     logger.info("Intake is extending to {}", IntakeConstants.kIntakeExtendPos);
   }
 
   public void retractClosedLoop() {
     intakeExtendTalon.set(ControlMode.MotionMagic, IntakeConstants.kIntakeRetractPos);
     intakeSetPointTicks = IntakeConstants.kIntakeRetractPos;
+    isIntakeExtended = false;
     logger.info("Intake is retracting to {}", IntakeConstants.kIntakeRetractPos);
+  }
+
+  public boolean getIsIntakeExtended() {
+    return isIntakeExtended;
   }
 
   public boolean isIntakeAtPos() {

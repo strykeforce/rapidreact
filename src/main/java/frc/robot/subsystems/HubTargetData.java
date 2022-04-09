@@ -99,8 +99,8 @@ public class HubTargetData extends TargetListTargetData {
     return (kFrameCenter - Math.abs(getErrorPixels())) / kFrameCenter;
   }
 
-  public double testGetTargetsPixelWidth() {
-    double pixelWidth;
+  public int testGetTargetsPixelWidth() {
+    int pixelWidth;
 
     if (targets.size() % 2 == 1) {
       Rect leftTarget = targets.get((targets.size() - 1) / 2 - 1);

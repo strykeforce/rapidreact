@@ -5,6 +5,7 @@ import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.BaseTalon;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.ColorMatch;
 import com.revrobotics.ColorMatchResult;
@@ -30,7 +31,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   private ColorSensorV3 colorSensor;
   private Color lastColor = new Color(0, 0, 0);
   private int lastProximity = 0;
-  private TalonSRX lowerMagazineTalon;
+  private TalonFX lowerMagazineFalcon;
   private TalonSRX upperMagazineTalon;
   private CargoColor[] storedCargoColors = new CargoColor[] {CargoColor.NONE, CargoColor.NONE};
   private CargoColor allianceCargoColor = CargoColor.NONE;
@@ -39,28 +40,38 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   private UpperMagazineState currUpperMagazineState = UpperMagazineState.STOP;
   private final TurretSubsystem turretSubsystem;
   private final VisionSubsystem visionSubsystem;
+  private final DriveSubsystem driveSubsystem;
+  private final IntakeSubsystem intakeSubsystem;
   private ShooterSubsystem shooterSubsystem;
   private Timer shootTimer = new Timer();
   private Timer ejectTimer = new Timer();
   private Timer readTimer = new Timer();
+  private Timer timedShootTimer = new Timer();
   private boolean ignoreColorSensor = false;
   private boolean continueToShoot = false;
-  private int shootUpperBeamStableCounts = 0;
   private boolean isBeamBreakEnabled = false;
+  private int shootUpperBeamStableCounts = 0;
+  private boolean doTimedShoot = false;
 
-  public MagazineSubsystem(TurretSubsystem turretSubsystem, VisionSubsystem visionSubsystem) {
+  public MagazineSubsystem(
+      TurretSubsystem turretSubsystem,
+      VisionSubsystem visionSubsystem,
+      DriveSubsystem driveSubsystem,
+      IntakeSubsystem intakeSubsystem) {
+    this.driveSubsystem = driveSubsystem;
     this.turretSubsystem = turretSubsystem;
     this.visionSubsystem = visionSubsystem;
+    this.intakeSubsystem = intakeSubsystem;
     colorSensor = new ColorSensorV3(Port.kMXP);
 
-    lowerMagazineTalon = new TalonSRX(MagazineConstants.kLowerMagazineTalonID);
-    lowerMagazineTalon.configFactoryDefault(Constants.kTalonConfigTimeout);
-    lowerMagazineTalon.configAllSettings(
+    lowerMagazineFalcon = new TalonFX(MagazineConstants.kLowerMagazineTalonID);
+    lowerMagazineFalcon.configFactoryDefault(Constants.kTalonConfigTimeout);
+    lowerMagazineFalcon.configAllSettings(
         MagazineConstants.getLowerMagazineTalonConfig(), Constants.kTalonConfigTimeout);
-    lowerMagazineTalon.configSupplyCurrentLimit(
+    lowerMagazineFalcon.configSupplyCurrentLimit(
         MagazineConstants.getLowerMagazineCurrentLimit(), Constants.kTalonConfigTimeout);
-    lowerMagazineTalon.enableVoltageCompensation(true);
-    lowerMagazineTalon.setNeutralMode(NeutralMode.Brake);
+    lowerMagazineFalcon.enableVoltageCompensation(true);
+    lowerMagazineFalcon.setNeutralMode(NeutralMode.Brake);
 
     upperMagazineTalon = new TalonSRX(MagazineConstants.kUpperMagazineTalonID);
     upperMagazineTalon.configFactoryDefault(Constants.kTalonConfigTimeout);
@@ -83,7 +94,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
 
   public void enableUpperBeamBreak(boolean enableUpper) {
     if (isBeamBreakEnabled != enableUpper) {
-      logger.info("Enabling talon limit switch: {}", enableUpper);
+      logger.info("Enabling upper talon limit switch: {}", enableUpper);
     }
     if (enableUpper) {
       upperMagazineTalon.configForwardLimitSwitchSource(
@@ -98,21 +109,21 @@ public class MagazineSubsystem extends MeasurableSubsystem {
 
   public void enableLowerBeamBreak(boolean enableLower) {
     if (isBeamBreakEnabled != enableLower) {
-      logger.info("Enabling talon limit switch: {}", enableLower);
+      logger.info("Enabling lower talon limit switch: {}", enableLower);
     }
     if (enableLower) {
-      lowerMagazineTalon.configForwardLimitSwitchSource(
+      lowerMagazineFalcon.configForwardLimitSwitchSource(
           LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
       isBeamBreakEnabled = true;
     } else {
-      lowerMagazineTalon.configForwardLimitSwitchSource(
+      lowerMagazineFalcon.configForwardLimitSwitchSource(
           LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled);
       isBeamBreakEnabled = false;
     }
   }
 
   public void lowerOpenLoopRotate(double percentOutput) {
-    lowerMagazineTalon.set(ControlMode.PercentOutput, percentOutput);
+    lowerMagazineFalcon.set(ControlMode.PercentOutput, percentOutput);
     logger.info("Lower magazine motor turned on {}", percentOutput);
   }
 
@@ -122,11 +133,11 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   }
 
   public List<BaseTalon> getTalons() {
-    return List.of(lowerMagazineTalon, upperMagazineTalon);
+    return List.of(lowerMagazineFalcon, upperMagazineTalon);
   }
 
   public void lowerClosedLoopRotate(double speed) {
-    lowerMagazineTalon.set(ControlMode.Velocity, speed);
+    lowerMagazineFalcon.set(ControlMode.Velocity, speed);
     logger.info("Lower magazine motor closedLoopRotate {}", speed);
   }
 
@@ -139,14 +150,14 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     logger.info("Stopping Magazine");
     currLowerMagazineState = LowerMagazineState.STOP;
     currUpperMagazineState = UpperMagazineState.STOP;
-    lowerMagazineTalon.set(ControlMode.PercentOutput, 0.0);
+    lowerMagazineFalcon.set(ControlMode.PercentOutput, 0.0);
     if (storedCargoColors[0] != CargoColor.NONE)
       upperMagazineTalon.set(ControlMode.Velocity, MagazineConstants.kUpperMagazineIntakeSpeed);
     else upperClosedLoopRotate(0.0);
   }
 
   public boolean isLowerBeamBroken() {
-    boolean lowerBeam = lowerMagazineTalon.getSensorCollection().isFwdLimitSwitchClosed();
+    boolean lowerBeam = (lowerMagazineFalcon.getSensorCollection().isFwdLimitSwitchClosed() == 1);
     return lowerBeam;
   }
 
@@ -340,7 +351,23 @@ public class MagazineSubsystem extends MeasurableSubsystem {
       currUpperMagazineState = UpperMagazineState.EMPTY;
     }
     continueToShoot = true;
+    doTimedShoot = false;
     // }
+  }
+
+  public void timedShoot() {
+    doTimedShoot = true;
+    continueToShoot = true;
+    enableUpperBeamBreak(true);
+    enableLowerBeamBreak(true);
+    if (currLowerMagazineState == LowerMagazineState.STOP) {
+      logger.info("lower {} -> WAIT_CARGO", currLowerMagazineState);
+      lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIntakeSpeed);
+    }
+    if (currUpperMagazineState == UpperMagazineState.STOP) {
+      logger.info("upper {} -> EMPTY", currUpperMagazineState);
+      currUpperMagazineState = UpperMagazineState.EMPTY;
+    }
   }
 
   public void setManualState() {
@@ -371,7 +398,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
           lowerOpenLoopRotate(0.0);
           break;
         } else if (storedCargoColors[1] == CargoColor.NONE) {
-          // if (lowerMagazineTalon.getMotorOutputPercent() == 0.0) {
+          // if (lowerMagazineFalcon.getMotorOutputPercent() == 0.0) {
           //   lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIntakeSpeed);
           // }
         }
@@ -398,7 +425,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
           }
           if (cargoColor != allianceCargoColor && !ignoreColorSensor) {
             logger.info("READ_CARGO -> EJECT_CARGO");
-            lowerClosedLoopRotate(MagazineConstants.kMagazineEjectSpeed);
+            lowerClosedLoopRotate(MagazineConstants.kLowerMagazineEjectSpeed);
             currLowerMagazineState = LowerMagazineState.EJECT_CARGO;
             ejectTimer.reset();
             ejectTimer.start();
@@ -448,6 +475,13 @@ public class MagazineSubsystem extends MeasurableSubsystem {
         }
         break;
 
+      case TIMED_FEED:
+        if (timedShootTimer.hasElapsed(MagazineConstants.kTimedShootTimerDelay)) {
+          logger.info("TIMED_FEED -> WAIT_CARGO");
+          currLowerMagazineState = LowerMagazineState.WAIT_CARGO;
+          enableLowerBeamBreak(true);
+        }
+        break;
       case STOP:
         break;
     }
@@ -513,11 +547,36 @@ public class MagazineSubsystem extends MeasurableSubsystem {
         break;
 
       case PAUSE:
+        // Vision Shoot
         if (shooterSubsystem.getCurrentState() == ShooterState.SHOOT
             && (turretSubsystem.getState() == TurretState.TRACKING
                 || turretSubsystem.getState() == TurretState.FENDER_AIMED
                 || turretSubsystem.getState() == TurretState.ODOM_AIMED
                 || turretSubsystem.getState() == TurretState.GEYSER_AIMED)) {
+            && turretSubsystem.getState() == TurretState.TRACKING
+            && visionSubsystem.isPixelWidthStable()
+            && driveSubsystem.isVelocityStable()) {
+          if (doTimedShoot) {
+            logger.info("PAUSE -> TIMED_FEED");
+            currUpperMagazineState = UpperMagazineState.TIMED_FEED;
+            currLowerMagazineState = LowerMagazineState.TIMED_FEED;
+            enableUpperBeamBreak(false);
+            enableLowerBeamBreak(false);
+            upperClosedLoopRotate(MagazineConstants.kUpperMagazineFeedSpeed);
+            lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIndexSpeed);
+            timedShootTimer.reset();
+            timedShootTimer.start();
+          } else {
+            logger.info("PAUSE -> SHOOT");
+            shooterSubsystem.logShotSol();
+            enableUpperBeamBreak(false);
+            upperClosedLoopRotate(MagazineConstants.kUpperMagazineFeedSpeed);
+            currUpperMagazineState = UpperMagazineState.SHOOT;
+          }
+          // Fender Shot || Odometry Aim
+        } else if (shooterSubsystem.getCurrentState() == ShooterState.SHOOT
+            && (turretSubsystem.getState() == TurretState.FENDER_AIMED
+                || turretSubsystem.getState() == TurretState.ODOM_AIMED)) {
           logger.info("PAUSE -> SHOOT");
           enableUpperBeamBreak(false);
           upperClosedLoopRotate(MagazineConstants.kUpperMagazineFeedSpeed);
@@ -525,6 +584,15 @@ public class MagazineSubsystem extends MeasurableSubsystem {
         } else if (turretSubsystem.getState() == TurretState.TRACKING
             && visionSubsystem.isValid()) {
           shooterSubsystem.shoot();
+        }
+        break;
+
+      case TIMED_FEED:
+        if (timedShootTimer.hasElapsed(MagazineConstants.kTimedShootTimerDelay)) {
+          logger.info("TIMED_FEED -> EMPTY");
+          currUpperMagazineState = UpperMagazineState.EMPTY;
+          clearCargoColors();
+          enableUpperBeamBreak(true);
         }
         break;
 
@@ -536,7 +604,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   @Override
   public void registerWith(TelemetryService telemetryService) {
     super.registerWith(telemetryService);
-    telemetryService.register(lowerMagazineTalon);
+    telemetryService.register(lowerMagazineFalcon);
     telemetryService.register(upperMagazineTalon);
   }
 
@@ -570,6 +638,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     WAIT_UPPER,
     WAIT_EMPTY,
     EJECT_CARGO,
+    TIMED_FEED,
     STOP;
   }
 
@@ -580,6 +649,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     SHOOT,
     CARGO_SHOT,
     PAUSE,
+    TIMED_FEED,
     STOP;
   }
 }

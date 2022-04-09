@@ -28,7 +28,14 @@ public class ShooterSubsystem extends MeasurableSubsystem {
   private boolean highFender;
   private boolean isBallOne;
   private ShooterState currentState = ShooterState.STOP;
-  private double shooterSetPointTicks, kickerSetpointTicks, hoodSetPointTicks;
+  private double shooterSetPointTicks,
+      kickerSetpointTicks,
+      hoodSetPointTicks,
+      logShooterTicks,
+      logKickerTicks,
+      logHoodTicks,
+      oldWidthPixels,
+      oldIndex;
   private String[][] lookupTable;
 
   public ShooterSubsystem(MagazineSubsystem magazineSubsystem, VisionSubsystem visionSubsystem) {
@@ -130,17 +137,13 @@ public class ShooterSubsystem extends MeasurableSubsystem {
       //         (Math.round(widthPixels / ShooterConstants.kLookupRes)
       //             + 1
       //             - ShooterConstants.kLookupMinPixel);
-      logger.info("Selected Index: {}, widthPixels: {}", index, widthPixels);
+      oldIndex = index;
+      oldWidthPixels = widthPixels;
     }
 
     shootSolution[0] = Double.parseDouble(lookupTable[index][2]);
     shootSolution[1] = Double.parseDouble(lookupTable[index][3]);
     shootSolution[2] = Double.parseDouble(lookupTable[index][4]);
-    logger.info(
-        "Kicker Speed: {} Shooter Speed: {} Hood Pos: {}",
-        shootSolution[0],
-        shootSolution[1],
-        shootSolution[2]);
     return shootSolution;
   }
 
@@ -167,13 +170,28 @@ public class ShooterSubsystem extends MeasurableSubsystem {
     kickerFalcon.set(ControlMode.Velocity, kickerSpeed);
     shooterSetPointTicks = shooterSpeed;
     kickerSetpointTicks = kickerSpeed;
-    logger.info("Kicker at {} speed, Shooter at {} speed", kickerSpeed, shooterSpeed);
+    logShooterTicks = shooterSpeed;
+    logKickerTicks = kickerSpeed;
+  }
+
+  public void logShotSol() {
+    logger.info(
+        "Kicker setpoint {}, Shooter setpoint {}, Hood setpoint {}",
+        logKickerTicks,
+        logShooterTicks,
+        logHoodTicks);
+    logger.info(
+        "Kicker at {} speed, Shooter at {} speed, Hood at {} pos",
+        kickerFalcon.getSelectedSensorVelocity(),
+        shooterFalcon.getSelectedSensorVelocity(),
+        hoodTalon.getSelectedSensorPosition());
+    logger.info("Selected Index: {}, widthPixels: {}", oldIndex, oldWidthPixels);
   }
 
   public void hoodClosedLoop(double hoodPos) {
     hoodTalon.set(ControlMode.MotionMagic, hoodPos);
     hoodSetPointTicks = hoodPos;
-    logger.info("Hood is moving to {}", hoodPos);
+    logHoodTicks = hoodSetPointTicks;
   }
 
   public boolean isShooterAtSpeed() {
@@ -305,7 +323,10 @@ public class ShooterSubsystem extends MeasurableSubsystem {
         }
         break;
       case ARMED:
-        // Just indicates that it is ready to shoot for other classes
+        if (visionSubsystem.isValid()) {
+          double[] shootSolution = getShootSolution();
+          shooterClosedLoop(shootSolution[0], shootSolution[1]);
+        }
         break;
       case ADJUSTING:
         if (isHoodAtPos() && isShooterAtSpeed()) {
