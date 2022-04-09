@@ -51,7 +51,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private State holoContInput = new State();
   private Rotation2d holoContAngle = new Rotation2d();
   private Double trajectoryActive = 0.0;
-  private final double[] lastVelocity = new double[3];
+  private double[] lastVelocity = new double[3];
+  private boolean fwdStable, strStable, yawStable, velStable;
 
   public DriveSubsystem() {
 
@@ -227,6 +228,21 @@ public class DriveSubsystem extends MeasurableSubsystem {
     return swerveDrive.getPoseMeters();
   }
 
+  public double getGyroRate() {
+    return swerveDrive.getGyroRate();
+  }
+
+  public boolean isVelocityStable() {
+    double gyroRate = swerveDrive.getGyroRate();
+    fwdStable = Math.abs(lastVelocity[0]) <= DriveConstants.kForwardThreshold;
+    strStable = Math.abs(lastVelocity[1]) <= DriveConstants.kStrafeThreshold;
+    yawStable = Math.abs(gyroRate) <= DriveConstants.kGyroRateThreshold;
+    boolean stable = fwdStable && strStable && yawStable;
+    velStable = stable;
+
+    return stable;
+  }
+
   // Trajectory TOML Parsing
   public PathData generateTrajectory(String trajectoryName) {
 
@@ -345,6 +361,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure("FWD Vel", () -> lastVelocity[0]),
         new Measure("STR Vel", () -> lastVelocity[1]),
         new Measure("YAW Vel", () -> lastVelocity[2]),
-        new Measure("FeadForwardTangent", () -> feedForwardAngle()));
+        new Measure("FeadForwardTangent", () -> feedForwardAngle()),
+        new Measure("Gyro Rate", () -> getGyroRate()));
   }
 }
