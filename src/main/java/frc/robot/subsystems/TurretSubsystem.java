@@ -462,6 +462,15 @@ public class TurretSubsystem extends MeasurableSubsystem {
       case ODOM_AIMED:
         // indicator for other subsystems
         break;
+      case STRYKE_ADJUSTING:
+        if (isTurretAtTarget()) {
+          currentState = TurretState.STRYKE_AIMED;
+          logger.info("STRYKE_ADJUSTING -> STRYKE_AIMED");
+        }
+        break;
+      case STRYKE_AIMED:
+        // indicator
+        break;
       case IDLE:
         // do nothing
         break;
@@ -496,6 +505,8 @@ public class TurretSubsystem extends MeasurableSubsystem {
     FENDER_AIMED,
     ODOM_ADJUSTING,
     ODOM_AIMED,
+    STRYKE_ADJUSTING,
+    STRYKE_AIMED,
     WRAPPING;
   }
 }

@@ -746,6 +746,7 @@ public final class Constants {
     public static final String kLookupTablePath = "/home/lvuser/deploy/LookupTable.csv";
 
     // StrykeShot Constants
+    public static final double kMiddleClimbY = 6.7;
     public static final double kLeftKickerTicksP100MS = 0.0;
     public static final double kLeftShooterTicksP100MS = 0.0;
     public static final double kLeftHoodTickPos = 0.0;

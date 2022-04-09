@@ -70,6 +70,8 @@ import frc.robot.commands.shooter.HoodClosedLoopCommand;
 import frc.robot.commands.shooter.HoodOpenLoopCommand;
 import frc.robot.commands.shooter.ShooterOpenLoopCommand;
 import frc.robot.commands.shooter.StopShooterCommand;
+import frc.robot.commands.shooter.StrykeShotCommand;
+import frc.robot.commands.shooter.SwitchClimbPos;
 import frc.robot.commands.turret.OpenLoopTurretCommand;
 import frc.robot.commands.turret.RotateToCommand;
 import frc.robot.commands.turret.TurretAimCommandGroup;
@@ -133,7 +135,7 @@ public class RobotContainer {
     intakeSubsystem = new IntakeSubsystem();
     magazineSubsystem =
         new MagazineSubsystem(turretSubsystem, visionSubsystem, driveSubsystem, intakeSubsystem);
-    shooterSubsystem = new ShooterSubsystem(magazineSubsystem, visionSubsystem);
+    shooterSubsystem = new ShooterSubsystem(magazineSubsystem, visionSubsystem, driveSubsystem);
     odometryTestSubsystem = new OdometryTestSubsystem();
     autoSwitch =
         new AutoSwitch(
@@ -225,8 +227,10 @@ public class RobotContainer {
     new JoystickButton(driveJoystick, Trim.RIGHT_X_NEG.id)
         .whenReleased(new OpenLoopTurretCommand(turretSubsystem, 0.0));
 
-    // new JoystickButton(driveJoystick, Button.HAMBURGER.id)
-    //     .whenPressed(new DriveAutonCommand(driveSubsystem, "straightPath", true, true));
+    new JoystickButton(driveJoystick, Button.HAMBURGER.id)
+        .whenPressed(
+            new StrykeShotCommand(
+                turretSubsystem, shooterSubsystem, magazineSubsystem, intakeSubsystem));
 
     new JoystickButton(driveJoystick, Trim.LEFT_Y_POS.id)
         .whenPressed(new EnableVisionCommand(visionSubsystem));
@@ -259,19 +263,19 @@ public class RobotContainer {
     new JoystickButton(driveJoystick, Trim.LEFT_X_POS.id)
         .whenPressed(
             new TraverseClimbCommandGroup(
-                climbSubsystem, driveSubsystem, driveJoystick, turretSubsystem));
+                climbSubsystem, driveSubsystem, shooterSubsystem, driveJoystick, turretSubsystem));
     new JoystickButton(driveJoystick, Trim.LEFT_X_NEG.id)
         .whenPressed(
             new TraverseClimbCommandGroup(
-                climbSubsystem, driveSubsystem, driveJoystick, turretSubsystem));
+                climbSubsystem, driveSubsystem, shooterSubsystem, driveJoystick, turretSubsystem));
     new JoystickButton(driveJoystick, Button.UP.id)
         .whenPressed(
             new HighClimbCommandGroup(
-                climbSubsystem, driveSubsystem, driveJoystick, turretSubsystem));
+                climbSubsystem, driveSubsystem, shooterSubsystem, driveJoystick, turretSubsystem));
     new JoystickButton(driveJoystick, Button.DOWN.id)
         .whenPressed(
             new MidClimbCommandGroup(
-                climbSubsystem, driveSubsystem, driveJoystick, turretSubsystem));
+                climbSubsystem, driveSubsystem, shooterSubsystem, driveJoystick, turretSubsystem));
   }
 
   private void configureOperatorButtonBindings() {
@@ -412,8 +416,18 @@ public class RobotContainer {
         .withPosition(3, 1);
 
     Shuffleboard.getTab("Match")
+        .addString("ClimbPosition", () -> shooterSubsystem.getIsLeft())
+        .withSize(1, 1)
+        .withPosition(8, 1);
+
+    Shuffleboard.getTab("Match")
+        .add("ChangeClimbPos", new SwitchClimbPos(shooterSubsystem))
+        .withSize(1, 1)
+        .withPosition(9, 1);
+
+    Shuffleboard.getTab("Match")
         .add("EstopClimb", new EmergencyStopClimbCommand(climbSubsystem))
-        .withSize(2, 2)
+        .withSize(2, 1)
         .withPosition(7, 0);
   }
 

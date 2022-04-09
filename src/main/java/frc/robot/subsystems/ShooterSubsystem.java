@@ -6,6 +6,7 @@ import com.ctre.phoenix.motorcontrol.can.BaseTalon;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.opencsv.CSVReader;
+import edu.wpi.first.math.geometry.Pose2d;
 import frc.robot.Constants;
 import frc.robot.Constants.ShooterConstants;
 import java.io.FileReader;
@@ -21,6 +22,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
 
   private static final Logger logger = LoggerFactory.getLogger(ShooterSubsystem.class);
   private final TalonFX shooterFalcon;
+  public final DriveSubsystem driveSubsystem;
   private final TalonFX kickerFalcon;
   private final TalonSRX hoodTalon;
   private final MagazineSubsystem magazineSubsystem;
@@ -38,9 +40,13 @@ public class ShooterSubsystem extends MeasurableSubsystem {
   private String[][] lookupTable;
   public boolean isLeft = true;
 
-  public ShooterSubsystem(MagazineSubsystem magazineSubsystem, VisionSubsystem visionSubsystem) {
+  public ShooterSubsystem(
+      MagazineSubsystem magazineSubsystem,
+      VisionSubsystem visionSubsystem,
+      DriveSubsystem driveSubsystem) {
     this.magazineSubsystem = magazineSubsystem;
     this.visionSubsystem = visionSubsystem;
+    this.driveSubsystem = driveSubsystem;
     parseLookupTable();
     shooterFalcon = new TalonFX(ShooterConstants.kShooterFalconID);
     shooterFalcon.configFactoryDefault(Constants.kTalonConfigTimeout);
@@ -243,6 +249,8 @@ public class ShooterSubsystem extends MeasurableSubsystem {
 
   public void strykeShot() {
     if (magazineSubsystem.isNextCargoAlliance()) {
+      logger.info("SHOOT: {} -> ADJUSTING", currentState);
+      currentState = ShooterState.ADJUSTING;
       shooterClosedLoop(
           isLeft
               ? ShooterConstants.kLeftKickerTicksP100MS
@@ -253,6 +261,23 @@ public class ShooterSubsystem extends MeasurableSubsystem {
       hoodClosedLoop(
           isLeft ? ShooterConstants.kLeftHoodTickPos : ShooterConstants.kRightHoodTickPos);
     }
+  }
+
+  public void setIsLeft(boolean pos) {
+    isLeft = pos;
+  }
+
+  public void checkLeft() {
+    Pose2d robotPos = driveSubsystem.getPoseMeters();
+    if (robotPos.getY() > ShooterConstants.kMiddleClimbY) {
+      isLeft = true;
+    } else {
+      isLeft = false;
+    }
+  }
+
+  public String getIsLeft() {
+    return isLeft ? "Left" : "Right";
   }
 
   public void manualShoot(double widthPixels) {

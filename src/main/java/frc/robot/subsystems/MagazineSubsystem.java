@@ -567,7 +567,8 @@ public class MagazineSubsystem extends MeasurableSubsystem {
           // Fender Shot || Odometry Aim
         } else if (shooterSubsystem.getCurrentState() == ShooterState.SHOOT
             && (turretSubsystem.getState() == TurretState.FENDER_AIMED
-                || turretSubsystem.getState() == TurretState.ODOM_AIMED)) {
+                || turretSubsystem.getState() == TurretState.ODOM_AIMED
+                || turretSubsystem.getState() == TurretState.STRYKE_AIMED)) {
           logger.info("PAUSE -> SHOOT");
           enableUpperBeamBreak(false);
           upperClosedLoopRotate(MagazineConstants.kUpperMagazineFeedSpeed);
