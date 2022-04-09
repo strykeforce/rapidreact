@@ -503,6 +503,11 @@ public class MagazineSubsystem extends MeasurableSubsystem {
           } else if (turretSubsystem.getState() == TurretState.ODOM_AIMED) {
             logger.info("WAIT_AIM -> PAUSE");
             currUpperMagazineState = UpperMagazineState.PAUSE;
+          } else if (turretSubsystem.getState() == TurretState.GEYSER_AIMED) {
+            logger.info("WAIT_AIM -> PAUSE");
+            shooterSubsystem.geyserShot();
+            turretSubsystem.geyserShot();
+            currUpperMagazineState = UpperMagazineState.PAUSE;
           }
         }
         break;
@@ -511,7 +516,8 @@ public class MagazineSubsystem extends MeasurableSubsystem {
         if (shooterSubsystem.getCurrentState() == ShooterState.SHOOT
             && (turretSubsystem.getState() == TurretState.TRACKING
                 || turretSubsystem.getState() == TurretState.FENDER_AIMED
-                || turretSubsystem.getState() == TurretState.ODOM_AIMED)) {
+                || turretSubsystem.getState() == TurretState.ODOM_AIMED
+                || turretSubsystem.getState() == TurretState.GEYSER_AIMED)) {
           logger.info("PAUSE -> SHOOT");
           enableUpperBeamBreak(false);
           upperClosedLoopRotate(MagazineConstants.kUpperMagazineFeedSpeed);

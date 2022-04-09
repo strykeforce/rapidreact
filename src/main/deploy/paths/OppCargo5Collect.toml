@@ -8,7 +8,7 @@ target_yaw = -88.5 #degrees
 [start_pose]
     x = 5.99
     y = 7.28
-    angle = 46.5
+    angle = -133.5
 [end_pose]
     x = 4.44
     y = 3.25
