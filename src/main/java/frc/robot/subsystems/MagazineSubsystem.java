@@ -46,10 +46,12 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   private Timer shootTimer = new Timer();
   private Timer ejectTimer = new Timer();
   private Timer readTimer = new Timer();
+  private Timer timedShootTimer = new Timer();
   private boolean ignoreColorSensor = false;
   private boolean continueToShoot = false;
   private boolean isBeamBreakEnabled = false;
   private int shootUpperBeamStableCounts = 0;
+  private boolean doTimedShoot = false;
 
   public MagazineSubsystem(
       TurretSubsystem turretSubsystem,
@@ -349,7 +351,23 @@ public class MagazineSubsystem extends MeasurableSubsystem {
       currUpperMagazineState = UpperMagazineState.EMPTY;
     }
     continueToShoot = true;
+    doTimedShoot = false;
     // }
+  }
+
+  public void timedShoot() {
+    doTimedShoot = true;
+    continueToShoot = true;
+    enableUpperBeamBreak(true);
+    enableLowerBeamBreak(true);
+    if (currLowerMagazineState == LowerMagazineState.STOP) {
+      logger.info("lower {} -> WAIT_CARGO", currLowerMagazineState);
+      lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIntakeSpeed);
+    }
+    if (currUpperMagazineState == UpperMagazineState.STOP) {
+      logger.info("upper {} -> EMPTY", currUpperMagazineState);
+      currUpperMagazineState = UpperMagazineState.EMPTY;
+    }
   }
 
   public void setManualState() {
@@ -456,6 +474,14 @@ public class MagazineSubsystem extends MeasurableSubsystem {
           currLowerMagazineState = LowerMagazineState.WAIT_CARGO;
         }
         break;
+
+      case TIMED_FEED:
+        if (timedShootTimer.hasElapsed(MagazineConstants.kTimedShootTimerDelay)) {
+          logger.info("TIMED_FEED -> WAIT_CARGO");
+          currLowerMagazineState = LowerMagazineState.WAIT_CARGO;
+          enableLowerBeamBreak(true);
+        }
+        break;
       case STOP:
         break;
     }
@@ -521,11 +547,23 @@ public class MagazineSubsystem extends MeasurableSubsystem {
             && turretSubsystem.getState() == TurretState.TRACKING
             && visionSubsystem.isPixelWidthStable()
             && driveSubsystem.isVelocityStable()) {
-          logger.info("PAUSE -> SHOOT");
-          shooterSubsystem.logShotSol();
-          enableUpperBeamBreak(false);
-          upperClosedLoopRotate(MagazineConstants.kUpperMagazineFeedSpeed);
-          currUpperMagazineState = UpperMagazineState.SHOOT;
+          if (doTimedShoot) {
+            logger.info("PAUSE -> TIMED_FEED");
+            currUpperMagazineState = UpperMagazineState.TIMED_FEED;
+            currLowerMagazineState = LowerMagazineState.TIMED_FEED;
+            enableUpperBeamBreak(false);
+            enableLowerBeamBreak(false);
+            upperClosedLoopRotate(MagazineConstants.kUpperMagazineFeedSpeed);
+            lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIndexSpeed);
+            timedShootTimer.reset();
+            timedShootTimer.start();
+          } else {
+            logger.info("PAUSE -> SHOOT");
+            shooterSubsystem.logShotSol();
+            enableUpperBeamBreak(false);
+            upperClosedLoopRotate(MagazineConstants.kUpperMagazineFeedSpeed);
+            currUpperMagazineState = UpperMagazineState.SHOOT;
+          }
           // Fender Shot || Odometry Aim
         } else if (shooterSubsystem.getCurrentState() == ShooterState.SHOOT
             && (turretSubsystem.getState() == TurretState.FENDER_AIMED
@@ -537,6 +575,16 @@ public class MagazineSubsystem extends MeasurableSubsystem {
         } else if (turretSubsystem.getState() == TurretState.TRACKING
             && visionSubsystem.isValid()) {
           shooterSubsystem.shoot();
+        }
+        break;
+
+      case TIMED_FEED:
+        if (timedShootTimer.hasElapsed(MagazineConstants.kTimedShootTimerDelay)) {
+          logger.info("TIMED_FEED -> EMPTY");
+          currUpperMagazineState = UpperMagazineState.EMPTY;
+          shotOneCargo();
+          shotOneCargo();
+          enableUpperBeamBreak(true);
         }
         break;
 
@@ -582,6 +630,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     WAIT_UPPER,
     WAIT_EMPTY,
     EJECT_CARGO,
+    TIMED_FEED,
     STOP;
   }
 
@@ -592,6 +641,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     SHOOT,
     CARGO_SHOT,
     PAUSE,
+    TIMED_FEED,
     STOP;
   }
 }

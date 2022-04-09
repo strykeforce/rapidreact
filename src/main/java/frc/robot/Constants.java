@@ -323,6 +323,7 @@ public final class Constants {
     public static final double kShootDelay = 0.2; // .35
     public static final double kEjectTimerDelay = 1.0;
     public static final double kReadTimerDelay = 0.5;
+    public static final double kTimedShootTimerDelay = 1.0;
     public static final double kShootUpperBeamStableCounts = 2;
 
     // Lower Magazine Talon Config

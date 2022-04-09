@@ -65,6 +65,7 @@ import frc.robot.commands.sequences.shooting.LowFenderShotCommand;
 import frc.robot.commands.sequences.shooting.PitShooterTuneCommandGroup;
 import frc.robot.commands.sequences.shooting.StopShooterCommandGroup;
 import frc.robot.commands.sequences.shooting.VisionShootCommandGroup;
+import frc.robot.commands.sequences.shooting.VisionTimedShootCommandGroup;
 import frc.robot.commands.shooter.HoodClosedLoopCommand;
 import frc.robot.commands.shooter.HoodOpenLoopCommand;
 import frc.robot.commands.shooter.ShooterOpenLoopCommand;
@@ -278,16 +279,25 @@ public class RobotContainer {
         .whenReleased(new ZeroClimbCommand(climbSubsystem));
 
     // Auto Intake
+    // new JoystickButton(xboxController, XboxController.Button.kA.value)
+    //     .toggleWhenPressed(
+    //         new AutoIntakeCommandGroup(
+    //             magazineSubsystem,
+    //             intakeSubsystem,
+    //             visionSubsystem,
+    //             turretSubsystem,
+    //             shooterSubsystem,
+    //             false,
+    //             false));
     new JoystickButton(xboxController, XboxController.Button.kA.value)
-        .toggleWhenPressed(
-            new AutoIntakeCommandGroup(
-                magazineSubsystem,
-                intakeSubsystem,
-                visionSubsystem,
-                turretSubsystem,
+        .whenPressed(
+            new VisionTimedShootCommandGroup(
                 shooterSubsystem,
-                false,
-                false));
+                turretSubsystem,
+                magazineSubsystem,
+                visionSubsystem,
+                true,
+                intakeSubsystem));
     new JoystickButton(xboxController, XboxController.Button.kY.value)
         .toggleWhenPressed(
             new AutoIntakeCommandGroup(
