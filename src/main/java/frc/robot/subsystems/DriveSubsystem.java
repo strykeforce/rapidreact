@@ -141,7 +141,6 @@ public class DriveSubsystem extends MeasurableSubsystem {
   @Override
   public void periodic() {
     swerveDrive.periodic();
-    isVelocityStable();
   }
 
   public void resetGyro() {
@@ -230,22 +229,6 @@ public class DriveSubsystem extends MeasurableSubsystem {
     velStable = stable;
 
     return stable;
-  }
-
-  private double getVelocityStable() {
-    return velStable ? 1.0 : 0.0;
-  }
-
-  private double getFwdStable() {
-    return fwdStable ? 1.0 : 0.0;
-  }
-
-  private double getStrStable() {
-    return strStable ? 1.0 : 0.0;
-  }
-
-  private double getYawStable() {
-    return yawStable ? 1.0 : 0.0;
   }
 
   // Trajectory TOML Parsing
@@ -366,10 +349,6 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure("FWD Vel", () -> lastVelocity[0]),
         new Measure("STR Vel", () -> lastVelocity[1]),
         new Measure("YAW Vel", () -> lastVelocity[2]),
-        new Measure("Gyro Rate", () -> getGyroRate()),
-        new Measure("Velocity Stable", () -> getVelocityStable()),
-        new Measure("YawStable", () -> getYawStable()),
-        new Measure("strStable", () -> getStrStable()),
-        new Measure("FwdStable", () -> getFwdStable()));
+        new Measure("Gyro Rate", () -> getGyroRate()));
   }
 }

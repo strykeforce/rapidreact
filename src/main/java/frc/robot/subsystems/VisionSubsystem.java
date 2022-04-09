@@ -69,8 +69,7 @@ public class VisionSubsystem extends MeasurableSubsystem
         new Measure("Target Data Valid", this::getValid),
         new Measure("Test Pixel Width", this::getTargetsDistancePixel),
         new Measure("Test Ground Distance", this::getTargetsDistanceGround),
-        new Measure("Target Data SN", () -> targetData.serial),
-        new Measure("Is vision stable", () -> getPixelWidthStable()));
+        new Measure("Target Data SN", () -> targetData.serial));
   }
 
   // these private getters are for the grapher and prevent a data race that can occur if targetData
