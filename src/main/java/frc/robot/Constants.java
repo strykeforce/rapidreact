@@ -723,6 +723,16 @@ public final class Constants {
     public static final int kHoodTalonID = 42;
     public static final String kLookupTablePath = "/home/lvuser/deploy/LookupTable.csv";
 
+    // StrykeShot Constants
+    public static final double kLeftKickerTicksP100MS = 0.0;
+    public static final double kLeftShooterTicksP100MS = 0.0;
+    public static final double kLeftHoodTickPos = 0.0;
+    public static final Rotation2d kLeftTurretPos = new Rotation2d();
+    public static final double kRightKickerTicksP100MS = 0.0;
+    public static final double kRightShooterTicksP100MS = 0.0;
+    public static final double kRightHoodTickPos = 0.0;
+    public static final Rotation2d kRightTurretPos = new Rotation2d();
+
     // Lookup Table Constants
     public static final double kLookupMinPixel = 134;
     public static final double kLookupMaxPixel = 414;

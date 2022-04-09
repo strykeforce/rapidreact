@@ -36,6 +36,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
       oldWidthPixels,
       oldIndex;
   private String[][] lookupTable;
+  public boolean isLeft = true;
 
   public ShooterSubsystem(MagazineSubsystem magazineSubsystem, VisionSubsystem visionSubsystem) {
     this.magazineSubsystem = magazineSubsystem;
@@ -237,6 +238,20 @@ public class ShooterSubsystem extends MeasurableSubsystem {
       double[] shootSolution = getShootSolution();
       shooterClosedLoop(shootSolution[0], shootSolution[1]);
       hoodClosedLoop(shootSolution[2]);
+    }
+  }
+
+  public void strykeShot() {
+    if (magazineSubsystem.isNextCargoAlliance()) {
+      shooterClosedLoop(
+          isLeft
+              ? ShooterConstants.kLeftKickerTicksP100MS
+              : ShooterConstants.kRightKickerTicksP100MS,
+          isLeft
+              ? ShooterConstants.kLeftShooterTicksP100MS
+              : ShooterConstants.kRightShooterTicksP100MS);
+      hoodClosedLoop(
+          isLeft ? ShooterConstants.kLeftHoodTickPos : ShooterConstants.kRightHoodTickPos);
     }
   }
 
