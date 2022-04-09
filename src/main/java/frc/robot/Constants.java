@@ -138,6 +138,7 @@ public final class Constants {
       azimuthConfig.velocityMeasurementWindow = 64;
       azimuthConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
       azimuthConfig.voltageCompSaturation = 12;
+      azimuthConfig.voltageMeasurementFilter = 32;
       return azimuthConfig;
     }
 
@@ -148,6 +149,7 @@ public final class Constants {
       driveConfig.supplyCurrLimit.triggerThresholdCurrent = 45;
       driveConfig.supplyCurrLimit.triggerThresholdTime = .04;
       driveConfig.supplyCurrLimit.enable = true;
+      driveConfig.statorCurrLimit.enable = false;
       driveConfig.slot0.kP = 0.045;
       driveConfig.slot0.kI = 0.0005;
       driveConfig.slot0.kD = 0.000;
@@ -159,6 +161,7 @@ public final class Constants {
       driveConfig.velocityMeasurementWindow = 64;
       driveConfig.voltageCompSaturation = 12;
       driveConfig.neutralDeadband = 0.01;
+      driveConfig.voltageMeasurementFilter = 32;
       return driveConfig;
     }
 
@@ -344,10 +347,10 @@ public final class Constants {
       magazineConfig.forwardLimitSwitchSource = LimitSwitchSource.Deactivated;
       magazineConfig.reverseLimitSwitchSource = LimitSwitchSource.Deactivated;
 
-      magazineConfig.slot0.kP = 0.1;
+      magazineConfig.slot0.kP = 0.02;
       magazineConfig.slot0.kI = 0.0;
-      magazineConfig.slot0.kD = 10.0;
-      magazineConfig.slot0.kF = 0.1;
+      magazineConfig.slot0.kD = 2.0;
+      magazineConfig.slot0.kF = 0.048;
       magazineConfig.slot0.integralZone = 0;
       magazineConfig.slot0.allowableClosedloopError = 0;
       magazineConfig.slot0.maxIntegralAccumulator = 0;
@@ -536,14 +539,17 @@ public final class Constants {
 
     public static TalonFXConfiguration getPivotArmFalconConfig() {
       TalonFXConfiguration pivotConfig = new TalonFXConfiguration();
+
       pivotConfig.supplyCurrLimit.currentLimit = 80;
       pivotConfig.supplyCurrLimit.triggerThresholdCurrent = 90;
       pivotConfig.supplyCurrLimit.triggerThresholdTime = 0.1;
       pivotConfig.supplyCurrLimit.enable = true;
+
       pivotConfig.statorCurrLimit.currentLimit = 100.0;
       pivotConfig.statorCurrLimit.triggerThresholdCurrent = 120.0;
       pivotConfig.statorCurrLimit.triggerThresholdTime = 0.1;
       pivotConfig.statorCurrLimit.enable = true;
+
       pivotConfig.slot0.kP = 1.0;
       pivotConfig.slot0.kI = 0.0;
       pivotConfig.slot0.kD = 0.0;
@@ -562,6 +568,7 @@ public final class Constants {
       pivotConfig.velocityMeasurementWindow = 64;
       pivotConfig.voltageCompSaturation = 12;
       pivotConfig.voltageMeasurementFilter = 32;
+
       return pivotConfig;
     }
 
@@ -576,14 +583,17 @@ public final class Constants {
 
     public static TalonFXConfiguration getFixedArmFalconConfig() {
       TalonFXConfiguration fixedConfig = new TalonFXConfiguration();
+
       fixedConfig.supplyCurrLimit.currentLimit = 80;
       fixedConfig.supplyCurrLimit.triggerThresholdCurrent = 90;
       fixedConfig.supplyCurrLimit.triggerThresholdTime = 0.1;
       fixedConfig.supplyCurrLimit.enable = true;
+
       fixedConfig.statorCurrLimit.currentLimit = 100.0;
       fixedConfig.statorCurrLimit.triggerThresholdCurrent = 120.0;
       fixedConfig.statorCurrLimit.triggerThresholdTime = 0.1;
       fixedConfig.statorCurrLimit.enable = true;
+
       fixedConfig.slot0.kP = 1.0;
       fixedConfig.slot0.kI = 0.0;
       fixedConfig.slot0.kD = 0.0;
@@ -602,6 +612,7 @@ public final class Constants {
       fixedConfig.velocityMeasurementWindow = 64;
       fixedConfig.voltageCompSaturation = 12;
       fixedConfig.voltageMeasurementFilter = 32;
+
       return fixedConfig;
     }
 
@@ -626,7 +637,7 @@ public final class Constants {
       ShoulderConfig.slot0.integralZone = 0;
       ShoulderConfig.slot0.allowableClosedloopError = 0;
       ShoulderConfig.slot0.maxIntegralAccumulator = 0;
-      ShoulderConfig.motionCruiseVelocity = 1_000;
+      ShoulderConfig.motionCruiseVelocity = 200; // 1_000
       ShoulderConfig.motionAcceleration = 5_000;
       ShoulderConfig.velocityMeasurementWindow = 64;
       ShoulderConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
@@ -664,6 +675,7 @@ public final class Constants {
       intakeConfig.supplyCurrLimit.triggerThresholdCurrent = 15;
       intakeConfig.supplyCurrLimit.triggerThresholdTime = 0.5;
       intakeConfig.supplyCurrLimit.enable = true;
+      intakeConfig.statorCurrLimit.enable = false;
       intakeConfig.openloopRamp = 0.5;
       intakeConfig.slot0.kP = 0.0;
       intakeConfig.slot0.kI = 0.0;
@@ -675,6 +687,7 @@ public final class Constants {
       intakeConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
       intakeConfig.velocityMeasurementWindow = 64;
       intakeConfig.voltageCompSaturation = 12;
+      intakeConfig.voltageMeasurementFilter = 32;
       return intakeConfig;
     }
 
@@ -740,7 +753,7 @@ public final class Constants {
     // Hood Encoder Constants
     public static final int kHoodZeroTicks = 1800;
     public static final int kForwardSoftLimts = 5800;
-    public static final int kReverseSoftLimits = 100;
+    public static final int kReverseSoftLimits = -50;
     public static final int kZeroCheckTicks = 2_600; // 500
 
     // Arm Shooter Constants
@@ -768,19 +781,22 @@ public final class Constants {
 
     public static TalonFXConfiguration getShooterFalconConfig() {
       TalonFXConfiguration shooterConfig = new TalonFXConfiguration();
+
       shooterConfig.supplyCurrLimit.currentLimit = 40;
       shooterConfig.supplyCurrLimit.triggerThresholdCurrent = 1;
       shooterConfig.supplyCurrLimit.triggerThresholdTime = 0.001;
       shooterConfig.supplyCurrLimit.enable = true;
-      shooterConfig.statorCurrLimit.currentLimit = 80.0;
+
+      shooterConfig.statorCurrLimit.currentLimit = 60.0;
       shooterConfig.statorCurrLimit.triggerThresholdCurrent = 1.0;
       shooterConfig.statorCurrLimit.triggerThresholdTime = 0.001;
       shooterConfig.statorCurrLimit.enable = true;
-      shooterConfig.slot0.kP = 0.2;
-      shooterConfig.slot0.kI = 0.0035; // 0.0035
-      shooterConfig.slot0.kD = 2.0;
+
+      shooterConfig.slot0.kP = 0.22;
+      shooterConfig.slot0.kI = 0.0022; // 0.0035
+      shooterConfig.slot0.kD = 4.0;
       shooterConfig.slot0.kF = 0.0465;
-      shooterConfig.slot0.integralZone = 150;
+      shooterConfig.slot0.integralZone = 200;
       shooterConfig.slot0.maxIntegralAccumulator = 20_000;
       shooterConfig.slot0.allowableClosedloopError = 0;
       shooterConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_20Ms;
@@ -795,19 +811,22 @@ public final class Constants {
 
     public static TalonFXConfiguration getKickerFalconConfig() {
       TalonFXConfiguration kickerConfig = new TalonFXConfiguration();
+
       kickerConfig.supplyCurrLimit.currentLimit = 40;
       kickerConfig.supplyCurrLimit.triggerThresholdCurrent = 1;
       kickerConfig.supplyCurrLimit.triggerThresholdTime = 0.001;
       kickerConfig.supplyCurrLimit.enable = true;
-      kickerConfig.statorCurrLimit.currentLimit = 80.0;
+
+      kickerConfig.statorCurrLimit.currentLimit = 60.0;
       kickerConfig.statorCurrLimit.triggerThresholdCurrent = 1.0;
       kickerConfig.statorCurrLimit.triggerThresholdTime = 0.001;
       kickerConfig.statorCurrLimit.enable = true;
-      kickerConfig.slot0.kP = 0.2;
-      kickerConfig.slot0.kI = 0.0035; // 0.0035
-      kickerConfig.slot0.kD = 0.5;
+
+      kickerConfig.slot0.kP = 0.22;
+      kickerConfig.slot0.kI = 0.0022; // 0.0035
+      kickerConfig.slot0.kD = 5.0;
       kickerConfig.slot0.kF = 0.0472;
-      kickerConfig.slot0.integralZone = 150;
+      kickerConfig.slot0.integralZone = 200;
       kickerConfig.slot0.maxIntegralAccumulator = 20_000;
       kickerConfig.slot0.allowableClosedloopError = 0;
       kickerConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_20Ms;
@@ -853,6 +872,11 @@ public final class Constants {
       hoodConfig.velocityMeasurementWindow = 64;
       hoodConfig.voltageCompSaturation = 12;
       hoodConfig.voltageMeasurementFilter = 32;
+
+      hoodConfig.forwardSoftLimitThreshold = kForwardSoftLimts;
+      hoodConfig.forwardSoftLimitEnable = true;
+      hoodConfig.reverseSoftLimitThreshold = kReverseSoftLimits;
+      hoodConfig.reverseSoftLimitEnable = true;
 
       return hoodConfig;
     }
