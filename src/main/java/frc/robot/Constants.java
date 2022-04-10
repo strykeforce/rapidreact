@@ -750,9 +750,9 @@ public final class Constants {
     public static final String kLookupTablePath = "/home/lvuser/deploy/LookupTable.csv";
 
     // Lookup Table Constants
-    public static final double kLookupMinPixel = 134;
+    public static final double kLookupMinPixel = 127;
     public static final double kLookupMaxPixel = 414;
-    public static final double kNumRows = 281;
+    public static final double kNumRows = 288;
     public static final double kLookupRes = 1.0;
 
     // Hood Encoder Constants
