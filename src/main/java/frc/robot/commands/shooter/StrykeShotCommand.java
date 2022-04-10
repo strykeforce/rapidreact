@@ -1,7 +1,6 @@
 package frc.robot.commands.shooter;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -30,10 +29,7 @@ public class StrykeShotCommand extends CommandBase {
 
   @Override
   public void initialize() {
-    turretSubsystem.rotateTo(
-        shooterSubsystem.isLeft
-            ? ShooterConstants.kLeftTurretPos
-            : ShooterConstants.kRightTurretPos);
+    turretSubsystem.strykeShot(shooterSubsystem.isLeft);
     shooterSubsystem.strykeShot();
     magazineSubsystem.timedShoot();
   }

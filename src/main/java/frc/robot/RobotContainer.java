@@ -60,7 +60,6 @@ import frc.robot.commands.sequences.climb.TraverseClimbCommandGroup;
 import frc.robot.commands.sequences.intaking.AutoIntakeCommand;
 import frc.robot.commands.sequences.intaking.ExtendIntakeCommand;
 import frc.robot.commands.sequences.shooting.ArmShooterCommandGroup;
-import frc.robot.commands.sequences.shooting.GeyserShootCommand;
 import frc.robot.commands.sequences.shooting.HighFenderShotCommand;
 import frc.robot.commands.sequences.shooting.LowFenderShotCommand;
 import frc.robot.commands.sequences.shooting.PitShooterTuneCommandGroup;
@@ -272,16 +271,11 @@ public class RobotContainer {
     new JoystickButton(driveJoystick, Button.UP.id)
         .whenPressed(
             new HighClimbCommandGroup(
-                climbSubsystem, driveSubsystem, shooterSubsystem, driveJoystick, turretSubsystem));
+                climbSubsystem, driveSubsystem, driveJoystick, turretSubsystem));
     new JoystickButton(driveJoystick, Button.DOWN.id)
         .whenPressed(
             new MidClimbCommandGroup(
-                climbSubsystem, driveSubsystem, shooterSubsystem, driveJoystick, turretSubsystem));
-
-    new JoystickButton(driveJoystick, Button.HAMBURGER.id)
-        .whenPressed(
-            new GeyserShootCommand(
-                turretSubsystem, shooterSubsystem, magazineSubsystem, intakeSubsystem));
+                climbSubsystem, driveSubsystem, driveJoystick, turretSubsystem));
   }
 
   private void configureOperatorButtonBindings() {
@@ -424,12 +418,12 @@ public class RobotContainer {
     Shuffleboard.getTab("Match")
         .addString("ClimbPosition", () -> shooterSubsystem.getIsLeft())
         .withSize(1, 1)
-        .withPosition(8, 1);
+        .withPosition(7, 1);
 
     Shuffleboard.getTab("Match")
         .add("ChangeClimbPos", new SwitchClimbPos(shooterSubsystem))
         .withSize(1, 1)
-        .withPosition(9, 1);
+        .withPosition(8, 1);
 
     Shuffleboard.getTab("Match")
         .add("EstopClimb", new EmergencyStopClimbCommand(climbSubsystem))

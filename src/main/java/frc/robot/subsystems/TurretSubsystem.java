@@ -324,6 +324,10 @@ public class TurretSubsystem extends MeasurableSubsystem {
     }
   }
 
+  public void fenderShot() {
+    fenderShot(lastDoRotate);
+  }
+
   public void geyserShot(boolean isBallOne) {
     logger.info("{} -> GEYSER_ADJUSTING", currentState);
     currentState = TurretState.GEYSER_ADJUSTING;
@@ -336,8 +340,10 @@ public class TurretSubsystem extends MeasurableSubsystem {
     }
   }
 
-  public void fenderShot() {
-    fenderShot(lastDoRotate);
+  public void strykeShot(boolean isLeftClimb) {
+    logger.info("{} -> STRYKE_ADJUSTING", currentState);
+    currentState = TurretState.STRYKE_ADJUSTING;
+    rotateTo(isLeftClimb ? TurretConstants.kLeftStrykePos : TurretConstants.kRightStrkePos);
   }
 
   @Override

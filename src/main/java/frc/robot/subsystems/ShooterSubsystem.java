@@ -249,31 +249,29 @@ public class ShooterSubsystem extends MeasurableSubsystem {
   }
 
   public void strykeShot() {
-    if (magazineSubsystem.isNextCargoAlliance()) {
-      logger.info("SHOOT: {} -> ADJUSTING", currentState);
-      currentState = ShooterState.ADJUSTING;
-      shooterClosedLoop(
-          isLeft
-              ? ShooterConstants.kLeftKickerTicksP100MS
-              : ShooterConstants.kRightKickerTicksP100MS,
-          isLeft
-              ? ShooterConstants.kLeftShooterTicksP100MS
-              : ShooterConstants.kRightShooterTicksP100MS);
-      hoodClosedLoop(
-          isLeft ? ShooterConstants.kLeftHoodTickPos : ShooterConstants.kRightHoodTickPos);
-    }
+    logger.info("Stryke Shot: {} -> ADJUSTING", currentState);
+    currentState = ShooterState.ADJUSTING;
+    shooterClosedLoop(
+        isLeft ? ShooterConstants.kLeftKickerTicksP100MS : ShooterConstants.kRightKickerTicksP100MS,
+        isLeft
+            ? ShooterConstants.kLeftShooterTicksP100MS
+            : ShooterConstants.kRightShooterTicksP100MS);
+    hoodClosedLoop(isLeft ? ShooterConstants.kLeftHoodTickPos : ShooterConstants.kRightHoodTickPos);
   }
 
   public void setIsLeft(boolean pos) {
     isLeft = pos;
+    logger.info("Manually Set Climb Pos: {}", pos ? "LEFT" : "RIGHT");
   }
 
   public void checkLeft() {
     Pose2d robotPos = driveSubsystem.getPoseMeters();
     if (robotPos.getY() > ShooterConstants.kMiddleClimbY) {
       isLeft = true;
+      logger.info("Detect LEFT climb: y= {}", robotPos.getY());
     } else {
       isLeft = false;
+      logger.info("Detect RIGHT climb: y= {}", robotPos.getY());
     }
   }
 
