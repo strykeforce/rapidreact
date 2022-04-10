@@ -60,9 +60,9 @@ public final class Constants {
     public static final double kDriveGearRatio =
         (kDriveMotorOutputGear / kDriveInputGear) * (kBevelInputGear / kBevelOutputGear);
 
-    static {
-      // logger.debug("kMaxOmega = {}", kMaxOmega);
-    }
+    //    static {
+    // logger.debug("kMaxOmega = {}", kMaxOmega);
+    //    }
 
     public static Translation2d[] getWheelLocationMeters() {
       final double x = kRobotLength / 2.0; // front-back, was ROBOT_LENGTH
@@ -76,12 +76,12 @@ public final class Constants {
     }
 
     // Teleop Drive Constants
-    public static final double kDeadbandXLock = 0.2;
+    //    public static final double kDeadbandXLock = 0.2;
     public static final double kDeadbandAllStick = 0.075;
-    public static final double kCloseEnoughTicks = 10.0;
+    //    public static final double kCloseEnoughTicks = 10.0;
     public static final double kRateLimitFwdStr = 3.5; // 2
     public static final double kRateLimitYaw = 3; // 3
-    public static final double kExpoScaleMoveFactor = 0.6; // .6
+    //    public static final double kExpoScaleMoveFactor = 0.6; // .6
     // public static final double kRateLimitMove = 0.3;
     public static final double kExpoScaleYawFactor = 0.75;
 
@@ -173,7 +173,7 @@ public final class Constants {
     public static final double kPOmega = 2.5;
     public static final double kIOmega = 0.0;
     public static final double kDOmega = 0.0;
-    public static final double kMaxVelOmega = kMaxOmega / 2.0;
+    //    public static final double kMaxVelOmega = kMaxOmega / 2.0;
     public static final double kMaxAccelOmega = 3.14;
   }
 
@@ -187,38 +187,38 @@ public final class Constants {
     public static final int kNumOfVisionChecks = 10;
 
     // Old 2020 Constants
-    public static final double kMinContourAreaSize = 100;
+    //    public static final double kMinContourAreaSize = 100;
     public static final double kVerticalFov = 0.6056; // 48.8 (34.7 degrees)
     public static final double kHorizonFov = 1.012; // 50.8 //146 //radians 1.012 // deg 57.999
-    public static final double kHorizonRes = 640; // 1280
-    public static final double kTargetWidthIn = 5;
-    public static final double kCameraHeight = 20.75;
-    public static final double kSizeThreshold = 400;
-    public static final double kDistanceThreshold = 200;
-    public static final int kStableRange = 20;
-    public static final int kStableCounts = 5;
+    //    public static final double kHorizonRes = 640; // 1280
+    //    public static final double kTargetWidthIn = 5;
+    //    public static final double kCameraHeight = 20.75;
+    //    public static final double kSizeThreshold = 400;
+    //    public static final double kDistanceThreshold = 200;
+    //    public static final int kStableRange = 20;
+    //    public static final int kStableCounts = 5;
     public static final int kPixelWidthStableCounts = 2; // FIXME
     public static final int kPixelWidthChangeThreshold = 3; // FIXME
-    public static final double kCenteredRange = 2;
-    public static final double kLostLimit = 30;
-    public static final String kTablePath = "/home/lvuser/deploy/Lookup_Table.csv";
-    public static final int kTableMin = 96;
-    public static final int kTableMax = 360;
-    public static final int kTableRes = 1;
-    public static final int kShooterIndex = 2;
-    public static final int kHoodIndex = 3;
-    public static final double kTapeHeightIn = 101.625; // in
-    public static final double kUpperHubRadiusIn = 26.6875;
-    // + is further along track and lower
-    public static final int kHoodInchesCorrectionR1 = 13; // 8-15 feet (was 20)
-    public static final int kHoodInchesCorrectionR2 = 13; // 15-19 feet (old 10)
-    public static final int kHoodInchesCorrectionR3 = 10; // 19-25 feet
-    public static final int kHoodInchesCorrectionR4 = 20; // 25+ feet
-    public static final int kHoodTicksPerInchR1 = 40; // 8-15 feet
-    public static final int kHoodTicksPerInchR2 = 75; // 15-19 feet
-    public static final int kHoodTicksPerInchR3 = 75; // 19-25 feet
-    public static final int kHoodTicksPerInchR4 = 40; // 25+ feet
-    public static String kCameraID = "A0";
+    //    public static final double kCenteredRange = 2;
+    //    public static final double kLostLimit = 30;
+    //    public static final String kTablePath = "/home/lvuser/deploy/Lookup_Table.csv";
+    //    public static final int kTableMin = 96;
+    //    public static final int kTableMax = 360;
+    //    public static final int kTableRes = 1;
+    //    public static final int kShooterIndex = 2;
+    //    public static final int kHoodIndex = 3;
+    //    public static final double kTapeHeightIn = 101.625; // in
+    //    public static final double kUpperHubRadiusIn = 26.6875;
+    //    // + is further along track and lower
+    //    public static final int kHoodInchesCorrectionR1 = 13; // 8-15 feet (was 20)
+    //    public static final int kHoodInchesCorrectionR2 = 13; // 15-19 feet (old 10)
+    //    public static final int kHoodInchesCorrectionR3 = 10; // 19-25 feet
+    //    public static final int kHoodInchesCorrectionR4 = 20; // 25+ feet
+    //    public static final int kHoodTicksPerInchR1 = 40; // 8-15 feet
+    //    public static final int kHoodTicksPerInchR2 = 75; // 15-19 feet
+    //    public static final int kHoodTicksPerInchR3 = 75; // 19-25 feet
+    //    public static final int kHoodTicksPerInchR4 = 40; // 25+ feet
+    //    public static String kCameraID = "A0";
   }
 
   public static final class TurretConstants {
@@ -231,15 +231,15 @@ public final class Constants {
     public static final int kTurretZeroTicks = 1_161; // 1250, 1194
     public static final int kForwardLimit = 20_000; // 13_800 14
     public static final int kReverseLimit = -20_000; // 13_800 14
-    public static final double kMaxStringPotZero = 100; // 2020 Robot
-    public static final double kMinStringPotZero = 0; // 2020 Robot
+    //    public static final double kMaxStringPotZero = 100; // 2020 Robot
+    //    public static final double kMinStringPotZero = 0; // 2020 Robot
 
     // Ticks -> Degrees/Radians
-    public static final double kTurretTicksPerDegree =
-        107.27; // 114.653     0.01745329 57.2957877856 72.404 120.522
+    //    public static final double kTurretTicksPerDegree =
+    //        107.27; // 114.653     0.01745329 57.2957877856 72.404 120.522
     public static final double kTurretTicksPerRadian = 6146.47; // 6569.133 6905.414
     // public static final double kTurretMidpoint = 13_000;
-    public static final double kWrapRange = 1;
+    //    public static final double kWrapRange = 1;
     public static final Rotation2d kOverlapAngle = Rotation2d.fromDegrees(6);
     public static final double kWrapTicks = 20_000;
 
@@ -461,10 +461,10 @@ public final class Constants {
     public static final double kShoulderCriuiseVelDefault = 1_000;
 
     // Open Loop Movement Constants
-    public static final double kFixedArmExtendSpeed = -0.25;
-    public static final double kFixedArmRetractSpeed = 0.25;
-    public static final double kPivotArmExtendSpeed = -0.25;
-    public static final double kPivotArmRetractSpeed = 0.25;
+    //    public static final double kFixedArmExtendSpeed = -0.25;
+    //    public static final double kFixedArmRetractSpeed = 0.25;
+    //    public static final double kPivotArmExtendSpeed = -0.25;
+    //    public static final double kPivotArmRetractSpeed = 0.25;
 
     // Climb States -> Desired Endpoint in Ticks
     public static final double kFMidExtTicks = -215_000;
@@ -753,7 +753,7 @@ public final class Constants {
     public static final double kLookupMinPixel = 134;
     public static final double kLookupMaxPixel = 414;
     public static final double kNumRows = 281;
-    public static final double kLookupRes = 1.0;
+    //    public static final double kLookupRes = 1.0;
 
     // Hood Encoder Constants
     public static final int kHoodZeroTicks = 1800;
@@ -783,7 +783,7 @@ public final class Constants {
     // Geyser Shot Constants
     public static double kShooterGeyserTicksP100ms = 12_000;
     public static double kKickerGeyserTicksP100ms = 5_500;
-    public static double kHoodGeyserBallOneTicks = 0;
+    //    public static double kHoodGeyserBallOneTicks = 0;
     public static double kHoodGeyserBallTwoTicks = 0;
 
     public static final double kShooterManualEjectTicksP100ms = -5_000;
