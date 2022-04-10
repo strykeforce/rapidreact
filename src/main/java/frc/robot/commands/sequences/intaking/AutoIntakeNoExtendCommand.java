@@ -6,33 +6,23 @@ import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
 import frc.robot.subsystems.MagazineSubsystem.LowerMagazineState;
 
-public class AutoIntakeCommand extends CommandBase {
+public class AutoIntakeNoExtendCommand extends CommandBase {
   public final MagazineSubsystem magazineSubsystem;
   public final IntakeSubsystem intakeSubsystem;
   public boolean magazineReversed = false;
-  public boolean isAuton;
-  public boolean intakeExtend;
 
-  public AutoIntakeCommand(
-      MagazineSubsystem magazineSubsystem,
-      IntakeSubsystem intakeSubsystem,
-      boolean isAuton,
-      boolean intakeExtend) {
+  public AutoIntakeNoExtendCommand(
+      MagazineSubsystem magazineSubsystem, IntakeSubsystem intakeSubsystem) {
     addRequirements(magazineSubsystem, intakeSubsystem);
     this.magazineSubsystem = magazineSubsystem;
     this.intakeSubsystem = intakeSubsystem;
-    this.isAuton = isAuton;
-    this.intakeExtend = intakeExtend;
   }
 
   @Override
   public void initialize() {
     magazineSubsystem.indexCargo();
-    intakeSubsystem.openLoopRotate(
-        isAuton ? IntakeConstants.kIntakeSpeedAuto : IntakeConstants.kIntakeSpeed);
+    intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeSpeed);
     magazineReversed = false;
-    if (intakeExtend) intakeSubsystem.extendClosedLoop();
-    else intakeSubsystem.retractClosedLoop();
   }
 
   @Override
@@ -43,8 +33,7 @@ public class AutoIntakeCommand extends CommandBase {
       magazineReversed = true;
     } else if (magazineReversed
         && (magazineSubsystem.getCurrLowerMagazineState() != LowerMagazineState.EJECT_CARGO)) {
-      intakeSubsystem.openLoopRotate(
-          isAuton ? IntakeConstants.kIntakeSpeedAuto : IntakeConstants.kIntakeSpeed);
+      intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeSpeed);
       magazineReversed = false;
     }
   }
@@ -60,6 +49,5 @@ public class AutoIntakeCommand extends CommandBase {
     if (!interrupted) {
       intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeReverseSpeed);
     }
-    if (!isAuton && !interrupted) intakeSubsystem.retractClosedLoop();
   }
 }

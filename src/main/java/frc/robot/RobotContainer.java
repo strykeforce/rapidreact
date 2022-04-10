@@ -58,6 +58,7 @@ import frc.robot.commands.sequences.climb.HighClimbCommandGroup;
 import frc.robot.commands.sequences.climb.MidClimbCommandGroup;
 import frc.robot.commands.sequences.climb.TraverseClimbCommandGroup;
 import frc.robot.commands.sequences.intaking.AutoIntakeCommand;
+import frc.robot.commands.sequences.intaking.AutoIntakeNoExtendCommand;
 import frc.robot.commands.sequences.intaking.ExtendIntakeCommand;
 import frc.robot.commands.sequences.shooting.ArmShooterCommandGroup;
 import frc.robot.commands.sequences.shooting.GeyserShootCommand;
@@ -78,6 +79,7 @@ import frc.robot.commands.vision.EnableVisionCommand;
 import frc.robot.subsystems.AutoSwitch;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.IntakeExtendSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
 import frc.robot.subsystems.MagazineSubsystem.CargoColor;
@@ -104,6 +106,7 @@ public class RobotContainer {
   private final MagazineSubsystem magazineSubsystem;
   private final ShooterSubsystem shooterSubsystem;
   private final IntakeSubsystem intakeSubsystem;
+  private final IntakeExtendSubsystem intakeExtendSubsystem;
   private final OdometryTestSubsystem odometryTestSubsystem;
   //   private final PowerDistHub powerDistHub = new PowerDistHub();
   private final AutoSwitch autoSwitch;
@@ -132,6 +135,7 @@ public class RobotContainer {
     turretSubsystem = new TurretSubsystem(visionSubsystem, driveSubsystem);
     climbSubsystem = new ClimbSubsystem();
     intakeSubsystem = new IntakeSubsystem();
+    intakeExtendSubsystem = new IntakeExtendSubsystem();
     magazineSubsystem =
         new MagazineSubsystem(turretSubsystem, visionSubsystem, driveSubsystem, intakeSubsystem);
     shooterSubsystem = new ShooterSubsystem(magazineSubsystem, visionSubsystem);
@@ -318,7 +322,7 @@ public class RobotContainer {
     new JoystickButton(xboxController, XboxController.Button.kBack.value)
         .whenReleased(
             new ParallelCommandGroup(
-                new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, false, false),
+                new AutoIntakeNoExtendCommand(magazineSubsystem, intakeSubsystem),
                 new StopShooterCommand(shooterSubsystem)));
 
     // Arm Shooter

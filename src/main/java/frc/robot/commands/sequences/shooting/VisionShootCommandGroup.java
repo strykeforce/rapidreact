@@ -2,7 +2,7 @@ package frc.robot.commands.sequences.shooting;
 
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.sequences.intaking.AutoIntakeCommand;
+import frc.robot.commands.sequences.intaking.AutoIntakeNoExtendCommand;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -26,7 +26,6 @@ public class VisionShootCommandGroup extends SequentialCommandGroup {
             visionSubsystem,
             disableTrackingOnFinish,
             intakeSubsystem),
-        new ScheduleCommand(
-            new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, false, false)));
+        new ScheduleCommand(new AutoIntakeNoExtendCommand(magazineSubsystem, intakeSubsystem)));
   }
 }
