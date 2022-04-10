@@ -10,6 +10,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.ColorMatch;
 import com.revrobotics.ColorMatchResult;
 import com.revrobotics.ColorSensorV3;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.Timer;
@@ -556,6 +557,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
             logger.info("PAUSE -> TIMED_FEED");
             currUpperMagazineState = UpperMagazineState.TIMED_FEED;
             currLowerMagazineState = LowerMagazineState.TIMED_FEED;
+            shooterSubsystem.logShotSol();
             enableUpperBeamBreak(false);
             enableLowerBeamBreak(false);
             upperClosedLoopRotate(MagazineConstants.kUpperMagazineFeedSpeed);
@@ -566,6 +568,14 @@ public class MagazineSubsystem extends MeasurableSubsystem {
           } else {
             logger.info("PAUSE -> SHOOT");
             shooterSubsystem.logShotSol();
+            if (!shooterSubsystem.isLastLookupBeyondTable()) {
+              Pose2d calcPose =
+                  visionSubsystem.getVisionOdometry(
+                      turretSubsystem.getTurretRotation2d(),
+                      driveSubsystem.getGyroRotation2d(),
+                      shooterSubsystem.getLastLookupDistance());
+              driveSubsystem.updateOdometryWithVision(calcPose);
+            }
             enableUpperBeamBreak(false);
             upperClosedLoopRotate(MagazineConstants.kUpperMagazineFeedSpeed);
             currUpperMagazineState = UpperMagazineState.SHOOT;

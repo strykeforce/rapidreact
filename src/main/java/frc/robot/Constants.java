@@ -12,10 +12,15 @@ import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.util.Color;
 import java.util.ArrayList;
 
@@ -175,6 +180,21 @@ public final class Constants {
     public static final double kDOmega = 0.0;
     public static final double kMaxVelOmega = kMaxOmega / 2.0;
     public static final double kMaxAccelOmega = 3.14;
+
+    //  Increase these numbers to trust our state estimates less. This matrix is in the form [x, y,
+    // theta]ᵀ, with units in meters and radians.
+    public static Matrix<N3, N1> kStateStdDevs =
+        VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5));
+
+    // Increase these numbers to trust sensor readings from encoders and gyros less. This matrix is
+    // in the form [theta], with units in radians.
+    public static Matrix<N1, N1> kLocalMeasurementStdDevs =
+        VecBuilder.fill(Units.degreesToRadians(0.01));
+
+    // Increase these numbers to trust global measurements from vision less. This matrix is in the
+    // form [x, y, theta]ᵀ, with units in meters and radians.
+    public static Matrix<N3, N1> kVisionMeasurementStdDevs =
+        VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(5));
   }
 
   public static final class VisionConstants {
@@ -209,6 +229,7 @@ public final class Constants {
     public static final int kHoodIndex = 3;
     public static final double kTapeHeightIn = 101.625; // in
     public static final double kUpperHubRadiusIn = 26.6875;
+    public static final double kLookupTableToLensOffset = 0.4959;
     // + is further along track and lower
     public static final int kHoodInchesCorrectionR1 = 13; // 8-15 feet (was 20)
     public static final int kHoodInchesCorrectionR2 = 13; // 15-19 feet (old 10)
