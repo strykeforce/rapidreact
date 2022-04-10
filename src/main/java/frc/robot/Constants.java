@@ -194,7 +194,7 @@ public final class Constants {
     // Increase these numbers to trust global measurements from vision less. This matrix is in the
     // form [x, y, theta]ᵀ, with units in meters and radians.
     public static Matrix<N3, N1> kVisionMeasurementStdDevs =
-        VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30));
+        VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(5));
   }
 
   public static final class VisionConstants {
@@ -229,6 +229,7 @@ public final class Constants {
     public static final int kHoodIndex = 3;
     public static final double kTapeHeightIn = 101.625; // in
     public static final double kUpperHubRadiusIn = 26.6875;
+    public static final double kLookupTableToLensOffset = 0.4959;
     // + is further along track and lower
     public static final int kHoodInchesCorrectionR1 = 13; // 8-15 feet (was 20)
     public static final int kHoodInchesCorrectionR2 = 13; // 15-19 feet (old 10)
