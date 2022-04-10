@@ -46,6 +46,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private final ProfiledPIDController omegaController;
   private final PIDController xController;
   private final PIDController yController;
+  private final PoseEstimatorOdometryStrategy odometryStrategy;
   private double[] desiredAzimuthPositions = new double[4];
   // Grapher Variables
   private ChassisSpeeds holoContOutput = new ChassisSpeeds();
@@ -93,7 +94,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
     swerveDrive = new SwerveDrive(swerveModules);
 
-    PoseEstimatorOdometryStrategy odometryStrategy =
+    odometryStrategy =
         new PoseEstimatorOdometryStrategy(
             swerveDrive.getHeading(),
             new Pose2d(),
@@ -102,7 +103,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
             kLocalMeasurementStdDevs,
             kVisionMeasurementStdDevs);
 
-    //    swerveDrive.setOdometry(odometryStrategy);
+    swerveDrive.setOdometry(odometryStrategy);
 
     swerveDrive.resetGyro();
     swerveDrive.setGyroOffset(Rotation2d.fromDegrees(0));
