@@ -288,8 +288,12 @@ public final class Constants {
     public static final Rotation2d kFenderOpponent = Rotation2d.fromDegrees(90.0);
 
     // Geyser Shot Constants
-    public static Rotation2d kGeyserBallOnePosition = Rotation2d.fromDegrees(90); // FIXME
-    public static Rotation2d kGeyserBallTwoPosition = Rotation2d.fromDegrees(95); // FIXME
+    public static Rotation2d kGeyserBallOnePosition = Rotation2d.fromDegrees(90);
+    public static Rotation2d kGeyserBallTwoPosition = Rotation2d.fromDegrees(95);
+
+    // Stryke Shot Constants
+    public static final double kOutsideStrykePos = 2250;
+    public static final double kInsideStrykePos = 1700;
 
     // Talon Constants
     public static SupplyCurrentLimitConfiguration getSupplyCurrentLimitConfig() {
@@ -770,6 +774,15 @@ public final class Constants {
     public static final int kHoodTalonID = 42;
     public static final String kLookupTablePath = "/home/lvuser/deploy/LookupTable.csv";
 
+    // StrykeShot Constants
+    public static final double kMiddleClimbY = 6.7;
+    public static final double kOutsideKickerTicksP100MS = 9_860; // FIXME
+    public static final double kOutsideShooterTicksP100MS = 10_400; // FIXME
+    public static final double kOutsideHoodTickPos = 5700; // FIXME
+    public static final double kInsideKickerTicksP100MS = 9_700; // FIXME
+    public static final double kInsideShooterTicksP100MS = 10_200; // FIXME
+    public static final double kInsideHoodTickPos = 5700; // FIXME
+
     // Lookup Table Constants
     public static final double kLookupMinPixel = 134;
     public static final double kLookupMaxPixel = 414;
@@ -802,10 +815,10 @@ public final class Constants {
     public static final double kHoodFenderLowTicks = 2_600; // 4000
 
     // Geyser Shot Constants
-    public static double kShooterGeyserTicksP100ms = 12_000;
-    public static double kKickerGeyserTicksP100ms = 5_500;
-    public static double kHoodGeyserBallOneTicks = 0;
-    public static double kHoodGeyserBallTwoTicks = 0;
+    public static final double kShooterGeyserTicksP100ms = 12_000;
+    public static final double kKickerGeyserTicksP100ms = 5_500;
+    public static final double kHoodGeyserBallOneTicks = 0;
+    public static final double kHoodGeyserBallTwoTicks = 0;
 
     public static final double kShooterManualEjectTicksP100ms = -5_000;
     public static final double kKickerManualEjectTicksP100ms = -5_000;

@@ -6,6 +6,7 @@ import com.ctre.phoenix.motorcontrol.can.BaseTalon;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.opencsv.CSVReader;
+import edu.wpi.first.math.geometry.Pose2d;
 import frc.robot.Constants;
 import frc.robot.Constants.ShooterConstants;
 import java.io.FileReader;
@@ -21,6 +22,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
 
   private static final Logger logger = LoggerFactory.getLogger(ShooterSubsystem.class);
   private final TalonFX shooterFalcon;
+  public final DriveSubsystem driveSubsystem;
   private final TalonFX kickerFalcon;
   private final TalonSRX hoodTalon;
   private final MagazineSubsystem magazineSubsystem;
@@ -37,12 +39,17 @@ public class ShooterSubsystem extends MeasurableSubsystem {
       oldWidthPixels,
       oldIndex;
   private String[][] lookupTable;
+  public boolean isOutside = true;
   private double lastLookupDistance = 0.0;
   private boolean lastLookupBeyondTable = false;
 
-  public ShooterSubsystem(MagazineSubsystem magazineSubsystem, VisionSubsystem visionSubsystem) {
+  public ShooterSubsystem(
+      MagazineSubsystem magazineSubsystem,
+      VisionSubsystem visionSubsystem,
+      DriveSubsystem driveSubsystem) {
     this.magazineSubsystem = magazineSubsystem;
     this.visionSubsystem = visionSubsystem;
+    this.driveSubsystem = driveSubsystem;
     parseLookupTable();
     shooterFalcon = new TalonFX(ShooterConstants.kShooterFalconID);
     shooterFalcon.configFactoryDefault(Constants.kTalonConfigTimeout);
@@ -246,6 +253,40 @@ public class ShooterSubsystem extends MeasurableSubsystem {
       shooterClosedLoop(shootSolution[0], shootSolution[1]);
       hoodClosedLoop(shootSolution[2]);
     }
+  }
+
+  public void strykeShot() {
+    logger.info("Stryke Shot: {} -> ADJUSTING", currentState);
+    currentState = ShooterState.ADJUSTING;
+    shooterClosedLoop(
+        isOutside
+            ? ShooterConstants.kOutsideKickerTicksP100MS
+            : ShooterConstants.kInsideKickerTicksP100MS,
+        isOutside
+            ? ShooterConstants.kOutsideShooterTicksP100MS
+            : ShooterConstants.kInsideShooterTicksP100MS);
+    hoodClosedLoop(
+        isOutside ? ShooterConstants.kOutsideHoodTickPos : ShooterConstants.kInsideHoodTickPos);
+  }
+
+  public void setOutside(boolean pos) {
+    isOutside = pos;
+    logger.info("Manually Set Climb Pos: {}", pos ? "LEFT" : "RIGHT");
+  }
+
+  public void checkOutside() {
+    Pose2d robotPos = driveSubsystem.getPoseMeters();
+    if (robotPos.getY() > ShooterConstants.kMiddleClimbY) {
+      isOutside = true;
+      logger.info("Detect OUTSIDE climb: y= {}", robotPos.getY());
+    } else {
+      isOutside = false;
+      logger.info("Detect INSIDE climb: y= {}", robotPos.getY());
+    }
+  }
+
+  public String getIsOutside() {
+    return isOutside ? "OUTSIDE" : "INSIDE";
   }
 
   public double getLastLookupDistance() {

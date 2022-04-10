@@ -539,7 +539,8 @@ public class MagazineSubsystem extends MeasurableSubsystem {
             shooterSubsystem.shoot();
             currUpperMagazineState = UpperMagazineState.PAUSE;
           } else if (turretSubsystem.getState() == TurretState.ODOM_AIMED
-              || turretSubsystem.getState() == TurretState.GEYSER_AIMED) {
+              || turretSubsystem.getState() == TurretState.GEYSER_AIMED
+              || turretSubsystem.getState() == TurretState.STRYKE_AIMED) {
             logger.info("WAIT_AIM -> PAUSE");
             currUpperMagazineState = UpperMagazineState.PAUSE;
           }
@@ -561,6 +562,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
             enableLowerBeamBreak(false);
             upperClosedLoopRotate(MagazineConstants.kUpperMagazineFeedSpeed);
             lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIndexSpeed);
+            shooterSubsystem.logShotSol();
             timedShootTimer.reset();
             timedShootTimer.start();
           } else {
@@ -582,11 +584,24 @@ public class MagazineSubsystem extends MeasurableSubsystem {
         } else if (shooterSubsystem.getCurrentState() == ShooterState.SHOOT
             && (turretSubsystem.getState() == TurretState.FENDER_AIMED
                 || turretSubsystem.getState() == TurretState.ODOM_AIMED
+                || turretSubsystem.getState() == TurretState.STRYKE_AIMED
                 || turretSubsystem.getState() == TurretState.GEYSER_AIMED)) {
-          logger.info("PAUSE -> SHOOT");
-          enableUpperBeamBreak(false);
-          upperClosedLoopRotate(MagazineConstants.kUpperMagazineFeedSpeed);
-          currUpperMagazineState = UpperMagazineState.SHOOT;
+          if (doTimedShoot) {
+            logger.info("PAUSE -> TIMED_FEED");
+            currUpperMagazineState = UpperMagazineState.TIMED_FEED;
+            currLowerMagazineState = LowerMagazineState.TIMED_FEED;
+            enableUpperBeamBreak(false);
+            enableLowerBeamBreak(false);
+            upperClosedLoopRotate(MagazineConstants.kUpperMagazineFeedSpeed);
+            lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIndexSpeed);
+            timedShootTimer.reset();
+            timedShootTimer.start();
+          } else {
+            logger.info("PAUSE -> SHOOT");
+            enableUpperBeamBreak(false);
+            upperClosedLoopRotate(MagazineConstants.kUpperMagazineFeedSpeed);
+            currUpperMagazineState = UpperMagazineState.SHOOT;
+          }
         } else if (turretSubsystem.getState() == TurretState.TRACKING
             && visionSubsystem.isValid()) {
           shooterSubsystem.shoot();

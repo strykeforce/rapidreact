@@ -510,20 +510,34 @@ public class ClimbSubsystem extends MeasurableSubsystem {
           // logger.info("Fixed: {} -> IDLE", currFixedArmState);
           // currFixedArmState = FixedArmState.IDLE;
           // openLoopFixedArm(0.0);
-          logger.info(
-              "Fixed: {} -> TVS_RET2, Pivot: {} -> TVS_RET2", currFixedArmState, currPivotArmState);
+
+          // logger.info(
+          //     "Fixed: {} -> TVS_RET2, Pivot: {} -> TVS_RET2", currFixedArmState,
+          // currPivotArmState);
+          // currFixedArmState = FixedArmState.TVS_RET2;
+          // currPivotArmState = PivotArmState.TVS_RET2;
+          // openLoopFixedArm(currFixedArmState.speed);
+          // openLoopPivotArm(currPivotArmState.speed);
+
+          climbStateCounter++;
+          logger.info("Fixed: {} -> TVS_RET2", currFixedArmState);
           currFixedArmState = FixedArmState.TVS_RET2;
-          currPivotArmState = PivotArmState.TVS_RET2;
           openLoopFixedArm(currFixedArmState.speed);
-          openLoopPivotArm(currPivotArmState.speed);
           climbStateCounter++;
         }
         break;
       case TVS_RET2:
         if (isFixedArmOpenLoopRetractFinished(currFixedArmState.setpoint)) {
-          logger.info("fixed: {} -> idle", currFixedArmState);
+          // logger.info("fixed: {} -> idle", currFixedArmState);
+          // currFixedArmState = FixedArmState.IDLE;
+          // openLoopFixedArm(0.0);
+          logger.info("Finished traverse climb");
+          shoulderState = ShoulderState.IDLE;
           currFixedArmState = FixedArmState.IDLE;
+          currPivotArmState = PivotArmState.IDLE;
           openLoopFixedArm(0.0);
+          openLoopPivotArm(0.0);
+          isClimbDone = true;
         }
         break;
       case MID_FIN_RET:
