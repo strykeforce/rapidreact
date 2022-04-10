@@ -38,6 +38,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
       oldIndex;
   private String[][] lookupTable;
   private double lastLookupDistance = 0.0;
+  private boolean lastLookupBeyondTable = false;
 
   public ShooterSubsystem(MagazineSubsystem magazineSubsystem, VisionSubsystem visionSubsystem) {
     this.magazineSubsystem = magazineSubsystem;
@@ -121,12 +122,14 @@ public class ShooterSubsystem extends MeasurableSubsystem {
           widthPixels,
           ShooterConstants.kLookupMinPixel);
       index = lookupTable.length - 1;
+      lastLookupBeyondTable = true;
     } else if (widthPixels > ShooterConstants.kLookupMaxPixel) {
       logger.warn(
           "Pixel width {} is more than max pixel in table, using {}",
           widthPixels,
           ShooterConstants.kLookupMaxPixel);
       index = 1;
+      lastLookupBeyondTable = true;
     } else {
       // total rows - (Width - minrows)
       index =
@@ -140,6 +143,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
       //             - ShooterConstants.kLookupMinPixel);
       oldIndex = index;
       oldWidthPixels = widthPixels;
+      lastLookupBeyondTable = false;
     }
 
     shootSolution[0] = Double.parseDouble(lookupTable[index][2]);
@@ -246,6 +250,10 @@ public class ShooterSubsystem extends MeasurableSubsystem {
 
   public double getLastLookupDistance() {
     return lastLookupDistance;
+  }
+
+  public boolean isLastLookupBeyondTable(){
+    return lastLookupBeyondTable;
   }
 
   public void manualShoot(double widthPixels) {

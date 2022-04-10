@@ -565,10 +565,12 @@ public class MagazineSubsystem extends MeasurableSubsystem {
           } else {
             logger.info("PAUSE -> SHOOT");
             shooterSubsystem.logShotSol();
-            visionSubsystem.getVisionOdometry(
-                turretSubsystem.getTurretRotation2d(),
-                driveSubsystem.getGyroRotation2d(),
-                shooterSubsystem.getLastLookupDistance());
+            if(!shooterSubsystem.isLastLookupBeyondTable()){
+              visionSubsystem.getVisionOdometry(
+                  turretSubsystem.getTurretRotation2d(),
+                  driveSubsystem.getGyroRotation2d(),
+                  shooterSubsystem.getLastLookupDistance());
+            }
             enableUpperBeamBreak(false);
             upperClosedLoopRotate(MagazineConstants.kUpperMagazineFeedSpeed);
             currUpperMagazineState = UpperMagazineState.SHOOT;
