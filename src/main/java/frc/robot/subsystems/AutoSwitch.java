@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.commands.auton.DefenseAuto;
 import frc.robot.commands.auton.FiveCargoAuto;
 import frc.robot.commands.auton.ThreeCargoAuto;
 import frc.robot.commands.auton.TwoCargoAuto;
@@ -109,6 +110,20 @@ public class AutoSwitch {
             "LeftCargo1Collect",
             AutoConstants.kLeftStartYaw,
             3.0,
+            230.0); // FIXME
+      case 0x12:
+        return new DefenseAuto(
+            visionSubsystem,
+            turretSubsystem,
+            shooterSubsystem,
+            magazineSubsystem,
+            intakeSubsystem,
+            driveSubsystem,
+            "LeftCargo1Collect",
+            "OppCargo6Collect",
+            "OppCargo5Collect",
+            AutoConstants.kLeftStartYaw,
+            0.0,
             230.0); // FIXME
       case 0x20:
         return new TwoCargoAuto(

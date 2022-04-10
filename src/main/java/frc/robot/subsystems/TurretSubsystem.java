@@ -39,6 +39,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
   private double targetTurretPosition = 0;
   private double cruiseVelocity = kFastCruiseVelocity;
   private boolean lastDoRotate = false;
+  private boolean isBallOne = true;
 
   private int trackingStableCount;
   private int
@@ -308,7 +309,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
   }
 
   public void fenderShot(boolean doRotate) {
-    logger.info("{} -> FENDER_ADJUSTING}", currentState);
+    logger.info("{} -> FENDER_ADJUSTING", currentState);
     currentState = TurretState.FENDER_ADJUSTING;
     lastDoRotate = doRotate;
     if (magazineSubsystem.isNextCargoAlliance() || (!doRotate)) {
@@ -320,6 +321,18 @@ public class TurretSubsystem extends MeasurableSubsystem {
     } else {
       rotateTo(TurretConstants.kFenderOpponent);
       logger.info("Fender Shot: Opponent Cargo");
+    }
+  }
+
+  public void geyserShot(boolean isBallOne) {
+    logger.info("{} -> GEYSER_ADJUSTING", currentState);
+    currentState = TurretState.GEYSER_ADJUSTING;
+    if (isBallOne) {
+      rotateTo(TurretConstants.kGeyserBallOnePosition);
+      logger.info("Geyser Shot: Starting Ball One Sequence");
+    } else {
+      rotateTo(TurretConstants.kGeyserBallTwoPosition);
+      logger.info("Geyser Shot: Starting Ball Two Sequence");
     }
   }
 
@@ -471,6 +484,15 @@ public class TurretSubsystem extends MeasurableSubsystem {
       case STRYKE_AIMED:
         // indicator
         break;
+      case GEYSER_ADJUSTING:
+        if (isTurretAtTarget()) {
+          currentState = TurretState.GEYSER_AIMED;
+          logger.info("GEYSER_ADJUSTING -> GEYSER_AIMED");
+        }
+        break;
+      case GEYSER_AIMED:
+        // indicator for other subsystems
+        break;
       case IDLE:
         // do nothing
         break;
@@ -507,6 +529,8 @@ public class TurretSubsystem extends MeasurableSubsystem {
     ODOM_AIMED,
     STRYKE_ADJUSTING,
     STRYKE_AIMED,
-    WRAPPING;
+    WRAPPING,
+    GEYSER_ADJUSTING,
+    GEYSER_AIMED;
   }
 }

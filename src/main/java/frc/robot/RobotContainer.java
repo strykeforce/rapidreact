@@ -60,6 +60,7 @@ import frc.robot.commands.sequences.climb.TraverseClimbCommandGroup;
 import frc.robot.commands.sequences.intaking.AutoIntakeCommand;
 import frc.robot.commands.sequences.intaking.ExtendIntakeCommand;
 import frc.robot.commands.sequences.shooting.ArmShooterCommandGroup;
+import frc.robot.commands.sequences.shooting.GeyserShootCommand;
 import frc.robot.commands.sequences.shooting.HighFenderShotCommand;
 import frc.robot.commands.sequences.shooting.LowFenderShotCommand;
 import frc.robot.commands.sequences.shooting.PitShooterTuneCommandGroup;
@@ -276,6 +277,11 @@ public class RobotContainer {
         .whenPressed(
             new MidClimbCommandGroup(
                 climbSubsystem, driveSubsystem, shooterSubsystem, driveJoystick, turretSubsystem));
+
+    new JoystickButton(driveJoystick, Button.HAMBURGER.id)
+        .whenPressed(
+            new GeyserShootCommand(
+                turretSubsystem, shooterSubsystem, magazineSubsystem, intakeSubsystem));
   }
 
   private void configureOperatorButtonBindings() {

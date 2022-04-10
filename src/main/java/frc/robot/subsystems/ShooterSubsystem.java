@@ -28,6 +28,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
   private final MagazineSubsystem magazineSubsystem;
   private final VisionSubsystem visionSubsystem;
   private boolean highFender;
+  private boolean isBallOne;
   private ShooterState currentState = ShooterState.STOP;
   private double shooterSetPointTicks,
       kickerSetpointTicks,
@@ -314,6 +315,23 @@ public class ShooterSubsystem extends MeasurableSubsystem {
       hoodClosedLoop(ShooterConstants.kHoodFenderLowTicks);
       logger.info("Low Fender Shot");
     }
+  }
+
+  public void geyserShot(boolean isBallOne) {
+    this.isBallOne = isBallOne;
+    logger.info("GEYSER_SHOT: {} -> ADJUSTING", currentState);
+    currentState = ShooterState.ADJUSTING;
+    shooterClosedLoop(
+        ShooterConstants.kKickerGeyserTicksP100ms, ShooterConstants.kShooterGeyserTicksP100ms);
+    if (isBallOne) {
+      hoodClosedLoop(ShooterConstants.kHoodGeyserBallTwoTicks);
+    } else {
+      hoodClosedLoop(ShooterConstants.kHoodGeyserBallTwoTicks);
+    }
+  }
+
+  public void geyserShot() {
+    geyserShot(!isBallOne);
   }
 
   public void stop() {
