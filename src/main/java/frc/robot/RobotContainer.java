@@ -228,9 +228,7 @@ public class RobotContainer {
         .whenReleased(new OpenLoopTurretCommand(turretSubsystem, 0.0));
 
     new JoystickButton(driveJoystick, Button.HAMBURGER.id)
-        .whenPressed(
-            new StrykeShotCommand(
-                turretSubsystem, shooterSubsystem, magazineSubsystem, intakeSubsystem));
+        .whenPressed(new StrykeShotCommand(turretSubsystem, shooterSubsystem, magazineSubsystem));
 
     new JoystickButton(driveJoystick, Trim.LEFT_Y_POS.id)
         .whenPressed(new EnableVisionCommand(visionSubsystem));
@@ -263,11 +261,21 @@ public class RobotContainer {
     new JoystickButton(driveJoystick, Trim.LEFT_X_POS.id)
         .whenPressed(
             new TraverseClimbCommandGroup(
-                climbSubsystem, driveSubsystem, shooterSubsystem, driveJoystick, turretSubsystem));
+                climbSubsystem,
+                driveSubsystem,
+                shooterSubsystem,
+                magazineSubsystem,
+                driveJoystick,
+                turretSubsystem));
     new JoystickButton(driveJoystick, Trim.LEFT_X_NEG.id)
         .whenPressed(
             new TraverseClimbCommandGroup(
-                climbSubsystem, driveSubsystem, shooterSubsystem, driveJoystick, turretSubsystem));
+                climbSubsystem,
+                driveSubsystem,
+                shooterSubsystem,
+                magazineSubsystem,
+                driveJoystick,
+                turretSubsystem));
     new JoystickButton(driveJoystick, Button.UP.id)
         .whenPressed(
             new HighClimbCommandGroup(
@@ -416,7 +424,7 @@ public class RobotContainer {
         .withPosition(3, 1);
 
     Shuffleboard.getTab("Match")
-        .addString("ClimbPosition", () -> shooterSubsystem.getIsLeft())
+        .addString("ClimbPosition", () -> shooterSubsystem.getIsOutside())
         .withSize(1, 1)
         .withPosition(7, 1);
 

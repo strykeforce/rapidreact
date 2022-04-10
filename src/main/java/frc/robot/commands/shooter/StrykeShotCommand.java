@@ -1,7 +1,6 @@
 package frc.robot.commands.shooter;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
@@ -13,25 +12,22 @@ public class StrykeShotCommand extends CommandBase {
   public final TurretSubsystem turretSubsystem;
   public final ShooterSubsystem shooterSubsystem;
   public final MagazineSubsystem magazineSubsystem;
-  public final IntakeSubsystem intakeSubsystem;
   private final Logger logger = LoggerFactory.getLogger(StrykeShotCommand.class);
 
   public StrykeShotCommand(
       TurretSubsystem turretSubsystem,
       ShooterSubsystem shooterSubsystem,
-      MagazineSubsystem magazineSubsystem,
-      IntakeSubsystem intakeSubsystem) {
+      MagazineSubsystem magazineSubsystem) {
     this.turretSubsystem = turretSubsystem;
     this.shooterSubsystem = shooterSubsystem;
     this.magazineSubsystem = magazineSubsystem;
-    this.intakeSubsystem = intakeSubsystem;
   }
 
   @Override
   public void initialize() {
-    turretSubsystem.strykeShot(shooterSubsystem.isLeft);
+    turretSubsystem.strykeShot(shooterSubsystem.isOutside);
     shooterSubsystem.strykeShot();
-    magazineSubsystem.timedShoot();
+    magazineSubsystem.shoot();
   }
 
   @Override
@@ -43,6 +39,5 @@ public class StrykeShotCommand extends CommandBase {
   public void end(boolean interrupted) {
     shooterSubsystem.stop();
     magazineSubsystem.magazineInterrupted();
-    intakeSubsystem.openLoopRotate(0.0);
   }
 }

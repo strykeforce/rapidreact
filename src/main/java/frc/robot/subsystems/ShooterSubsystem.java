@@ -39,7 +39,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
       oldWidthPixels,
       oldIndex;
   private String[][] lookupTable;
-  public boolean isLeft = true;
+  public boolean isOutside = true;
 
   public ShooterSubsystem(
       MagazineSubsystem magazineSubsystem,
@@ -252,31 +252,34 @@ public class ShooterSubsystem extends MeasurableSubsystem {
     logger.info("Stryke Shot: {} -> ADJUSTING", currentState);
     currentState = ShooterState.ADJUSTING;
     shooterClosedLoop(
-        isLeft ? ShooterConstants.kLeftKickerTicksP100MS : ShooterConstants.kRightKickerTicksP100MS,
-        isLeft
-            ? ShooterConstants.kLeftShooterTicksP100MS
-            : ShooterConstants.kRightShooterTicksP100MS);
-    hoodClosedLoop(isLeft ? ShooterConstants.kLeftHoodTickPos : ShooterConstants.kRightHoodTickPos);
+        isOutside
+            ? ShooterConstants.kOutsideKickerTicksP100MS
+            : ShooterConstants.kInsideKickerTicksP100MS,
+        isOutside
+            ? ShooterConstants.kOutsideShooterTicksP100MS
+            : ShooterConstants.kInsideShooterTicksP100MS);
+    hoodClosedLoop(
+        isOutside ? ShooterConstants.kOutsideHoodTickPos : ShooterConstants.kInsideHoodTickPos);
   }
 
-  public void setIsLeft(boolean pos) {
-    isLeft = pos;
+  public void setOutside(boolean pos) {
+    isOutside = pos;
     logger.info("Manually Set Climb Pos: {}", pos ? "LEFT" : "RIGHT");
   }
 
-  public void checkLeft() {
+  public void checkOutside() {
     Pose2d robotPos = driveSubsystem.getPoseMeters();
     if (robotPos.getY() > ShooterConstants.kMiddleClimbY) {
-      isLeft = true;
-      logger.info("Detect LEFT climb: y= {}", robotPos.getY());
+      isOutside = true;
+      logger.info("Detect OUTSIDE climb: y= {}", robotPos.getY());
     } else {
-      isLeft = false;
-      logger.info("Detect RIGHT climb: y= {}", robotPos.getY());
+      isOutside = false;
+      logger.info("Detect INSIDE climb: y= {}", robotPos.getY());
     }
   }
 
-  public String getIsLeft() {
-    return isLeft ? "Left" : "Right";
+  public String getIsOutside() {
+    return isOutside ? "OUTSIDE" : "INSIDE";
   }
 
   public void manualShoot(double widthPixels) {

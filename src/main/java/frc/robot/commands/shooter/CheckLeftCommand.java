@@ -12,6 +12,6 @@ public class CheckLeftCommand extends InstantCommand {
 
   @Override
   public void initialize() {
-    shooterSubsystem.checkLeft();
+    shooterSubsystem.checkOutside();
   }
 }

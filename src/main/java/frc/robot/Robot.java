@@ -109,7 +109,7 @@ public class Robot extends TimedRobot {
     if (autoCommand != null) {
       autoCommand.schedule();
     }
-    m_robotContainer.zeroClimb();
+    // m_robotContainer.zeroClimb();
   }
 
   /** This function is called periodically during autonomous. */
@@ -119,7 +119,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     logger.info("TeleopInit");
-    m_robotContainer.zeroClimb();
+    // m_robotContainer.zeroClimb();
     Command autoIntakeCommand = m_robotContainer.startAutoIntake();
     autoIntakeCommand.schedule();
   }

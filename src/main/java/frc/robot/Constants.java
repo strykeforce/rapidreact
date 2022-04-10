@@ -271,8 +271,8 @@ public final class Constants {
     public static Rotation2d kGeyserBallTwoPosition = Rotation2d.fromDegrees(95);
 
     // Stryke Shot Constants
-    public static final Rotation2d kLeftStrykePos = Rotation2d.fromDegrees(-90.0);
-    public static final Rotation2d kRightStrkePos = Rotation2d.fromDegrees(90.0);
+    public static final double kOutsideStrykePos = 2250;
+    public static final double kInsideStrykePos = 1700;
 
     // Talon Constants
     public static SupplyCurrentLimitConfiguration getSupplyCurrentLimitConfig() {
@@ -755,12 +755,12 @@ public final class Constants {
 
     // StrykeShot Constants
     public static final double kMiddleClimbY = 6.7;
-    public static final double kLeftKickerTicksP100MS = 5_000; // FIXME
-    public static final double kLeftShooterTicksP100MS = 5_000; // FIXME
-    public static final double kLeftHoodTickPos = 0; // FIXME
-    public static final double kRightKickerTicksP100MS = 5_000; // FIXME
-    public static final double kRightShooterTicksP100MS = 5_000; // FIXME
-    public static final double kRightHoodTickPos = 500; // FIXME
+    public static final double kOutsideKickerTicksP100MS = 9_860; // FIXME
+    public static final double kOutsideShooterTicksP100MS = 10_400; // FIXME
+    public static final double kOutsideHoodTickPos = 5700; // FIXME
+    public static final double kInsideKickerTicksP100MS = 9_700; // FIXME
+    public static final double kInsideShooterTicksP100MS = 10_200; // FIXME
+    public static final double kInsideHoodTickPos = 5700; // FIXME
 
     // Lookup Table Constants
     public static final double kLookupMinPixel = 134;

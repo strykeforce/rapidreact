@@ -343,7 +343,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
   public void strykeShot(boolean isLeftClimb) {
     logger.info("{} -> STRYKE_ADJUSTING", currentState);
     currentState = TurretState.STRYKE_ADJUSTING;
-    rotateTo(isLeftClimb ? TurretConstants.kLeftStrykePos : TurretConstants.kRightStrkePos);
+    rotateTo(isLeftClimb ? TurretConstants.kOutsideStrykePos : TurretConstants.kInsideStrykePos);
   }
 
   @Override

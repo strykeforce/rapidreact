@@ -12,6 +12,6 @@ public class SwitchClimbPos extends InstantCommand {
 
   @Override
   public void initialize() {
-    shooterSubsystem.setIsLeft(!shooterSubsystem.isLeft);
+    shooterSubsystem.setOutside(!shooterSubsystem.isOutside);
   }
 }
