@@ -198,6 +198,11 @@ public class TurretSubsystem extends MeasurableSubsystem {
     return turretStableCounts >= Constants.ShooterConstants.kStableCounts;
   }
 
+  public Rotation2d getTurretRotation2d() {
+    return new Rotation2d(
+        turret.getSelectedSensorPosition() / -TurretConstants.kTurretTicksPerRadian);
+  }
+
   public void zeroTurret() {
     // double stringPotPosition = turret.getSensorCollection().getAnalogInRaw();
     if (!turret.getSensorCollection().isFwdLimitSwitchClosed()) {

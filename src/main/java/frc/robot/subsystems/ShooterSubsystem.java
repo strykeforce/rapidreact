@@ -37,6 +37,8 @@ public class ShooterSubsystem extends MeasurableSubsystem {
       oldWidthPixels,
       oldIndex;
   private String[][] lookupTable;
+  private double lastLookupDistance = 0.0;
+  private boolean lastLookupBeyondTable = false;
 
   public ShooterSubsystem(MagazineSubsystem magazineSubsystem, VisionSubsystem visionSubsystem) {
     this.magazineSubsystem = magazineSubsystem;
@@ -113,19 +115,21 @@ public class ShooterSubsystem extends MeasurableSubsystem {
 
   private double[] getShootSolution(double widthPixels) {
     int index = 0;
-    double[] shootSolution = new double[3];
+    double[] shootSolution = new double[4];
     if (widthPixels < ShooterConstants.kLookupMinPixel) {
       logger.warn(
           "Pixel width {} is less than min pixel in table, using {}",
           widthPixels,
           ShooterConstants.kLookupMinPixel);
       index = lookupTable.length - 1;
+      lastLookupBeyondTable = true;
     } else if (widthPixels > ShooterConstants.kLookupMaxPixel) {
       logger.warn(
           "Pixel width {} is more than max pixel in table, using {}",
           widthPixels,
           ShooterConstants.kLookupMaxPixel);
       index = 1;
+      lastLookupBeyondTable = true;
     } else {
       // total rows - (Width - minrows)
       index =
@@ -139,11 +143,13 @@ public class ShooterSubsystem extends MeasurableSubsystem {
       //             - ShooterConstants.kLookupMinPixel);
       oldIndex = index;
       oldWidthPixels = widthPixels;
+      lastLookupBeyondTable = false;
     }
 
     shootSolution[0] = Double.parseDouble(lookupTable[index][2]);
     shootSolution[1] = Double.parseDouble(lookupTable[index][3]);
     shootSolution[2] = Double.parseDouble(lookupTable[index][4]);
+    shootSolution[3] = Double.parseDouble(lookupTable[index][0]);
     return shootSolution;
   }
 
@@ -236,9 +242,18 @@ public class ShooterSubsystem extends MeasurableSubsystem {
       hoodClosedLoop(ShooterConstants.kHoodOpTicks);
     } else {
       double[] shootSolution = getShootSolution();
+      lastLookupDistance = shootSolution[3];
       shooterClosedLoop(shootSolution[0], shootSolution[1]);
       hoodClosedLoop(shootSolution[2]);
     }
+  }
+
+  public double getLastLookupDistance() {
+    return lastLookupDistance;
+  }
+
+  public boolean isLastLookupBeyondTable() {
+    return lastLookupBeyondTable;
   }
 
   public void manualShoot(double widthPixels) {
