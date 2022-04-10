@@ -24,6 +24,7 @@ public class AutoSwitch {
   private Command autoCommand;
   private final DriveSubsystem driveSubsystem;
   private final IntakeSubsystem intakeSubsystem;
+  private final IntakeExtendSubsystem intakeExtendSubsystem;
   private final MagazineSubsystem magazineSubsystem;
   private final TurretSubsystem turretSubsystem;
   private final ShooterSubsystem shooterSubsystem;
@@ -32,12 +33,14 @@ public class AutoSwitch {
   public AutoSwitch(
       DriveSubsystem driveSubsystem,
       IntakeSubsystem intakeSubsystem,
+      IntakeExtendSubsystem intakeExtendSubsystem,
       MagazineSubsystem magazineSubsystem,
       TurretSubsystem turretSubsystem,
       ShooterSubsystem shooterSubsystem,
       VisionSubsystem visionSubsystem) {
     this.driveSubsystem = driveSubsystem;
     this.intakeSubsystem = intakeSubsystem;
+    this.intakeExtendSubsystem = intakeExtendSubsystem;
     this.magazineSubsystem = magazineSubsystem;
     this.turretSubsystem = turretSubsystem;
     this.shooterSubsystem = shooterSubsystem;
@@ -94,6 +97,7 @@ public class AutoSwitch {
             shooterSubsystem,
             magazineSubsystem,
             intakeSubsystem,
+            intakeExtendSubsystem,
             driveSubsystem,
             "LeftCargo1Collect",
             AutoConstants.kLeftStartYaw,
@@ -106,6 +110,7 @@ public class AutoSwitch {
             shooterSubsystem,
             magazineSubsystem,
             intakeSubsystem,
+            intakeExtendSubsystem,
             driveSubsystem,
             "LeftCargo1Collect",
             AutoConstants.kLeftStartYaw,
@@ -118,6 +123,7 @@ public class AutoSwitch {
             shooterSubsystem,
             magazineSubsystem,
             intakeSubsystem,
+            intakeExtendSubsystem,
             driveSubsystem,
             "LeftCargo1Collect",
             "OppCargo6Collect",
@@ -132,6 +138,7 @@ public class AutoSwitch {
             shooterSubsystem,
             magazineSubsystem,
             intakeSubsystem,
+            intakeExtendSubsystem,
             driveSubsystem,
             "MidCargo1Collect",
             AutoConstants.kMidStartYaw,
@@ -144,6 +151,7 @@ public class AutoSwitch {
             shooterSubsystem,
             magazineSubsystem,
             intakeSubsystem,
+            intakeExtendSubsystem,
             driveSubsystem,
             "MidCargo1Collect",
             AutoConstants.kMidStartYaw,
@@ -156,6 +164,7 @@ public class AutoSwitch {
             shooterSubsystem,
             magazineSubsystem,
             intakeSubsystem,
+            intakeExtendSubsystem,
             driveSubsystem,
             "RightCargo1Collect",
             AutoConstants.kRightStartYaw,
@@ -168,6 +177,7 @@ public class AutoSwitch {
             shooterSubsystem,
             magazineSubsystem,
             intakeSubsystem,
+            intakeExtendSubsystem,
             driveSubsystem,
             "RightCargo1Collect",
             AutoConstants.kRightStartYaw,
@@ -180,6 +190,7 @@ public class AutoSwitch {
             shooterSubsystem,
             magazineSubsystem,
             intakeSubsystem,
+            intakeExtendSubsystem,
             driveSubsystem,
             "RightCargo1Collect",
             "RightCargo2Collect",
@@ -194,6 +205,7 @@ public class AutoSwitch {
             shooterSubsystem,
             magazineSubsystem,
             intakeSubsystem,
+            intakeExtendSubsystem,
             driveSubsystem,
             "RightCargo1Collect",
             "RightCargo2Collect",
@@ -211,6 +223,7 @@ public class AutoSwitch {
             shooterSubsystem,
             magazineSubsystem,
             intakeSubsystem,
+            intakeExtendSubsystem,
             driveSubsystem,
             "RightCargo1Collect",
             "BlueRightCargo2Collect",

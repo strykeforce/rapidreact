@@ -2,6 +2,7 @@ package frc.robot.commands.sequences.intaking;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.IntakeConstants;
+import frc.robot.subsystems.IntakeExtendSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
 import frc.robot.subsystems.MagazineSubsystem.LowerMagazineState;
@@ -9,6 +10,7 @@ import frc.robot.subsystems.MagazineSubsystem.LowerMagazineState;
 public class AutoIntakeCommand extends CommandBase {
   public final MagazineSubsystem magazineSubsystem;
   public final IntakeSubsystem intakeSubsystem;
+  private final IntakeExtendSubsystem intakeExtendSubsystem;
   public boolean magazineReversed = false;
   public boolean isAuton;
   public boolean intakeExtend;
@@ -16,11 +18,13 @@ public class AutoIntakeCommand extends CommandBase {
   public AutoIntakeCommand(
       MagazineSubsystem magazineSubsystem,
       IntakeSubsystem intakeSubsystem,
+      IntakeExtendSubsystem intakeExtendSubsystem,
       boolean isAuton,
       boolean intakeExtend) {
     addRequirements(magazineSubsystem, intakeSubsystem);
     this.magazineSubsystem = magazineSubsystem;
     this.intakeSubsystem = intakeSubsystem;
+    this.intakeExtendSubsystem = intakeExtendSubsystem;
     this.isAuton = isAuton;
     this.intakeExtend = intakeExtend;
   }
@@ -31,8 +35,8 @@ public class AutoIntakeCommand extends CommandBase {
     intakeSubsystem.openLoopRotate(
         isAuton ? IntakeConstants.kIntakeSpeedAuto : IntakeConstants.kIntakeSpeed);
     magazineReversed = false;
-    if (intakeExtend) intakeSubsystem.extendClosedLoop();
-    else intakeSubsystem.retractClosedLoop();
+    if (intakeExtend) intakeExtendSubsystem.extendClosedLoop();
+    else intakeExtendSubsystem.retractClosedLoop();
   }
 
   @Override
@@ -60,6 +64,6 @@ public class AutoIntakeCommand extends CommandBase {
     if (!interrupted) {
       intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeReverseSpeed);
     }
-    if (!isAuton && !interrupted) intakeSubsystem.retractClosedLoop();
+    if (!isAuton && !interrupted) intakeExtendSubsystem.retractClosedLoop();
   }
 }

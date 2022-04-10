@@ -144,6 +144,7 @@ public class RobotContainer {
         new AutoSwitch(
             driveSubsystem,
             intakeSubsystem,
+            intakeExtendSubsystem,
             magazineSubsystem,
             turretSubsystem,
             shooterSubsystem,
@@ -166,7 +167,8 @@ public class RobotContainer {
   }
 
   public Command startAutoIntake() {
-    return new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, false, false);
+    return new AutoIntakeCommand(
+        magazineSubsystem, intakeSubsystem, intakeExtendSubsystem, false, false);
   }
 
   public AutoSwitch getAutoSwitch() {
@@ -245,7 +247,9 @@ public class RobotContainer {
 
     // Auto Intake
     new JoystickButton(driveJoystick, Shoulder.LEFT_DOWN.id)
-        .whenPressed(new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, false, false));
+        .whenPressed(
+            new AutoIntakeCommand(
+                magazineSubsystem, intakeSubsystem, intakeExtendSubsystem, false, false));
     new JoystickButton(driveJoystick, Shoulder.LEFT_DOWN.id)
         .whenReleased(new IntakeOpenLoopCommand(intakeSubsystem, 0.0));
 
@@ -310,9 +314,11 @@ public class RobotContainer {
                 true,
                 intakeSubsystem));
     new JoystickButton(xboxController, XboxController.Button.kY.value)
-        .toggleWhenPressed(new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, false, true));
-    LeftTriggerDown.whileActiveOnce(new ExtendIntakeCommand(intakeSubsystem, true));
-    RightTriggerDown.whileActiveOnce(new ExtendIntakeCommand(intakeSubsystem, false));
+        .toggleWhenPressed(
+            new AutoIntakeCommand(
+                magazineSubsystem, intakeSubsystem, intakeExtendSubsystem, false, true));
+    LeftTriggerDown.whileActiveOnce(new ExtendIntakeCommand(intakeExtendSubsystem, true));
+    RightTriggerDown.whileActiveOnce(new ExtendIntakeCommand(intakeExtendSubsystem, false));
 
     // Eject Cargo Reverse
     new JoystickButton(xboxController, XboxController.Button.kBack.value)
@@ -585,9 +591,11 @@ public class RobotContainer {
         .add("REV", new IntakeOpenLoopCommand(intakeSubsystem, IntakeConstants.kIntakeEjectSpeed))
         .withPosition(0, 1);
     intakeCommands.add("Stop", new IntakeOpenLoopCommand(intakeSubsystem, 0.0)).withPosition(0, 2);
-    intakeCommands.add("Extend", new ExtendIntakeCommand(intakeSubsystem, true)).withPosition(0, 3);
     intakeCommands
-        .add("Retract", new ExtendIntakeCommand(intakeSubsystem, false))
+        .add("Extend", new ExtendIntakeCommand(intakeExtendSubsystem, true))
+        .withPosition(0, 3);
+    intakeCommands
+        .add("Retract", new ExtendIntakeCommand(intakeExtendSubsystem, false))
         .withPosition(0, 4);
 
     // SmartDashboard.putData("Pit/Intake/Start", new PitIntakeOpenLoopCommand(intakeSubsystem));
