@@ -1,12 +1,11 @@
 package frc.robot.subsystems;
 
+import static frc.robot.Constants.DriveConstants.*;
 import static frc.robot.Constants.kTalonConfigTimeout;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -15,14 +14,11 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.DriveConstants;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -97,26 +93,14 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
     swerveDrive = new SwerveDrive(swerveModules);
 
-    //  Increase these numbers to trust our state estimates less. This matrix is in the form [x, y,
-    // theta]ᵀ, with units in meters and radians.
-    Matrix<N3, N1> stateStdDevs = VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5));
-
-    // Increase these numbers to trust sensor readings from encoders and gyros less. This matrix is
-    // in the form [theta], with units in radians.
-    Matrix<N1, N1> localMeasurementStdDevs = VecBuilder.fill(Units.degreesToRadians(0.01));
-
-    // Increase these numbers to trust global measurements from vision less. This matrix is in the
-    // form [x, y, theta]ᵀ, with units in meters and radians.
-    Matrix<N3, N1> visionMeasurementStdDevs = VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30));
-
     PoseEstimatorOdometryStrategy odometryStrategy =
         new PoseEstimatorOdometryStrategy(
             swerveDrive.getHeading(),
             new Pose2d(),
             swerveDrive.getKinematics(),
-            stateStdDevs,
-            localMeasurementStdDevs,
-            visionMeasurementStdDevs);
+            kStateStdDevs,
+            kLocalMeasurementStdDevs,
+            kVisionMeasurementStdDevs);
 
     //    swerveDrive.setOdometry(odometryStrategy);
 
