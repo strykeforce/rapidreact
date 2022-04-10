@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import static frc.robot.Constants.DriveConstants.*;
 import static frc.robot.Constants.kTalonConfigTimeout;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -29,6 +30,7 @@ import net.consensys.cava.toml.TomlTable;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.strykeforce.swerve.PoseEstimatorOdometryStrategy;
 import org.strykeforce.swerve.SwerveDrive;
 import org.strykeforce.swerve.SwerveModule;
 import org.strykeforce.swerve.TalonSwerveModule;
@@ -44,6 +46,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private final ProfiledPIDController omegaController;
   private final PIDController xController;
   private final PIDController yController;
+  private final PoseEstimatorOdometryStrategy odometryStrategy;
   private double[] desiredAzimuthPositions = new double[4];
   // Grapher Variables
   private ChassisSpeeds holoContOutput = new ChassisSpeeds();
@@ -90,6 +93,18 @@ public class DriveSubsystem extends MeasurableSubsystem {
     }
 
     swerveDrive = new SwerveDrive(swerveModules);
+
+    odometryStrategy =
+        new PoseEstimatorOdometryStrategy(
+            swerveDrive.getHeading(),
+            new Pose2d(),
+            swerveDrive.getKinematics(),
+            kStateStdDevs,
+            kLocalMeasurementStdDevs,
+            kVisionMeasurementStdDevs);
+
+    swerveDrive.setOdometry(odometryStrategy);
+
     swerveDrive.resetGyro();
     swerveDrive.setGyroOffset(Rotation2d.fromDegrees(0));
 
