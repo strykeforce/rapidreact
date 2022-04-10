@@ -252,7 +252,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
     return lastLookupDistance;
   }
 
-  public boolean isLastLookupBeyondTable(){
+  public boolean isLastLookupBeyondTable() {
     return lastLookupBeyondTable;
   }
 

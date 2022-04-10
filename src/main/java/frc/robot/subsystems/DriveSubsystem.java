@@ -19,6 +19,7 @@ import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.DriveConstants;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -219,6 +220,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
   public void resetOdometry(Pose2d pose) {
     swerveDrive.resetOdometry(pose);
     logger.info("reset odometry with: {}", pose);
+  }
+
+  public void updateOdometryWithVision(Pose2d calculatedPose) {
+    odometryStrategy.addVisionMeasurement(calculatedPose, Timer.getFPGATimestamp());
   }
 
   public void resetHolonomicController() {

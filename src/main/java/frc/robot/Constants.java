@@ -194,7 +194,7 @@ public final class Constants {
     // Increase these numbers to trust global measurements from vision less. This matrix is in the
     // form [x, y, theta]ᵀ, with units in meters and radians.
     public static Matrix<N3, N1> kVisionMeasurementStdDevs =
-        VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30));
+        VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(5));
   }
 
   public static final class VisionConstants {
