@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SuppliedValueWidget;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -47,18 +46,20 @@ import frc.robot.commands.drive.ResetOdometryCommand;
 import frc.robot.commands.drive.XLockCommand;
 import frc.robot.commands.drive.ZeroGyroCommand;
 import frc.robot.commands.intake.IntakeOpenLoopCommand;
+import frc.robot.commands.intake.RetractOnFullCommand;
 import frc.robot.commands.magazine.IgnoreColorSensorCommand;
 import frc.robot.commands.magazine.LowerMagazineOpenLoopCommand;
 import frc.robot.commands.magazine.ManualEjectCargoReverseCommand;
 import frc.robot.commands.magazine.PitClearCargoColor;
 import frc.robot.commands.magazine.PitReadCargoColor;
+import frc.robot.commands.magazine.RumbleOnCargoCommand;
 import frc.robot.commands.magazine.StopMagazineCommand;
 import frc.robot.commands.magazine.UpperMagazineOpenLoopCommand;
 import frc.robot.commands.sequences.climb.HighClimbCommandGroup;
 import frc.robot.commands.sequences.climb.MidClimbCommandGroup;
 import frc.robot.commands.sequences.climb.TraverseClimbCommandGroup;
 import frc.robot.commands.sequences.intaking.AutoIntakeCommand;
-import frc.robot.commands.sequences.intaking.AutoIntakeNoExtendCommand;
+import frc.robot.commands.sequences.intaking.AutoIntakeNoExtendCommandGroup;
 import frc.robot.commands.sequences.intaking.ExtendIntakeCommand;
 import frc.robot.commands.sequences.shooting.ArmShooterCommandGroup;
 import frc.robot.commands.sequences.shooting.GeyserShootCommand;
@@ -131,7 +132,7 @@ public class RobotContainer {
       System.out.println("Event Flag Removed - logging to file in ~lvuser/logs/");
     }
     driveSubsystem = new DriveSubsystem();
-    visionSubsystem = new VisionSubsystem();
+    visionSubsystem = new VisionSubsystem(driveSubsystem);
     turretSubsystem = new TurretSubsystem(visionSubsystem, driveSubsystem);
     climbSubsystem = new ClimbSubsystem();
     intakeSubsystem = new IntakeSubsystem();
@@ -166,9 +167,10 @@ public class RobotContainer {
     return visionSubsystem;
   }
 
-  public Command startAutoIntake() {
-    return new AutoIntakeCommand(
-        magazineSubsystem, intakeSubsystem, intakeExtendSubsystem, false, false);
+  public void startAutoIntake() {
+    new AutoIntakeNoExtendCommandGroup(magazineSubsystem, intakeSubsystem, xboxController)
+        .schedule();
+    new RetractOnFullCommand(magazineSubsystem, intakeExtendSubsystem).schedule();
   }
 
   public AutoSwitch getAutoSwitch() {
@@ -249,7 +251,8 @@ public class RobotContainer {
     new JoystickButton(driveJoystick, Shoulder.LEFT_DOWN.id)
         .whenPressed(
             new AutoIntakeCommand(
-                magazineSubsystem, intakeSubsystem, intakeExtendSubsystem, false, false));
+                magazineSubsystem, intakeSubsystem, intakeExtendSubsystem, false, false))
+        .whenPressed(new RumbleOnCargoCommand(xboxController, magazineSubsystem));
     new JoystickButton(driveJoystick, Shoulder.LEFT_DOWN.id)
         .whenReleased(new IntakeOpenLoopCommand(intakeSubsystem, 0.0));
 
@@ -262,7 +265,9 @@ public class RobotContainer {
                 magazineSubsystem,
                 visionSubsystem,
                 true,
-                intakeSubsystem));
+                intakeSubsystem,
+                intakeExtendSubsystem,
+                xboxController));
 
     // Auto Climb
     new JoystickButton(driveJoystick, Trim.LEFT_X_POS.id)
@@ -312,11 +317,13 @@ public class RobotContainer {
                 magazineSubsystem,
                 visionSubsystem,
                 true,
-                intakeSubsystem));
+                intakeSubsystem,
+                intakeExtendSubsystem,
+                xboxController));
     new JoystickButton(xboxController, XboxController.Button.kY.value)
-        .toggleWhenPressed(
-            new AutoIntakeCommand(
-                magazineSubsystem, intakeSubsystem, intakeExtendSubsystem, false, true));
+        .whenPressed(
+            new AutoIntakeNoExtendCommandGroup(magazineSubsystem, intakeSubsystem, xboxController))
+        .whenPressed(new RetractOnFullCommand(magazineSubsystem, intakeExtendSubsystem));
     LeftTriggerDown.whileActiveOnce(new ExtendIntakeCommand(intakeExtendSubsystem, true));
     RightTriggerDown.whileActiveOnce(new ExtendIntakeCommand(intakeExtendSubsystem, false));
 
@@ -328,8 +335,10 @@ public class RobotContainer {
     new JoystickButton(xboxController, XboxController.Button.kBack.value)
         .whenReleased(
             new ParallelCommandGroup(
-                new AutoIntakeNoExtendCommand(magazineSubsystem, intakeSubsystem),
-                new StopShooterCommand(shooterSubsystem)));
+                new AutoIntakeNoExtendCommandGroup(
+                    magazineSubsystem, intakeSubsystem, xboxController),
+                new StopShooterCommand(shooterSubsystem),
+                new RumbleOnCargoCommand(xboxController, magazineSubsystem)));
 
     // Arm Shooter
     new JoystickButton(xboxController, XboxController.Button.kB.value)

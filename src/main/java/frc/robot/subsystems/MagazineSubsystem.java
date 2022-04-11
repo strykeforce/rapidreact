@@ -203,6 +203,13 @@ public class MagazineSubsystem extends MeasurableSubsystem {
         || storedCargoColors[0] == CargoColor.NONE;
   }
 
+  public boolean isFirstCargoAlliance() {
+    return (!isMagazineFull()
+            && (storedCargoColors[0] == allianceCargoColor
+                || storedCargoColors[1] == allianceCargoColor))
+        || (isMagazineFull() && storedCargoColors[0] == allianceCargoColor);
+  }
+
   public CargoColor readCargoColor() {
     CargoColor currentCargoColor = CargoColor.NONE;
     if (!ignoreColorSensor) {
@@ -552,11 +559,19 @@ public class MagazineSubsystem extends MeasurableSubsystem {
             && turretSubsystem.getState() == TurretState.TRACKING
             && visionSubsystem.isPixelWidthStable()
             && driveSubsystem.isVelocityStable()) {
+          shooterSubsystem.logShotSol();
+          if (!shooterSubsystem.isLastLookupBeyondTable()) {
+            Pose2d calcPose =
+                visionSubsystem.getVisionOdometry(
+                    turretSubsystem.getTurretRotation2d(),
+                    driveSubsystem.getGyroRotation2d(),
+                    shooterSubsystem.getLastLookupDistance());
+            driveSubsystem.updateOdometryWithVision(calcPose);
+          }
           if (doTimedShoot) {
             logger.info("PAUSE -> TIMED_FEED");
             currUpperMagazineState = UpperMagazineState.TIMED_FEED;
             currLowerMagazineState = LowerMagazineState.TIMED_FEED;
-            shooterSubsystem.logShotSol();
             enableUpperBeamBreak(false);
             enableLowerBeamBreak(false);
             upperClosedLoopRotate(MagazineConstants.kUpperMagazineFeedSpeed);
@@ -565,15 +580,6 @@ public class MagazineSubsystem extends MeasurableSubsystem {
             timedShootTimer.start();
           } else {
             logger.info("PAUSE -> SHOOT");
-            shooterSubsystem.logShotSol();
-            if (!shooterSubsystem.isLastLookupBeyondTable()) {
-              Pose2d calcPose =
-                  visionSubsystem.getVisionOdometry(
-                      turretSubsystem.getTurretRotation2d(),
-                      driveSubsystem.getGyroRotation2d(),
-                      shooterSubsystem.getLastLookupDistance());
-              driveSubsystem.updateOdometryWithVision(calcPose);
-            }
             enableUpperBeamBreak(false);
             upperClosedLoopRotate(MagazineConstants.kUpperMagazineFeedSpeed);
             currUpperMagazineState = UpperMagazineState.SHOOT;

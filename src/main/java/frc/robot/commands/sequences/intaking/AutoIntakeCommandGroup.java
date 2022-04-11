@@ -1,32 +1,23 @@
 package frc.robot.commands.sequences.intaking;
 
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.sequences.shooting.ArmShooterCommandGroup;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import frc.robot.commands.magazine.RumbleOnCargoCommand;
 import frc.robot.subsystems.IntakeExtendSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
-import frc.robot.subsystems.TurretSubsystem;
-import frc.robot.subsystems.VisionSubsystem;
 
-public class AutoIntakeCommandGroup extends SequentialCommandGroup {
+public class AutoIntakeCommandGroup extends ParallelCommandGroup {
   public AutoIntakeCommandGroup(
       MagazineSubsystem magazineSubsystem,
       IntakeSubsystem intakeSubsystem,
       IntakeExtendSubsystem intakeExtendSubsystem,
-      VisionSubsystem visionSubsystem,
-      TurretSubsystem turretSubsystem,
-      ShooterSubsystem shooterSubsystem,
+      XboxController xbox,
       boolean isAuton,
       boolean extendArm) {
     addCommands(
         new AutoIntakeCommand(
             magazineSubsystem, intakeSubsystem, intakeExtendSubsystem, isAuton, extendArm),
-        new ConditionalCommand(
-            new ArmShooterCommandGroup(visionSubsystem, turretSubsystem, shooterSubsystem),
-            new InstantCommand(),
-            () -> magazineSubsystem.isMagazineFull()));
+        new RumbleOnCargoCommand(xbox, magazineSubsystem));
   }
 }

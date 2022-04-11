@@ -5,11 +5,14 @@ import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
 import frc.robot.subsystems.MagazineSubsystem.LowerMagazineState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AutoIntakeNoExtendCommand extends CommandBase {
   public final MagazineSubsystem magazineSubsystem;
   public final IntakeSubsystem intakeSubsystem;
   public boolean magazineReversed = false;
+  private final Logger logger = LoggerFactory.getLogger(AutoIntakeNoExtendCommandGroup.class);
 
   public AutoIntakeNoExtendCommand(
       MagazineSubsystem magazineSubsystem, IntakeSubsystem intakeSubsystem) {
@@ -20,6 +23,7 @@ public class AutoIntakeNoExtendCommand extends CommandBase {
 
   @Override
   public void initialize() {
+    logger.info("Init");
     magazineSubsystem.indexCargo();
     intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeSpeed);
     magazineReversed = false;

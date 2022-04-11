@@ -927,6 +927,7 @@ public final class Constants {
     public static final String kPitKickerSetpointTicks = "Tune/Kicker/kickerSpeed";
     public static final String kTuneUpperMagSpeedTicks = "Tune/Magazine/UpperSpeed";
     public static final int kLockoutBNCid = 8;
+    public static final double kRumbleTime = 0.5;
   }
 
   public static final class AutoConstants {
