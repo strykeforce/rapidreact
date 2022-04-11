@@ -8,7 +8,6 @@ public class IgnoreColorSensorCommand extends InstantCommand {
   private final boolean ignore;
 
   public IgnoreColorSensorCommand(MagazineSubsystem magazineSubsystem, boolean ignore) {
-    addRequirements(magazineSubsystem);
     this.magazineSubsystem = magazineSubsystem;
     this.ignore = ignore;
   }
