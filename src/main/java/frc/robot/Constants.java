@@ -787,9 +787,9 @@ public final class Constants {
     public static final double kInsideHoodTickPos = 5700; // FIXME
 
     // Lookup Table Constants
-    public static final double kLookupMinPixel = 134;
+    public static final double kLookupMinPixel = 127;
     public static final double kLookupMaxPixel = 414;
-    public static final double kNumRows = 281;
+    public static final double kNumRows = 288;
     public static final double kLookupRes = 1.0;
 
     // Hood Encoder Constants
@@ -943,6 +943,7 @@ public final class Constants {
     public static final String kPitKickerSetpointTicks = "Tune/Kicker/kickerSpeed";
     public static final String kTuneUpperMagSpeedTicks = "Tune/Magazine/UpperSpeed";
     public static final int kLockoutBNCid = 8;
+    public static final double kRumbleTime = 0.5;
   }
 
   public static final class AutoConstants {

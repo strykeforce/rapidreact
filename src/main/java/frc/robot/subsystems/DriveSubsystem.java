@@ -242,10 +242,12 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public boolean isVelocityStable() {
     double gyroRate = swerveDrive.getGyroRate();
-    fwdStable = Math.abs(lastVelocity[0]) <= DriveConstants.kForwardThreshold;
-    strStable = Math.abs(lastVelocity[1]) <= DriveConstants.kStrafeThreshold;
+    double wheelZeroSpeed = swerveDrive.getSwerveModules()[0].getState().speedMetersPerSecond;
+    // fwdStable = Math.abs(lastVelocity[0]) <= DriveConstants.kForwardThreshold;
+    // strStable = Math.abs(lastVelocity[1]) <= DriveConstants.kStrafeThreshold;
+    velStable = Math.abs(wheelZeroSpeed) <= DriveConstants.kForwardThreshold;
     yawStable = Math.abs(gyroRate) <= DriveConstants.kGyroRateThreshold;
-    boolean stable = fwdStable && strStable && yawStable;
+    boolean stable = velStable && yawStable;
     velStable = stable;
 
     return stable;

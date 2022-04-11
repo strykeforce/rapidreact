@@ -27,8 +27,10 @@ public class VisionSubsystem extends MeasurableSubsystem
   private int lastSerialNum = -1;
   private Timer visionCheckTime = new Timer();
   private boolean isVisionWorking = true;
+  private final DriveSubsystem driveSubsystem;
 
-  public VisionSubsystem() {
+  public VisionSubsystem(DriveSubsystem driveSubsystem) {
+    this.driveSubsystem = driveSubsystem;
     visionCheckTime.reset();
     visionCheckTime.start();
     NetworkTableInstance networkTableInstance = NetworkTableInstance.create();
@@ -124,6 +126,11 @@ public class VisionSubsystem extends MeasurableSubsystem
 
   public Pose2d getVisionOdometry(
       Rotation2d turretAngle, Rotation2d gyroAngle, double distanceInches) {
+    if (!isValid()) {
+      logger.info("Vision Odom: not valid -> keep current odom");
+      return driveSubsystem.getPoseMeters();
+    }
+
     Rotation2d errorRadians = new Rotation2d(getErrorRadians());
     Rotation2d calcAngle =
         turretAngle.plus(gyroAngle).plus(TurretConstants.kTurretRobotOffset).minus(errorRadians);

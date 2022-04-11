@@ -248,10 +248,12 @@ public class ShooterSubsystem extends MeasurableSubsystem {
           ShooterConstants.kKickerOpTicksP100ms, ShooterConstants.kShooterOpTicksP100ms);
       hoodClosedLoop(ShooterConstants.kHoodOpTicks);
     } else {
-      double[] shootSolution = getShootSolution();
-      lastLookupDistance = shootSolution[3];
-      shooterClosedLoop(shootSolution[0], shootSolution[1]);
-      hoodClosedLoop(shootSolution[2]);
+      if (visionSubsystem.isValid()) {
+        double[] shootSolution = getShootSolution();
+        lastLookupDistance = shootSolution[3];
+        shooterClosedLoop(shootSolution[0], shootSolution[1]);
+        hoodClosedLoop(shootSolution[2]);
+      }
     }
   }
 
