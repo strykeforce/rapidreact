@@ -475,7 +475,7 @@ public final class Constants {
     public static final double kDisengageRatchetSpeed = 0.25;
     public static final double kDisengageRatchetTicks = 100;
     public static final double kDisengageRatchetServoTimer = 0.2;
-    public static final double kDisengageRatchetMotorTimer = 0.05;
+    public static final double kDisengageRatchetMotorTimer = 0.01;
 
     // Closed Loop Movement Constants
     public static final double kFixedArmCloseEnough = 1_000.0;
