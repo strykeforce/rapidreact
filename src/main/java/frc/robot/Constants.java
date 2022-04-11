@@ -475,6 +475,7 @@ public final class Constants {
     public static final double kDisengageRatchetSpeed = 0.25;
     public static final double kDisengageRatchetTicks = 100;
     public static final double kDisengageRatchetServoTimer = 0.2;
+    public static final double kDisengageRatchetMotorTimer = 0.05;
 
     // Closed Loop Movement Constants
     public static final double kFixedArmCloseEnough = 1_000.0;
@@ -494,6 +495,7 @@ public final class Constants {
     // Climb States -> Desired Endpoint in Ticks
     public static final double kFMidExtTicks = -215_000;
     public static final double kPMidExtTicks = -198_000;
+    public static final double kMidPvtBkTicks = 3_000;
     public static final double kPMidRetST1Ticks = -145_000;
     public static final double kPMidRetST2Ticks = -130_000;
     public static final double kPMidRetST3Ticks = -76_000;
@@ -526,13 +528,14 @@ public final class Constants {
     public static final double kMidFinPvtBkTicks = 1_000;
 
     // Climb States -> Desired Open Loop or Close Loop Speed
-    public static final double kFMidExtSpeed = -0.8;
-    public static final double kPMidExtSpeed = -0.8;
-    public static final double kPMidRetST1Speed = 0.7;
-    public static final double kPMidRetST2Speed = 0.18;
-    public static final double kPMidRetST3Speed = 0.6;
+    public static final double kFMidExtSpeed = -0.9;
+    public static final double kPMidExtSpeed = -0.9;
+    public static final double kMidPvtBkSpeed = 1_000;
+    public static final double kPMidRetST1Speed = 0.8;
+    public static final double kPMidRetST2Speed = 0.8;
+    public static final double kPMidRetST3Speed = 0.8;
     public static final double kPMidRetST4Speed = 0.3;
-    public static final double kHighPvtFwdSpeed = 700;
+    public static final double kHighPvtFwdSpeed = 1_000;
     public static final double kPHighRetST1Speed = 0.6;
     public static final double kPHighRetST2Speed = 0.3;
     public static final double kHighPvtBk1Speed = 1_000;
