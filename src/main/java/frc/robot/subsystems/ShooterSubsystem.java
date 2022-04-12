@@ -6,6 +6,7 @@ import com.ctre.phoenix.motorcontrol.can.BaseTalon;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.opencsv.CSVReader;
+import edu.wpi.first.math.geometry.Pose2d;
 import frc.robot.Constants;
 import frc.robot.Constants.ShooterConstants;
 import java.io.FileReader;
@@ -21,11 +22,13 @@ public class ShooterSubsystem extends MeasurableSubsystem {
 
   private static final Logger logger = LoggerFactory.getLogger(ShooterSubsystem.class);
   private final TalonFX shooterFalcon;
+  public final DriveSubsystem driveSubsystem;
   private final TalonFX kickerFalcon;
   private final TalonSRX hoodTalon;
   private final MagazineSubsystem magazineSubsystem;
   private final VisionSubsystem visionSubsystem;
   private boolean highFender;
+  private boolean isBallOne;
   private ShooterState currentState = ShooterState.STOP;
   private double shooterSetPointTicks,
       kickerSetpointTicks,
@@ -36,10 +39,17 @@ public class ShooterSubsystem extends MeasurableSubsystem {
       oldWidthPixels,
       oldIndex;
   private String[][] lookupTable;
+  public boolean isOutside = true;
+  private double lastLookupDistance = 0.0;
+  private boolean lastLookupBeyondTable = false;
 
-  public ShooterSubsystem(MagazineSubsystem magazineSubsystem, VisionSubsystem visionSubsystem) {
+  public ShooterSubsystem(
+      MagazineSubsystem magazineSubsystem,
+      VisionSubsystem visionSubsystem,
+      DriveSubsystem driveSubsystem) {
     this.magazineSubsystem = magazineSubsystem;
     this.visionSubsystem = visionSubsystem;
+    this.driveSubsystem = driveSubsystem;
     parseLookupTable();
     shooterFalcon = new TalonFX(ShooterConstants.kShooterFalconID);
     shooterFalcon.configFactoryDefault(Constants.kTalonConfigTimeout);
@@ -112,19 +122,21 @@ public class ShooterSubsystem extends MeasurableSubsystem {
 
   private double[] getShootSolution(double widthPixels) {
     int index = 0;
-    double[] shootSolution = new double[3];
+    double[] shootSolution = new double[4];
     if (widthPixels < ShooterConstants.kLookupMinPixel) {
       logger.warn(
           "Pixel width {} is less than min pixel in table, using {}",
           widthPixels,
           ShooterConstants.kLookupMinPixel);
       index = lookupTable.length - 1;
+      lastLookupBeyondTable = true;
     } else if (widthPixels > ShooterConstants.kLookupMaxPixel) {
       logger.warn(
           "Pixel width {} is more than max pixel in table, using {}",
           widthPixels,
           ShooterConstants.kLookupMaxPixel);
       index = 1;
+      lastLookupBeyondTable = true;
     } else {
       // total rows - (Width - minrows)
       index =
@@ -138,11 +150,13 @@ public class ShooterSubsystem extends MeasurableSubsystem {
       //             - ShooterConstants.kLookupMinPixel);
       oldIndex = index;
       oldWidthPixels = widthPixels;
+      lastLookupBeyondTable = false;
     }
 
     shootSolution[0] = Double.parseDouble(lookupTable[index][2]);
     shootSolution[1] = Double.parseDouble(lookupTable[index][3]);
     shootSolution[2] = Double.parseDouble(lookupTable[index][4]);
+    shootSolution[3] = Double.parseDouble(lookupTable[index][0]);
     return shootSolution;
   }
 
@@ -234,10 +248,55 @@ public class ShooterSubsystem extends MeasurableSubsystem {
           ShooterConstants.kKickerOpTicksP100ms, ShooterConstants.kShooterOpTicksP100ms);
       hoodClosedLoop(ShooterConstants.kHoodOpTicks);
     } else {
-      double[] shootSolution = getShootSolution();
-      shooterClosedLoop(shootSolution[0], shootSolution[1]);
-      hoodClosedLoop(shootSolution[2]);
+      if (visionSubsystem.isValid()) {
+        double[] shootSolution = getShootSolution();
+        lastLookupDistance = shootSolution[3];
+        shooterClosedLoop(shootSolution[0], shootSolution[1]);
+        hoodClosedLoop(shootSolution[2]);
+      }
     }
+  }
+
+  public void strykeShot() {
+    logger.info("Stryke Shot: {} -> ADJUSTING", currentState);
+    currentState = ShooterState.ADJUSTING;
+    shooterClosedLoop(
+        isOutside
+            ? ShooterConstants.kOutsideKickerTicksP100MS
+            : ShooterConstants.kInsideKickerTicksP100MS,
+        isOutside
+            ? ShooterConstants.kOutsideShooterTicksP100MS
+            : ShooterConstants.kInsideShooterTicksP100MS);
+    hoodClosedLoop(
+        isOutside ? ShooterConstants.kOutsideHoodTickPos : ShooterConstants.kInsideHoodTickPos);
+  }
+
+  public void setOutside(boolean pos) {
+    isOutside = pos;
+    logger.info("Manually Set Climb Pos: {}", pos ? "LEFT" : "RIGHT");
+  }
+
+  public void checkOutside() {
+    Pose2d robotPos = driveSubsystem.getPoseMeters();
+    if (robotPos.getY() > ShooterConstants.kMiddleClimbY) {
+      isOutside = true;
+      logger.info("Detect OUTSIDE climb: y= {}", robotPos.getY());
+    } else {
+      isOutside = false;
+      logger.info("Detect INSIDE climb: y= {}", robotPos.getY());
+    }
+  }
+
+  public String getIsOutside() {
+    return isOutside ? "OUTSIDE" : "INSIDE";
+  }
+
+  public double getLastLookupDistance() {
+    return lastLookupDistance;
+  }
+
+  public boolean isLastLookupBeyondTable() {
+    return lastLookupBeyondTable;
   }
 
   public void manualShoot(double widthPixels) {
@@ -274,6 +333,23 @@ public class ShooterSubsystem extends MeasurableSubsystem {
       hoodClosedLoop(ShooterConstants.kHoodFenderLowTicks);
       logger.info("Low Fender Shot");
     }
+  }
+
+  public void geyserShot(boolean isBallOne) {
+    this.isBallOne = isBallOne;
+    logger.info("GEYSER_SHOT: {} -> ADJUSTING", currentState);
+    currentState = ShooterState.ADJUSTING;
+    shooterClosedLoop(
+        ShooterConstants.kKickerGeyserTicksP100ms, ShooterConstants.kShooterGeyserTicksP100ms);
+    if (isBallOne) {
+      hoodClosedLoop(ShooterConstants.kHoodGeyserBallTwoTicks);
+    } else {
+      hoodClosedLoop(ShooterConstants.kHoodGeyserBallTwoTicks);
+    }
+  }
+
+  public void geyserShot() {
+    geyserShot(!isBallOne);
   }
 
   public void stop() {

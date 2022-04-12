@@ -12,6 +12,7 @@ import frc.robot.commands.sequences.shooting.ArmShooterCommandGroup;
 import frc.robot.commands.sequences.shooting.VisionShootAutoCommand;
 import frc.robot.commands.sequences.shooting.VisionShootNoIsFinishedCommand;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.IntakeExtendSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -26,6 +27,7 @@ public class FiveCargoAuto extends SequentialCommandGroup {
       ShooterSubsystem shooterSubsystem,
       MagazineSubsystem magazineSubsystem,
       IntakeSubsystem intakeSubsystem,
+      IntakeExtendSubsystem intakeExtendSubsystem,
       DriveSubsystem driveSubsystem,
       String path1Name,
       String path2Name,
@@ -45,7 +47,8 @@ public class FiveCargoAuto extends SequentialCommandGroup {
         new ParallelDeadlineGroup(
             new DriveAutonCommand(driveSubsystem, path1Name, true, false), // deadline
             new ArmShooterCommandGroup(visionSubsystem, turretSubsystem, shooterSubsystem),
-            new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, true, true)),
+            new AutoIntakeCommand(
+                magazineSubsystem, intakeSubsystem, intakeExtendSubsystem, true, true)),
         new VisionShootAutoCommand(
             shooterSubsystem,
             turretSubsystem,
@@ -57,7 +60,8 @@ public class FiveCargoAuto extends SequentialCommandGroup {
         new ParallelDeadlineGroup(
             new DriveAutonCommand(driveSubsystem, path2Name, false, true),
             new ArmShooterCommandGroup(visionSubsystem, turretSubsystem, shooterSubsystem),
-            new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, true, true)),
+            new AutoIntakeCommand(
+                magazineSubsystem, intakeSubsystem, intakeExtendSubsystem, true, true)),
         new VisionShootAutoCommand(
             shooterSubsystem,
             turretSubsystem,
@@ -69,7 +73,8 @@ public class FiveCargoAuto extends SequentialCommandGroup {
         new ParallelDeadlineGroup(
             new DriveAutonCommand(driveSubsystem, path3Name, false, true),
             new ArmShooterCommandGroup(visionSubsystem, turretSubsystem, shooterSubsystem),
-            new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, true, true)),
+            new AutoIntakeCommand(
+                magazineSubsystem, intakeSubsystem, intakeExtendSubsystem, true, true)),
         new DriveAutonCommand(driveSubsystem, path4Name, false, true),
         new VisionShootNoIsFinishedCommand(
             shooterSubsystem,

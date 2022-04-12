@@ -10,6 +10,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.ColorMatch;
 import com.revrobotics.ColorMatchResult;
 import com.revrobotics.ColorSensorV3;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.Timer;
@@ -200,6 +201,13 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     return ignoreColorSensor
         || storedCargoColors[0] == allianceCargoColor
         || storedCargoColors[0] == CargoColor.NONE;
+  }
+
+  public boolean isFirstCargoAlliance() {
+    return (!isMagazineFull()
+            && (storedCargoColors[0] == allianceCargoColor
+                || storedCargoColors[1] == allianceCargoColor))
+        || (isMagazineFull() && storedCargoColors[0] == allianceCargoColor);
   }
 
   public CargoColor readCargoColor() {
@@ -509,6 +517,9 @@ public class MagazineSubsystem extends MeasurableSubsystem {
         if (shootTimer.hasElapsed(MagazineConstants.kShootDelay)) {
           logger.info("CARGO_SHOT -> EMPTY");
           currUpperMagazineState = UpperMagazineState.EMPTY;
+          if (turretSubsystem.getState() == TurretState.GEYSER_AIMED) {
+            turretSubsystem.geyserShot(false);
+          }
           if (isMagazineEmpty()) upperClosedLoopRotate(0.0);
           break;
         }
@@ -534,7 +545,9 @@ public class MagazineSubsystem extends MeasurableSubsystem {
             logger.info("WAIT_AIM -> PAUSE");
             shooterSubsystem.shoot();
             currUpperMagazineState = UpperMagazineState.PAUSE;
-          } else if (turretSubsystem.getState() == TurretState.ODOM_AIMED) {
+          } else if (turretSubsystem.getState() == TurretState.ODOM_AIMED
+              || turretSubsystem.getState() == TurretState.GEYSER_AIMED
+              || turretSubsystem.getState() == TurretState.STRYKE_AIMED) {
             logger.info("WAIT_AIM -> PAUSE");
             currUpperMagazineState = UpperMagazineState.PAUSE;
           }
@@ -547,6 +560,38 @@ public class MagazineSubsystem extends MeasurableSubsystem {
             && turretSubsystem.getState() == TurretState.TRACKING
             && visionSubsystem.isPixelWidthStable()
             && driveSubsystem.isVelocityStable()) {
+          shooterSubsystem.logShotSol();
+          if (!shooterSubsystem.isLastLookupBeyondTable()) {
+            Pose2d calcPose =
+                visionSubsystem.getVisionOdometry(
+                    turretSubsystem.getTurretRotation2d(),
+                    driveSubsystem.getGyroRotation2d(),
+                    shooterSubsystem.getLastLookupDistance());
+            driveSubsystem.updateOdometryWithVision(calcPose);
+          }
+          if (doTimedShoot) {
+            logger.info("PAUSE -> TIMED_FEED");
+            currUpperMagazineState = UpperMagazineState.TIMED_FEED;
+            currLowerMagazineState = LowerMagazineState.TIMED_FEED;
+            enableUpperBeamBreak(false);
+            enableLowerBeamBreak(false);
+            upperClosedLoopRotate(MagazineConstants.kUpperMagazineFeedSpeed);
+            lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIndexSpeed);
+            shooterSubsystem.logShotSol();
+            timedShootTimer.reset();
+            timedShootTimer.start();
+          } else {
+            logger.info("PAUSE -> SHOOT");
+            enableUpperBeamBreak(false);
+            upperClosedLoopRotate(MagazineConstants.kUpperMagazineFeedSpeed);
+            currUpperMagazineState = UpperMagazineState.SHOOT;
+          }
+          // Fender Shot || Odometry Aim
+        } else if (shooterSubsystem.getCurrentState() == ShooterState.SHOOT
+            && (turretSubsystem.getState() == TurretState.FENDER_AIMED
+                || turretSubsystem.getState() == TurretState.ODOM_AIMED
+                || turretSubsystem.getState() == TurretState.STRYKE_AIMED
+                || turretSubsystem.getState() == TurretState.GEYSER_AIMED)) {
           if (doTimedShoot) {
             logger.info("PAUSE -> TIMED_FEED");
             currUpperMagazineState = UpperMagazineState.TIMED_FEED;
@@ -559,19 +604,10 @@ public class MagazineSubsystem extends MeasurableSubsystem {
             timedShootTimer.start();
           } else {
             logger.info("PAUSE -> SHOOT");
-            shooterSubsystem.logShotSol();
             enableUpperBeamBreak(false);
             upperClosedLoopRotate(MagazineConstants.kUpperMagazineFeedSpeed);
             currUpperMagazineState = UpperMagazineState.SHOOT;
           }
-          // Fender Shot || Odometry Aim
-        } else if (shooterSubsystem.getCurrentState() == ShooterState.SHOOT
-            && (turretSubsystem.getState() == TurretState.FENDER_AIMED
-                || turretSubsystem.getState() == TurretState.ODOM_AIMED)) {
-          logger.info("PAUSE -> SHOOT");
-          enableUpperBeamBreak(false);
-          upperClosedLoopRotate(MagazineConstants.kUpperMagazineFeedSpeed);
-          currUpperMagazineState = UpperMagazineState.SHOOT;
         } else if (turretSubsystem.getState() == TurretState.TRACKING
             && visionSubsystem.isValid()) {
           shooterSubsystem.shoot();

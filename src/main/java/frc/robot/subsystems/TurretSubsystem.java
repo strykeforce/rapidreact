@@ -39,6 +39,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
   private double targetTurretPosition = 0;
   private double cruiseVelocity = kFastCruiseVelocity;
   private boolean lastDoRotate = false;
+  private boolean isBallOne = true;
 
   private int trackingStableCount;
   private int
@@ -197,6 +198,11 @@ public class TurretSubsystem extends MeasurableSubsystem {
     return turretStableCounts >= Constants.ShooterConstants.kStableCounts;
   }
 
+  public Rotation2d getTurretRotation2d() {
+    return new Rotation2d(
+        turret.getSelectedSensorPosition() / -TurretConstants.kTurretTicksPerRadian);
+  }
+
   public void zeroTurret() {
     // double stringPotPosition = turret.getSensorCollection().getAnalogInRaw();
     if (!turret.getSensorCollection().isFwdLimitSwitchClosed()) {
@@ -303,7 +309,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
   }
 
   public void fenderShot(boolean doRotate) {
-    logger.info("{} -> FENDER_ADJUSTING}", currentState);
+    logger.info("{} -> FENDER_ADJUSTING", currentState);
     currentState = TurretState.FENDER_ADJUSTING;
     lastDoRotate = doRotate;
     if (magazineSubsystem.isNextCargoAlliance() || (!doRotate)) {
@@ -320,6 +326,24 @@ public class TurretSubsystem extends MeasurableSubsystem {
 
   public void fenderShot() {
     fenderShot(lastDoRotate);
+  }
+
+  public void geyserShot(boolean isBallOne) {
+    logger.info("{} -> GEYSER_ADJUSTING", currentState);
+    currentState = TurretState.GEYSER_ADJUSTING;
+    if (isBallOne) {
+      rotateTo(TurretConstants.kGeyserBallOnePosition);
+      logger.info("Geyser Shot: Starting Ball One Sequence");
+    } else {
+      rotateTo(TurretConstants.kGeyserBallTwoPosition);
+      logger.info("Geyser Shot: Starting Ball Two Sequence");
+    }
+  }
+
+  public void strykeShot(boolean isLeftClimb) {
+    logger.info("{} -> STRYKE_ADJUSTING", currentState);
+    currentState = TurretState.STRYKE_ADJUSTING;
+    rotateTo(isLeftClimb ? TurretConstants.kOutsideStrykePos : TurretConstants.kInsideStrykePos);
   }
 
   @Override
@@ -457,6 +481,24 @@ public class TurretSubsystem extends MeasurableSubsystem {
       case ODOM_AIMED:
         // indicator for other subsystems
         break;
+      case STRYKE_ADJUSTING:
+        if (isTurretAtTarget()) {
+          currentState = TurretState.STRYKE_AIMED;
+          logger.info("STRYKE_ADJUSTING -> STRYKE_AIMED");
+        }
+        break;
+      case STRYKE_AIMED:
+        // indicator
+        break;
+      case GEYSER_ADJUSTING:
+        if (isTurretAtTarget()) {
+          currentState = TurretState.GEYSER_AIMED;
+          logger.info("GEYSER_ADJUSTING -> GEYSER_AIMED");
+        }
+        break;
+      case GEYSER_AIMED:
+        // indicator for other subsystems
+        break;
       case IDLE:
         // do nothing
         break;
@@ -491,6 +533,10 @@ public class TurretSubsystem extends MeasurableSubsystem {
     FENDER_AIMED,
     ODOM_ADJUSTING,
     ODOM_AIMED,
-    WRAPPING;
+    STRYKE_ADJUSTING,
+    STRYKE_AIMED,
+    WRAPPING,
+    GEYSER_ADJUSTING,
+    GEYSER_AIMED;
   }
 }

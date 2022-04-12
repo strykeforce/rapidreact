@@ -21,7 +21,7 @@
 | Drive     | FX   | drive           | 13  |  15 | Falcon |  40     |
 | Intake    | FX   | intake          | 20  |  8  | Falcon |  40     |
 | Intake    | SRX  | intakeExtend    | 21  |  2  | 550    |  30     |
-| Magazine  | SRX  | lowerMagazine   | 30  |  9  | 775    |  30     |
+| Magazine  | FX   | lowerMagazine   | 30  |  9  | Falcon |  30     |
 | Magazine  | SRX  | upperMagazine   | 31  |  5  | 550    |  30     |
 | Shooter   | FX   | shooter         | 40  |  6  | Falcon |  40     |
 | Shooter   | FX   | kicker          | 41  |  4  | Falcon |  40     |

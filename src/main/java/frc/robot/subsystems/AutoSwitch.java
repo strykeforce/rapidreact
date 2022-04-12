@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.commands.auton.DefenseAuto;
 import frc.robot.commands.auton.FiveCargoAuto;
 import frc.robot.commands.auton.ThreeCargoAuto;
 import frc.robot.commands.auton.TwoCargoAuto;
@@ -23,6 +24,7 @@ public class AutoSwitch {
   private Command autoCommand;
   private final DriveSubsystem driveSubsystem;
   private final IntakeSubsystem intakeSubsystem;
+  private final IntakeExtendSubsystem intakeExtendSubsystem;
   private final MagazineSubsystem magazineSubsystem;
   private final TurretSubsystem turretSubsystem;
   private final ShooterSubsystem shooterSubsystem;
@@ -31,12 +33,14 @@ public class AutoSwitch {
   public AutoSwitch(
       DriveSubsystem driveSubsystem,
       IntakeSubsystem intakeSubsystem,
+      IntakeExtendSubsystem intakeExtendSubsystem,
       MagazineSubsystem magazineSubsystem,
       TurretSubsystem turretSubsystem,
       ShooterSubsystem shooterSubsystem,
       VisionSubsystem visionSubsystem) {
     this.driveSubsystem = driveSubsystem;
     this.intakeSubsystem = intakeSubsystem;
+    this.intakeExtendSubsystem = intakeExtendSubsystem;
     this.magazineSubsystem = magazineSubsystem;
     this.turretSubsystem = turretSubsystem;
     this.shooterSubsystem = shooterSubsystem;
@@ -93,6 +97,7 @@ public class AutoSwitch {
             shooterSubsystem,
             magazineSubsystem,
             intakeSubsystem,
+            intakeExtendSubsystem,
             driveSubsystem,
             "LeftCargo1Collect",
             AutoConstants.kLeftStartYaw,
@@ -105,10 +110,27 @@ public class AutoSwitch {
             shooterSubsystem,
             magazineSubsystem,
             intakeSubsystem,
+            intakeExtendSubsystem,
             driveSubsystem,
             "LeftCargo1Collect",
             AutoConstants.kLeftStartYaw,
             3.0,
+            230.0); // FIXME
+      case 0x12:
+        return new DefenseAuto(
+            visionSubsystem,
+            turretSubsystem,
+            shooterSubsystem,
+            magazineSubsystem,
+            intakeSubsystem,
+            intakeExtendSubsystem,
+            driveSubsystem,
+            "LeftCargo1Collect",
+            "OppCargo2Collect",
+            "OppCargo3Collect",
+            "DefenseMoveOffOppBall",
+            AutoConstants.kLeftStartYaw,
+            0.0,
             230.0); // FIXME
       case 0x20:
         return new TwoCargoAuto(
@@ -117,6 +139,7 @@ public class AutoSwitch {
             shooterSubsystem,
             magazineSubsystem,
             intakeSubsystem,
+            intakeExtendSubsystem,
             driveSubsystem,
             "MidCargo1Collect",
             AutoConstants.kMidStartYaw,
@@ -129,6 +152,7 @@ public class AutoSwitch {
             shooterSubsystem,
             magazineSubsystem,
             intakeSubsystem,
+            intakeExtendSubsystem,
             driveSubsystem,
             "MidCargo1Collect",
             AutoConstants.kMidStartYaw,
@@ -141,6 +165,7 @@ public class AutoSwitch {
             shooterSubsystem,
             magazineSubsystem,
             intakeSubsystem,
+            intakeExtendSubsystem,
             driveSubsystem,
             "RightCargo1Collect",
             AutoConstants.kRightStartYaw,
@@ -153,6 +178,7 @@ public class AutoSwitch {
             shooterSubsystem,
             magazineSubsystem,
             intakeSubsystem,
+            intakeExtendSubsystem,
             driveSubsystem,
             "RightCargo1Collect",
             AutoConstants.kRightStartYaw,
@@ -165,6 +191,7 @@ public class AutoSwitch {
             shooterSubsystem,
             magazineSubsystem,
             intakeSubsystem,
+            intakeExtendSubsystem,
             driveSubsystem,
             "RightCargo1Collect",
             "RightCargo2Collect",
@@ -179,6 +206,7 @@ public class AutoSwitch {
             shooterSubsystem,
             magazineSubsystem,
             intakeSubsystem,
+            intakeExtendSubsystem,
             driveSubsystem,
             "RightCargo1Collect",
             "RightCargo2Collect",
@@ -196,6 +224,7 @@ public class AutoSwitch {
             shooterSubsystem,
             magazineSubsystem,
             intakeSubsystem,
+            intakeExtendSubsystem,
             driveSubsystem,
             "RightCargo1Collect",
             "BlueRightCargo2Collect",

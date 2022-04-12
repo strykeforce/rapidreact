@@ -12,10 +12,15 @@ import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.util.Color;
 import java.util.ArrayList;
 
@@ -60,9 +65,9 @@ public final class Constants {
     public static final double kDriveGearRatio =
         (kDriveMotorOutputGear / kDriveInputGear) * (kBevelInputGear / kBevelOutputGear);
 
-    static {
-      // logger.debug("kMaxOmega = {}", kMaxOmega);
-    }
+    //    static {
+    // logger.debug("kMaxOmega = {}", kMaxOmega);
+    //    }
 
     public static Translation2d[] getWheelLocationMeters() {
       final double x = kRobotLength / 2.0; // front-back, was ROBOT_LENGTH
@@ -76,12 +81,12 @@ public final class Constants {
     }
 
     // Teleop Drive Constants
-    public static final double kDeadbandXLock = 0.2;
+    //    public static final double kDeadbandXLock = 0.2;
     public static final double kDeadbandAllStick = 0.075;
-    public static final double kCloseEnoughTicks = 10.0;
+    //    public static final double kCloseEnoughTicks = 10.0;
     public static final double kRateLimitFwdStr = 3.5; // 2
     public static final double kRateLimitYaw = 3; // 3
-    public static final double kExpoScaleMoveFactor = 0.6; // .6
+    //    public static final double kExpoScaleMoveFactor = 0.6; // .6
     // public static final double kRateLimitMove = 0.3;
     public static final double kExpoScaleYawFactor = 0.75;
 
@@ -173,8 +178,23 @@ public final class Constants {
     public static final double kPOmega = 2.5;
     public static final double kIOmega = 0.0;
     public static final double kDOmega = 0.0;
-    public static final double kMaxVelOmega = kMaxOmega / 2.0;
+    //    public static final double kMaxVelOmega = kMaxOmega / 2.0;
     public static final double kMaxAccelOmega = 3.14;
+
+    //  Increase these numbers to trust our state estimates less. This matrix is in the form [x, y,
+    // theta]ᵀ, with units in meters and radians.
+    public static Matrix<N3, N1> kStateStdDevs =
+        VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5));
+
+    // Increase these numbers to trust sensor readings from encoders and gyros less. This matrix is
+    // in the form [theta], with units in radians.
+    public static Matrix<N1, N1> kLocalMeasurementStdDevs =
+        VecBuilder.fill(Units.degreesToRadians(0.01));
+
+    // Increase these numbers to trust global measurements from vision less. This matrix is in the
+    // form [x, y, theta]ᵀ, with units in meters and radians.
+    public static Matrix<N3, N1> kVisionMeasurementStdDevs =
+        VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(5));
   }
 
   public static final class VisionConstants {
@@ -187,38 +207,39 @@ public final class Constants {
     public static final int kNumOfVisionChecks = 10;
 
     // Old 2020 Constants
-    public static final double kMinContourAreaSize = 100;
+    //    public static final double kMinContourAreaSize = 100;
     public static final double kVerticalFov = 0.6056; // 48.8 (34.7 degrees)
     public static final double kHorizonFov = 1.012; // 50.8 //146 //radians 1.012 // deg 57.999
-    public static final double kHorizonRes = 640; // 1280
-    public static final double kTargetWidthIn = 5;
-    public static final double kCameraHeight = 20.75;
-    public static final double kSizeThreshold = 400;
-    public static final double kDistanceThreshold = 200;
-    public static final int kStableRange = 20;
-    public static final int kStableCounts = 5;
+    public static final double kLookupTableToLensOffset = 0.4959;
+    //    public static final double kHorizonRes = 640; // 1280
+    //    public static final double kTargetWidthIn = 5;
+    //    public static final double kCameraHeight = 20.75;
+    //    public static final double kSizeThreshold = 400;
+    //    public static final double kDistanceThreshold = 200;
+    //    public static final int kStableRange = 20;
+    //    public static final int kStableCounts = 5;
     public static final int kPixelWidthStableCounts = 2; // FIXME
     public static final int kPixelWidthChangeThreshold = 3; // FIXME
-    public static final double kCenteredRange = 2;
-    public static final double kLostLimit = 30;
-    public static final String kTablePath = "/home/lvuser/deploy/Lookup_Table.csv";
-    public static final int kTableMin = 96;
-    public static final int kTableMax = 360;
-    public static final int kTableRes = 1;
-    public static final int kShooterIndex = 2;
-    public static final int kHoodIndex = 3;
-    public static final double kTapeHeightIn = 101.625; // in
-    public static final double kUpperHubRadiusIn = 26.6875;
-    // + is further along track and lower
-    public static final int kHoodInchesCorrectionR1 = 13; // 8-15 feet (was 20)
-    public static final int kHoodInchesCorrectionR2 = 13; // 15-19 feet (old 10)
-    public static final int kHoodInchesCorrectionR3 = 10; // 19-25 feet
-    public static final int kHoodInchesCorrectionR4 = 20; // 25+ feet
-    public static final int kHoodTicksPerInchR1 = 40; // 8-15 feet
-    public static final int kHoodTicksPerInchR2 = 75; // 15-19 feet
-    public static final int kHoodTicksPerInchR3 = 75; // 19-25 feet
-    public static final int kHoodTicksPerInchR4 = 40; // 25+ feet
-    public static String kCameraID = "A0";
+    //    public static final double kCenteredRange = 2;
+    //    public static final double kLostLimit = 30;
+    //    public static final String kTablePath = "/home/lvuser/deploy/Lookup_Table.csv";
+    //    public static final int kTableMin = 96;
+    //    public static final int kTableMax = 360;
+    //    public static final int kTableRes = 1;
+    //    public static final int kShooterIndex = 2;
+    //    public static final int kHoodIndex = 3;
+    //    public static final double kTapeHeightIn = 101.625; // in
+    //    public static final double kUpperHubRadiusIn = 26.6875;
+    //    // + is further along track and lower
+    //    public static final int kHoodInchesCorrectionR1 = 13; // 8-15 feet (was 20)
+    //    public static final int kHoodInchesCorrectionR2 = 13; // 15-19 feet (old 10)
+    //    public static final int kHoodInchesCorrectionR3 = 10; // 19-25 feet
+    //    public static final int kHoodInchesCorrectionR4 = 20; // 25+ feet
+    //    public static final int kHoodTicksPerInchR1 = 40; // 8-15 feet
+    //    public static final int kHoodTicksPerInchR2 = 75; // 15-19 feet
+    //    public static final int kHoodTicksPerInchR3 = 75; // 19-25 feet
+    //    public static final int kHoodTicksPerInchR4 = 40; // 25+ feet
+    //    public static String kCameraID = "A0";
   }
 
   public static final class TurretConstants {
@@ -231,15 +252,15 @@ public final class Constants {
     public static final int kTurretZeroTicks = 1_161; // 1250, 1194
     public static final int kForwardLimit = 20_000; // 13_800 14
     public static final int kReverseLimit = -20_000; // 13_800 14
-    public static final double kMaxStringPotZero = 100; // 2020 Robot
-    public static final double kMinStringPotZero = 0; // 2020 Robot
+    //    public static final double kMaxStringPotZero = 100; // 2020 Robot
+    //    public static final double kMinStringPotZero = 0; // 2020 Robot
 
     // Ticks -> Degrees/Radians
-    public static final double kTurretTicksPerDegree =
-        107.27; // 114.653     0.01745329 57.2957877856 72.404 120.522
+    //    public static final double kTurretTicksPerDegree =
+    //        107.27; // 114.653     0.01745329 57.2957877856 72.404 120.522
     public static final double kTurretTicksPerRadian = 6146.47; // 6569.133 6905.414
     // public static final double kTurretMidpoint = 13_000;
-    public static final double kWrapRange = 1;
+    //    public static final double kWrapRange = 1;
     public static final Rotation2d kOverlapAngle = Rotation2d.fromDegrees(6);
     public static final double kWrapTicks = 20_000;
 
@@ -264,6 +285,14 @@ public final class Constants {
     // Fender Shot Constants
     public static final Rotation2d kFenderAlliance = Rotation2d.fromDegrees(0.0);
     public static final Rotation2d kFenderOpponent = Rotation2d.fromDegrees(90.0);
+
+    // Geyser Shot Constants
+    public static Rotation2d kGeyserBallOnePosition = Rotation2d.fromDegrees(90);
+    public static Rotation2d kGeyserBallTwoPosition = Rotation2d.fromDegrees(95);
+
+    // Stryke Shot Constants
+    public static final double kOutsideStrykePos = 2250;
+    public static final double kInsideStrykePos = 1700;
 
     // Talon Constants
     public static SupplyCurrentLimitConfiguration getSupplyCurrentLimitConfig() {
@@ -445,6 +474,7 @@ public final class Constants {
     public static final double kDisengageRatchetSpeed = 0.25;
     public static final double kDisengageRatchetTicks = 100;
     public static final double kDisengageRatchetServoTimer = 0.2;
+    public static final double kDisengageRatchetMotorTimer = 0.01;
 
     // Closed Loop Movement Constants
     public static final double kFixedArmCloseEnough = 1_000.0;
@@ -456,14 +486,15 @@ public final class Constants {
     public static final double kShoulderCriuiseVelDefault = 1_000;
 
     // Open Loop Movement Constants
-    public static final double kFixedArmExtendSpeed = -0.25;
-    public static final double kFixedArmRetractSpeed = 0.25;
-    public static final double kPivotArmExtendSpeed = -0.25;
-    public static final double kPivotArmRetractSpeed = 0.25;
+    //    public static final double kFixedArmExtendSpeed = -0.25;
+    //    public static final double kFixedArmRetractSpeed = 0.25;
+    //    public static final double kPivotArmExtendSpeed = -0.25;
+    //    public static final double kPivotArmRetractSpeed = 0.25;
 
     // Climb States -> Desired Endpoint in Ticks
     public static final double kFMidExtTicks = -215_000;
     public static final double kPMidExtTicks = -198_000;
+    public static final double kMidPvtBkTicks = 3_000;
     public static final double kPMidRetST1Ticks = -145_000;
     public static final double kPMidRetST2Ticks = -130_000;
     public static final double kPMidRetST3Ticks = -76_000;
@@ -496,13 +527,14 @@ public final class Constants {
     public static final double kMidFinPvtBkTicks = 1_000;
 
     // Climb States -> Desired Open Loop or Close Loop Speed
-    public static final double kFMidExtSpeed = -0.8;
-    public static final double kPMidExtSpeed = -0.8;
-    public static final double kPMidRetST1Speed = 0.7;
-    public static final double kPMidRetST2Speed = 0.18;
-    public static final double kPMidRetST3Speed = 0.6;
+    public static final double kFMidExtSpeed = -0.9;
+    public static final double kPMidExtSpeed = -0.9;
+    public static final double kMidPvtBkSpeed = 1_000;
+    public static final double kPMidRetST1Speed = 0.8;
+    public static final double kPMidRetST2Speed = 0.8;
+    public static final double kPMidRetST3Speed = 0.8;
     public static final double kPMidRetST4Speed = 0.3;
-    public static final double kHighPvtFwdSpeed = 700;
+    public static final double kHighPvtFwdSpeed = 1_000;
     public static final double kPHighRetST1Speed = 0.6;
     public static final double kPHighRetST2Speed = 0.3;
     public static final double kHighPvtBk1Speed = 1_000;
@@ -744,10 +776,19 @@ public final class Constants {
     public static final int kHoodTalonID = 42;
     public static final String kLookupTablePath = "/home/lvuser/deploy/LookupTable.csv";
 
+    // StrykeShot Constants
+    public static final double kMiddleClimbY = 6.7;
+    public static final double kOutsideKickerTicksP100MS = 9_860; // FIXME
+    public static final double kOutsideShooterTicksP100MS = 10_400; // FIXME
+    public static final double kOutsideHoodTickPos = 5700; // FIXME
+    public static final double kInsideKickerTicksP100MS = 9_700; // FIXME
+    public static final double kInsideShooterTicksP100MS = 10_200; // FIXME
+    public static final double kInsideHoodTickPos = 5700; // FIXME
+
     // Lookup Table Constants
-    public static final double kLookupMinPixel = 134;
+    public static final double kLookupMinPixel = 127;
     public static final double kLookupMaxPixel = 414;
-    public static final double kNumRows = 281;
+    public static final double kNumRows = 288;
     public static final double kLookupRes = 1.0;
 
     // Hood Encoder Constants
@@ -774,6 +815,12 @@ public final class Constants {
     public static final double kKickerFenderLowTicksP100ms = 0; // 0
     public static final double kShooterFenderLowTicksP100ms = 6_500; // 6000
     public static final double kHoodFenderLowTicks = 2_600; // 4000
+
+    // Geyser Shot Constants
+    public static final double kShooterGeyserTicksP100ms = 12_000;
+    public static final double kKickerGeyserTicksP100ms = 5_500;
+    public static final double kHoodGeyserBallOneTicks = 0;
+    public static final double kHoodGeyserBallTwoTicks = 0;
 
     public static final double kShooterManualEjectTicksP100ms = -5_000;
     public static final double kKickerManualEjectTicksP100ms = -5_000;
@@ -895,6 +942,7 @@ public final class Constants {
     public static final String kPitKickerSetpointTicks = "Tune/Kicker/kickerSpeed";
     public static final String kTuneUpperMagSpeedTicks = "Tune/Magazine/UpperSpeed";
     public static final int kLockoutBNCid = 8;
+    public static final double kRumbleTime = 0.5;
   }
 
   public static final class AutoConstants {
@@ -904,5 +952,7 @@ public final class Constants {
     public static final Rotation2d kLeftStartYaw = Rotation2d.fromDegrees(136.5);
     public static final Rotation2d kMidStartYaw = Rotation2d.fromDegrees(-156.0);
     public static final Rotation2d kRightStartYaw = Rotation2d.fromDegrees(-88.5);
+    public static final double kDefenseBallPickupDelay = 0.2;
+    public static final double kWaitUntilMatchTime = 2.0;
   }
 }

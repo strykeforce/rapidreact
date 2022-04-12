@@ -17,13 +17,13 @@ public class DriveTeleopCommand extends CommandBase {
       new ExpoScale(DriveConstants.kDeadbandAllStick, DriveConstants.kExpoScaleYawFactor);
   // private final RateLimit rateLimitYaw = new RateLimit(DriveConstants.kRateLimitYaw);
   // private final RateLimit rateLimitMove = new RateLimit(DriveConstants.kRateLimitMove);
-  private double[] adjustedValues = new double[3];
-  private final double vectorOffset =
-      Math.sqrt(2)
-          / (DriveConstants.kExpoScaleMoveFactor
-                  * Math.pow((Math.sqrt(2) - DriveConstants.kDeadbandAllStick), 3)
-              + (1 - DriveConstants.kExpoScaleMoveFactor)
-                  * (Math.sqrt(2) - DriveConstants.kDeadbandAllStick));
+  // private double[] adjustedValues = new double[3];
+  // private final double vectorOffset =
+  //     Math.sqrt(2)
+  //         / (DriveConstants.kExpoScaleMoveFactor
+  //                 * Math.pow((Math.sqrt(2) - DriveConstants.kDeadbandAllStick), 3)
+  //             + (1 - DriveConstants.kExpoScaleMoveFactor)
+  //                 * (Math.sqrt(2) - DriveConstants.kDeadbandAllStick));
   private final SlewRateLimiter fwdLimiter = new SlewRateLimiter(DriveConstants.kRateLimitFwdStr);
   private final SlewRateLimiter strLimiter = new SlewRateLimiter(DriveConstants.kRateLimitFwdStr);
   private final SlewRateLimiter yawLimiter = new SlewRateLimiter(DriveConstants.kRateLimitYaw);
@@ -40,11 +40,11 @@ public class DriveTeleopCommand extends CommandBase {
     rawValues[1] = joystick.getRawAxis(RobotContainer.Axis.LEFT_Y.id);
     rawValues[2] = joystick.getRawAxis(RobotContainer.Axis.RIGHT_Y.id);
 
-    adjustedValues =
-        calcAdjustedValues(
-            joystick.getRawAxis(RobotContainer.Axis.LEFT_X.id),
-            joystick.getRawAxis(RobotContainer.Axis.LEFT_Y.id),
-            joystick.getRawAxis(RobotContainer.Axis.RIGHT_Y.id));
+    // adjustedValues =
+    //     calcAdjustedValues(
+    //         joystick.getRawAxis(RobotContainer.Axis.LEFT_X.id),
+    //         joystick.getRawAxis(RobotContainer.Axis.LEFT_Y.id),
+    //         joystick.getRawAxis(RobotContainer.Axis.RIGHT_Y.id));
 
     driveSubsystem.drive(
         -DriveConstants.kMaxSpeedMetersPerSecond
@@ -74,32 +74,32 @@ public class DriveTeleopCommand extends CommandBase {
     driveSubsystem.drive(0, 0, 0);
   }
 
-  private double applyExpoScaling(double input) {
-    double y;
+  // private double applyExpoScaling(double input) {
+  //   double y;
 
-    if (Math.abs(input) < DriveConstants.kDeadbandAllStick) {
-      return 0;
-    }
+  //   if (Math.abs(input) < DriveConstants.kDeadbandAllStick) {
+  //     return 0;
+  //   }
 
-    y =
-        input > 0
-            ? input - DriveConstants.kDeadbandAllStick
-            : input + DriveConstants.kDeadbandAllStick;
+  //   y =
+  //       input > 0
+  //           ? input - DriveConstants.kDeadbandAllStick
+  //           : input + DriveConstants.kDeadbandAllStick;
 
-    return (DriveConstants.kExpoScaleMoveFactor * Math.pow(y, 3)
-            + (1 - DriveConstants.kExpoScaleMoveFactor) * y)
-        * vectorOffset;
-  }
+  //   return (DriveConstants.kExpoScaleMoveFactor * Math.pow(y, 3)
+  //           + (1 - DriveConstants.kExpoScaleMoveFactor) * y)
+  //       * vectorOffset;
+  // }
 
-  private double[] calcAdjustedValues(double rawForward, double rawStrafe, double rawYaw) {
-    double[] tempAdjustedValues = new double[3];
-    double rawAngle = Math.atan2(rawForward, rawStrafe);
-    double orgMag = (Math.sqrt(Math.pow(rawForward, 2) + Math.pow(rawStrafe, 2)));
-    double adjustedMag = applyExpoScaling(orgMag);
-    tempAdjustedValues[0] = Math.sin(rawAngle) * adjustedMag;
-    tempAdjustedValues[1] = Math.cos(rawAngle) * adjustedMag;
-    tempAdjustedValues[2] = expoScaleYaw.apply(rawYaw);
+  // private double[] calcAdjustedValues(double rawForward, double rawStrafe, double rawYaw) {
+  //   double[] tempAdjustedValues = new double[3];
+  //   double rawAngle = Math.atan2(rawForward, rawStrafe);
+  //   double orgMag = (Math.sqrt(Math.pow(rawForward, 2) + Math.pow(rawStrafe, 2)));
+  //   double adjustedMag = applyExpoScaling(orgMag);
+  //   tempAdjustedValues[0] = Math.sin(rawAngle) * adjustedMag;
+  //   tempAdjustedValues[1] = Math.cos(rawAngle) * adjustedMag;
+  //   tempAdjustedValues[2] = expoScaleYaw.apply(rawYaw);
 
-    return tempAdjustedValues;
-  }
+  //   return tempAdjustedValues;
+  // }
 }

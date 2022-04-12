@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import static frc.robot.Constants.DriveConstants.*;
 import static frc.robot.Constants.kTalonConfigTimeout;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -18,6 +19,7 @@ import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.TurretConstants;
 import java.nio.file.Paths;
@@ -30,6 +32,7 @@ import net.consensys.cava.toml.TomlTable;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.strykeforce.swerve.PoseEstimatorOdometryStrategy;
 import org.strykeforce.swerve.SwerveDrive;
 import org.strykeforce.swerve.SwerveModule;
 import org.strykeforce.swerve.TalonSwerveModule;
@@ -45,6 +48,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private final ProfiledPIDController omegaController;
   private final PIDController xController;
   private final PIDController yController;
+  private final PoseEstimatorOdometryStrategy odometryStrategy;
   private double[] desiredAzimuthPositions = new double[4];
   // Grapher Variables
   private ChassisSpeeds holoContOutput = new ChassisSpeeds();
@@ -91,6 +95,18 @@ public class DriveSubsystem extends MeasurableSubsystem {
     }
 
     swerveDrive = new SwerveDrive(swerveModules);
+
+    odometryStrategy =
+        new PoseEstimatorOdometryStrategy(
+            swerveDrive.getHeading(),
+            new Pose2d(),
+            swerveDrive.getKinematics(),
+            kStateStdDevs,
+            kLocalMeasurementStdDevs,
+            kVisionMeasurementStdDevs);
+
+    swerveDrive.setOdometry(odometryStrategy);
+
     swerveDrive.resetGyro();
     swerveDrive.setGyroOffset(Rotation2d.fromDegrees(0));
 
@@ -218,6 +234,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
     logger.info("reset odometry with: {}", pose);
   }
 
+  public void updateOdometryWithVision(Pose2d calculatedPose) {
+    odometryStrategy.addVisionMeasurement(calculatedPose, Timer.getFPGATimestamp());
+  }
+
   public void resetHolonomicController() {
     xController.reset();
     yController.reset();
@@ -234,10 +254,12 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public boolean isVelocityStable() {
     double gyroRate = swerveDrive.getGyroRate();
-    fwdStable = Math.abs(lastVelocity[0]) <= DriveConstants.kForwardThreshold;
-    strStable = Math.abs(lastVelocity[1]) <= DriveConstants.kStrafeThreshold;
+    double wheelZeroSpeed = swerveDrive.getSwerveModules()[0].getState().speedMetersPerSecond;
+    // fwdStable = Math.abs(lastVelocity[0]) <= DriveConstants.kForwardThreshold;
+    // strStable = Math.abs(lastVelocity[1]) <= DriveConstants.kStrafeThreshold;
+    velStable = Math.abs(wheelZeroSpeed) <= DriveConstants.kForwardThreshold;
     yawStable = Math.abs(gyroRate) <= DriveConstants.kGyroRateThreshold;
-    boolean stable = fwdStable && strStable && yawStable;
+    boolean stable = velStable && yawStable;
     velStable = stable;
 
     return stable;
