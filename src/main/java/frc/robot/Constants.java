@@ -12,10 +12,15 @@ import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.util.Color;
 import java.util.ArrayList;
 
@@ -175,6 +180,21 @@ public final class Constants {
     public static final double kDOmega = 0.0;
     //    public static final double kMaxVelOmega = kMaxOmega / 2.0;
     public static final double kMaxAccelOmega = 3.14;
+
+    //  Increase these numbers to trust our state estimates less. This matrix is in the form [x, y,
+    // theta]ᵀ, with units in meters and radians.
+    public static Matrix<N3, N1> kStateStdDevs =
+        VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5));
+
+    // Increase these numbers to trust sensor readings from encoders and gyros less. This matrix is
+    // in the form [theta], with units in radians.
+    public static Matrix<N1, N1> kLocalMeasurementStdDevs =
+        VecBuilder.fill(Units.degreesToRadians(0.01));
+
+    // Increase these numbers to trust global measurements from vision less. This matrix is in the
+    // form [x, y, theta]ᵀ, with units in meters and radians.
+    public static Matrix<N3, N1> kVisionMeasurementStdDevs =
+        VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(5));
   }
 
   public static final class VisionConstants {
@@ -267,8 +287,12 @@ public final class Constants {
     public static final Rotation2d kFenderOpponent = Rotation2d.fromDegrees(90.0);
 
     // Geyser Shot Constants
-    public static Rotation2d kGeyserBallOnePosition = Rotation2d.fromDegrees(90); // FIXME
-    public static Rotation2d kGeyserBallTwoPosition = Rotation2d.fromDegrees(95); // FIXME
+    public static Rotation2d kGeyserBallOnePosition = Rotation2d.fromDegrees(90);
+    public static Rotation2d kGeyserBallTwoPosition = Rotation2d.fromDegrees(95);
+
+    // Stryke Shot Constants
+    public static final double kOutsideStrykePos = 2250;
+    public static final double kInsideStrykePos = 1700;
 
     // Talon Constants
     public static SupplyCurrentLimitConfiguration getSupplyCurrentLimitConfig() {
@@ -450,6 +474,7 @@ public final class Constants {
     public static final double kDisengageRatchetSpeed = 0.25;
     public static final double kDisengageRatchetTicks = 100;
     public static final double kDisengageRatchetServoTimer = 0.2;
+    public static final double kDisengageRatchetMotorTimer = 0.01;
 
     // Closed Loop Movement Constants
     public static final double kFixedArmCloseEnough = 1_000.0;
@@ -469,6 +494,7 @@ public final class Constants {
     // Climb States -> Desired Endpoint in Ticks
     public static final double kFMidExtTicks = -215_000;
     public static final double kPMidExtTicks = -198_000;
+    public static final double kMidPvtBkTicks = 3_000;
     public static final double kPMidRetST1Ticks = -145_000;
     public static final double kPMidRetST2Ticks = -130_000;
     public static final double kPMidRetST3Ticks = -76_000;
@@ -501,13 +527,14 @@ public final class Constants {
     public static final double kMidFinPvtBkTicks = 1_000;
 
     // Climb States -> Desired Open Loop or Close Loop Speed
-    public static final double kFMidExtSpeed = -0.8;
-    public static final double kPMidExtSpeed = -0.8;
-    public static final double kPMidRetST1Speed = 0.7;
-    public static final double kPMidRetST2Speed = 0.18;
-    public static final double kPMidRetST3Speed = 0.6;
+    public static final double kFMidExtSpeed = -0.9;
+    public static final double kPMidExtSpeed = -0.9;
+    public static final double kMidPvtBkSpeed = 1_000;
+    public static final double kPMidRetST1Speed = 0.8;
+    public static final double kPMidRetST2Speed = 0.8;
+    public static final double kPMidRetST3Speed = 0.8;
     public static final double kPMidRetST4Speed = 0.3;
-    public static final double kHighPvtFwdSpeed = 700;
+    public static final double kHighPvtFwdSpeed = 1_000;
     public static final double kPHighRetST1Speed = 0.6;
     public static final double kPHighRetST2Speed = 0.3;
     public static final double kHighPvtBk1Speed = 1_000;
@@ -749,11 +776,20 @@ public final class Constants {
     public static final int kHoodTalonID = 42;
     public static final String kLookupTablePath = "/home/lvuser/deploy/LookupTable.csv";
 
+    // StrykeShot Constants
+    public static final double kMiddleClimbY = 6.7;
+    public static final double kOutsideKickerTicksP100MS = 9_860; // FIXME
+    public static final double kOutsideShooterTicksP100MS = 10_400; // FIXME
+    public static final double kOutsideHoodTickPos = 5700; // FIXME
+    public static final double kInsideKickerTicksP100MS = 9_700; // FIXME
+    public static final double kInsideShooterTicksP100MS = 10_200; // FIXME
+    public static final double kInsideHoodTickPos = 5700; // FIXME
+
     // Lookup Table Constants
-    public static final double kLookupMinPixel = 134;
+    public static final double kLookupMinPixel = 127;
     public static final double kLookupMaxPixel = 414;
-    public static final double kNumRows = 281;
-    //    public static final double kLookupRes = 1.0;
+    public static final double kNumRows = 288;
+    public static final double kLookupRes = 1.0;
 
     // Hood Encoder Constants
     public static final int kHoodZeroTicks = 1800;
@@ -781,10 +817,10 @@ public final class Constants {
     public static final double kHoodFenderLowTicks = 2_600; // 4000
 
     // Geyser Shot Constants
-    public static double kShooterGeyserTicksP100ms = 12_000;
-    public static double kKickerGeyserTicksP100ms = 5_500;
-    //    public static double kHoodGeyserBallOneTicks = 0;
-    public static double kHoodGeyserBallTwoTicks = 0;
+    public static final double kShooterGeyserTicksP100ms = 12_000;
+    public static final double kKickerGeyserTicksP100ms = 5_500;
+    public static final double kHoodGeyserBallOneTicks = 0;
+    public static final double kHoodGeyserBallTwoTicks = 0;
 
     public static final double kShooterManualEjectTicksP100ms = -5_000;
     public static final double kKickerManualEjectTicksP100ms = -5_000;
@@ -906,6 +942,7 @@ public final class Constants {
     public static final String kPitKickerSetpointTicks = "Tune/Kicker/kickerSpeed";
     public static final String kTuneUpperMagSpeedTicks = "Tune/Magazine/UpperSpeed";
     public static final int kLockoutBNCid = 8;
+    public static final double kRumbleTime = 0.5;
   }
 
   public static final class AutoConstants {

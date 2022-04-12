@@ -268,14 +268,14 @@ public class ClimbSubsystem extends MeasurableSubsystem {
   }
 
   public boolean isLeftArmTouchingBar() {
-    if (!leftArmHome.get()) leftHomeStableCounts++;
+    if (leftArmHome.get()) leftHomeStableCounts++;
     else leftHomeStableCounts = 0;
 
     return leftHomeStableCounts >= ClimbConstants.kHomeSensorStableCounts;
   }
 
   public boolean isRightArmTouchingBar() {
-    if (!rightArmHome.get()) rightHomeStableCounts++;
+    if (rightArmHome.get()) rightHomeStableCounts++;
     else rightHomeStableCounts = 0;
     return rightHomeStableCounts >= ClimbConstants.kHomeSensorStableCounts;
   }
@@ -300,6 +300,9 @@ public class ClimbSubsystem extends MeasurableSubsystem {
     currPivotArmState = PivotArmState.DISENGAGE_RATCHET;
     desiredFixedArmState = FixedArmState.MID_EXT;
     desiredPivotArmState = PivotArmState.MID_EXT;
+    shoulderState = ShoulderState.MID_PVT_BK;
+    rotateShoulder(shoulderState.setpoint);
+    setShoulderCruise(shoulderState.cruiseVel);
   }
 
   public void midClimb() {
@@ -405,11 +408,15 @@ public class ClimbSubsystem extends MeasurableSubsystem {
       case DISENGAGE_RATCHET:
         if (disengageFixedArmRatchetTimer.hasElapsed(ClimbConstants.kDisengageRatchetServoTimer)
             && !motorOnDisengageFixedRatchet) {
+          disengageFixedArmRatchetTimer.reset();
+          disengageFixedArmRatchetTimer.start();
           openLoopFixedArm(ClimbConstants.kDisengageRatchetSpeed);
           motorOnDisengageFixedRatchet = true;
         } else if (motorOnDisengageFixedRatchet
-            && (fixedArmFalcon.getSelectedSensorPosition() - fixedArmDisengageRatchetStartTicks)
-                > ClimbConstants.kDisengageRatchetTicks) {
+            && disengageFixedArmRatchetTimer.hasElapsed(
+                ClimbConstants.kDisengageRatchetMotorTimer)) {
+          // && (fixedArmFalcon.getSelectedSensorPosition() - fixedArmDisengageRatchetStartTicks)
+          //     > ClimbConstants.kDisengageRatchetTicks) {
           logger.info("Fixed: DISENGAGE_RATCHET -> {}", desiredFixedArmState);
           climbStateCounter++;
           currFixedArmState = desiredFixedArmState;
@@ -510,20 +517,34 @@ public class ClimbSubsystem extends MeasurableSubsystem {
           // logger.info("Fixed: {} -> IDLE", currFixedArmState);
           // currFixedArmState = FixedArmState.IDLE;
           // openLoopFixedArm(0.0);
-          logger.info(
-              "Fixed: {} -> TVS_RET2, Pivot: {} -> TVS_RET2", currFixedArmState, currPivotArmState);
+
+          // logger.info(
+          //     "Fixed: {} -> TVS_RET2, Pivot: {} -> TVS_RET2", currFixedArmState,
+          // currPivotArmState);
+          // currFixedArmState = FixedArmState.TVS_RET2;
+          // currPivotArmState = PivotArmState.TVS_RET2;
+          // openLoopFixedArm(currFixedArmState.speed);
+          // openLoopPivotArm(currPivotArmState.speed);
+
+          climbStateCounter++;
+          logger.info("Fixed: {} -> TVS_RET2", currFixedArmState);
           currFixedArmState = FixedArmState.TVS_RET2;
-          currPivotArmState = PivotArmState.TVS_RET2;
           openLoopFixedArm(currFixedArmState.speed);
-          openLoopPivotArm(currPivotArmState.speed);
           climbStateCounter++;
         }
         break;
       case TVS_RET2:
         if (isFixedArmOpenLoopRetractFinished(currFixedArmState.setpoint)) {
-          logger.info("fixed: {} -> idle", currFixedArmState);
+          // logger.info("fixed: {} -> idle", currFixedArmState);
+          // currFixedArmState = FixedArmState.IDLE;
+          // openLoopFixedArm(0.0);
+          logger.info("Finished traverse climb");
+          shoulderState = ShoulderState.IDLE;
           currFixedArmState = FixedArmState.IDLE;
+          currPivotArmState = PivotArmState.IDLE;
           openLoopFixedArm(0.0);
+          openLoopPivotArm(0.0);
+          isClimbDone = true;
         }
         break;
       case MID_FIN_RET:
@@ -574,9 +595,13 @@ public class ClimbSubsystem extends MeasurableSubsystem {
             && !motorOnDisengagePivotRatchet) {
           openLoopPivotArm(ClimbConstants.kDisengageRatchetSpeed);
           motorOnDisengagePivotRatchet = true;
+          disengagePivotArmRatchetTimer.reset();
+          disengagePivotArmRatchetTimer.start();
         } else if (motorOnDisengagePivotRatchet
-            && (pivotArmFalcon.getSelectedSensorPosition() - pivotArmDisengageRatchetStartTicks)
-                > ClimbConstants.kDisengageRatchetTicks) {
+            && disengagePivotArmRatchetTimer.hasElapsed(
+                ClimbConstants.kDisengageRatchetMotorTimer)) {
+          // && (pivotArmFalcon.getSelectedSensorPosition() - pivotArmDisengageRatchetStartTicks)
+          //     > ClimbConstants.kDisengageRatchetTicks) {
           logger.info("Pivot: DISENGAGE_RATCHET -> {}", desiredPivotArmState);
           climbStateCounter++;
           currPivotArmState = desiredPivotArmState;
@@ -755,6 +780,11 @@ public class ClimbSubsystem extends MeasurableSubsystem {
         break;
       case ZEROED:
         break;
+      case MID_PVT_BK:
+        if (isShoulderFinished()) {
+          shoulderState = shoulderState.IDLE;
+        }
+        break;
       case HIGH_PVT_FWD:
         if (isShoulderFinished()) {
           logger.info("Pivot: {} -> HIGH_RET_ST1", currPivotArmState);
@@ -893,6 +923,7 @@ public class ClimbSubsystem extends MeasurableSubsystem {
     IDLE(0, ClimbConstants.kShoulderCriuiseVelDefault), // not used
     ZEROING(0, ClimbConstants.kShoulderCriuiseVelDefault), // not used
     ZEROED(0, ClimbConstants.kShoulderCriuiseVelDefault), // not used
+    MID_PVT_BK(ClimbConstants.kMidPvtBkTicks, ClimbConstants.kMidPvtBkSpeed),
     HIGH_PVT_FWD(ClimbConstants.kHighPvtFwdTicks, ClimbConstants.kHighPvtFwdSpeed),
     HIGH_PVT_BK1(ClimbConstants.kHighPvtBk1Ticks, ClimbConstants.kHighPvtBk1Speed),
     HIGH_PVT_BK2(ClimbConstants.kHighPvtBk2Ticks, ClimbConstants.kHighPvtBk2Speed),

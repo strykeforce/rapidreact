@@ -2,41 +2,31 @@ package frc.robot.commands.sequences.intaking;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.IntakeConstants;
-import frc.robot.subsystems.IntakeExtendSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
 import frc.robot.subsystems.MagazineSubsystem.LowerMagazineState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class AutoIntakeCommand extends CommandBase {
+public class AutoIntakeNoExtendCommand extends CommandBase {
   public final MagazineSubsystem magazineSubsystem;
   public final IntakeSubsystem intakeSubsystem;
-  private final IntakeExtendSubsystem intakeExtendSubsystem;
   public boolean magazineReversed = false;
-  public boolean isAuton;
-  public boolean intakeExtend;
+  private final Logger logger = LoggerFactory.getLogger(AutoIntakeNoExtendCommandGroup.class);
 
-  public AutoIntakeCommand(
-      MagazineSubsystem magazineSubsystem,
-      IntakeSubsystem intakeSubsystem,
-      IntakeExtendSubsystem intakeExtendSubsystem,
-      boolean isAuton,
-      boolean intakeExtend) {
+  public AutoIntakeNoExtendCommand(
+      MagazineSubsystem magazineSubsystem, IntakeSubsystem intakeSubsystem) {
     addRequirements(magazineSubsystem, intakeSubsystem);
     this.magazineSubsystem = magazineSubsystem;
     this.intakeSubsystem = intakeSubsystem;
-    this.intakeExtendSubsystem = intakeExtendSubsystem;
-    this.isAuton = isAuton;
-    this.intakeExtend = intakeExtend;
   }
 
   @Override
   public void initialize() {
+    logger.info("Init");
     magazineSubsystem.indexCargo();
-    intakeSubsystem.openLoopRotate(
-        isAuton ? IntakeConstants.kIntakeSpeedAuto : IntakeConstants.kIntakeSpeed);
+    intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeSpeed);
     magazineReversed = false;
-    if (intakeExtend) intakeExtendSubsystem.extendClosedLoop();
-    else intakeExtendSubsystem.retractClosedLoop();
   }
 
   @Override
@@ -47,8 +37,7 @@ public class AutoIntakeCommand extends CommandBase {
       magazineReversed = true;
     } else if (magazineReversed
         && (magazineSubsystem.getCurrLowerMagazineState() != LowerMagazineState.EJECT_CARGO)) {
-      intakeSubsystem.openLoopRotate(
-          isAuton ? IntakeConstants.kIntakeSpeedAuto : IntakeConstants.kIntakeSpeed);
+      intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeSpeed);
       magazineReversed = false;
     }
   }
@@ -64,6 +53,5 @@ public class AutoIntakeCommand extends CommandBase {
     if (!interrupted) {
       intakeSubsystem.openLoopRotate(IntakeConstants.kIntakeReverseSpeed);
     }
-    if (!isAuton && !interrupted) intakeExtendSubsystem.retractClosedLoop();
   }
 }
