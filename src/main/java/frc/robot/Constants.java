@@ -953,5 +953,7 @@ public final class Constants {
     public static final Rotation2d kLeftStartYaw = Rotation2d.fromDegrees(136.5);
     public static final Rotation2d kMidStartYaw = Rotation2d.fromDegrees(-156.0);
     public static final Rotation2d kRightStartYaw = Rotation2d.fromDegrees(-88.5);
+    public static final double kDefenseBallPickupDelay = 0.2;
+    public static final double kWaitUntilMatchTime = 2.0;
   }
 }

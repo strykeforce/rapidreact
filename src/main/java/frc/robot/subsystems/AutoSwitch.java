@@ -126,8 +126,9 @@ public class AutoSwitch {
             intakeExtendSubsystem,
             driveSubsystem,
             "LeftCargo1Collect",
-            "OppCargo6Collect",
-            "OppCargo5Collect",
+            "OppCargo2Collect",
+            "OppCargo3Collect",
+            "DefenseMoveOffOppBall",
             AutoConstants.kLeftStartYaw,
             0.0,
             230.0); // FIXME
