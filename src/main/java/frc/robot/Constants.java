@@ -210,6 +210,7 @@ public final class Constants {
     //    public static final double kMinContourAreaSize = 100;
     public static final double kVerticalFov = 0.6056; // 48.8 (34.7 degrees)
     public static final double kHorizonFov = 1.012; // 50.8 //146 //radians 1.012 // deg 57.999
+    public static final double kLookupTableToLensOffset = 0.4959;
     //    public static final double kHorizonRes = 640; // 1280
     //    public static final double kTargetWidthIn = 5;
     //    public static final double kCameraHeight = 20.75;
