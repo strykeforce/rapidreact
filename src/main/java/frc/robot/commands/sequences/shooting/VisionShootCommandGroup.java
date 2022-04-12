@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.intake.RetractOnFullCommand;
+import frc.robot.commands.intake.IntakeReverseWithMagazineCommand;
 import frc.robot.commands.sequences.intaking.AutoIntakeNoExtendCommandGroup;
 import frc.robot.subsystems.IntakeExtendSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -31,11 +31,9 @@ public class VisionShootCommandGroup extends SequentialCommandGroup {
                 turretSubsystem,
                 magazineSubsystem,
                 visionSubsystem,
-                disableTrackingOnFinish,
-                intakeSubsystem),
-            new RetractOnFullCommand(magazineSubsystem, intakeExtendSubsystem)),
+                disableTrackingOnFinish),
+            new IntakeReverseWithMagazineCommand(magazineSubsystem, intakeSubsystem)),
         new ScheduleCommand(
-            new AutoIntakeNoExtendCommandGroup(magazineSubsystem, intakeSubsystem, xbox)),
-        new ScheduleCommand(new RetractOnFullCommand(magazineSubsystem, intakeExtendSubsystem)));
+            new AutoIntakeNoExtendCommandGroup(magazineSubsystem, intakeSubsystem, xbox)));
   }
 }

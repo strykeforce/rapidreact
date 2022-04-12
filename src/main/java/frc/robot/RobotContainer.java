@@ -46,7 +46,6 @@ import frc.robot.commands.drive.ResetOdometryCommand;
 import frc.robot.commands.drive.XLockCommand;
 import frc.robot.commands.drive.ZeroGyroCommand;
 import frc.robot.commands.intake.IntakeOpenLoopCommand;
-import frc.robot.commands.intake.RetractOnFullCommand;
 import frc.robot.commands.magazine.IgnoreColorSensorCommand;
 import frc.robot.commands.magazine.LowerMagazineOpenLoopCommand;
 import frc.robot.commands.magazine.ManualEjectCargoReverseCommand;
@@ -171,7 +170,6 @@ public class RobotContainer {
   public void startAutoIntake() {
     new AutoIntakeNoExtendCommandGroup(magazineSubsystem, intakeSubsystem, xboxController)
         .schedule();
-    new RetractOnFullCommand(magazineSubsystem, intakeExtendSubsystem).schedule();
   }
 
   public AutoSwitch getAutoSwitch() {
@@ -324,12 +322,10 @@ public class RobotContainer {
                 visionSubsystem,
                 true,
                 intakeSubsystem,
-                intakeExtendSubsystem,
                 xboxController));
     new JoystickButton(xboxController, XboxController.Button.kY.value)
         .whenPressed(
-            new AutoIntakeNoExtendCommandGroup(magazineSubsystem, intakeSubsystem, xboxController))
-        .whenPressed(new RetractOnFullCommand(magazineSubsystem, intakeExtendSubsystem));
+            new AutoIntakeNoExtendCommandGroup(magazineSubsystem, intakeSubsystem, xboxController));
     LeftTriggerDown.whileActiveOnce(new ExtendIntakeCommand(intakeExtendSubsystem, true));
     RightTriggerDown.whileActiveOnce(new ExtendIntakeCommand(intakeExtendSubsystem, false));
 
