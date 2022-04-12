@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.OffsetGyroCommand;
 import frc.robot.commands.magazine.IgnoreColorSensorCommand;
@@ -33,6 +34,7 @@ public class DefenseAuto extends SequentialCommandGroup {
       String path1Name,
       String path2Name,
       String path3Name,
+      String path4Name,
       Rotation2d gyroOffset,
       double delay,
       double widthPixels) {
@@ -59,18 +61,16 @@ public class DefenseAuto extends SequentialCommandGroup {
             new DriveAutonCommand(driveSubsystem, path2Name, false, true),
             new AutoIntakeCommand(
                 magazineSubsystem, intakeSubsystem, intakeExtendSubsystem, true, true)),
-        new WaitCommand(0.5),
+        new WaitCommand(AutoConstants.kDefenseBallPickupDelay),
         new ParallelDeadlineGroup(
             new DriveAutonCommand(driveSubsystem, path3Name, false, true),
             new AutoIntakeCommand(
                 magazineSubsystem, intakeSubsystem, intakeExtendSubsystem, true, true)),
         new IgnoreColorSensorCommand(magazineSubsystem, false),
-        new WaitMatchTimeCommand(2.0),
+        new WaitCommand(AutoConstants.kDefenseBallPickupDelay),
+        new DriveAutonCommand(driveSubsystem, path4Name, false, true),
+        new WaitMatchTimeCommand(AutoConstants.kWaitUntilMatchTime),
         new GeyserShootCommand(
-            turretSubsystem, shooterSubsystem, magazineSubsystem, intakeSubsystem)
-
-        // TODO: Add functionality to shoot state machine to "Geyser Shot"
-
-        );
+            turretSubsystem, shooterSubsystem, magazineSubsystem, intakeSubsystem));
   }
 }
