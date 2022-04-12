@@ -87,6 +87,11 @@ public class TurretSubsystem extends MeasurableSubsystem {
     //     horizontalAngleCorrection);
     Rotation2d targetAngle = currentTurretPose.minus(errorRotation2d);
     targetAngle = targetAngle.plus(horizontalAngleCorrection);
+    double tangentVel = driveSubsystem.getTangentVelocity();
+    double gyroRate = driveSubsystem.getGyroRate();
+    targetAngle = targetAngle.plus(Rotation2d.fromDegrees(gyroRate * TurretConstants.kFYaw));
+    targetAngle =
+        targetAngle.plus(Rotation2d.fromDegrees(tangentVel * TurretConstants.kFTangentVelocity));
     rotateTo(targetAngle);
 
     // double targetAngleRadians =

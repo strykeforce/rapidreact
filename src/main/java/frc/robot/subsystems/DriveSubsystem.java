@@ -151,7 +151,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
     swerveDrive.move(forwardMetersPerSec, strafeMetersPerSec, yawRadiansPerSec, isFieldOriented);
   }
 
-  public double feedForwardAngle() {
+  public double getTangentVelocity() {
     Translation2d deltaGoal =
         TurretConstants.kHubPositionMeters.minus(getPoseMeters().getTranslation());
     double angleGoal = Math.atan2(deltaGoal.getY(), deltaGoal.getX());
@@ -383,7 +383,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure("FWD Vel", () -> lastVelocity[0]),
         new Measure("STR Vel", () -> lastVelocity[1]),
         new Measure("YAW Vel", () -> lastVelocity[2]),
-        new Measure("FeadForwardTangent", () -> feedForwardAngle()),
+        new Measure("FeadForwardTangent", () -> getTangentVelocity()),
         new Measure("Gyro Rate", () -> getGyroRate()));
   }
 }

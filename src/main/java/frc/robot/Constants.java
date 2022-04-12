@@ -200,7 +200,7 @@ public final class Constants {
   public static final class VisionConstants {
     // Actual 2022 Constants
     // + is left
-    public static final double kHorizAngleCorrectionDegrees = 0.0; // 2.5 degrees
+    public static final double kHorizAngleCorrectionDegrees = 0.0; // -1.25 deg
 
     // Vision test for failure const
     public static final double kTimeForVisionCheck = 1.0;
@@ -208,7 +208,7 @@ public final class Constants {
 
     // Old 2020 Constants
     //    public static final double kMinContourAreaSize = 100;
-    public static final double kVerticalFov = 0.6056; // 48.8 (34.7 degrees)
+    public static final double kVerticalFov = 0.6056; // Measured 0.4939 FIXME
     public static final double kHorizonFov = 1.012; // 50.8 //146 //radians 1.012 // deg 57.999
     public static final double kLookupTableToLensOffset = 0.4959;
     //    public static final double kHorizonRes = 640; // 1280
@@ -265,11 +265,11 @@ public final class Constants {
     public static final double kWrapTicks = 20_000;
 
     // Rotate Under Vision Constants
-    public static final double kRotateByInitialKp = -0.4; // -0.4 old: 0.4
-    public static final double kRotateByFinalKp = -0.4; // 0.95
+    public static final double kRotateByInitialKp = -0.4; // -0.4
+    public static final double kRotateByFinalKp = -0.4; // -0.4
     public static final int kNotValidTargetCounts = 5; // how many frames to wait before seeking
-    public static final double kFYaw = 0.0;
-    public static final double kFTangentVelocity = 0.0;
+    public static final double kFYaw = 1.0;
+    public static final double kFTangentVelocity = 0.9;
 
     // Seek Constants
     public static final Translation2d kHubPositionMeters = new Translation2d(8.23, 4.11); // meters
