@@ -475,7 +475,7 @@ public final class Constants {
     public static final double kDisengageRatchetSpeed = 0.25;
     public static final double kDisengageRatchetTicks = 100;
     public static final double kDisengageRatchetServoTimer = 0.2;
-    public static final double kDisengageRatchetMotorTimer = 0.01;
+    public static final double kDisengageRatchetMotorTimer = 0.02;
 
     // Closed Loop Movement Constants
     public static final double kFixedArmCloseEnough = 1_000.0;
@@ -493,7 +493,7 @@ public final class Constants {
     //    public static final double kPivotArmRetractSpeed = 0.25;
 
     // Climb States -> Desired Endpoint in Ticks
-    public static final double kFMidExtTicks = -215_000;
+    public static final double kFMidExtTicks = -195_000;
     public static final double kPMidExtTicks = -198_000;
     public static final double kMidPvtBkTicks = 3_000;
     public static final double kPMidRetST1Ticks = -145_000;
@@ -501,6 +501,7 @@ public final class Constants {
     public static final double kPMidRetST3Ticks = -76_000;
     public static final double kPMidRetST4Ticks = -66_000;
     public static final double kHighPvtFwdTicks = -6_850;
+    public static final double kFHighExtTicks = -215_000;
     public static final double kPHighRetST1Ticks = -13_500;
     public static final double kPHighRetST2Ticks = -4_000;
     public static final double kHighPvtBk1Ticks = -5_000;
@@ -536,6 +537,7 @@ public final class Constants {
     public static final double kPMidRetST3Speed = 0.8;
     public static final double kPMidRetST4Speed = 0.3;
     public static final double kHighPvtFwdSpeed = 1_000;
+    public static final double kFHighExtSpeed = -0.8;
     public static final double kPHighRetST1Speed = 0.6;
     public static final double kPHighRetST2Speed = 0.3;
     public static final double kHighPvtBk1Speed = 1_000;
