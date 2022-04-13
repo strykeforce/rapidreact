@@ -432,6 +432,12 @@ public class ClimbSubsystem extends MeasurableSubsystem {
           currFixedArmState = FixedArmState.IDLE;
         }
         break;
+      case HIGH_EXT:
+        if (isFixedArmOpenLoopExtendFinished(currFixedArmState.setpoint)) {
+          currFixedArmState = FixedArmState.IDLE;
+          openLoopFixedArm(0.0);
+        }
+        break;
       case HIGH_RET_ST1:
         if (isFixedArmOpenLoopRetractFinished(currFixedArmState.setpoint)) {
           // logger.info("Fixed: {} -> HIGH_RET_ST2", currFixedArmState);
@@ -787,10 +793,15 @@ public class ClimbSubsystem extends MeasurableSubsystem {
         break;
       case HIGH_PVT_FWD:
         if (isShoulderFinished()) {
-          logger.info("Pivot: {} -> HIGH_RET_ST1", currPivotArmState);
+          logger.info(
+              "Pivot: {} -> HIGH_RET_ST1, Fixed: {} -> HIGH_EXT",
+              currPivotArmState,
+              currFixedArmState);
           currPivotArmState = PivotArmState.HIGH_RET_ST1;
+          currFixedArmState = FixedArmState.HIGH_EXT;
           climbStateCounter++;
           openLoopPivotArm(currPivotArmState.speed);
+          openLoopFixedArm(currFixedArmState.speed);
           shoulderState = ShoulderState.IDLE;
         }
         break;
@@ -866,6 +877,7 @@ public class ClimbSubsystem extends MeasurableSubsystem {
     ZEROED(0, false, 0), // not used
     DISENGAGE_RATCHET(0, false, 0), // not used
     MID_EXT(ClimbConstants.kFMidExtTicks, true, ClimbConstants.kFMidExtSpeed),
+    HIGH_EXT(ClimbConstants.kFHighExtTicks, true, ClimbConstants.kFHighExtSpeed),
     HIGH_RET_ST1(ClimbConstants.kFHighRetST1Ticks, false, ClimbConstants.kFHighRetST1Speed),
     HIGH_RET_ST2(ClimbConstants.kFHighRetST2Ticks, false, ClimbConstants.kFHighRetST2Speed),
     TVS_DELAY(0, false, 0), // not used
