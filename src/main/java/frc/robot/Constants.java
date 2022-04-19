@@ -249,7 +249,7 @@ public final class Constants {
     public static final double kSlowCruiseVelocity = 4_000; // 2000
     public static final double kFastAccel = 15_000; // 20_000
     public static final double kSlowAccel = 15_000; // 20_000
-    public static final int kTurretZeroTicks = 1_161; // 1250, 1194
+    public static final int kTurretZeroTicks = 1_065;
     public static final int kForwardLimit = 20_000; // 13_800 14
     public static final int kReverseLimit = -20_000; // 13_800 14
     //    public static final double kMaxStringPotZero = 100; // 2020 Robot
@@ -292,8 +292,8 @@ public final class Constants {
     public static Rotation2d kGeyserBallTwoPosition = Rotation2d.fromDegrees(95);
 
     // Stryke Shot Constants
-    public static final double kOutsideStrykePos = 2250;
-    public static final double kInsideStrykePos = 1700;
+    public static final double kOutsideStrykePos = 2450; // 2250
+    public static final double kInsideStrykePos = 1600; // 1700
 
     // Talon Constants
     public static SupplyCurrentLimitConfiguration getSupplyCurrentLimitConfig() {
@@ -781,12 +781,12 @@ public final class Constants {
 
     // StrykeShot Constants
     public static final double kMiddleClimbY = 6.7;
-    public static final double kOutsideKickerTicksP100MS = 9_860; // FIXME
-    public static final double kOutsideShooterTicksP100MS = 10_400; // FIXME
-    public static final double kOutsideHoodTickPos = 5700; // FIXME
-    public static final double kInsideKickerTicksP100MS = 9_700; // FIXME
-    public static final double kInsideShooterTicksP100MS = 10_200; // FIXME
-    public static final double kInsideHoodTickPos = 5700; // FIXME
+    public static final double kOutsideKickerTicksP100MS = 9_580; // 9860
+    public static final double kOutsideShooterTicksP100MS = 10_100; // 10400
+    public static final double kOutsideHoodTickPos = 5700; // 5700
+    public static final double kInsideKickerTicksP100MS = 9_075; // 9_275
+    public static final double kInsideShooterTicksP100MS = 9_700; // 9_900
+    public static final double kInsideHoodTickPos = 5700; // 5700
 
     // Lookup Table Constants
     public static final double kLookupMinPixel = 127;

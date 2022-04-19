@@ -26,13 +26,14 @@ class HealthCheckCommand(val driveSubsystem : DriveSubsystem,
             shooterSubsystem,
             turretSubsystem
         )
-        magazineSubsystem.setManualState()
-        shooterSubsystem.setManualState()
     }
 
     private lateinit var healthCheck : HealthCheck
 
     override fun initialize() {
+        logger.info("HealthCheck Init")
+        magazineSubsystem.setManualState()
+        shooterSubsystem.setManualState()
         healthCheck = healthCheck {
             // azimuths
             talonCheck {
@@ -54,14 +55,14 @@ class HealthCheckCommand(val driveSubsystem : DriveSubsystem,
                     percentOutput = 0.25
                     supplyCurrentRange = volt3supplyCurrentRange
                     statorCurrentRange = volt3statorCurrentRange
-                    speedRange = 230..260
+                    speedRange = 225..260
                 }
 
                 timedTest {
                     percentOutput = -0.25
                     supplyCurrentRange = volt3supplyCurrentRange
                     statorCurrentRange = volt3statorCurrentRange
-                    speedRange = -260..-230
+                    speedRange = -260..-225
                 }
 
                 timedTest {
@@ -104,7 +105,7 @@ class HealthCheckCommand(val driveSubsystem : DriveSubsystem,
                 val volt6supplyCurrentRange = 0.5..1.1
                 val volt9supplyCurrentRange = 3.5..4.75
 
-                val volt3statorCurrentRange = 0.5..1.125
+                val volt3statorCurrentRange = 1.0..2.0
                 val volt6statorCurrentRange = 1.0..2.0
                 val volt9statorCurrentRange = 2.5..5.0
 
@@ -140,14 +141,14 @@ class HealthCheckCommand(val driveSubsystem : DriveSubsystem,
                     percentOutput = 1.0
                     supplyCurrentRange = volt9supplyCurrentRange
                     statorCurrentRange = volt9statorCurrentRange
-                    speedRange = 21350..21800
+                    speedRange = 21350..22300
                 }
 
                 timedTest {
                     percentOutput = -1.0
                     supplyCurrentRange = volt9supplyCurrentRange
                     statorCurrentRange = volt9statorCurrentRange
-                    speedRange = -21800..-21350
+                    speedRange = -22300..-21350
                 }
             }
             // intake
@@ -155,22 +156,22 @@ class HealthCheckCommand(val driveSubsystem : DriveSubsystem,
                 name = "Intake Tests"
                 talons = intakeSubsystem.talons
                 
-                val volt6supplyCurrentRange = 1.0..4.0
+                val volt6supplyCurrentRange = 2.0..3.0
 
-                val volt6statorCurrentRange = 1.0..4.0
+                val volt6statorCurrentRange = 4.0..5.0
 
                 timedTest {
                     percentOutput = 0.5
                     supplyCurrentRange = volt6supplyCurrentRange
                     statorCurrentRange = volt6statorCurrentRange
-                    speedRange = 10850..11000
+                    speedRange = 10700..11000
                 }
 
                 timedTest {
                     percentOutput = -0.5
                     supplyCurrentRange = volt6supplyCurrentRange
                     statorCurrentRange = volt6statorCurrentRange
-                    speedRange = -11000..-10850
+                    speedRange = -11000..-10700
                 }
             }
             // magazine
@@ -178,38 +179,38 @@ class HealthCheckCommand(val driveSubsystem : DriveSubsystem,
                 name = "Magazine Tests"
                 talons = magazineSubsystem.talons
 
-                val volt6supplyCurrentRange = 3.5..4.2
-                val volt12supplyCurrentRange = 6.5..7.0
+                val volt6supplyCurrentRange = 2.5..3.5
+                val volt12supplyCurrentRange = 5.0..6.0
 
-                val volt6statorCurrentRange = 1.0..4.0
-                val volt12statorCurrentRange = 13.0..17.0
+                val volt6statorCurrentRange = 5.5..6.5
+                val volt12statorCurrentRange = 6.0..7.25
 
                 timedTest {
                     percentOutput = 0.5
                     supplyCurrentRange = volt6supplyCurrentRange
                     statorCurrentRange = volt6statorCurrentRange
-                    speedRange = 6000..6050
+                    speedRange = 10200..10900
                 }
 
                 timedTest {
                     percentOutput = -0.5
                     supplyCurrentRange = volt6supplyCurrentRange
                     statorCurrentRange = volt6statorCurrentRange
-                    speedRange = -5400..-5100
+                    speedRange = -10900..-10200
                 }
 
                 timedTest {
                     percentOutput = 0.8
                     supplyCurrentRange = volt12supplyCurrentRange
                     statorCurrentRange = volt12statorCurrentRange
-                    speedRange = 10300..10700
+                    speedRange = 16700..17200
                 }
 
                 timedTest {
                     percentOutput = -0.8
                     supplyCurrentRange = volt12supplyCurrentRange
                     statorCurrentRange = volt12statorCurrentRange
-                    speedRange = -9400..-8500
+                    speedRange = -17200..-16700
                 }
             }
             // turret
@@ -217,8 +218,8 @@ class HealthCheckCommand(val driveSubsystem : DriveSubsystem,
                 name = "Turret Tests"
                 talons = turretSubsystem.talons
 
-                val supplyCurrentRange = 0.375..1.0
-                val statorCurrentRange = 0.375..1.0
+                val volt3_6SupplyCurrentRange = 0.0..0.5
+                val volt3_6StatorCurrentRange = -0.25..1.25
 
                 positionTalon {
                     encoderTarget = -10_000
@@ -231,9 +232,9 @@ class HealthCheckCommand(val driveSubsystem : DriveSubsystem,
                     encoderGoodEnough = 500
                     encoderTimeCount = 500
 
-                    supplyCurrentRange
-                    statorCurrentRange
-                    speedRange = 550..750
+                    supplyCurrentRange = volt3_6SupplyCurrentRange
+                    statorCurrentRange = volt3_6StatorCurrentRange
+                    speedRange = 2000..2500
                 }
 
                 positionTest {
@@ -242,9 +243,9 @@ class HealthCheckCommand(val driveSubsystem : DriveSubsystem,
                     encoderGoodEnough = 500
                     encoderTimeCount = 500
 
-                    supplyCurrentRange
-                    statorCurrentRange
-                    speedRange = -750..-550
+                    supplyCurrentRange = volt3_6SupplyCurrentRange
+                    statorCurrentRange = volt3_6StatorCurrentRange
+                    speedRange = -2500..-2000
                 }
                 positionTalon {
                     encoderTarget = 0
@@ -256,24 +257,24 @@ class HealthCheckCommand(val driveSubsystem : DriveSubsystem,
                 name = "Shooter Tests"
                 talons = shooterSubsystem.shooterTalons
 
-                val volt10_000supplyCurrentRange = 1.0..4.0
-                val volt16_000supplyCurrentRange = 13.0..17.0
+                val volt10_000supplyCurrentRange = 2.0..3.0
+                val volt16_000supplyCurrentRange = 6.0..10.0
 
-                val volt10_000statorCurrentRange = 1.0..4.0
-                val volt16_000statorCurrentRange = 13.0..17.0
+                val volt10_000statorCurrentRange = 4.0..5.0
+                val volt16_000statorCurrentRange = 7.0..9.0
 
                 timedTest {
                     percentOutput = 0.53
                     supplyCurrentRange = volt10_000supplyCurrentRange
                     statorCurrentRange = volt10_000statorCurrentRange
-                    speedRange = 8_000..12_000
+                    speedRange = 11_100..11_700
                 }
 
                 timedTest {
                     percentOutput = 0.84
                     supplyCurrentRange = volt16_000supplyCurrentRange
                     statorCurrentRange = volt16_000statorCurrentRange
-                    speedRange = 14_000..19_000
+                    speedRange = 17_500..18_200
                 }
             }
             // hood
@@ -281,8 +282,8 @@ class HealthCheckCommand(val driveSubsystem : DriveSubsystem,
                 name = "Hood Tests"
                 talons = shooterSubsystem.hoodTalons
 
-                val supplyCurrent = 0.375..1.0
-                val statorCurrent = 0.375..1.0
+                val supplyCurrent = 0.0..0.5
+                val statorCurrent = 0.0..2.0
 
                 positionTalon {
                     encoderTarget = 0
@@ -297,6 +298,7 @@ class HealthCheckCommand(val driveSubsystem : DriveSubsystem,
 
                     supplyCurrentRange = supplyCurrent
                     statorCurrentRange = statorCurrent
+                    speedRange = 185..350
                 }
 
                 positionTest {
@@ -307,6 +309,7 @@ class HealthCheckCommand(val driveSubsystem : DriveSubsystem,
 
                     supplyCurrentRange = supplyCurrent
                     statorCurrentRange = statorCurrent
+                    speedRange = -350..-185
                 }
             }
         }
