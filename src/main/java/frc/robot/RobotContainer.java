@@ -583,6 +583,7 @@ public class RobotContainer {
     turretCommands
         .add("LockNeg90", new RotateToCommand(turretSubsystem, Rotation2d.fromDegrees(-90.0)))
         .withPosition(0, 2);
+    SmartDashboard.putNumber(DashboardConstants.kTurretSetpointRadians, 0.0);
 
     // SmartDashboard.putNumber(
     //     DashboardConstants.kTurretSetpointRadians, turretSubsystem.getRotation2d().getRadians());
