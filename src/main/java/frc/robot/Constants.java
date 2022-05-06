@@ -249,7 +249,7 @@ public final class Constants {
     public static final double kSlowCruiseVelocity = 2_000; // 4000
     public static final double kFastAccel = 15_000; // 20_000
     public static final double kSlowAccel = 15_000; // 20_000
-    public static final int kTurretZeroTicks = 1_000; // 1065
+    public static final int kTurretZeroTicks = 946; // 1000
     public static final int kForwardLimit = 20_000; // 13_800 14
     public static final int kReverseLimit = -20_000; // 13_800 14
     //    public static final double kMaxStringPotZero = 100; // 2020 Robot
@@ -458,6 +458,15 @@ public final class Constants {
     public static final int kShoulderZeroTicks = 2675;
     public static final double kShoulderPostZeroTicks = 0;
     public static final double kPostZeroTickArmRatchetOn = -100;
+
+    // Defense Sail Constants
+    public static final double kPivotExtendSailPos = -136_600;
+    public static final double kShoulderExtendSailPos = -3_870;
+    public static final double kPivotRetractSailPos = -600;
+    public static final double kShoulderRetractSailPos = -1_120;
+    public static final double kRetractSailSpeed = 0.8;
+    public static final double kExtendSailSpeed = -0.8;
+    public static final double kSailShoulderSpeed = 1000;
 
     public static SupplyCurrentLimitConfiguration getZeroSupplyCurrentLimit() {
       return new SupplyCurrentLimitConfiguration(true, 5, 5, 0.1);
