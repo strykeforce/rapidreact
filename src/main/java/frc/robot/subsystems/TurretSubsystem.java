@@ -228,22 +228,26 @@ public class TurretSubsystem extends MeasurableSubsystem {
   }
   // change back to private
   public void setSeekAngleLeft(boolean seekLeft) {
-    Pose2d pose = driveSubsystem.getPoseMeters();
-    Translation2d deltaPosition = TurretConstants.kHubPositionMeters.minus(pose.getTranslation());
-    Rotation2d seekingAngle = new Rotation2d(deltaPosition.getX(), deltaPosition.getY());
-    logger.info("Pose: {}, Delta pose: {}, seek angle: {}", pose, deltaPosition, seekingAngle);
-    seekingAngle = seekingAngle.minus(pose.getRotation());
-    seekingAngle = seekingAngle.plus(TurretConstants.kTurretRobotOffset); // plus
+    double seekTicks = 0.0;
+    // Pose2d pose = driveSubsystem.getPoseMeters();
+    // Translation2d deltaPosition =
+    // TurretConstants.kHubPositionMeters.minus(pose.getTranslation());
+    // Rotation2d seekingAngle = new Rotation2d(deltaPosition.getX(), deltaPosition.getY());
+    // logger.info("Pose: {}, Delta pose: {}, seek angle: {}", pose, deltaPosition, seekingAngle);
+    // seekingAngle = seekingAngle.minus(pose.getRotation());
+    // seekingAngle = seekingAngle.plus(TurretConstants.kTurretRobotOffset); // plus
 
     if (seekLeft) {
-      seekingAngle = seekingAngle.minus(TurretConstants.kSeekAngleError); // plus
+      seekTicks = TurretConstants.kForwardLimit;
+      // seekingAngle = seekingAngle.minus(TurretConstants.kSeekAngleError); // plus
     } else {
-      seekingAngle = seekingAngle.plus(TurretConstants.kSeekAngleError);
+      seekTicks = TurretConstants.kReverseLimit;
+      // seekingAngle = seekingAngle.plus(TurretConstants.kSeekAngleError);
     }
 
-    rotateTo(seekingAngle); // getNonWrappedSetpoint
+    rotateTo(seekTicks); // getNonWrappedSetpoint
 
-    logger.info("Seeking angle is at: {}", seekingAngle);
+    logger.info("Seeking angle is at: {}", seekTicks);
   }
 
   public void seekCenter() {
@@ -360,7 +364,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
         if (isTurretAtTarget()) {
           targetData = visionSubsystem.getTargetData();
           if (targetData.isValid()) {
-            setCruiseVelocityFast(false);
+            setCruiseVelocityFast(true);
             logger.info("SEEK_CENTER -> AIMING");
             logger.info("target data: {}", targetData);
             currentState = TurretState.AIMING;
@@ -382,7 +386,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
         if (targetData.isValid()) {
           logger.info("{} -> AIMING", currentState);
           logger.info("targetData: {}", targetData);
-          setCruiseVelocityFast(false);
+          setCruiseVelocityFast(true);
           currentState = TurretState.AIMING;
           rotateTo(turret.getSelectedSensorPosition());
           // currentState = TurretState.IDLE;

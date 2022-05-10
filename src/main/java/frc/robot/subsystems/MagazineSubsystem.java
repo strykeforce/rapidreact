@@ -53,6 +53,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   private boolean isBeamBreakEnabled = false;
   private int shootUpperBeamStableCounts = 0;
   private boolean doTimedShoot = false;
+  private boolean doOdomVisionReset = false;
 
   public MagazineSubsystem(
       TurretSubsystem turretSubsystem,
@@ -91,6 +92,11 @@ public class MagazineSubsystem extends MeasurableSubsystem {
 
   public void setShooterSubsystem(ShooterSubsystem shooterSubsystem) {
     this.shooterSubsystem = shooterSubsystem;
+  }
+
+  public void setDoVisionOdometryReset(boolean doReset) {
+    doOdomVisionReset = doReset;
+    logger.info("DoVisionOdometryReset: {}", doReset);
   }
 
   public void enableUpperBeamBreak(boolean enableUpper) {
@@ -567,7 +573,11 @@ public class MagazineSubsystem extends MeasurableSubsystem {
                     turretSubsystem.getTurretRotation2d(),
                     driveSubsystem.getGyroRotation2d(),
                     shooterSubsystem.getLastLookupDistance());
-            driveSubsystem.updateOdometryWithVision(calcPose);
+            if (doOdomVisionReset) {
+              driveSubsystem.resetOdometry(calcPose);
+            } else {
+              driveSubsystem.updateOdometryWithVision(calcPose);
+            }
           }
           if (doTimedShoot) {
             logger.info("PAUSE -> TIMED_FEED");

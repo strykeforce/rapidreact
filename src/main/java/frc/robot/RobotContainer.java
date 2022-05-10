@@ -167,6 +167,10 @@ public class RobotContainer {
     return visionSubsystem;
   }
 
+  public void setDoVisionOdomReset(boolean doReset) {
+    magazineSubsystem.setDoVisionOdometryReset(doReset);
+  }
+
   public void startAutoIntake() {
     new AutoIntakeNoExtendCommandGroup(magazineSubsystem, intakeSubsystem, xboxController)
         .schedule();
@@ -301,6 +305,10 @@ public class RobotContainer {
     // Zero Climb
     new JoystickButton(xboxController, XboxController.Button.kStart.value)
         .whenReleased(new ZeroClimbCommand(climbSubsystem));
+    // new JoystickButton(xboxController, XboxController.Button.kLeftStick.value)
+    //     .whenPressed(new ExtendSailCommand(climbSubsystem));
+    // new JoystickButton(xboxController, XboxController.Button.kRightStick.value)
+    //     .whenPressed(new RetractSailCommand(climbSubsystem));
 
     // Auto Intake
     // new JoystickButton(xboxController, XboxController.Button.kA.value)
@@ -583,6 +591,7 @@ public class RobotContainer {
     turretCommands
         .add("LockNeg90", new RotateToCommand(turretSubsystem, Rotation2d.fromDegrees(-90.0)))
         .withPosition(0, 2);
+    SmartDashboard.putNumber(DashboardConstants.kTurretSetpointRadians, 0.0);
 
     // SmartDashboard.putNumber(
     //     DashboardConstants.kTurretSetpointRadians, turretSubsystem.getRotation2d().getRadians());
