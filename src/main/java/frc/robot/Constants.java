@@ -245,28 +245,28 @@ public final class Constants {
   public static final class TurretConstants {
     // Talon Constants
     public static final int kTurretId = 50;
-    public static final double kFastCruiseVelocity = 4_000;
-    public static final double kSlowCruiseVelocity = 2_000; // 4000
-    public static final double kFastAccel = 15_000; // 20_000
-    public static final double kSlowAccel = 15_000; // 20_000
-    public static final int kTurretZeroTicks = 946; // 1000
-    public static final int kForwardLimit = 20_000; // 13_800 14
-    public static final int kReverseLimit = -20_000; // 13_800 14
+    public static final double kFastCruiseVelocity = 14_000; // 4000
+    public static final double kSlowCruiseVelocity = 7_000; // 2000
+    public static final double kFastAccel = 52_500; // 15_000
+    public static final double kSlowAccel = 52_500; // 15_000
+    public static final int kTurretZeroTicks = 1350; // 946 
+    public static final int kForwardLimit = 70_000; // 13_800 14
+    public static final int kReverseLimit = -70_000; // 13_800 14
     //    public static final double kMaxStringPotZero = 100; // 2020 Robot
     //    public static final double kMinStringPotZero = 0; // 2020 Robot
 
     // Ticks -> Degrees/Radians
     //    public static final double kTurretTicksPerDegree =
     //        107.27; // 114.653     0.01745329 57.2957877856 72.404 120.522
-    public static final double kTurretTicksPerRadian = 6146.47; // 6569.133 6905.414
+    public static final double kTurretTicksPerRadian = 21512.66; // 6146.47 6569.133 6905.414
     // public static final double kTurretMidpoint = 13_000;
     //    public static final double kWrapRange = 1;
     public static final Rotation2d kOverlapAngle = Rotation2d.fromDegrees(6);
-    public static final double kWrapTicks = 20_000;
+    public static final double kWrapTicks = 70_000;
 
     // Rotate Under Vision Constants
     public static final double kRotateByInitialKp = -0.4; // -0.4 old: 0.4
-    public static final double kRotateByFinalKp = -0.4; // 0.95
+    public static final double kRotateByFinalKp = -0.4; // -0.4
     public static final int kNotValidTargetCounts = 5; // how many frames to wait before seeking
     public static final double kFYawSlow = -0.05;
     public static final double kFYawMedium = -0.08;
@@ -279,7 +279,7 @@ public final class Constants {
     public static final Rotation2d kTurretRobotOffset = Rotation2d.fromDegrees(180);
 
     // Close Enough & Stable Counts
-    public static final int kCloseEnoughTicks = 40;
+    public static final int kCloseEnoughTicks = 140; // 40
     public static final Rotation2d kCloseEnoughTarget = Rotation2d.fromDegrees(5); // 1
     public static final int kRotateByStableCounts = 3; // 3
 
@@ -292,27 +292,27 @@ public final class Constants {
     public static Rotation2d kGeyserBallTwoPosition = Rotation2d.fromDegrees(95);
 
     // Stryke Shot Constants
-    public static final double kOutsideStrykePos = 2450; // 2250
-    public static final double kInsideStrykePos = 1600; // 1700
+    public static final double kOutsideStrykePos = 8575; // 2450
+    public static final double kInsideStrykePos = 5600; // 1600
 
     // Talon Constants
     public static SupplyCurrentLimitConfiguration getSupplyCurrentLimitConfig() {
-      return new SupplyCurrentLimitConfiguration(true, 10, 30, 0.5);
+      return new SupplyCurrentLimitConfiguration(true, 40, 40, 0.5);
     }
 
-    public static TalonSRXConfiguration getTurretTalonConfig() {
-      TalonSRXConfiguration turretConfig = new TalonSRXConfiguration();
+    public static TalonFXConfiguration getTurretTalonConfig() {
+      TalonFXConfiguration turretConfig = new TalonFXConfiguration();
 
       turretConfig.forwardSoftLimitThreshold = Constants.TurretConstants.kForwardLimit;
       turretConfig.reverseSoftLimitThreshold = Constants.TurretConstants.kReverseLimit;
       turretConfig.forwardSoftLimitEnable = true;
       turretConfig.reverseSoftLimitEnable = true;
-      turretConfig.slot0.kP = 2.5;
-      turretConfig.slot0.kI = 0.04;
-      turretConfig.slot0.kD = 100;
-      turretConfig.slot0.kF = 0.13;
-      turretConfig.slot0.integralZone = 150; // 100
-      turretConfig.slot0.maxIntegralAccumulator = 0;
+      turretConfig.slot0.kP = 0.5;
+      turretConfig.slot0.kI = 0.0;
+      turretConfig.slot0.kD = 10;
+      turretConfig.slot0.kF = 0.047;
+      turretConfig.slot0.integralZone = 200; // 100
+      turretConfig.slot0.maxIntegralAccumulator = 25000;
       turretConfig.slot0.allowableClosedloopError = 15;
       turretConfig.voltageMeasurementFilter = 32;
       turretConfig.voltageCompSaturation = 12;
@@ -322,6 +322,7 @@ public final class Constants {
       turretConfig.reverseLimitSwitchNormal = LimitSwitchNormal.Disabled;
       turretConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
       turretConfig.velocityMeasurementWindow = 64;
+      turretConfig.neutralDeadband = 0.01;
 
       return turretConfig;
     }

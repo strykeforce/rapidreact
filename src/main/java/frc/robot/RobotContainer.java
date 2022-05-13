@@ -238,7 +238,7 @@ public class RobotContainer {
         .whenReleased(new OpenLoopTurretCommand(turretSubsystem, 0.0));
 
     new JoystickButton(driveJoystick, Button.HAMBURGER.id)
-        .whenPressed(new StrykeShotCommand(turretSubsystem, shooterSubsystem, magazineSubsystem));
+        .whenPressed(new DriveAutonCommand(driveSubsystem, "straightPath", true, true));
 
     new JoystickButton(driveJoystick, Trim.LEFT_Y_POS.id)
         .whenPressed(new EnableVisionCommand(visionSubsystem));
