@@ -194,7 +194,7 @@ public final class Constants {
     // Increase these numbers to trust global measurements from vision less. This matrix is in the
     // form [x, y, theta]ᵀ, with units in meters and radians.
     public static Matrix<N3, N1> kVisionMeasurementStdDevs =
-        VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(5));
+        VecBuilder.fill(0.25, 0.25, Units.degreesToRadians(5));
   }
 
   public static final class VisionConstants {
@@ -245,27 +245,27 @@ public final class Constants {
   public static final class TurretConstants {
     // Talon Constants
     public static final int kTurretId = 50;
-    public static final double kFastCruiseVelocity = 4_000;
-    public static final double kSlowCruiseVelocity = 4_000; // 2000
-    public static final double kFastAccel = 15_000; // 20_000
-    public static final double kSlowAccel = 15_000; // 20_000
-    public static final int kTurretZeroTicks = 1_161; // 1250, 1194
-    public static final int kForwardLimit = 20_000; // 13_800 14
-    public static final int kReverseLimit = -20_000; // 13_800 14
+    public static final double kFastCruiseVelocity = 14_000; // 4000
+    public static final double kSlowCruiseVelocity = 7_000; // 2000
+    public static final double kFastAccel = 52_500; // 15_000
+    public static final double kSlowAccel = 52_500; // 15_000
+    public static final int kTurretZeroTicks = 1350; // 946
+    public static final int kForwardLimit = 70_000; // 13_800 14
+    public static final int kReverseLimit = -70_000; // 13_800 14
     //    public static final double kMaxStringPotZero = 100; // 2020 Robot
     //    public static final double kMinStringPotZero = 0; // 2020 Robot
 
     // Ticks -> Degrees/Radians
     //    public static final double kTurretTicksPerDegree =
     //        107.27; // 114.653     0.01745329 57.2957877856 72.404 120.522
-    public static final double kTurretTicksPerRadian = 6146.47; // 6569.133 6905.414
+    public static final double kTurretTicksPerRadian = 21512.66; // 6146.47 6569.133 6905.414
     // public static final double kTurretMidpoint = 13_000;
     //    public static final double kWrapRange = 1;
     public static final Rotation2d kOverlapAngle = Rotation2d.fromDegrees(6);
-    public static final double kWrapTicks = 20_000;
+    public static final double kWrapTicks = 70_000;
 
     // Rotate Under Vision Constants
-    public static final double kRotateByInitialKp = -0.4; // -0.4
+    public static final double kRotateByInitialKp = -0.4; // -0.4 old: 0.4
     public static final double kRotateByFinalKp = -0.4; // -0.4
     public static final int kNotValidTargetCounts = 5; // how many frames to wait before seeking
     public static final double kFYaw = 1.0;
@@ -273,12 +273,12 @@ public final class Constants {
 
     // Seek Constants
     public static final Translation2d kHubPositionMeters = new Translation2d(8.23, 4.11); // meters
-    public static final Rotation2d kSeekAngleError = Rotation2d.fromDegrees(30); // 30 degrees
+    public static final Rotation2d kSeekAngleError = Rotation2d.fromDegrees(90); // 30 degrees
     public static final int kMaxSeekCount = 3; // 6
     public static final Rotation2d kTurretRobotOffset = Rotation2d.fromDegrees(180);
 
     // Close Enough & Stable Counts
-    public static final int kCloseEnoughTicks = 40;
+    public static final int kCloseEnoughTicks = 140; // 40
     public static final Rotation2d kCloseEnoughTarget = Rotation2d.fromDegrees(5); // 1
     public static final int kRotateByStableCounts = 3; // 3
 
@@ -291,27 +291,27 @@ public final class Constants {
     public static Rotation2d kGeyserBallTwoPosition = Rotation2d.fromDegrees(95);
 
     // Stryke Shot Constants
-    public static final double kOutsideStrykePos = 2250;
-    public static final double kInsideStrykePos = 1700;
+    public static final double kOutsideStrykePos = -8575; // 2450
+    public static final double kInsideStrykePos = -5600; // 1600
 
     // Talon Constants
     public static SupplyCurrentLimitConfiguration getSupplyCurrentLimitConfig() {
-      return new SupplyCurrentLimitConfiguration(true, 10, 30, 0.5);
+      return new SupplyCurrentLimitConfiguration(true, 40, 40, 0.5);
     }
 
-    public static TalonSRXConfiguration getTurretTalonConfig() {
-      TalonSRXConfiguration turretConfig = new TalonSRXConfiguration();
+    public static TalonFXConfiguration getTurretTalonConfig() {
+      TalonFXConfiguration turretConfig = new TalonFXConfiguration();
 
       turretConfig.forwardSoftLimitThreshold = Constants.TurretConstants.kForwardLimit;
       turretConfig.reverseSoftLimitThreshold = Constants.TurretConstants.kReverseLimit;
       turretConfig.forwardSoftLimitEnable = true;
       turretConfig.reverseSoftLimitEnable = true;
-      turretConfig.slot0.kP = 2.5;
-      turretConfig.slot0.kI = 0.04;
-      turretConfig.slot0.kD = 100;
-      turretConfig.slot0.kF = 0.13;
-      turretConfig.slot0.integralZone = 150; // 100
-      turretConfig.slot0.maxIntegralAccumulator = 0;
+      turretConfig.slot0.kP = 0.5;
+      turretConfig.slot0.kI = 0.0;
+      turretConfig.slot0.kD = 10;
+      turretConfig.slot0.kF = 0.047;
+      turretConfig.slot0.integralZone = 200; // 100
+      turretConfig.slot0.maxIntegralAccumulator = 25000;
       turretConfig.slot0.allowableClosedloopError = 15;
       turretConfig.voltageMeasurementFilter = 32;
       turretConfig.voltageCompSaturation = 12;
@@ -321,6 +321,7 @@ public final class Constants {
       turretConfig.reverseLimitSwitchNormal = LimitSwitchNormal.Disabled;
       turretConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
       turretConfig.velocityMeasurementWindow = 64;
+      turretConfig.neutralDeadband = 0.01;
 
       return turretConfig;
     }
@@ -458,6 +459,15 @@ public final class Constants {
     public static final double kShoulderPostZeroTicks = 0;
     public static final double kPostZeroTickArmRatchetOn = -100;
 
+    // Defense Sail Constants
+    public static final double kPivotExtendSailPos = -136_600;
+    public static final double kShoulderExtendSailPos = -3_870;
+    public static final double kPivotRetractSailPos = -600;
+    public static final double kShoulderRetractSailPos = -1_120;
+    public static final double kRetractSailSpeed = 0.8;
+    public static final double kExtendSailSpeed = -0.8;
+    public static final double kSailShoulderSpeed = 1000;
+
     public static SupplyCurrentLimitConfiguration getZeroSupplyCurrentLimit() {
       return new SupplyCurrentLimitConfiguration(true, 5, 5, 0.1);
     }
@@ -474,7 +484,7 @@ public final class Constants {
     public static final double kDisengageRatchetSpeed = 0.25;
     public static final double kDisengageRatchetTicks = 100;
     public static final double kDisengageRatchetServoTimer = 0.2;
-    public static final double kDisengageRatchetMotorTimer = 0.01;
+    public static final double kDisengageRatchetMotorTimer = 0.02;
 
     // Closed Loop Movement Constants
     public static final double kFixedArmCloseEnough = 1_000.0;
@@ -492,7 +502,7 @@ public final class Constants {
     //    public static final double kPivotArmRetractSpeed = 0.25;
 
     // Climb States -> Desired Endpoint in Ticks
-    public static final double kFMidExtTicks = -215_000;
+    public static final double kFMidExtTicks = -195_000;
     public static final double kPMidExtTicks = -198_000;
     public static final double kMidPvtBkTicks = 3_000;
     public static final double kPMidRetST1Ticks = -145_000;
@@ -500,6 +510,7 @@ public final class Constants {
     public static final double kPMidRetST3Ticks = -76_000;
     public static final double kPMidRetST4Ticks = -66_000;
     public static final double kHighPvtFwdTicks = -6_850;
+    public static final double kFHighExtTicks = -215_000;
     public static final double kPHighRetST1Ticks = -13_500;
     public static final double kPHighRetST2Ticks = -4_000;
     public static final double kHighPvtBk1Ticks = -5_000;
@@ -535,6 +546,7 @@ public final class Constants {
     public static final double kPMidRetST3Speed = 0.8;
     public static final double kPMidRetST4Speed = 0.3;
     public static final double kHighPvtFwdSpeed = 1_000;
+    public static final double kFHighExtSpeed = -0.8;
     public static final double kPHighRetST1Speed = 0.6;
     public static final double kPHighRetST2Speed = 0.3;
     public static final double kHighPvtBk1Speed = 1_000;
@@ -778,12 +790,12 @@ public final class Constants {
 
     // StrykeShot Constants
     public static final double kMiddleClimbY = 6.7;
-    public static final double kOutsideKickerTicksP100MS = 9_860; // FIXME
-    public static final double kOutsideShooterTicksP100MS = 10_400; // FIXME
-    public static final double kOutsideHoodTickPos = 5700; // FIXME
-    public static final double kInsideKickerTicksP100MS = 9_700; // FIXME
-    public static final double kInsideShooterTicksP100MS = 10_200; // FIXME
-    public static final double kInsideHoodTickPos = 5700; // FIXME
+    public static final double kOutsideKickerTicksP100MS = 9_580; // 9860
+    public static final double kOutsideShooterTicksP100MS = 10_100; // 10400
+    public static final double kOutsideHoodTickPos = 5700; // 5700
+    public static final double kInsideKickerTicksP100MS = 9_000; // 9_075
+    public static final double kInsideShooterTicksP100MS = 9_750; // 9_700
+    public static final double kInsideHoodTickPos = 5700; // 5700
 
     // Lookup Table Constants
     public static final double kLookupMinPixel = 127;
@@ -792,7 +804,7 @@ public final class Constants {
     public static final double kLookupRes = 1.0;
 
     // Hood Encoder Constants
-    public static final int kHoodZeroTicks = 1800;
+    public static final int kHoodZeroTicks = 935; // 1800
     public static final int kForwardSoftLimts = 5800;
     public static final int kReverseSoftLimits = -50;
     public static final int kZeroCheckTicks = 2_600; // 500
@@ -892,9 +904,9 @@ public final class Constants {
     public static SupplyCurrentLimitConfiguration getHoodCurrentLimit() {
       SupplyCurrentLimitConfiguration hoodCurrentLimit = new SupplyCurrentLimitConfiguration();
 
-      hoodCurrentLimit.currentLimit = 10.0;
-      hoodCurrentLimit.triggerThresholdCurrent = 15.0;
-      hoodCurrentLimit.triggerThresholdTime = 0.04;
+      hoodCurrentLimit.currentLimit = 5.0; // 10
+      hoodCurrentLimit.triggerThresholdCurrent = 5.0; // 15
+      hoodCurrentLimit.triggerThresholdTime = 0.2; // .04
       hoodCurrentLimit.enable = true;
 
       return hoodCurrentLimit;

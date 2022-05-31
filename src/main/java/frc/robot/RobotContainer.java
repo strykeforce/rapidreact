@@ -71,7 +71,6 @@ import frc.robot.commands.shooter.HoodClosedLoopCommand;
 import frc.robot.commands.shooter.HoodOpenLoopCommand;
 import frc.robot.commands.shooter.ShooterOpenLoopCommand;
 import frc.robot.commands.shooter.StopShooterCommand;
-import frc.robot.commands.shooter.StrykeShotCommand;
 import frc.robot.commands.shooter.SwitchClimbPos;
 import frc.robot.commands.turret.OpenLoopTurretCommand;
 import frc.robot.commands.turret.RotateToCommand;
@@ -167,6 +166,10 @@ public class RobotContainer {
     return visionSubsystem;
   }
 
+  public void setDoVisionOdomReset(boolean doReset) {
+    magazineSubsystem.setDoVisionOdometryReset(doReset);
+  }
+
   public void startAutoIntake() {
     new AutoIntakeNoExtendCommandGroup(magazineSubsystem, intakeSubsystem, xboxController)
         .schedule();
@@ -234,7 +237,7 @@ public class RobotContainer {
         .whenReleased(new OpenLoopTurretCommand(turretSubsystem, 0.0));
 
     new JoystickButton(driveJoystick, Button.HAMBURGER.id)
-        .whenPressed(new StrykeShotCommand(turretSubsystem, shooterSubsystem, magazineSubsystem));
+        .whenPressed(new DriveAutonCommand(driveSubsystem, "straightPath", true, true));
 
     new JoystickButton(driveJoystick, Trim.LEFT_Y_POS.id)
         .whenPressed(new EnableVisionCommand(visionSubsystem));
@@ -301,6 +304,10 @@ public class RobotContainer {
     // Zero Climb
     new JoystickButton(xboxController, XboxController.Button.kStart.value)
         .whenReleased(new ZeroClimbCommand(climbSubsystem));
+    // new JoystickButton(xboxController, XboxController.Button.kLeftStick.value)
+    //     .whenPressed(new ExtendSailCommand(climbSubsystem));
+    // new JoystickButton(xboxController, XboxController.Button.kRightStick.value)
+    //     .whenPressed(new RetractSailCommand(climbSubsystem));
 
     // Auto Intake
     // new JoystickButton(xboxController, XboxController.Button.kA.value)
@@ -583,6 +590,7 @@ public class RobotContainer {
     turretCommands
         .add("LockNeg90", new RotateToCommand(turretSubsystem, Rotation2d.fromDegrees(-90.0)))
         .withPosition(0, 2);
+    SmartDashboard.putNumber(DashboardConstants.kTurretSetpointRadians, 0.0);
 
     // SmartDashboard.putNumber(
     //     DashboardConstants.kTurretSetpointRadians, turretSubsystem.getRotation2d().getRadians());

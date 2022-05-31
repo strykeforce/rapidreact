@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.OffsetGyroCommand;
+import frc.robot.commands.magazine.IgnoreColorSensorCommand;
 import frc.robot.commands.magazine.PreloadCargoCommand;
 import frc.robot.commands.sequences.intaking.AutoIntakeCommand;
 import frc.robot.commands.sequences.shooting.ArmShooterCommandGroup;
@@ -43,7 +44,8 @@ public class FiveCargoAuto extends SequentialCommandGroup {
         new ParallelCommandGroup(
             new PreloadCargoCommand(magazineSubsystem),
             new OffsetGyroCommand(driveSubsystem, gyroOffset)),
-        new WaitCommand(delay),
+        new ParallelCommandGroup(
+            new WaitCommand(delay), new IgnoreColorSensorCommand(magazineSubsystem, true)),
         new ParallelDeadlineGroup(
             new DriveAutonCommand(driveSubsystem, path1Name, true, false), // deadline
             new ArmShooterCommandGroup(visionSubsystem, turretSubsystem, shooterSubsystem),

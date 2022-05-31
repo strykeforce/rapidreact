@@ -85,6 +85,7 @@ public class VisionShootNoIsFinishedCommand extends CommandBase {
     }
     shooterSubsystem.stop();
     magazineSubsystem.stopMagazine();
+    magazineSubsystem.ignoreColorSensor(false);
     intakeSubsystem.openLoopRotate(0.0);
   }
 }

@@ -1,7 +1,7 @@
 {
   "camera": "A0",
   "server": "10.27.67.10",
-  "date": "2022-03-31T11:02:17.914890",
+  "date": "2022-04-12T19:07:02.823558",
   "capture": {
     "config": {
       "flipMethod": 3,
@@ -38,7 +38,7 @@
       90
     ],
     "log": {
-      "fps": 1,
+      "fps": 0,
       "mount": true,
       "path": "/var/opt/deadeye",
       "type": "four_up"
@@ -47,7 +47,7 @@
       200,
       255
     ],
-    "sn": 319,
+    "sn": 342,
     "val": [
       151,
       255

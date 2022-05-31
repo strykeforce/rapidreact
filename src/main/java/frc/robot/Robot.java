@@ -105,6 +105,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     logger.info("Auto Init");
+    m_robotContainer.setDoVisionOdomReset(false);
     Command autoCommand = m_robotContainer.getAutoSwitch().getAutoCommand();
     if (autoCommand != null) {
       autoCommand.schedule();
@@ -121,6 +122,7 @@ public class Robot extends TimedRobot {
     logger.info("TeleopInit");
     m_robotContainer.zeroClimb();
     m_robotContainer.startAutoIntake();
+    m_robotContainer.setDoVisionOdomReset(true);
   }
 
   /** This function is called periodically during operator control. */

@@ -42,6 +42,7 @@ public class ClimbSubsystem extends MeasurableSubsystem {
   private boolean continueToTraverse = false;
   private boolean isClimbDone = false;
   private boolean isClimbInitiated = false;
+  private boolean isSailExtended = false;
   private Timer disengageFixedArmRatchetTimer = new Timer();
   private Timer disengagePivotArmRatchetTimer = new Timer();
   private int leftHomeStableCounts = 0;
@@ -369,6 +370,31 @@ public class ClimbSubsystem extends MeasurableSubsystem {
     shoulderState = ShoulderState.IDLE;
   }
 
+  public void extendSail() {
+    logger.info("Extending Sail.");
+    isSailExtended = false;
+    currPivotArmState = PivotArmState.DISENGAGE_RATCHET;
+    desiredPivotArmState = PivotArmState.SAIL_EXT;
+    disengagePivotRatchet();
+    shoulderState = ShoulderState.SAIL_EXT;
+    setShoulderCruise(shoulderState.cruiseVel);
+    rotateShoulder(shoulderState.setpoint);
+  }
+
+  public void retractSail() {
+    logger.info("Retracting Sail.");
+    isSailExtended = true;
+    currPivotArmState = PivotArmState.SAIL_RET;
+    openLoopPivotArm(currPivotArmState.speed);
+    shoulderState = ShoulderState.SAIL_RET;
+    setShoulderCruise(shoulderState.cruiseVel);
+    rotateShoulder(shoulderState.setpoint);
+  }
+
+  public boolean getIsSailExtended() {
+    return isSailExtended;
+  }
+
   @Override
   public void periodic() {
     switch (currFixedArmState) {
@@ -430,6 +456,12 @@ public class ClimbSubsystem extends MeasurableSubsystem {
           isClimbInitiated = true;
           openLoopFixedArm(0.0);
           currFixedArmState = FixedArmState.IDLE;
+        }
+        break;
+      case HIGH_EXT:
+        if (isFixedArmOpenLoopExtendFinished(currFixedArmState.setpoint)) {
+          currFixedArmState = FixedArmState.IDLE;
+          openLoopFixedArm(0.0);
         }
         break;
       case HIGH_RET_ST1:
@@ -765,6 +797,24 @@ public class ClimbSubsystem extends MeasurableSubsystem {
           isClimbDone = true;
         }
         break;
+      case SAIL_EXT:
+        if (isPivotArmOpenLoopExtendFinished(currPivotArmState.setpoint)) {
+          logger.info("Pivot: {} -> IDLE", shoulderState);
+          currPivotArmState = PivotArmState.IDLE;
+          openLoopPivotArm(0.0);
+          enablePivotRatchet(true);
+          isSailExtended = true;
+        }
+        break;
+      case SAIL_RET:
+        if (isPivotArmOpenLoopRetractFinished(currPivotArmState.setpoint)) {
+          logger.info("Pivot: {} -> IDLE", shoulderState);
+          currPivotArmState = PivotArmState.IDLE;
+          openLoopPivotArm(0.0);
+          enablePivotRatchet(true);
+          isSailExtended = false;
+        }
+        break;
     }
     switch (shoulderState) {
       case IDLE:
@@ -776,7 +826,7 @@ public class ClimbSubsystem extends MeasurableSubsystem {
         shoulderTalon.setSelectedSensorPosition(offset);
         logger.info("Shoulder: {} -> ZEROED, absPos: {}, offset: {}", absPos, offset);
         shoulderState = ShoulderState.ZEROED;
-        rotateShoulder(ClimbConstants.kShoulderPostZeroTicks);
+        rotateShoulder(ClimbConstants.kShoulderPostZeroTicks); // fixme
         break;
       case ZEROED:
         break;
@@ -787,10 +837,15 @@ public class ClimbSubsystem extends MeasurableSubsystem {
         break;
       case HIGH_PVT_FWD:
         if (isShoulderFinished()) {
-          logger.info("Pivot: {} -> HIGH_RET_ST1", currPivotArmState);
+          logger.info(
+              "Pivot: {} -> HIGH_RET_ST1, Fixed: {} -> HIGH_EXT",
+              currPivotArmState,
+              currFixedArmState);
           currPivotArmState = PivotArmState.HIGH_RET_ST1;
+          currFixedArmState = FixedArmState.HIGH_EXT;
           climbStateCounter++;
           openLoopPivotArm(currPivotArmState.speed);
+          openLoopFixedArm(currFixedArmState.speed);
           shoulderState = ShoulderState.IDLE;
         }
         break;
@@ -857,6 +912,18 @@ public class ClimbSubsystem extends MeasurableSubsystem {
           shoulderState = ShoulderState.IDLE;
         }
         break;
+      case SAIL_EXT:
+        if (isShoulderFinished()) {
+          logger.info("Shoulder: {} -> IDLE", shoulderState);
+          shoulderState = ShoulderState.IDLE;
+        }
+        break;
+      case SAIL_RET:
+        if (isShoulderFinished()) {
+          logger.info("Shoulder: {} -> IDLE", shoulderState);
+          shoulderState = ShoulderState.IDLE;
+        }
+        break;
     }
   }
 
@@ -866,6 +933,7 @@ public class ClimbSubsystem extends MeasurableSubsystem {
     ZEROED(0, false, 0), // not used
     DISENGAGE_RATCHET(0, false, 0), // not used
     MID_EXT(ClimbConstants.kFMidExtTicks, true, ClimbConstants.kFMidExtSpeed),
+    HIGH_EXT(ClimbConstants.kFHighExtTicks, true, ClimbConstants.kFHighExtSpeed),
     HIGH_RET_ST1(ClimbConstants.kFHighRetST1Ticks, false, ClimbConstants.kFHighRetST1Speed),
     HIGH_RET_ST2(ClimbConstants.kFHighRetST2Ticks, false, ClimbConstants.kFHighRetST2Speed),
     TVS_DELAY(0, false, 0), // not used
@@ -906,7 +974,9 @@ public class ClimbSubsystem extends MeasurableSubsystem {
     TVS_EXT(ClimbConstants.kPTvsExtTicks, true, ClimbConstants.kPTvsExtSpeed),
     TVS_RET_ST1(ClimbConstants.kPTvsRetST1Ticks, false, ClimbConstants.kPTvsRetST1Speed),
     TVS_RET_ST2(ClimbConstants.kPTvsRetST2Ticks, false, ClimbConstants.kPTvsRetST2Speed),
-    TVS_RET2(ClimbConstants.kPTvsRet2Ticks, false, ClimbConstants.kPTvsRet2Speed);
+    TVS_RET2(ClimbConstants.kPTvsRet2Ticks, false, ClimbConstants.kPTvsRet2Speed),
+    SAIL_EXT(ClimbConstants.kPivotExtendSailPos, true, ClimbConstants.kExtendSailSpeed),
+    SAIL_RET(ClimbConstants.kPivotRetractSailPos, false, ClimbConstants.kRetractSailSpeed);
 
     public final double setpoint;
     public final boolean isExtend;
@@ -930,7 +1000,9 @@ public class ClimbSubsystem extends MeasurableSubsystem {
     TVS_PVT_BK(ClimbConstants.kTvsPvtBkTicks, ClimbConstants.kTvsPvtBkSpeed),
     TVS_PVT_FWD1(ClimbConstants.kTvsPvtFwd1Ticks, ClimbConstants.kTvsPvtFwd1Speed),
     TVS_PVT_FWD2(ClimbConstants.kTvsPvtFwd2Ticks, ClimbConstants.kTvsPvtFwd2Speed),
-    MID_FIN_PVT_Bk(ClimbConstants.kMidFinPvtBkTicks, ClimbConstants.kMidFinPvtBkSpeed);
+    MID_FIN_PVT_Bk(ClimbConstants.kMidFinPvtBkTicks, ClimbConstants.kMidFinPvtBkSpeed),
+    SAIL_EXT(ClimbConstants.kShoulderExtendSailPos, ClimbConstants.kSailShoulderSpeed),
+    SAIL_RET(ClimbConstants.kShoulderRetractSailPos, ClimbConstants.kSailShoulderSpeed);
 
     public final double setpoint;
     public final double cruiseVel;

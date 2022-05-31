@@ -58,3 +58,4 @@ Pack the following items to take to event.
 - [ ] Raspberry Pi camera ribbon cable (2)
 - [ ] camera LED driver block
 - [ ] camera LEDs
+- [ ] VRM
