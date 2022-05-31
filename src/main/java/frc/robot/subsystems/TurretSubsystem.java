@@ -9,11 +9,13 @@ import static frc.robot.Constants.TurretConstants.kTurretZeroTicks;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.BaseTalon;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Constants;
 import frc.robot.Constants.TurretConstants;
 import frc.robot.Constants.VisionConstants;
@@ -29,7 +31,7 @@ import org.strykeforce.telemetry.measurable.Measure;
 public class TurretSubsystem extends MeasurableSubsystem {
 
   public boolean talonReset;
-  private TalonSRX turret;
+  private TalonFX turret;
   private int turretStableCounts = 0;
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
   private TurretState currentState = TurretState.IDLE;
@@ -40,6 +42,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
   private double cruiseVelocity = kFastCruiseVelocity;
   private boolean lastDoRotate = false;
   private boolean isBallOne = true;
+  private DigitalInput zeroTurretInput = new DigitalInput(9);
 
   private int trackingStableCount;
   private int
@@ -60,14 +63,13 @@ public class TurretSubsystem extends MeasurableSubsystem {
 
   private void configTalons() {
     // turret setup
-    turret = new TalonSRX(kTurretId);
+    turret = new TalonFX(kTurretId);
     turret.configAllSettings(Constants.TurretConstants.getTurretTalonConfig());
     turret.setNeutralMode(NeutralMode.Brake);
-    turret.enableCurrentLimit(false);
     turret.enableVoltageCompensation(true);
     turret.configSupplyCurrentLimit(Constants.TurretConstants.getSupplyCurrentLimitConfig());
     // turret.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 10); // FIXME
-    //    turret.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 5);
+    turret.setStatusFramePeriod(StatusFrameEnhanced.Status_21_FeedbackIntegrated, 10);
   }
 
   public List<BaseTalon> getTalons() {
@@ -76,7 +78,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
 
   public boolean visionRotateBy(Rotation2d errorRotation2d) {
     Rotation2d currentTurretPose =
-        new Rotation2d(-turret.getSelectedSensorPosition() / kTurretTicksPerRadian);
+        new Rotation2d(turret.getSelectedSensorPosition() / kTurretTicksPerRadian);
     Rotation2d horizontalAngleCorrection =
         Rotation2d.fromDegrees(VisionConstants.kHorizAngleCorrectionDegrees);
 
@@ -104,7 +106,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
 
   public void rotateBy(Rotation2d deltaRotation) {
     Rotation2d currentAngle =
-        new Rotation2d(-turret.getSelectedSensorPosition() / kTurretTicksPerRadian);
+        new Rotation2d(turret.getSelectedSensorPosition() / kTurretTicksPerRadian);
     Rotation2d targetAngle = currentAngle.plus(deltaRotation);
     rotateTo(targetAngle);
   }
@@ -144,7 +146,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
       if (turret.getSelectedSensorPosition() > 0 && position.getRadians() > 0) {
         positionTicks =
             (-Math.PI - Math.abs(Rotation2d.fromDegrees(180).minus(position).getRadians()))
-                * -kTurretTicksPerRadian;
+                * kTurretTicksPerRadian;
         logger.info(
             "Positive Overlap region POS: {}, turret pos: {}, PositionTicks: {}",
             position,
@@ -153,17 +155,17 @@ public class TurretSubsystem extends MeasurableSubsystem {
       } else if (turret.getSelectedSensorPosition() <= 0 && position.getRadians() < 0) {
         positionTicks =
             (Math.PI + position.plus(Rotation2d.fromDegrees(180)).getRadians())
-                * -kTurretTicksPerRadian;
+                * kTurretTicksPerRadian;
         logger.info(
             "Negative Overlap region   POS: {}, turret pos: {}, PositionTicks: {}",
             position,
             turret.getSelectedSensorPosition(),
             positionTicks);
       } else {
-        positionTicks = position.getRadians() * -kTurretTicksPerRadian;
+        positionTicks = position.getRadians() * kTurretTicksPerRadian;
       }
     } else {
-      positionTicks = position.getRadians() * -kTurretTicksPerRadian;
+      positionTicks = position.getRadians() * kTurretTicksPerRadian;
     }
     // logger.info("Rotating Turret to {}", position);
     if (Math.abs(turret.getSelectedSensorPosition() - positionTicks) >= TurretConstants.kWrapTicks
@@ -205,10 +207,10 @@ public class TurretSubsystem extends MeasurableSubsystem {
 
   public void zeroTurret() {
     // double stringPotPosition = turret.getSensorCollection().getAnalogInRaw();
-    if (!turret.getSensorCollection().isFwdLimitSwitchClosed()) {
-      int absPos = turret.getSensorCollection().getPulseWidthPosition() & 0xFFF;
+    if (zeroTurretInput.get()) {
+      double absPos = turret.getSensorCollection().getIntegratedSensorAbsolutePosition();
       // inverted because absolute and relative encoders are out of phase
-      int offset = absPos - kTurretZeroTicks;
+      double offset = absPos - kTurretZeroTicks;
       turret.setSelectedSensorPosition(offset);
       logger.info(
           "Turret zeroed; offset: {} zeroTicks: {} absPosition: {}",
@@ -522,7 +524,8 @@ public class TurretSubsystem extends MeasurableSubsystem {
         new Measure("isRotationFinished", () -> isRotationFinished() ? 1.0 : 0.0),
         new Measure("TurretAtTarget", () -> isTurretAtTarget() ? 1.0 : 0.0),
         new Measure("rotateKp", this::getRotateByKp),
-        new Measure("state", () -> currentState.ordinal()));
+        new Measure("state", () -> currentState.ordinal()),
+        new Measure("DIO", () -> zeroTurretInput.get() ? 1.0 : 0.0));
   }
 
   @Override
