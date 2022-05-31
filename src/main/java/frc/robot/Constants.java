@@ -249,7 +249,7 @@ public final class Constants {
     public static final double kSlowCruiseVelocity = 7_000; // 2000
     public static final double kFastAccel = 52_500; // 15_000
     public static final double kSlowAccel = 52_500; // 15_000
-    public static final int kTurretZeroTicks = 1350; // 946 
+    public static final int kTurretZeroTicks = 1350; // 946
     public static final int kForwardLimit = 70_000; // 13_800 14
     public static final int kReverseLimit = -70_000; // 13_800 14
     //    public static final double kMaxStringPotZero = 100; // 2020 Robot
@@ -292,8 +292,8 @@ public final class Constants {
     public static Rotation2d kGeyserBallTwoPosition = Rotation2d.fromDegrees(95);
 
     // Stryke Shot Constants
-    public static final double kOutsideStrykePos = 8575; // 2450
-    public static final double kInsideStrykePos = 5600; // 1600
+    public static final double kOutsideStrykePos = -8575; // 2450
+    public static final double kInsideStrykePos = -5600; // 1600
 
     // Talon Constants
     public static SupplyCurrentLimitConfiguration getSupplyCurrentLimitConfig() {
@@ -805,7 +805,7 @@ public final class Constants {
     public static final double kLookupRes = 1.0;
 
     // Hood Encoder Constants
-    public static final int kHoodZeroTicks = 1800;
+    public static final int kHoodZeroTicks = 935; // 1800
     public static final int kForwardSoftLimts = 5800;
     public static final int kReverseSoftLimits = -50;
     public static final int kZeroCheckTicks = 2_600; // 500
@@ -905,9 +905,9 @@ public final class Constants {
     public static SupplyCurrentLimitConfiguration getHoodCurrentLimit() {
       SupplyCurrentLimitConfiguration hoodCurrentLimit = new SupplyCurrentLimitConfiguration();
 
-      hoodCurrentLimit.currentLimit = 10.0;
-      hoodCurrentLimit.triggerThresholdCurrent = 15.0;
-      hoodCurrentLimit.triggerThresholdTime = 0.04;
+      hoodCurrentLimit.currentLimit = 5.0; // 10
+      hoodCurrentLimit.triggerThresholdCurrent = 5.0; // 15
+      hoodCurrentLimit.triggerThresholdTime = 0.2; // .04
       hoodCurrentLimit.enable = true;
 
       return hoodCurrentLimit;
