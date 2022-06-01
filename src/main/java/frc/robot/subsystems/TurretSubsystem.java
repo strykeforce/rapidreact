@@ -45,6 +45,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
   private DigitalInput zeroTurretInput = new DigitalInput(9);
 
   private int trackingStableCount;
+  private int wrappingCount = 0;
   private int
       notValidTargetCount; // don't go to seeking if there is only a few frames of no valid target
   private int seekingCount = 0;
@@ -148,7 +149,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
   public void rotateTo(Rotation2d position) {
     double positionTicks = 0.0;
     if (Math.PI - Math.abs(position.getRadians()) <= TurretConstants.kOverlapAngle.getRadians()) {
-      if (turret.getSelectedSensorPosition() > 0 && position.getRadians() > 0) {
+      if (turret.getSelectedSensorPosition() < 0 && position.getRadians() > 0) {
         positionTicks =
             (-Math.PI - Math.abs(Rotation2d.fromDegrees(180).minus(position).getRadians()))
                 * kTurretTicksPerRadian;
@@ -157,7 +158,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
             position,
             turret.getSelectedSensorPosition(),
             positionTicks);
-      } else if (turret.getSelectedSensorPosition() <= 0 && position.getRadians() < 0) {
+      } else if (turret.getSelectedSensorPosition() >= 0 && position.getRadians() < 0) {
         positionTicks =
             (Math.PI + position.plus(Rotation2d.fromDegrees(180)).getRadians())
                 * kTurretTicksPerRadian;
@@ -263,6 +264,13 @@ public class TurretSubsystem extends MeasurableSubsystem {
     Rotation2d seekAngle = new Rotation2d(deltaPosition.getX(), deltaPosition.getY());
     seekAngle = seekAngle.minus(pose.getRotation());
     seekAngle = seekAngle.plus(TurretConstants.kTurretRobotOffset);
+
+    double tangentVel = driveSubsystem.getTangentVelocity();
+    double gyroRate = driveSubsystem.getGyroRate();
+    seekAngle = seekAngle.plus(Rotation2d.fromDegrees(gyroRate * TurretConstants.kFYaw));
+    seekAngle =
+        seekAngle.plus(Rotation2d.fromDegrees(tangentVel * TurretConstants.kFTangentVelocity));
+
     logger.info(
         "Seek Center Angle: pose: {}, deltaPos: {}, seekAngle:{}", pose, deltaPosition, seekAngle);
     rotateTo(seekAngle);
@@ -467,9 +475,13 @@ public class TurretSubsystem extends MeasurableSubsystem {
         break;
       case WRAPPING:
         setCruiseVelocityFast(true);
-        if (isTurretAtTarget()) {
+        wrappingCount++;
+        if (isTurretAtTarget() || wrappingCount > TurretConstants.kMaxWrapping) {
           currentState = TurretState.AIMING;
+          wrappingCount = 0;
           logger.info("WRAPPING-> AIMING");
+        } else {
+          seekCenter();
         }
         break;
       case FENDER_ADJUSTING:
