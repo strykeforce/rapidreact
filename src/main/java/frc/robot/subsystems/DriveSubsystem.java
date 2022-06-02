@@ -57,6 +57,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private Double trajectoryActive = 0.0;
   private double[] lastVelocity = new double[3];
   private boolean fwdStable, strStable, yawStable, velStable;
+  private boolean useOdometry = true;
 
   public DriveSubsystem() {
 
@@ -160,6 +161,18 @@ public class DriveSubsystem extends MeasurableSubsystem {
     double tangentVelocity =
         Math.hypot(lastVelocity[0], lastVelocity[1]) * Math.cos(angleTangent - angleVelocity);
     return tangentVelocity;
+  }
+
+  public boolean getUseOdometry() {
+    return useOdometry;
+  }
+
+  public void setUseOdometry(boolean useOdometry) {
+    this.useOdometry = useOdometry;
+  }
+
+  public void toggleUseOdometry() {
+    useOdometry = !useOdometry;
   }
 
   public double[] getDriveVelocity() {

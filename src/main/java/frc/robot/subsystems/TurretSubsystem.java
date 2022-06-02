@@ -90,11 +90,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
     //     horizontalAngleCorrection);
     Rotation2d targetAngle = currentTurretPose.minus(errorRotation2d);
     targetAngle = targetAngle.plus(horizontalAngleCorrection);
-    double tangentVel = driveSubsystem.getTangentVelocity();
-    double gyroRate = driveSubsystem.getGyroRate();
-    targetAngle = targetAngle.plus(Rotation2d.fromDegrees(gyroRate * TurretConstants.kFYaw));
-    targetAngle =
-        targetAngle.plus(Rotation2d.fromDegrees(tangentVel * TurretConstants.kFTangentVelocity));
+    targetAngle = targetAngle.plus(calcFeedForward());
     rotateTo(targetAngle);
 
     // double targetAngleRadians =
@@ -108,6 +104,16 @@ public class TurretSubsystem extends MeasurableSubsystem {
     // }
     // rotateTo(targetAngleRadians * -kTurretTicksPerRadian);
     return false;
+  }
+
+  public Rotation2d calcFeedForward() {
+    if (!driveSubsystem.getUseOdometry()) return new Rotation2d();
+    double tangentVel = driveSubsystem.getTangentVelocity();
+    double gyroRate = driveSubsystem.getGyroRate();
+    Rotation2d feedForward = Rotation2d.fromDegrees(gyroRate * TurretConstants.kFYaw);
+    feedForward =
+        feedForward.plus(Rotation2d.fromDegrees(tangentVel * TurretConstants.kFTangentVelocity));
+    return feedForward;
   }
 
   public void rotateBy(Rotation2d deltaRotation) {
@@ -264,13 +270,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
     Rotation2d seekAngle = new Rotation2d(deltaPosition.getX(), deltaPosition.getY());
     seekAngle = seekAngle.minus(pose.getRotation());
     seekAngle = seekAngle.plus(TurretConstants.kTurretRobotOffset);
-
-    double tangentVel = driveSubsystem.getTangentVelocity();
-    double gyroRate = driveSubsystem.getGyroRate();
-    seekAngle = seekAngle.plus(Rotation2d.fromDegrees(gyroRate * TurretConstants.kFYaw));
-    seekAngle =
-        seekAngle.plus(Rotation2d.fromDegrees(tangentVel * TurretConstants.kFTangentVelocity));
-
+    seekAngle = seekAngle.plus(calcFeedForward());
     logger.info(
         "Seek Center Angle: pose: {}, deltaPos: {}, seekAngle:{}", pose, deltaPosition, seekAngle);
     rotateTo(seekAngle);
