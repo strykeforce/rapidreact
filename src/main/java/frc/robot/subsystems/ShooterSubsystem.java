@@ -248,7 +248,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
           ShooterConstants.kKickerOpTicksP100ms, ShooterConstants.kShooterOpTicksP100ms);
       hoodClosedLoop(ShooterConstants.kHoodOpTicks);
     } else {
-      if (visionSubsystem.isValid()) {
+      if (visionSubsystem.isRangingValid()) {
         double[] shootSolution = getShootSolution();
         lastLookupDistance = shootSolution[3];
         shooterClosedLoop(shootSolution[0], shootSolution[1]);
@@ -381,7 +381,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
         }
         break;
       case ARMED:
-        if (visionSubsystem.isValid()) {
+        if (visionSubsystem.isRangingValid()) {
           double[] shootSolution = getShootSolution();
           shooterClosedLoop(shootSolution[0], shootSolution[1]);
         }

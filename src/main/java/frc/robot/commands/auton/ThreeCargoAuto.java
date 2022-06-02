@@ -62,7 +62,7 @@ public class ThreeCargoAuto extends SequentialCommandGroup {
             turretSubsystem,
             magazineSubsystem,
             visionSubsystem,
-            true,
+            false,
             intakeSubsystem,
             widthPixels2));
   }

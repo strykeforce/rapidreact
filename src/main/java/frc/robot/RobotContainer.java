@@ -268,7 +268,7 @@ public class RobotContainer {
                 turretSubsystem,
                 magazineSubsystem,
                 visionSubsystem,
-                true,
+                false,
                 intakeSubsystem,
                 intakeExtendSubsystem,
                 xboxController));
@@ -329,7 +329,7 @@ public class RobotContainer {
                 turretSubsystem,
                 magazineSubsystem,
                 visionSubsystem,
-                true,
+                false,
                 intakeSubsystem,
                 xboxController));
     new JoystickButton(xboxController, XboxController.Button.kY.value)
