@@ -201,6 +201,8 @@ public final class Constants {
     // Actual 2022 Constants
     // + is left
     public static final double kHorizAngleCorrectionDegrees = 0.0; // -1.25 deg
+    public static final int kCircularBufferSize = 10;
+    public static final int kBufferLookupOffset = 5;
 
     // Vision test for failure const
     public static final double kTimeForVisionCheck = 1.0;

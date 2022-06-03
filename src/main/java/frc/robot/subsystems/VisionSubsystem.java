@@ -1,8 +1,12 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.util.CircularBuffer;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.TurretConstants;
 import frc.robot.Constants.VisionConstants;
@@ -28,6 +32,10 @@ public class VisionSubsystem extends MeasurableSubsystem
   private Timer visionCheckTime = new Timer();
   private boolean isVisionWorking = true;
   private final DriveSubsystem driveSubsystem;
+  private TurretSubsystem turretSubsystem;
+  private CircularBuffer gyroBuffer = new CircularBuffer(VisionConstants.kCircularBufferSize);
+  private CircularBuffer turretBuffer = new CircularBuffer(VisionConstants.kCircularBufferSize);
+  private CircularBuffer timestampBuffer = new CircularBuffer(VisionConstants.kCircularBufferSize);
 
   public VisionSubsystem(DriveSubsystem driveSubsystem) {
     this.driveSubsystem = driveSubsystem;
@@ -40,9 +48,20 @@ public class VisionSubsystem extends MeasurableSubsystem
     HubTargetData.kFrameCenter = deadeye.getCapture().width / 2;
   }
 
+  public void setTurretSubsystem(TurretSubsystem turretSubsystem) {
+    this.turretSubsystem = turretSubsystem;
+  }
+
   @Override
   public void onTargetData(HubTargetData targetData) {
     this.targetData = targetData;
+    fillBuffers();
+  }
+
+  public void fillBuffers() {
+    gyroBuffer.addFirst(driveSubsystem.getGyroRotation2d().getRadians());
+    turretBuffer.addFirst(turretSubsystem.getTurretRotation2d().getRadians());
+    timestampBuffer.addFirst(RobotController.getFPGATime());
   }
 
   public HubTargetData getTargetData() {
@@ -144,10 +163,10 @@ public class VisionSubsystem extends MeasurableSubsystem
     Rotation2d errorRadians = new Rotation2d(getErrorRadians());
     Rotation2d calcAngle =
         turretAngle.plus(gyroAngle).plus(TurretConstants.kTurretRobotOffset).minus(errorRadians);
-    double distanceMeters = distanceInches * 0.0254 + VisionConstants.kLookupTableToLensOffset;
+    double distanceMeters = Units.inchesToMeters(distanceInches) + VisionConstants.kLookupTableToLensOffset;
     double x, y;
-    y = Math.abs(-4.121 + distanceMeters * Math.sin(calcAngle.getRadians()));
-    x = Math.abs(-8.23 + distanceMeters * Math.cos(calcAngle.getRadians()));
+    y = Math.abs(-TurretConstants.kHubPositionMeters.getY() + distanceMeters * Math.sin(calcAngle.getRadians()));   //-4.121
+    x = Math.abs(-TurretConstants.kHubPositionMeters.getX() + distanceMeters * Math.cos(calcAngle.getRadians()));   //-8.23
     logger.info(
         "VISIONODOM: turretAngle: {}, gyroAngle: {}, calcAngle: {}, errorRadians: {}, distance: {}, X: {}, Y: {}, Odometry: {}",
         turretAngle,
