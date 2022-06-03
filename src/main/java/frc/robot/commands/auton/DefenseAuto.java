@@ -53,7 +53,7 @@ public class DefenseAuto extends SequentialCommandGroup {
             turretSubsystem,
             magazineSubsystem,
             visionSubsystem,
-            true,
+            false,
             intakeSubsystem,
             widthPixels),
         new IgnoreColorSensorCommand(magazineSubsystem, true),

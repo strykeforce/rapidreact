@@ -83,7 +83,7 @@ public class FiveCargoAuto extends SequentialCommandGroup {
             turretSubsystem,
             magazineSubsystem,
             visionSubsystem,
-            true,
+            false,
             intakeSubsystem,
             widthPixels3));
   }

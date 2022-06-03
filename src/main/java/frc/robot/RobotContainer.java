@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SuppliedValueWidget;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -74,6 +75,7 @@ import frc.robot.commands.shooter.StopShooterCommand;
 import frc.robot.commands.shooter.SwitchClimbPos;
 import frc.robot.commands.turret.OpenLoopTurretCommand;
 import frc.robot.commands.turret.RotateToCommand;
+import frc.robot.commands.turret.SeekCenterOdometryCommand;
 import frc.robot.commands.turret.TurretAimCommandGroup;
 import frc.robot.commands.vision.EnableVisionCommand;
 import frc.robot.subsystems.AutoSwitch;
@@ -237,7 +239,7 @@ public class RobotContainer {
         .whenReleased(new OpenLoopTurretCommand(turretSubsystem, 0.0));
 
     new JoystickButton(driveJoystick, Button.HAMBURGER.id)
-        .whenPressed(new DriveAutonCommand(driveSubsystem, "straightPath", true, true));
+        .whenPressed(new SeekCenterOdometryCommand(turretSubsystem));
 
     new JoystickButton(driveJoystick, Trim.LEFT_Y_POS.id)
         .whenPressed(new EnableVisionCommand(visionSubsystem));
@@ -266,7 +268,7 @@ public class RobotContainer {
                 turretSubsystem,
                 magazineSubsystem,
                 visionSubsystem,
-                true,
+                false,
                 intakeSubsystem,
                 intakeExtendSubsystem,
                 xboxController));
@@ -327,7 +329,7 @@ public class RobotContainer {
                 turretSubsystem,
                 magazineSubsystem,
                 visionSubsystem,
-                true,
+                false,
                 intakeSubsystem,
                 xboxController));
     new JoystickButton(xboxController, XboxController.Button.kY.value)
@@ -437,12 +439,12 @@ public class RobotContainer {
 
     Shuffleboard.getTab("Match")
         .addBoolean("IgnoreColorSensor", () -> magazineSubsystem.isColorSensorIgnored())
-        .withSize(2, 1)
+        .withSize(1, 1)
         .withPosition(3, 0);
 
     Shuffleboard.getTab("Match")
         .addBoolean("VisionNotWorking", () -> visionSubsystem.isVisionWorking())
-        .withSize(2, 1)
+        .withSize(1, 1)
         .withPosition(3, 1);
 
     Shuffleboard.getTab("Match")
@@ -459,6 +461,16 @@ public class RobotContainer {
         .add("EstopClimb", new EmergencyStopClimbCommand(climbSubsystem))
         .withSize(2, 1)
         .withPosition(7, 0);
+
+    Shuffleboard.getTab("Match")
+        .add("ToggleUseOdometry", new InstantCommand(driveSubsystem::toggleUseOdometry))
+        .withSize(1, 1)
+        .withPosition(4, 0);
+
+    Shuffleboard.getTab("Match")
+        .addBoolean("UseOdometry", () -> driveSubsystem.getUseOdometry())
+        .withSize(1, 1)
+        .withPosition(4, 1);
   }
 
   public void setAllianceColor(Alliance alliance) {

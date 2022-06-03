@@ -21,6 +21,7 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.TurretConstants;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Set;
@@ -56,6 +57,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private Double trajectoryActive = 0.0;
   private double[] lastVelocity = new double[3];
   private boolean fwdStable, strStable, yawStable, velStable;
+  private boolean useOdometry = true;
 
   public DriveSubsystem() {
 
@@ -148,6 +150,29 @@ public class DriveSubsystem extends MeasurableSubsystem {
     lastVelocity[1] = strafeMetersPerSec;
     lastVelocity[2] = yawRadiansPerSec;
     swerveDrive.move(forwardMetersPerSec, strafeMetersPerSec, yawRadiansPerSec, isFieldOriented);
+  }
+
+  public double getTangentVelocity() {
+    Translation2d deltaGoal =
+        TurretConstants.kHubPositionMeters.minus(getPoseMeters().getTranslation());
+    double angleGoal = Math.atan2(deltaGoal.getY(), deltaGoal.getX());
+    double angleTangent = angleGoal - 90.0;
+    double angleVelocity = Math.atan2(lastVelocity[1], lastVelocity[0]);
+    double tangentVelocity =
+        Math.hypot(lastVelocity[0], lastVelocity[1]) * Math.cos(angleTangent - angleVelocity);
+    return tangentVelocity;
+  }
+
+  public boolean getUseOdometry() {
+    return useOdometry;
+  }
+
+  public void setUseOdometry(boolean useOdometry) {
+    this.useOdometry = useOdometry;
+  }
+
+  public void toggleUseOdometry() {
+    useOdometry = !useOdometry;
   }
 
   public double[] getDriveVelocity() {
@@ -371,6 +396,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure("FWD Vel", () -> lastVelocity[0]),
         new Measure("STR Vel", () -> lastVelocity[1]),
         new Measure("YAW Vel", () -> lastVelocity[2]),
+        new Measure("FeadForwardTangent", () -> getTangentVelocity()),
         new Measure("Gyro Rate", () -> getGyroRate()));
   }
 }

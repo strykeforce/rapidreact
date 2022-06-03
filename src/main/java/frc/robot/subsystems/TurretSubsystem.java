@@ -45,6 +45,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
   private DigitalInput zeroTurretInput = new DigitalInput(9);
 
   private int trackingStableCount;
+  private int wrappingCount = 0;
   private int
       notValidTargetCount; // don't go to seeking if there is only a few frames of no valid target
   private int seekingCount = 0;
@@ -89,6 +90,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
     //     horizontalAngleCorrection);
     Rotation2d targetAngle = currentTurretPose.minus(errorRotation2d);
     targetAngle = targetAngle.plus(horizontalAngleCorrection);
+    targetAngle = targetAngle.plus(calcFeedForward());
     rotateTo(targetAngle);
 
     // double targetAngleRadians =
@@ -102,6 +104,16 @@ public class TurretSubsystem extends MeasurableSubsystem {
     // }
     // rotateTo(targetAngleRadians * -kTurretTicksPerRadian);
     return false;
+  }
+
+  public Rotation2d calcFeedForward() {
+    if (!driveSubsystem.getUseOdometry()) return new Rotation2d();
+    double tangentVel = driveSubsystem.getTangentVelocity();
+    double gyroRate = driveSubsystem.getGyroRate();
+    Rotation2d feedForward = Rotation2d.fromDegrees(gyroRate * TurretConstants.kFYaw);
+    feedForward =
+        feedForward.plus(Rotation2d.fromDegrees(tangentVel * TurretConstants.kFTangentVelocity));
+    return feedForward;
   }
 
   public void rotateBy(Rotation2d deltaRotation) {
@@ -143,7 +155,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
   public void rotateTo(Rotation2d position) {
     double positionTicks = 0.0;
     if (Math.PI - Math.abs(position.getRadians()) <= TurretConstants.kOverlapAngle.getRadians()) {
-      if (turret.getSelectedSensorPosition() > 0 && position.getRadians() > 0) {
+      if (turret.getSelectedSensorPosition() < 0 && position.getRadians() > 0) {
         positionTicks =
             (-Math.PI - Math.abs(Rotation2d.fromDegrees(180).minus(position).getRadians()))
                 * kTurretTicksPerRadian;
@@ -152,7 +164,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
             position,
             turret.getSelectedSensorPosition(),
             positionTicks);
-      } else if (turret.getSelectedSensorPosition() <= 0 && position.getRadians() < 0) {
+      } else if (turret.getSelectedSensorPosition() >= 0 && position.getRadians() < 0) {
         positionTicks =
             (Math.PI + position.plus(Rotation2d.fromDegrees(180)).getRadians())
                 * kTurretTicksPerRadian;
@@ -258,23 +270,19 @@ public class TurretSubsystem extends MeasurableSubsystem {
     Rotation2d seekAngle = new Rotation2d(deltaPosition.getX(), deltaPosition.getY());
     seekAngle = seekAngle.minus(pose.getRotation());
     seekAngle = seekAngle.plus(TurretConstants.kTurretRobotOffset);
+    seekAngle = seekAngle.plus(calcFeedForward());
     logger.info(
         "Seek Center Angle: pose: {}, deltaPos: {}, seekAngle:{}", pose, deltaPosition, seekAngle);
     rotateTo(seekAngle);
   }
 
-  public void updateOpenLoopFeedFwd() {
-    currentState = TurretState.IDLE;
-    double[] driveVel = driveSubsystem.getDriveVelocity();
-    double kF = 0.0;
-    if (Math.abs(driveVel[2]) < 0.25) kF = 0.0;
-    else if (Math.abs(driveVel[2]) < 0.6) kF = TurretConstants.kFYawSlow;
-    else if (Math.abs(driveVel[2]) < 2.0) kF = TurretConstants.kFYawMedium;
-    else kF = TurretConstants.kFYawFast;
-
-    Rotation2d deltaRotation = new Rotation2d(driveVel[2] * kF);
-    rotateBy(deltaRotation);
-  }
+  // public void updateOpenLoopFeedFwd() {
+  //   currentState = TurretState.IDLE;
+  //   double[] driveVel = driveSubsystem.getDriveVelocity();
+  //   double kF = TurretConstants.kFYaw;
+  //   Rotation2d deltaRotation = new Rotation2d(driveSubsystem.gyroRate * kF);
+  //   rotateBy(deltaRotation);
+  // }
 
   private void setCruiseVelocityFast(boolean isFast) {
     if (isFast) {
@@ -467,9 +475,13 @@ public class TurretSubsystem extends MeasurableSubsystem {
         break;
       case WRAPPING:
         setCruiseVelocityFast(true);
-        if (isTurretAtTarget()) {
+        wrappingCount++;
+        if (isTurretAtTarget() || wrappingCount > TurretConstants.kMaxWrapping) {
           currentState = TurretState.AIMING;
+          wrappingCount = 0;
           logger.info("WRAPPING-> AIMING");
+        } else {
+          seekCenter();
         }
         break;
       case FENDER_ADJUSTING:

@@ -47,7 +47,7 @@ public class TwoCargoAuto extends SequentialCommandGroup {
             turretSubsystem,
             magazineSubsystem,
             visionSubsystem,
-            true,
+            false,
             intakeSubsystem,
             widthPixels));
   }

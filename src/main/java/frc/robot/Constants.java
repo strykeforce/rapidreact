@@ -200,7 +200,7 @@ public final class Constants {
   public static final class VisionConstants {
     // Actual 2022 Constants
     // + is left
-    public static final double kHorizAngleCorrectionDegrees = 0.0; // 2.5 degrees
+    public static final double kHorizAngleCorrectionDegrees = 0.0; // -1.25 deg
 
     // Vision test for failure const
     public static final double kTimeForVisionCheck = 1.0;
@@ -208,7 +208,7 @@ public final class Constants {
 
     // Old 2020 Constants
     //    public static final double kMinContourAreaSize = 100;
-    public static final double kVerticalFov = 0.6056; // 48.8 (34.7 degrees)
+    public static final double kVerticalFov = 0.6056; // Measured 0.4939 FIXME
     public static final double kHorizonFov = 1.012; // 50.8 //146 //radians 1.012 // deg 57.999
     public static final double kLookupTableToLensOffset = 0.4959;
     //    public static final double kHorizonRes = 640; // 1280
@@ -247,7 +247,7 @@ public final class Constants {
     public static final int kTurretId = 50;
     public static final double kFastCruiseVelocity = 14_000; // 4000
     public static final double kSlowCruiseVelocity = 7_000; // 2000
-    public static final double kFastAccel = 52_500; // 15_000
+    public static final double kFastAccel = 100_000; // 15_000
     public static final double kSlowAccel = 52_500; // 15_000
     public static final int kTurretZeroTicks = 1350; // 946
     public static final int kForwardLimit = 70_000; // 13_800 14
@@ -265,12 +265,11 @@ public final class Constants {
     public static final double kWrapTicks = 70_000;
 
     // Rotate Under Vision Constants
-    public static final double kRotateByInitialKp = -0.4; // -0.4 old: 0.4
+    public static final double kRotateByInitialKp = -0.4; // -0.4
     public static final double kRotateByFinalKp = -0.4; // -0.4
     public static final int kNotValidTargetCounts = 5; // how many frames to wait before seeking
-    public static final double kFYawSlow = -0.05;
-    public static final double kFYawMedium = -0.08;
-    public static final double kFYawFast = -0.12;
+    public static final double kFYaw = 4.0;
+    public static final double kFTangentVelocity = 0.95; // 0.9
 
     // Seek Constants
     public static final Translation2d kHubPositionMeters = new Translation2d(8.23, 4.11); // meters
@@ -282,6 +281,7 @@ public final class Constants {
     public static final int kCloseEnoughTicks = 140; // 40
     public static final Rotation2d kCloseEnoughTarget = Rotation2d.fromDegrees(5); // 1
     public static final int kRotateByStableCounts = 3; // 3
+    public static final int kMaxWrapping = 5;
 
     // Fender Shot Constants
     public static final Rotation2d kFenderAlliance = Rotation2d.fromDegrees(0.0);
