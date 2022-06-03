@@ -26,6 +26,7 @@ public class HubTargetData extends TargetListTargetData {
   private final double errorPixels;
   private final double range;
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
+  public boolean evenNumTargets = false;
 
   public HubTargetData() {
     super();
@@ -107,14 +108,43 @@ public class HubTargetData extends TargetListTargetData {
       Rect rightTarget = targets.get((targets.size() - 1) / 2 + 1);
 
       pixelWidth = rightTarget.bottomRight.x - leftTarget.topLeft.x;
+      evenNumTargets = false;
     } else {
       Rect leftTarget = targets.get(targets.size() / 2 - 2);
       Rect rightTarget = targets.get(targets.size() / 2 + 1);
 
       pixelWidth = rightTarget.topLeft.x - leftTarget.bottomRight.x;
+      evenNumTargets = true;
     }
 
     return pixelWidth;
+  }
+
+  public boolean isNumTargetsEven() {
+    return evenNumTargets;
+  }
+
+  public int getVerticalPixelHeight() {
+    int pixelHeight;
+    if (targets.size() % 2 == 1) {
+      Rect centerTarget = targets.get((targets.size() - 1) / 2);
+      Rect rightTarget = targets.get((targets.size() - 1) / 2 + 1);
+      Rect leftTarget = targets.get((targets.size() - 1) / 2 - 1);
+
+      pixelHeight =
+          (rightTarget.bottomRight.y + leftTarget.bottomRight.y) / 2 - centerTarget.topLeft.y;
+    } else {
+      Rect rightCenterTarget = targets.get(targets.size() / 2);
+      Rect rightTarget = targets.get(targets.size() / 2 + 1);
+      Rect leftCenterTarget = targets.get(targets.size() / 2 - 1);
+      Rect leftTarget = targets.get(targets.size() / 2 - 2);
+
+      pixelHeight =
+          ((rightTarget.bottomRight.y - rightCenterTarget.topLeft.y)
+                  + (leftTarget.bottomRight.y - leftCenterTarget.topLeft.y))
+              / 2;
+    }
+    return pixelHeight;
   }
 
   public double testGetDistance() {
