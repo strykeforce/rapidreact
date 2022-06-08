@@ -55,8 +55,12 @@ public class HubTargetData extends TargetListTargetData {
    * @return true if valid
    */
   public boolean isValid() {
+    // return valid && targets.size() > 2;
+    return valid && !targets.isEmpty();
+  }
+
+  public boolean isRangingValid() {
     return valid && targets.size() > 2;
-    // return valid && !targets.isEmpty();
   }
 
   /**
@@ -180,7 +184,7 @@ public class HubTargetData extends TargetListTargetData {
   }
 
   public double getGroundDistance() {
-    if (!isValid()) {
+    if (!isRangingValid()) {
       return 2767;
     }
     double x = testGetDistance();

@@ -79,6 +79,8 @@ public class VisionSubsystem extends MeasurableSubsystem
         new Measure("Vertical Pixel Height", this::getVerticalPixelHeight),
         new Measure("Vertical Radian Offset", this::getVerticalOffsetRadians),
         new Measure("Target Data SN", () -> targetData.serial));
+        new Measure("Target Data SN", () -> targetData.serial),
+        new Measure("Ranging Valid", this::getRangingValid));
   }
 
   // these private getters are for the grapher and prevent a data race that can occur if targetData
@@ -117,12 +119,12 @@ public class VisionSubsystem extends MeasurableSubsystem
   // not used
   public double getTargetsDistancePixel() {
     var td = targetData;
-    return td.isValid() ? td.testGetTargetsPixelWidth() : 2767.0;
+    return td.isRangingValid() ? td.testGetTargetsPixelWidth() : 2767.0;
   }
 
   public double getTargetsDistanceGround() {
     var td = targetData;
-    return td.isValid() ? td.getGroundDistance() : 2767.0;
+    return td.isRangingValid() ? td.getGroundDistance() : 2767.0;
   }
 
   public int getTargetPixelWidth() {
@@ -134,14 +136,23 @@ public class VisionSubsystem extends MeasurableSubsystem
     return targetData.isValid();
   }
 
+  public boolean isRangingValid() {
+    return targetData.isRangingValid();
+  }
+
   private double getValid() {
     var td = targetData;
     return td.isValid() ? 1.0 : 0.0;
   }
 
+  private double getRangingValid() {
+    var td = targetData;
+    return td.isRangingValid() ? 1.0 : 0.0;
+  }
+
   public Pose2d getVisionOdometry(
       Rotation2d turretAngle, Rotation2d gyroAngle, double distanceInches) {
-    if (!isValid()) {
+    if (!isRangingValid()) {
       logger.info("Vision Odom: not valid -> keep current odom");
       return driveSubsystem.getPoseMeters();
     }
@@ -167,7 +178,7 @@ public class VisionSubsystem extends MeasurableSubsystem
   }
 
   public boolean isPixelWidthStable() {
-    if (!isValid()) {
+    if (!isRangingValid()) {
       return false;
     }
     var pixelWidth = getTargetPixelWidth();

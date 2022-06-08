@@ -547,7 +547,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
             turretSubsystem.fenderShot();
             currUpperMagazineState = UpperMagazineState.PAUSE;
           } else if (turretSubsystem.getState() == TurretState.TRACKING
-              && visionSubsystem.isValid()) {
+              && visionSubsystem.isRangingValid()) {
             logger.info("WAIT_AIM -> PAUSE");
             shooterSubsystem.shoot();
             currUpperMagazineState = UpperMagazineState.PAUSE;
@@ -619,7 +619,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
             currUpperMagazineState = UpperMagazineState.SHOOT;
           }
         } else if (turretSubsystem.getState() == TurretState.TRACKING
-            && visionSubsystem.isValid()) {
+            && visionSubsystem.isRangingValid()) {
           shooterSubsystem.shoot();
         }
         break;
