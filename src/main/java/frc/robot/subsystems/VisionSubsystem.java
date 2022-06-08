@@ -86,11 +86,13 @@ public class VisionSubsystem extends MeasurableSubsystem
   // these private getters are for the grapher and prevent a data race that can occur if targetData
   // updates after isValid() and before getErrorXXX()
   private boolean isNumTargetsEven() {
-    return targetData.isNumTargetsEven();
+    var td = targetData;
+    return td.isValid() ? td.isNumTargetsEven() : false;
   }
 
   private double getVerticalPixelHeight() {
-    return targetData.getVerticalPixelHeight();
+    var td = targetData;
+    return td.isValid() ? td.getVerticalPixelHeight() : 2767.0;
   }
 
   private double getErrorPixels() {
@@ -113,7 +115,8 @@ public class VisionSubsystem extends MeasurableSubsystem
     return td.isValid() ? Math.toDegrees(td.getErrorRadians()) : 2767.0;
   }
   private double getVerticalOffsetRadians() {
-    return targetData.getVerticalOffsetRadians();
+    var td = targetData;
+    return td.isValid() ? targetData.getVerticalOffsetRadians() : 2767.0;
   }
 
   // not used
