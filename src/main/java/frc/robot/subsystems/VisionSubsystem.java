@@ -38,6 +38,7 @@ public class VisionSubsystem extends MeasurableSubsystem
     deadeye = new Deadeye<>("A0", HubTargetData.class, networkTableInstance);
     deadeye.setTargetDataListener(this);
     HubTargetData.kFrameCenter = deadeye.getCapture().width / 2;
+    HubTargetData.kFrameVerticalCenter = deadeye.getCapture().height / 2;
   }
 
   @Override
@@ -76,6 +77,7 @@ public class VisionSubsystem extends MeasurableSubsystem
         new Measure("Test Ground Distance", this::getTargetsDistanceGround),
         new Measure("Is Even Num Of Targets", () -> isNumTargetsEven() ? 1.0 : 0.0),
         new Measure("Vertical Pixel Height", this::getVerticalPixelHeight),
+        new Measure("Vertical Radian Offset", this::getVerticalOffsetRadians),
         new Measure("Target Data SN", () -> targetData.serial));
   }
 
@@ -107,6 +109,9 @@ public class VisionSubsystem extends MeasurableSubsystem
   private double getErrorDegrees() {
     var td = targetData;
     return td.isValid() ? Math.toDegrees(td.getErrorRadians()) : 2767.0;
+  }
+  private double getVerticalOffsetRadians() {
+    return targetData.getVerticalOffsetRadians();
   }
 
   // not used

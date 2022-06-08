@@ -5,6 +5,7 @@ import static frc.robot.Constants.VisionConstants.kHorizonFov;
 import com.squareup.moshi.JsonReader;
 import com.squareup.moshi.JsonWriter;
 import edu.wpi.first.math.geometry.Rotation2d;
+import frc.robot.Constants;
 import frc.robot.Constants.VisionConstants;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import org.strykeforce.deadeye.TargetListTargetData;
 public class HubTargetData extends TargetListTargetData {
 
   static int kFrameCenter = Integer.MAX_VALUE;
+  static int kFrameVerticalCenter = Integer.MAX_VALUE;
   private final double errorPixels;
   private final double range;
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -74,6 +76,14 @@ public class HubTargetData extends TargetListTargetData {
     return errorPixels;
   }
 
+  public double getVerticalOffsetPixels() {
+      int maxY = targets.get(Math.round(targets.size() / 2)).topLeft.y;
+      return maxY;
+  }
+  public double getVerticalOffsetRadians() {
+    return VisionConstants.kHorizonFov * getVerticalOffsetPixels() / (kFrameVerticalCenter * 2); //FIXME kVerticalFov?
+  }
+
   /**
    * Return the angle from the center of the Hub target group to the center of the camera frame. You
    * should check {@link #isValid()} before calling this method.
@@ -82,7 +92,7 @@ public class HubTargetData extends TargetListTargetData {
    * @throws IndexOutOfBoundsException if the list of targets is empty
    */
   public double getErrorRadians() {
-    return -VisionConstants.kVerticalFov * getErrorPixels() / (kFrameCenter * 2);
+    return -VisionConstants.kVerticalFov * getErrorPixels() / (kFrameCenter * 2); //FIXME kHorizonFov?
   }
 
   /**
