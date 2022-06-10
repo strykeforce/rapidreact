@@ -78,7 +78,7 @@ public class VisionSubsystem extends MeasurableSubsystem
         new Measure("Is Even Num Of Targets", () -> isNumTargetsEven() ? 1.0 : 0.0),
         new Measure("Vertical Pixel Height", this::getVerticalPixelHeight),
         new Measure("Vertical Radian Offset", this::getVerticalOffsetRadians),
-        new Measure("Target Data SN", () -> targetData.serial));
+        new Measure("Target Data SN", () -> targetData.serial),
         new Measure("Target Data SN", () -> targetData.serial),
         new Measure("Ranging Valid", this::getRangingValid));
   }
@@ -114,6 +114,7 @@ public class VisionSubsystem extends MeasurableSubsystem
     var td = targetData;
     return td.isValid() ? Math.toDegrees(td.getErrorRadians()) : 2767.0;
   }
+
   private double getVerticalOffsetRadians() {
     var td = targetData;
     return td.isValid() ? targetData.getVerticalOffsetRadians() : 2767.0;

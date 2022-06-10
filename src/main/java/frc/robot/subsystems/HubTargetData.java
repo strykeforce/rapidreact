@@ -5,7 +5,6 @@ import static frc.robot.Constants.VisionConstants.kHorizonFov;
 import com.squareup.moshi.JsonReader;
 import com.squareup.moshi.JsonWriter;
 import edu.wpi.first.math.geometry.Rotation2d;
-import frc.robot.Constants;
 import frc.robot.Constants.VisionConstants;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -81,11 +80,14 @@ public class HubTargetData extends TargetListTargetData {
   }
 
   public double getVerticalOffsetPixels() {
-      int maxY = targets.get(Math.round(targets.size() / 2)).topLeft.y;
-      return maxY;
+    int maxY = targets.get(Math.round(targets.size() / 2)).topLeft.y;
+    return maxY;
   }
+
   public double getVerticalOffsetRadians() {
-    return VisionConstants.kHorizonFov * getVerticalOffsetPixels() / (kFrameVerticalCenter * 2); //FIXME kVerticalFov?
+    return VisionConstants.kHorizonFov
+        * getVerticalOffsetPixels()
+        / (kFrameVerticalCenter * 2); // FIXME kVerticalFov?
   }
 
   /**
@@ -96,7 +98,9 @@ public class HubTargetData extends TargetListTargetData {
    * @throws IndexOutOfBoundsException if the list of targets is empty
    */
   public double getErrorRadians() {
-    return -VisionConstants.kVerticalFov * getErrorPixels() / (kFrameCenter * 2); //FIXME kHorizonFov?
+    return -VisionConstants.kVerticalFov
+        * getErrorPixels()
+        / (kFrameCenter * 2); // FIXME kHorizonFov?
   }
 
   /**
