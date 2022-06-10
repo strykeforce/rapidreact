@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
@@ -56,12 +55,6 @@ public class VisionSubsystem extends MeasurableSubsystem
   public void onTargetData(HubTargetData targetData) {
     this.targetData = targetData;
     fillBuffers();
-  }
-
-  public void fillBuffers() {
-    gyroBuffer.addFirst(driveSubsystem.getGyroRotation2d().getRadians());
-    turretBuffer.addFirst(turretSubsystem.getTurretRotation2d().getRadians());
-    timestampBuffer.addFirst(RobotController.getFPGATime());
   }
 
   public HubTargetData getTargetData() {
@@ -163,10 +156,17 @@ public class VisionSubsystem extends MeasurableSubsystem
     Rotation2d errorRadians = new Rotation2d(getErrorRadians());
     Rotation2d calcAngle =
         turretAngle.plus(gyroAngle).plus(TurretConstants.kTurretRobotOffset).minus(errorRadians);
-    double distanceMeters = Units.inchesToMeters(distanceInches) + VisionConstants.kLookupTableToLensOffset;
+    double distanceMeters =
+        Units.inchesToMeters(distanceInches) + VisionConstants.kLookupTableToLensOffset;
     double x, y;
-    y = Math.abs(-TurretConstants.kHubPositionMeters.getY() + distanceMeters * Math.sin(calcAngle.getRadians()));   //-4.121
-    x = Math.abs(-TurretConstants.kHubPositionMeters.getX() + distanceMeters * Math.cos(calcAngle.getRadians()));   //-8.23
+    y =
+        Math.abs(
+            -TurretConstants.kHubPositionMeters.getY()
+                + distanceMeters * Math.sin(calcAngle.getRadians())); // -4.121
+    x =
+        Math.abs(
+            -TurretConstants.kHubPositionMeters.getX()
+                + distanceMeters * Math.cos(calcAngle.getRadians())); // -8.23
     logger.info(
         "VISIONODOM: turretAngle: {}, gyroAngle: {}, calcAngle: {}, errorRadians: {}, distance: {}, X: {}, Y: {}, Odometry: {}",
         turretAngle,
@@ -178,6 +178,21 @@ public class VisionSubsystem extends MeasurableSubsystem
         y,
         driveSubsystem.getPoseMeters());
     return new Pose2d(x, y, gyroAngle);
+  }
+
+  public TimestampedPose odomNewPoseViaVision(double distanceInches) {
+    Rotation2d gyroAngle = new Rotation2d(gyroBuffer.get(VisionConstants.kBufferLookupOffset));
+    Rotation2d turretAngle = new Rotation2d(turretBuffer.get(VisionConstants.kBufferLookupOffset));
+    double timestamp = timestampBuffer.get(VisionConstants.kBufferLookupOffset);
+
+    Pose2d odomPose = getVisionOdometry(turretAngle, gyroAngle, distanceInches);
+    return new TimestampedPose((long) timestamp, odomPose);
+  }
+
+  public void fillBuffers() {
+    gyroBuffer.addFirst(driveSubsystem.getGyroRotation2d().getRadians());
+    turretBuffer.addFirst(turretSubsystem.getTurretRotation2d().getRadians());
+    timestampBuffer.addFirst(RobotController.getFPGATime());
   }
 
   public boolean isPixelWidthStable() {

@@ -19,6 +19,7 @@ import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.TurretConstants;
@@ -58,6 +59,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private double[] lastVelocity = new double[3];
   private boolean fwdStable, strStable, yawStable, velStable;
   private boolean useOdometry = true;
+  private TimestampedPose timestampedPose =
+      new TimestampedPose(RobotController.getFPGATime(), new Pose2d());
+  private VisionSubsystem visionSubsystem;
+  private ShooterSubsystem shooterSubsystem;
 
   public DriveSubsystem() {
 
@@ -132,6 +137,14 @@ public class DriveSubsystem extends MeasurableSubsystem {
     holonomicController.setEnabled(true);
   }
 
+  public void setVisionSubsystem(VisionSubsystem visionSubsystem) {
+    this.visionSubsystem = visionSubsystem;
+  }
+
+  public void setShooterSubsystem(ShooterSubsystem shooterSubsystem) {
+    this.shooterSubsystem = shooterSubsystem;
+  }
+
   public void drive(
       double forwardMetersPerSec, double strafeMetersPerSec, double yawRadiansPerSec) {
     lastVelocity[0] = forwardMetersPerSec;
@@ -182,6 +195,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   @Override
   public void periodic() {
     swerveDrive.periodic();
+    timestampedPose = visionSubsystem.odomNewPoseViaVision(shooterSubsystem.getDistInches());
   }
 
   public void resetGyro() {
@@ -397,6 +411,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure("STR Vel", () -> lastVelocity[1]),
         new Measure("YAW Vel", () -> lastVelocity[2]),
         new Measure("FeadForwardTangent", () -> getTangentVelocity()),
-        new Measure("Gyro Rate", () -> getGyroRate()));
+        new Measure("Gyro Rate", () -> getGyroRate()),
+        new Measure("Timestamp X", () -> timestampedPose.getPose().getX()),
+        new Measure("Timestamp Y", () -> timestampedPose.getPose().getY()),
+        new Measure("Timestamp Gyro", () -> timestampedPose.getPose().getRotation().getDegrees()));
   }
 }

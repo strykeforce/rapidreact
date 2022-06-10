@@ -202,7 +202,7 @@ public final class Constants {
     // + is left
     public static final double kHorizAngleCorrectionDegrees = 0.0; // -1.25 deg
     public static final int kCircularBufferSize = 10;
-    public static final int kBufferLookupOffset = 5;
+    public static final int kBufferLookupOffset = 2;
 
     // Vision test for failure const
     public static final double kTimeForVisionCheck = 1.0;
