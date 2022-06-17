@@ -214,7 +214,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
 
   public Rotation2d getTurretRotation2d() {
     return new Rotation2d(
-        turret.getSelectedSensorPosition() / -TurretConstants.kTurretTicksPerRadian);
+        turret.getSelectedSensorPosition() / TurretConstants.kTurretTicksPerRadian);
   }
 
   public void zeroTurret() {

@@ -195,7 +195,15 @@ public class DriveSubsystem extends MeasurableSubsystem {
   @Override
   public void periodic() {
     swerveDrive.periodic();
-    timestampedPose = visionSubsystem.odomNewPoseViaVision(shooterSubsystem.getDistInches());
+    if (visionSubsystem.isRangingValid()) {
+      if (Math.abs(visionSubsystem.getTargetData().getErrorRotation2d().getDegrees())
+          < DriveConstants.kMaxDegreeError) {
+        TimestampedPose pose =
+            visionSubsystem.odomNewPoseViaVision(shooterSubsystem.getDistInches());
+        timestampedPose.setPose(pose.getPose());
+        timestampedPose.setTimestamp(pose.getTimestamp());
+      }
+    }
   }
 
   public void resetGyro() {
