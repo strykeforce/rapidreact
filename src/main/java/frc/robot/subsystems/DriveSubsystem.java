@@ -23,6 +23,8 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.TurretConstants;
+import frc.robot.subsystems.DriveSubsystem.DriveStates;
+
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Set;
@@ -51,6 +53,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private final PIDController yController;
   private final PoseEstimatorOdometryStrategy odometryStrategy;
   private double[] desiredAzimuthPositions = new double[4];
+  private double didUseUpdate = 0.0;
+  private DriveStates driveStates = DriveStates.NONE;
+
   // Grapher Variables
   private ChassisSpeeds holoContOutput = new ChassisSpeeds();
   private State holoContInput = new State();
@@ -200,6 +205,27 @@ public class DriveSubsystem extends MeasurableSubsystem {
           < DriveConstants.kMaxDegreeError) {
         TimestampedPose pose =
             visionSubsystem.odomNewPoseViaVision(shooterSubsystem.getDistInches());
+
+        if (pose.getPose().getTranslation().getDistance(timestampedPose.getPose().getTranslation())
+            < DriveConstants.kUpdateThreshold) {
+          didUseUpdate = 1.0;
+          updateOdometryWithVision(pose.getPose(), pose.getTimestamp());
+        } else {
+          didUseUpdate = 0.0;
+        }
+        //State Machine 1st Update 2nd reset 3rd nothing
+        switch (driveStates) {
+          case UPDATE_ODOM:
+            
+            break;
+          case RESET_ODOM:
+
+            break;
+          case NONE:
+
+            break;
+        }
+
         timestampedPose.setPose(pose.getPose());
         timestampedPose.setTimestamp(pose.getTimestamp());
       }
@@ -271,6 +297,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public void updateOdometryWithVision(Pose2d calculatedPose) {
     odometryStrategy.addVisionMeasurement(calculatedPose, Timer.getFPGATimestamp());
+  }
+
+  public void updateOdometryWithVision(Pose2d calculatedPose, long timestamp) {
+    odometryStrategy.addVisionMeasurement(calculatedPose, timestamp);
   }
 
   public void resetHolonomicController() {
@@ -422,6 +452,14 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure("Gyro Rate", () -> getGyroRate()),
         new Measure("Timestamp X", () -> timestampedPose.getPose().getX()),
         new Measure("Timestamp Y", () -> timestampedPose.getPose().getY()),
-        new Measure("Timestamp Gyro", () -> timestampedPose.getPose().getRotation().getDegrees()));
+        new Measure("Timestamp Gyro", () -> timestampedPose.getPose().getRotation().getDegrees()),
+        new Measure("Did Use Odometry Update", () -> didUseUpdate));
   }
+
+  public enum DriveStates{
+    UPDATE_ODOM,
+    RESET_ODOM,
+    NONE;
+  }
+
 }
