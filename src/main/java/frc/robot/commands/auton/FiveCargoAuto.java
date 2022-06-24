@@ -48,7 +48,8 @@ public class FiveCargoAuto extends SequentialCommandGroup {
             new WaitCommand(delay), new IgnoreColorSensorCommand(magazineSubsystem, true)),
         new ParallelDeadlineGroup(
             new DriveAutonCommand(driveSubsystem, path1Name, true, false), // deadline
-            new ArmShooterCommandGroup(visionSubsystem, turretSubsystem, shooterSubsystem),
+            new ArmShooterCommandGroup(
+                visionSubsystem, turretSubsystem, shooterSubsystem, driveSubsystem),
             new AutoIntakeCommand(
                 magazineSubsystem, intakeSubsystem, intakeExtendSubsystem, true, true)),
         new VisionShootAutoCommand(
@@ -61,7 +62,8 @@ public class FiveCargoAuto extends SequentialCommandGroup {
             widthPixels1),
         new ParallelDeadlineGroup(
             new DriveAutonCommand(driveSubsystem, path2Name, false, true),
-            new ArmShooterCommandGroup(visionSubsystem, turretSubsystem, shooterSubsystem),
+            new ArmShooterCommandGroup(
+                visionSubsystem, turretSubsystem, shooterSubsystem, driveSubsystem),
             new AutoIntakeCommand(
                 magazineSubsystem, intakeSubsystem, intakeExtendSubsystem, true, true)),
         new VisionShootAutoCommand(
@@ -74,7 +76,8 @@ public class FiveCargoAuto extends SequentialCommandGroup {
             widthPixels2),
         new ParallelDeadlineGroup(
             new DriveAutonCommand(driveSubsystem, path3Name, false, true),
-            new ArmShooterCommandGroup(visionSubsystem, turretSubsystem, shooterSubsystem),
+            new ArmShooterCommandGroup(
+                visionSubsystem, turretSubsystem, shooterSubsystem, driveSubsystem),
             new AutoIntakeCommand(
                 magazineSubsystem, intakeSubsystem, intakeExtendSubsystem, true, true)),
         new DriveAutonCommand(driveSubsystem, path4Name, false, true),

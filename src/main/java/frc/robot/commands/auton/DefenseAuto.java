@@ -45,7 +45,8 @@ public class DefenseAuto extends SequentialCommandGroup {
         new WaitCommand(delay),
         new ParallelDeadlineGroup(
             new DriveAutonCommand(driveSubsystem, path1Name, true, true), // deadline
-            new ArmShooterCommandGroup(visionSubsystem, turretSubsystem, shooterSubsystem),
+            new ArmShooterCommandGroup(
+                visionSubsystem, turretSubsystem, shooterSubsystem, driveSubsystem),
             new AutoIntakeCommand(
                 magazineSubsystem, intakeSubsystem, intakeExtendSubsystem, true, true)),
         new VisionShootAutoCommand(

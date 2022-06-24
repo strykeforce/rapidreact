@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.TurretConstants;
 import frc.robot.subsystems.DriveSubsystem.DriveStates;
-
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Set;
@@ -68,6 +67,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
       new TimestampedPose(RobotController.getFPGATime(), new Pose2d());
   private VisionSubsystem visionSubsystem;
   private ShooterSubsystem shooterSubsystem;
+  private TimestampedPose lastTimeStampedPose =
+      new TimestampedPose(RobotController.getFPGATime(), new Pose2d());
 
   public DriveSubsystem() {
 
@@ -200,36 +201,56 @@ public class DriveSubsystem extends MeasurableSubsystem {
   @Override
   public void periodic() {
     swerveDrive.periodic();
-    if (visionSubsystem.isRangingValid()) {
-      if (Math.abs(visionSubsystem.getTargetData().getErrorRotation2d().getDegrees())
-          < DriveConstants.kMaxDegreeError) {
-        TimestampedPose pose =
-            visionSubsystem.odomNewPoseViaVision(shooterSubsystem.getDistInches());
 
-        if (pose.getPose().getTranslation().getDistance(timestampedPose.getPose().getTranslation())
-            < DriveConstants.kUpdateThreshold) {
-          didUseUpdate = 1.0;
-          updateOdometryWithVision(pose.getPose(), pose.getTimestamp());
-        } else {
-          didUseUpdate = 0.0;
+    // State Machine 1st Update 2nd reset 3rd nothing
+    switch (driveStates) {
+      case UPDATE_ODOM:
+
+      case RESET_ODOM:
+        if (visionSubsystem.isRangingValid()) {
+          if (Math.abs(visionSubsystem.getTargetData().getErrorRotation2d().getDegrees())
+              < DriveConstants.kMaxDegreeError) {
+            TimestampedPose pose =
+                visionSubsystem.odomNewPoseViaVision(shooterSubsystem.getDistInches());
+
+            timestampedPose.setPose(pose.getPose());
+            timestampedPose.setTimestamp(pose.getTimestamp());
+
+            if (driveStates == DriveStates.UPDATE_ODOM) {
+              if (pose.getPose()
+                      .getTranslation()
+                      .getDistance(swerveDrive.getPoseMeters().getTranslation())
+                  < DriveConstants.kUpdateThreshold) {
+                didUseUpdate = 1.0;
+                updateOdometryWithVision(pose.getPose(), pose.getTimestamp());
+              } else {
+                didUseUpdate = 0.0;
+              }
+            } else {
+
+              if (pose.getPose()
+                          .getTranslation()
+                          .getDistance(lastTimeStampedPose.getPose().getTranslation())
+                      < DriveConstants.kUpdateThreshold
+                  && Math.abs(visionSubsystem.getTargetData().getErrorRotation2d().getDegrees())
+                      < DriveConstants.kMaxDegreeReset) {
+                resetOdometry(pose.getPose());
+                driveStates = DriveStates.UPDATE_ODOM;
+                logger.info("RESET_ODOM -> UPDATE_ODOM");
+              }
+              lastTimeStampedPose = pose;
+            }
+          }
         }
-        //State Machine 1st Update 2nd reset 3rd nothing
-        switch (driveStates) {
-          case UPDATE_ODOM:
-            
-            break;
-          case RESET_ODOM:
-
-            break;
-          case NONE:
-
-            break;
-        }
-
-        timestampedPose.setPose(pose.getPose());
-        timestampedPose.setTimestamp(pose.getTimestamp());
-      }
+        break;
+      case NONE:
+        break;
     }
+  }
+
+  public void doOdomReset() {
+    logger.info("{} -> RESET_ODOM", driveStates);
+    driveStates = DriveStates.RESET_ODOM;
   }
 
   public void resetGyro() {
@@ -288,6 +309,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public Rotation2d getGyroRotation2d() {
     return swerveDrive.getHeading();
+  }
+
+  public int inchesToPixels(double inches) {
+    return (int) Math.round(Math.pow(8685.0 * inches, -0.738));
   }
 
   public void resetOdometry(Pose2d pose) {
@@ -456,10 +481,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure("Did Use Odometry Update", () -> didUseUpdate));
   }
 
-  public enum DriveStates{
+  public enum DriveStates {
     UPDATE_ODOM,
     RESET_ODOM,
     NONE;
   }
-
 }

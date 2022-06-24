@@ -8,7 +8,6 @@ public class TurnOnDeadeyeCommand extends InstantCommand {
 
   public TurnOnDeadeyeCommand(VisionSubsystem visionSubsystem) {
     this.visionSubsystem = visionSubsystem;
-    addRequirements(visionSubsystem);
   }
 
   @Override

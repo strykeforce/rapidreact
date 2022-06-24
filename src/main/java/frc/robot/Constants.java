@@ -49,6 +49,7 @@ public final class Constants {
     public static final double kStrafeThreshold = 0.1; // meters per second
     public static final double kGyroRateThreshold = 0.5; // degrees per second
     public static final double kMaxDegreeError = 5.0;
+    public static final double kMaxDegreeReset = 2.0;
 
     // From: https://github.com/strykeforce/axis-config/
     public static final double kMaxSpeedMetersPerSecond = 3.889;

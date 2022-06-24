@@ -7,6 +7,7 @@ import frc.robot.commands.magazine.UpperAndLowerMagazineClosedLoopTuningCommand;
 import frc.robot.commands.shooter.PitHoodAndShooterClosedLoopCommand;
 import frc.robot.commands.turret.PitTurretCloseLoopPositionCommand;
 import frc.robot.commands.vision.EnableVisionCommand;
+import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -19,12 +20,13 @@ public class PitShooterTuneCommandGroup extends ParallelCommandGroup {
       MagazineSubsystem magazineSubsystem,
       IntakeSubsystem intakeSubsystem,
       TurretSubsystem turretSubsystem,
-      VisionSubsystem visionSubsystem) {
+      VisionSubsystem visionSubsystem,
+      DriveSubsystem driveSubsystem) {
     addCommands(
         new PitHoodAndShooterClosedLoopCommand(shooterSubsystem),
         new IntakeOpenLoopCommand(intakeSubsystem, IntakeConstants.kIntakeSpeed),
         new UpperAndLowerMagazineClosedLoopTuningCommand(magazineSubsystem),
         new PitTurretCloseLoopPositionCommand(turretSubsystem),
-        new EnableVisionCommand(visionSubsystem));
+        new EnableVisionCommand(visionSubsystem, driveSubsystem));
   }
 }

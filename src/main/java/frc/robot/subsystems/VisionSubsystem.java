@@ -32,11 +32,18 @@ public class VisionSubsystem extends MeasurableSubsystem
   private boolean isVisionWorking = true;
   private final DriveSubsystem driveSubsystem;
   private TurretSubsystem turretSubsystem;
-  private CircularBuffer gyroBuffer = new CircularBuffer(VisionConstants.kCircularBufferSize);
-  private CircularBuffer turretBuffer = new CircularBuffer(VisionConstants.kCircularBufferSize);
-  private CircularBuffer timestampBuffer = new CircularBuffer(VisionConstants.kCircularBufferSize);
+  private CircularBuffer gyroBuffer;
+  private CircularBuffer turretBuffer;
+  private CircularBuffer timestampBuffer;
+  private CircularBuffer temp = new CircularBuffer(10);
+  private CircularBuffer temp2 = new CircularBuffer(10);
+  private CircularBuffer temp3 = new CircularBuffer(10);
+  private boolean canFillBuffers = false;
 
   public VisionSubsystem(DriveSubsystem driveSubsystem) {
+    timestampBuffer = new CircularBuffer(VisionConstants.kCircularBufferSize);
+    turretBuffer = new CircularBuffer(VisionConstants.kCircularBufferSize);
+    gyroBuffer = new CircularBuffer(VisionConstants.kCircularBufferSize);
     this.driveSubsystem = driveSubsystem;
     visionCheckTime.reset();
     visionCheckTime.start();
@@ -54,7 +61,7 @@ public class VisionSubsystem extends MeasurableSubsystem
   @Override
   public void onTargetData(HubTargetData targetData) {
     this.targetData = targetData;
-    fillBuffers();
+    if (canFillBuffers) fillBuffers();
   }
 
   public HubTargetData getTargetData() {
@@ -64,6 +71,11 @@ public class VisionSubsystem extends MeasurableSubsystem
   public void turnOnDeadeye() {
     deadeye.setEnabled(true);
     logger.info("Vision is turned on");
+  }
+
+  public void turnOffDeadeye() {
+    deadeye.setEnabled(false);
+    logger.info("Vision is turned off");
   }
 
   public void enable() {
@@ -195,6 +207,10 @@ public class VisionSubsystem extends MeasurableSubsystem
     timestampBuffer.addFirst(RobotController.getFPGATime());
   }
 
+  public void setFillBuffers(boolean set) {
+    canFillBuffers = set;
+  }
+
   public boolean isPixelWidthStable() {
     if (!isRangingValid()) {
       return false;
@@ -226,6 +242,7 @@ public class VisionSubsystem extends MeasurableSubsystem
 
   @Override
   public void periodic() {
+    fillBuffers();
     if (lastSerialNum != targetData.serial) {
       numOfSerialChanges++;
       lastSerialNum = targetData.serial;

@@ -41,7 +41,8 @@ public class ThreeCargoAuto extends SequentialCommandGroup {
         new WaitCommand(delay),
         new ParallelDeadlineGroup(
             new DriveAutonCommand(driveSubsystem, path1Name, true, false), // deadline
-            new ArmShooterCommandGroup(visionSubsystem, turretSubsystem, shooterSubsystem),
+            new ArmShooterCommandGroup(
+                visionSubsystem, turretSubsystem, shooterSubsystem, driveSubsystem),
             new AutoIntakeCommand(
                 magazineSubsystem, intakeSubsystem, intakeExtendSubsystem, true, true)),
         new VisionShootAutoCommand(
@@ -54,7 +55,8 @@ public class ThreeCargoAuto extends SequentialCommandGroup {
             widthPixels1),
         new ParallelDeadlineGroup(
             new DriveAutonCommand(driveSubsystem, path2Name, false, true),
-            new ArmShooterCommandGroup(visionSubsystem, turretSubsystem, shooterSubsystem),
+            new ArmShooterCommandGroup(
+                visionSubsystem, turretSubsystem, shooterSubsystem, driveSubsystem),
             new AutoIntakeCommand(
                 magazineSubsystem, intakeSubsystem, intakeExtendSubsystem, true, true)),
         new VisionShootAutoCommand(
