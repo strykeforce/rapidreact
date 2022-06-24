@@ -276,6 +276,18 @@ public class TurretSubsystem extends MeasurableSubsystem {
     rotateTo(seekAngle);
   }
 
+  public void inputOdomAim(Translation2d aimPosition) {
+    Pose2d pose = driveSubsystem.getPoseMeters();
+    Translation2d deltaPosition = aimPosition.minus(pose.getTranslation());
+    Rotation2d findAngle = new Rotation2d(deltaPosition.getX(), deltaPosition.getY());
+    findAngle = findAngle.minus(pose.getRotation());
+    findAngle = findAngle.plus(TurretConstants.kTurretRobotOffset);
+    double gyroRate = driveSubsystem.getGyroRate();
+    Rotation2d feedForward = Rotation2d.fromDegrees(gyroRate * TurretConstants.kFYaw);
+    findAngle = findAngle.plus(feedForward);
+    rotateTo(findAngle);
+  }
+
   // public void updateOpenLoopFeedFwd() {
   //   currentState = TurretState.IDLE;
   //   double[] driveVel = driveSubsystem.getDriveVelocity();
