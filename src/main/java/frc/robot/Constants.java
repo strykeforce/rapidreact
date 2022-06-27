@@ -42,7 +42,8 @@ public final class Constants {
   public static final class DriveConstants {
     // Drive Constants
     public static final double kWheelDiameterInches = 3.0 * (571.0 / 500.0); // Actual/Odometry
-    public static final double kUpdateThreshold = 0.5;
+    public static final double kUpdateThreshold = 0.08;
+    public static final double kResetThreshold = 0.005;
 
     // velocity stable
     public static final double kForwardThreshold = 0.1; // meters per second

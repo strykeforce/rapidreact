@@ -231,7 +231,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
               if (pose.getPose()
                           .getTranslation()
                           .getDistance(lastTimeStampedPose.getPose().getTranslation())
-                      < DriveConstants.kUpdateThreshold
+                      < DriveConstants.kResetThreshold
                   && Math.abs(visionSubsystem.getTargetData().getErrorRotation2d().getDegrees())
                       < DriveConstants.kMaxDegreeReset) {
                 resetOdometry(pose.getPose());
