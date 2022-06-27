@@ -19,9 +19,11 @@ import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.TurretConstants;
+import frc.robot.subsystems.DriveSubsystem.DriveStates;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Set;
@@ -50,6 +52,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private final PIDController yController;
   private final PoseEstimatorOdometryStrategy odometryStrategy;
   private double[] desiredAzimuthPositions = new double[4];
+  private double didUseUpdate = 0.0;
+  private DriveStates driveStates = DriveStates.NONE;
+
   // Grapher Variables
   private ChassisSpeeds holoContOutput = new ChassisSpeeds();
   private State holoContInput = new State();
@@ -58,6 +63,12 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private double[] lastVelocity = new double[3];
   private boolean fwdStable, strStable, yawStable, velStable;
   private boolean useOdometry = true;
+  private TimestampedPose timestampedPose =
+      new TimestampedPose(RobotController.getFPGATime(), new Pose2d());
+  private VisionSubsystem visionSubsystem;
+  private ShooterSubsystem shooterSubsystem;
+  private TimestampedPose lastTimeStampedPose =
+      new TimestampedPose(RobotController.getFPGATime(), new Pose2d());
 
   public DriveSubsystem() {
 
@@ -132,6 +143,14 @@ public class DriveSubsystem extends MeasurableSubsystem {
     holonomicController.setEnabled(true);
   }
 
+  public void setVisionSubsystem(VisionSubsystem visionSubsystem) {
+    this.visionSubsystem = visionSubsystem;
+  }
+
+  public void setShooterSubsystem(ShooterSubsystem shooterSubsystem) {
+    this.shooterSubsystem = shooterSubsystem;
+  }
+
   public void drive(
       double forwardMetersPerSec, double strafeMetersPerSec, double yawRadiansPerSec) {
     lastVelocity[0] = forwardMetersPerSec;
@@ -182,6 +201,56 @@ public class DriveSubsystem extends MeasurableSubsystem {
   @Override
   public void periodic() {
     swerveDrive.periodic();
+
+    // State Machine 1st Update 2nd reset 3rd nothing
+    switch (driveStates) {
+      case UPDATE_ODOM:
+
+      case RESET_ODOM:
+        if (visionSubsystem.isRangingValid()) {
+          if (Math.abs(visionSubsystem.getTargetData().getErrorRotation2d().getDegrees())
+              < DriveConstants.kMaxDegreeError) {
+            TimestampedPose pose =
+                visionSubsystem.odomNewPoseViaVision(shooterSubsystem.getDistInches());
+
+            timestampedPose.setPose(pose.getPose());
+            timestampedPose.setTimestamp(pose.getTimestamp());
+
+            if (driveStates == DriveStates.UPDATE_ODOM) {
+              if (pose.getPose()
+                      .getTranslation()
+                      .getDistance(swerveDrive.getPoseMeters().getTranslation())
+                  < DriveConstants.kUpdateThreshold) {
+                didUseUpdate = 1.0;
+                updateOdometryWithVision(pose.getPose(), pose.getTimestamp());
+              } else {
+                didUseUpdate = 0.0;
+              }
+            } else {
+
+              if (pose.getPose()
+                          .getTranslation()
+                          .getDistance(lastTimeStampedPose.getPose().getTranslation())
+                      < DriveConstants.kResetThreshold
+                  && Math.abs(visionSubsystem.getTargetData().getErrorRotation2d().getDegrees())
+                      < DriveConstants.kMaxDegreeReset) {
+                resetOdometry(pose.getPose());
+                driveStates = DriveStates.UPDATE_ODOM;
+                logger.info("RESET_ODOM -> UPDATE_ODOM");
+              }
+              lastTimeStampedPose = pose;
+            }
+          }
+        }
+        break;
+      case NONE:
+        break;
+    }
+  }
+
+  public void doOdomReset() {
+    logger.info("{} -> RESET_ODOM", driveStates);
+    driveStates = DriveStates.RESET_ODOM;
   }
 
   public void resetGyro() {
@@ -242,6 +311,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
     return swerveDrive.getHeading();
   }
 
+  public int inchesToPixels(double inches) {
+    return (int) Math.round(Math.pow(8685.0 * inches, -0.738));
+  }
+
   public void resetOdometry(Pose2d pose) {
     swerveDrive.resetOdometry(pose);
     logger.info("reset odometry with: {}", pose);
@@ -249,6 +322,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public void updateOdometryWithVision(Pose2d calculatedPose) {
     odometryStrategy.addVisionMeasurement(calculatedPose, Timer.getFPGATimestamp());
+  }
+
+  public void updateOdometryWithVision(Pose2d calculatedPose, long timestamp) {
+    odometryStrategy.addVisionMeasurement(calculatedPose, timestamp);
   }
 
   public void resetHolonomicController() {
@@ -397,6 +474,16 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure("STR Vel", () -> lastVelocity[1]),
         new Measure("YAW Vel", () -> lastVelocity[2]),
         new Measure("FeadForwardTangent", () -> getTangentVelocity()),
-        new Measure("Gyro Rate", () -> getGyroRate()));
+        new Measure("Gyro Rate", () -> getGyroRate()),
+        new Measure("Timestamp X", () -> timestampedPose.getPose().getX()),
+        new Measure("Timestamp Y", () -> timestampedPose.getPose().getY()),
+        new Measure("Timestamp Gyro", () -> timestampedPose.getPose().getRotation().getDegrees()),
+        new Measure("Did Use Odometry Update", () -> didUseUpdate));
+  }
+
+  public enum DriveStates {
+    UPDATE_ODOM,
+    RESET_ODOM,
+    NONE;
   }
 }

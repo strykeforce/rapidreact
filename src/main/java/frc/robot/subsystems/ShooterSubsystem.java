@@ -257,6 +257,14 @@ public class ShooterSubsystem extends MeasurableSubsystem {
     }
   }
 
+  public double getDistInches() {
+    if (visionSubsystem.isRangingValid()) {
+      double[] shootSolution = getShootSolution();
+      return shootSolution[3];
+    }
+    return 2767.0;
+  }
+
   public void strykeShot() {
     logger.info("Stryke Shot: {} -> ADJUSTING", currentState);
     currentState = ShooterState.ADJUSTING;

@@ -42,11 +42,15 @@ public final class Constants {
   public static final class DriveConstants {
     // Drive Constants
     public static final double kWheelDiameterInches = 3.0 * (571.0 / 500.0); // Actual/Odometry
+    public static final double kUpdateThreshold = 0.08;
+    public static final double kResetThreshold = 0.005;
 
     // velocity stable
     public static final double kForwardThreshold = 0.1; // meters per second
     public static final double kStrafeThreshold = 0.1; // meters per second
     public static final double kGyroRateThreshold = 0.5; // degrees per second
+    public static final double kMaxDegreeError = 5.0;
+    public static final double kMaxDegreeReset = 2.0;
 
     // From: https://github.com/strykeforce/axis-config/
     public static final double kMaxSpeedMetersPerSecond = 3.889;
@@ -201,6 +205,8 @@ public final class Constants {
     // Actual 2022 Constants
     // + is left
     public static final double kHorizAngleCorrectionDegrees = 0.0; // -1.25 deg
+    public static final int kCircularBufferSize = 10;
+    public static final int kBufferLookupOffset = 2;
 
     // Vision test for failure const
     public static final double kTimeForVisionCheck = 1.0;
@@ -208,7 +214,7 @@ public final class Constants {
 
     // Old 2020 Constants
     //    public static final double kMinContourAreaSize = 100;
-    public static final double kVerticalFov = 0.6056; // Measured 0.4939 FIXME
+    public static final double kVerticalFov = 0.4939; // old 0.6056
     public static final double kHorizonFov = 1.012; // 50.8 //146 //radians 1.012 // deg 57.999
     public static final double kLookupTableToLensOffset = 0.4959;
     //    public static final double kHorizonRes = 640; // 1280
@@ -265,8 +271,8 @@ public final class Constants {
     public static final double kWrapTicks = 70_000;
 
     // Rotate Under Vision Constants
-    public static final double kRotateByInitialKp = -0.4; // -0.4
-    public static final double kRotateByFinalKp = -0.4; // -0.4
+    public static final double kRotateByInitialKp = -0.49; // old -0.4
+    public static final double kRotateByFinalKp = -0.49; // old -0.4
     public static final int kNotValidTargetCounts = 5; // how many frames to wait before seeking
     public static final double kFYaw = 4.0;
     public static final double kFTangentVelocity = 0.95; // 0.9

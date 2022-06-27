@@ -2,7 +2,10 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.util.CircularBuffer;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.TurretConstants;
 import frc.robot.Constants.VisionConstants;
@@ -28,8 +31,19 @@ public class VisionSubsystem extends MeasurableSubsystem
   private Timer visionCheckTime = new Timer();
   private boolean isVisionWorking = true;
   private final DriveSubsystem driveSubsystem;
+  private TurretSubsystem turretSubsystem;
+  private CircularBuffer gyroBuffer;
+  private CircularBuffer turretBuffer;
+  private CircularBuffer timestampBuffer;
+  private CircularBuffer temp = new CircularBuffer(10);
+  private CircularBuffer temp2 = new CircularBuffer(10);
+  private CircularBuffer temp3 = new CircularBuffer(10);
+  private boolean canFillBuffers = false;
 
   public VisionSubsystem(DriveSubsystem driveSubsystem) {
+    timestampBuffer = new CircularBuffer(VisionConstants.kCircularBufferSize);
+    turretBuffer = new CircularBuffer(VisionConstants.kCircularBufferSize);
+    gyroBuffer = new CircularBuffer(VisionConstants.kCircularBufferSize);
     this.driveSubsystem = driveSubsystem;
     visionCheckTime.reset();
     visionCheckTime.start();
@@ -40,9 +54,14 @@ public class VisionSubsystem extends MeasurableSubsystem
     HubTargetData.kFrameCenter = deadeye.getCapture().width / 2;
   }
 
+  public void setTurretSubsystem(TurretSubsystem turretSubsystem) {
+    this.turretSubsystem = turretSubsystem;
+  }
+
   @Override
   public void onTargetData(HubTargetData targetData) {
     this.targetData = targetData;
+    if (canFillBuffers) fillBuffers();
   }
 
   public HubTargetData getTargetData() {
@@ -52,6 +71,11 @@ public class VisionSubsystem extends MeasurableSubsystem
   public void turnOnDeadeye() {
     deadeye.setEnabled(true);
     logger.info("Vision is turned on");
+  }
+
+  public void turnOffDeadeye() {
+    deadeye.setEnabled(false);
+    logger.info("Vision is turned off");
   }
 
   public void enable() {
@@ -144,10 +168,17 @@ public class VisionSubsystem extends MeasurableSubsystem
     Rotation2d errorRadians = new Rotation2d(getErrorRadians());
     Rotation2d calcAngle =
         turretAngle.plus(gyroAngle).plus(TurretConstants.kTurretRobotOffset).minus(errorRadians);
-    double distanceMeters = distanceInches * 0.0254 + VisionConstants.kLookupTableToLensOffset;
+    double distanceMeters =
+        Units.inchesToMeters(distanceInches) + VisionConstants.kLookupTableToLensOffset;
     double x, y;
-    y = Math.abs(-4.121 + distanceMeters * Math.sin(calcAngle.getRadians()));
-    x = Math.abs(-8.23 + distanceMeters * Math.cos(calcAngle.getRadians()));
+    y =
+        Math.abs(
+            -TurretConstants.kHubPositionMeters.getY()
+                + distanceMeters * Math.sin(calcAngle.getRadians())); // -4.121
+    x =
+        Math.abs(
+            -TurretConstants.kHubPositionMeters.getX()
+                + distanceMeters * Math.cos(calcAngle.getRadians())); // -8.23
     logger.info(
         "VISIONODOM: turretAngle: {}, gyroAngle: {}, calcAngle: {}, errorRadians: {}, distance: {}, X: {}, Y: {}, Odometry: {}",
         turretAngle,
@@ -159,6 +190,25 @@ public class VisionSubsystem extends MeasurableSubsystem
         y,
         driveSubsystem.getPoseMeters());
     return new Pose2d(x, y, gyroAngle);
+  }
+
+  public TimestampedPose odomNewPoseViaVision(double distanceInches) {
+    Rotation2d gyroAngle = new Rotation2d(gyroBuffer.get(VisionConstants.kBufferLookupOffset));
+    Rotation2d turretAngle = new Rotation2d(turretBuffer.get(VisionConstants.kBufferLookupOffset));
+    double timestamp = timestampBuffer.get(VisionConstants.kBufferLookupOffset);
+
+    Pose2d odomPose = getVisionOdometry(turretAngle, gyroAngle, distanceInches);
+    return new TimestampedPose((long) timestamp, odomPose);
+  }
+
+  public void fillBuffers() {
+    gyroBuffer.addFirst(driveSubsystem.getGyroRotation2d().getRadians());
+    turretBuffer.addFirst(turretSubsystem.getTurretRotation2d().getRadians());
+    timestampBuffer.addFirst(RobotController.getFPGATime());
+  }
+
+  public void setFillBuffers(boolean set) {
+    canFillBuffers = set;
   }
 
   public boolean isPixelWidthStable() {
@@ -192,6 +242,7 @@ public class VisionSubsystem extends MeasurableSubsystem
 
   @Override
   public void periodic() {
+    fillBuffers();
     if (lastSerialNum != targetData.serial) {
       numOfSerialChanges++;
       lastSerialNum = targetData.serial;

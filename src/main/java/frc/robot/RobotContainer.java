@@ -154,6 +154,9 @@ public class RobotContainer {
 
     turretSubsystem.setMagazineSubsystem(magazineSubsystem);
     magazineSubsystem.setShooterSubsystem(shooterSubsystem);
+    visionSubsystem.setTurretSubsystem(turretSubsystem);
+    driveSubsystem.setShooterSubsystem(shooterSubsystem);
+    driveSubsystem.setVisionSubsystem(visionSubsystem);
     if (!isEvent) {
       configureTelemetry();
       configurePitDashboard();
@@ -162,6 +165,7 @@ public class RobotContainer {
     configureOperatorButtonBindings();
     configureMatchDashboard();
     // configureManualClimbButtons();
+    visionSubsystem.setFillBuffers(true);
   }
 
   public VisionSubsystem getVisionSubsystem() {
@@ -242,7 +246,7 @@ public class RobotContainer {
         .whenPressed(new SeekCenterOdometryCommand(turretSubsystem));
 
     new JoystickButton(driveJoystick, Trim.LEFT_Y_POS.id)
-        .whenPressed(new EnableVisionCommand(visionSubsystem));
+        .whenPressed(new EnableVisionCommand(visionSubsystem, driveSubsystem));
 
     // Drive Practice Odometry Reset
     new JoystickButton(driveJoystick, Trim.LEFT_Y_NEG.id)
@@ -354,7 +358,8 @@ public class RobotContainer {
     // Arm Shooter
     new JoystickButton(xboxController, XboxController.Button.kB.value)
         .whenPressed(
-            new ArmShooterCommandGroup(visionSubsystem, turretSubsystem, shooterSubsystem));
+            new ArmShooterCommandGroup(
+                visionSubsystem, turretSubsystem, shooterSubsystem, driveSubsystem));
 
     // Stop Shoot
     new JoystickButton(xboxController, XboxController.Button.kX.value)
@@ -673,7 +678,7 @@ public class RobotContainer {
 
     // Vision Commands
     pitTab
-        .add("Seek", new TurretAimCommandGroup(visionSubsystem, turretSubsystem))
+        .add("Seek", new TurretAimCommandGroup(visionSubsystem, turretSubsystem, driveSubsystem))
         .withPosition(5, 0);
     // SmartDashboard.putData(
     //     "Pit/Turret/Seek", new TurretAimCommandGroup(visionSubsystem, turretSubsystem));
@@ -698,7 +703,8 @@ public class RobotContainer {
             magazineSubsystem,
             intakeSubsystem,
             turretSubsystem,
-            visionSubsystem));
+            visionSubsystem,
+            driveSubsystem));
     SmartDashboard.putData(
         "Tune/Stop",
         new StopShooterCommandGroup(
