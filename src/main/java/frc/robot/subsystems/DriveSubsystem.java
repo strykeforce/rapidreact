@@ -19,6 +19,7 @@ import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.DriveConstants;
@@ -217,9 +218,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
             timestampedPose.setTimestamp(pose.getTimestamp());
 
             if (driveStates == DriveStates.UPDATE_ODOM) {
-              if (pose.getPose()
-                      .getTranslation()
-                      .getDistance(swerveDrive.getPoseMeters().getTranslation())
+              if (distancePose(pose.getPose(), swerveDrive.getPoseMeters())
                   < DriveConstants.kUpdateThreshold) {
                 didUseUpdate = 1.0;
                 updateOdometryWithVision(pose.getPose(), pose.getTimestamp());
@@ -228,9 +227,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
               }
             } else {
 
-              if (pose.getPose()
-                          .getTranslation()
-                          .getDistance(lastTimeStampedPose.getPose().getTranslation())
+              if (distancePose(pose.getPose(), timestampedPose.getPose())
                       < DriveConstants.kResetThreshold
                   && Math.abs(visionSubsystem.getTargetData().getErrorRotation2d().getDegrees())
                       < DriveConstants.kMaxDegreeReset) {
@@ -246,6 +243,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
       case NONE:
         break;
     }
+  }
+
+  public double distancePose(Pose2d a, Pose2d b) {
+    return a.getTranslation().getDistance(b.getTranslation());
   }
 
   public void doOdomReset() {
@@ -311,7 +312,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
     return swerveDrive.getHeading();
   }
 
-  public int inchesToPixels(double inches) {
+  public int getPixelOdometry(Translation2d hubPose) {
+    double inches =
+        Units.inchesToMeters(hubPose.getDistance(swerveDrive.getPoseMeters().getTranslation()));
     return (int) Math.round(Math.pow(8685.0 * inches, -0.738));
   }
 

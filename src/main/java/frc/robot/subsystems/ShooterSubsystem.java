@@ -7,8 +7,10 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.opencsv.CSVReader;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.Constants;
 import frc.robot.Constants.ShooterConstants;
+import frc.robot.Constants.TurretConstants;
 import java.io.FileReader;
 import java.util.List;
 import java.util.Set;
@@ -157,6 +159,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
     shootSolution[1] = Double.parseDouble(lookupTable[index][3]);
     shootSolution[2] = Double.parseDouble(lookupTable[index][4]);
     shootSolution[3] = Double.parseDouble(lookupTable[index][0]);
+    shootSolution[4] = Double.parseDouble(lookupTable[index][5]);
     return shootSolution;
   }
 
@@ -236,6 +239,34 @@ public class ShooterSubsystem extends MeasurableSubsystem {
     shooterClosedLoop(
         ShooterConstants.kKickerArmTicksP100ms, ShooterConstants.kShooterArmTicksP100ms);
     logger.info("Arming starting");
+  }
+
+  public Translation2d getFutureGoalPos() {
+    if (currentState != ShooterState.SHOOT) {
+      logger.info("SHOOT: {} -> ADJUSTING", currentState);
+      currentState = ShooterState.ADJUSTING;
+    }
+    if (!magazineSubsystem.isNextCargoAlliance()) {
+      shooterClosedLoop(
+          ShooterConstants.kKickerOpTicksP100ms, ShooterConstants.kShooterOpTicksP100ms);
+      hoodClosedLoop(ShooterConstants.kHoodOpTicks);
+    } else {
+      if (visionSubsystem.isRangingValid()) {
+        double[] shootSolution =
+            getShootSolution(driveSubsystem.getPixelOdometry(TurretConstants.kHubPositionMeters));
+        double[] velocity = driveSubsystem.getDriveVelocity();
+        double dx = -velocity[0] * shootSolution[4];
+        double dy = -velocity[1] * shootSolution[4];
+        Translation2d delta = new Translation2d(dx, dy);
+        Translation2d newHub = TurretConstants.kHubPositionMeters;
+        newHub = newHub.plus(delta);
+        shootSolution = getShootSolution(driveSubsystem.getPixelOdometry(newHub));
+        shooterClosedLoop(shootSolution[0], shootSolution[1]);
+        hoodClosedLoop(shootSolution[2]);
+        return newHub;
+      }
+    }
+    return TurretConstants.kHubPositionMeters;
   }
 
   public void shoot() {
