@@ -23,9 +23,11 @@ import org.strykeforce.deadeye.TargetListTargetData;
 public class HubTargetData extends TargetListTargetData {
 
   static int kFrameCenter = Integer.MAX_VALUE;
+  static int kFrameVerticalCenter = Integer.MAX_VALUE;
   private final double errorPixels;
   private final double range;
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
+  public boolean evenNumTargets = false;
 
   public HubTargetData() {
     super();
@@ -77,6 +79,17 @@ public class HubTargetData extends TargetListTargetData {
     return errorPixels;
   }
 
+  public double getVerticalOffsetPixels() {
+    int maxY = targets.get(Math.round(targets.size() / 2)).topLeft.y;
+    return maxY;
+  }
+
+  public double getVerticalOffsetRadians() {
+    return VisionConstants.kHorizonFov
+        * getVerticalOffsetPixels()
+        / (kFrameVerticalCenter * 2); // FIXME kVerticalFov?
+  }
+
   /**
    * Return the angle from the center of the Hub target group to the center of the camera frame. You
    * should check {@link #isValid()} before calling this method.
@@ -85,7 +98,9 @@ public class HubTargetData extends TargetListTargetData {
    * @throws IndexOutOfBoundsException if the list of targets is empty
    */
   public double getErrorRadians() {
-    return -VisionConstants.kVerticalFov * getErrorPixels() / (kFrameCenter * 2);
+    return -VisionConstants.kVerticalFov
+        * getErrorPixels()
+        / (kFrameCenter * 2); // FIXME kHorizonFov?
   }
 
   /**
@@ -111,14 +126,43 @@ public class HubTargetData extends TargetListTargetData {
       Rect rightTarget = targets.get((targets.size() - 1) / 2 + 1);
 
       pixelWidth = rightTarget.bottomRight.x - leftTarget.topLeft.x;
+      evenNumTargets = false;
     } else {
       Rect leftTarget = targets.get(targets.size() / 2 - 2);
       Rect rightTarget = targets.get(targets.size() / 2 + 1);
 
       pixelWidth = rightTarget.topLeft.x - leftTarget.bottomRight.x;
+      evenNumTargets = true;
     }
 
     return pixelWidth;
+  }
+
+  public boolean isNumTargetsEven() {
+    return evenNumTargets;
+  }
+
+  public int getVerticalPixelHeight() {
+    int pixelHeight;
+    if (targets.size() % 2 == 1) {
+      Rect centerTarget = targets.get((targets.size() - 1) / 2);
+      Rect rightTarget = targets.get((targets.size() - 1) / 2 + 1);
+      Rect leftTarget = targets.get((targets.size() - 1) / 2 - 1);
+
+      pixelHeight =
+          (rightTarget.bottomRight.y + leftTarget.bottomRight.y) / 2 - centerTarget.topLeft.y;
+    } else {
+      Rect rightCenterTarget = targets.get(targets.size() / 2);
+      Rect rightTarget = targets.get(targets.size() / 2 + 1);
+      Rect leftCenterTarget = targets.get(targets.size() / 2 - 1);
+      Rect leftTarget = targets.get(targets.size() / 2 - 2);
+
+      pixelHeight =
+          ((rightTarget.bottomRight.y - rightCenterTarget.topLeft.y)
+                  + (leftTarget.bottomRight.y - leftCenterTarget.topLeft.y))
+              / 2;
+    }
+    return pixelHeight;
   }
 
   public double testGetDistance() {

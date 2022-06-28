@@ -52,6 +52,7 @@ public class VisionSubsystem extends MeasurableSubsystem
     deadeye = new Deadeye<>("A0", HubTargetData.class, networkTableInstance);
     deadeye.setTargetDataListener(this);
     HubTargetData.kFrameCenter = deadeye.getCapture().width / 2;
+    HubTargetData.kFrameVerticalCenter = deadeye.getCapture().height / 2;
   }
 
   public void setTurretSubsystem(TurretSubsystem turretSubsystem) {
@@ -98,12 +99,26 @@ public class VisionSubsystem extends MeasurableSubsystem
         new Measure("Target Data Valid", this::getValid),
         new Measure("Test Pixel Width", this::getTargetsDistancePixel),
         new Measure("Test Ground Distance", this::getTargetsDistanceGround),
+        new Measure("Is Even Num Of Targets", () -> isNumTargetsEven() ? 1.0 : 0.0),
+        new Measure("Vertical Pixel Height", this::getVerticalPixelHeight),
+        new Measure("Vertical Radian Offset", this::getVerticalOffsetRadians),
+        new Measure("Target Data SN", () -> targetData.serial),
         new Measure("Target Data SN", () -> targetData.serial),
         new Measure("Ranging Valid", this::getRangingValid));
   }
 
   // these private getters are for the grapher and prevent a data race that can occur if targetData
   // updates after isValid() and before getErrorXXX()
+  private boolean isNumTargetsEven() {
+    var td = targetData;
+    return td.isValid() ? td.isNumTargetsEven() : false;
+  }
+
+  private double getVerticalPixelHeight() {
+    var td = targetData;
+    return td.isValid() ? td.getVerticalPixelHeight() : 2767.0;
+  }
+
   private double getErrorPixels() {
     var td = targetData;
     return td.isValid() ? td.getErrorPixels() : 2767.0;
@@ -122,6 +137,11 @@ public class VisionSubsystem extends MeasurableSubsystem
   private double getErrorDegrees() {
     var td = targetData;
     return td.isValid() ? Math.toDegrees(td.getErrorRadians()) : 2767.0;
+  }
+
+  private double getVerticalOffsetRadians() {
+    var td = targetData;
+    return td.isValid() ? targetData.getVerticalOffsetRadians() : 2767.0;
   }
 
   // not used
