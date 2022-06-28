@@ -361,6 +361,10 @@ public class RobotContainer {
             new ArmShooterCommandGroup(
                 visionSubsystem, turretSubsystem, shooterSubsystem, driveSubsystem));
 
+    // Toggle don't shoot
+    new JoystickButton(xboxController, XboxController.Button.kLeftStick.value)
+        .whenPressed(new InstantCommand(magazineSubsystem::toggleContinuedShoot));
+
     // Stop Shoot
     new JoystickButton(xboxController, XboxController.Button.kX.value)
         .whenPressed(
@@ -476,6 +480,16 @@ public class RobotContainer {
         .addBoolean("UseOdometry", () -> driveSubsystem.getUseOdometry())
         .withSize(1, 1)
         .withPosition(4, 1);
+
+    Shuffleboard.getTab("Match2")
+        .add("ToggleShootWhileMove", new InstantCommand(magazineSubsystem::toggleShootWhileMove))
+        .withSize(1, 1)
+        .withPosition(0, 0);
+
+    Shuffleboard.getTab("Match2")
+        .addBoolean("ShootWhileMove", () -> magazineSubsystem.getShootWhileMove())
+        .withSize(1, 1)
+        .withPosition(1, 0);
   }
 
   public void setAllianceColor(Alliance alliance) {

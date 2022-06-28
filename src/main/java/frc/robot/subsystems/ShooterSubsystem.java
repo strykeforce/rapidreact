@@ -44,6 +44,8 @@ public class ShooterSubsystem extends MeasurableSubsystem {
   public boolean isOutside = true;
   private double lastLookupDistance = 0.0;
   private boolean lastLookupBeyondTable = false;
+  private Translation2d newHub = new Translation2d();
+  private Translation2d delta = new Translation2d();
 
   public ShooterSubsystem(
       MagazineSubsystem magazineSubsystem,
@@ -124,7 +126,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
 
   private double[] getShootSolution(double widthPixels) {
     int index = 0;
-    double[] shootSolution = new double[4];
+    double[] shootSolution = new double[5];
     if (widthPixels < ShooterConstants.kLookupMinPixel) {
       logger.warn(
           "Pixel width {} is less than min pixel in table, using {}",
@@ -257,8 +259,8 @@ public class ShooterSubsystem extends MeasurableSubsystem {
         double[] velocity = driveSubsystem.getDriveVelocity();
         double dx = -velocity[0] * shootSolution[4];
         double dy = -velocity[1] * shootSolution[4];
-        Translation2d delta = new Translation2d(dx, dy);
-        Translation2d newHub = TurretConstants.kHubPositionMeters;
+        delta = new Translation2d(dx, dy);
+        newHub = TurretConstants.kHubPositionMeters;
         newHub = newHub.plus(delta);
         shootSolution = getShootSolution(driveSubsystem.getPixelOdometry(newHub));
         shooterClosedLoop(shootSolution[0], shootSolution[1]);
@@ -447,7 +449,12 @@ public class ShooterSubsystem extends MeasurableSubsystem {
 
   @Override
   public Set<Measure> getMeasures() {
-    return Set.of(new Measure("Shooter State", () -> currentState.ordinal()));
+    return Set.of(
+        new Measure("Shooter State", () -> currentState.ordinal()),
+        new Measure("Future Goal X", () -> newHub.getX()),
+        new Measure("Future Goal Y", () -> newHub.getY()),
+        new Measure("Delta Goal X", () -> delta.getX()),
+        new Measure("Delta Goal Y", () -> delta.getY()));
   }
 
   public enum ShooterState {

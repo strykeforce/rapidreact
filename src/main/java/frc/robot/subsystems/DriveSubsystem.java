@@ -315,7 +315,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   public int getPixelOdometry(Translation2d hubPose) {
     double inches =
         Units.inchesToMeters(hubPose.getDistance(swerveDrive.getPoseMeters().getTranslation()));
-    return (int) Math.round(Math.pow(8685.0 * inches, -0.738));
+    return (int) Math.round(8685 * Math.pow(inches, -0.738));
   }
 
   public void resetOdometry(Pose2d pose) {

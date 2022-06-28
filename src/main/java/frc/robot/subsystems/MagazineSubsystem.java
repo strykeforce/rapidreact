@@ -11,6 +11,7 @@ import com.revrobotics.ColorMatch;
 import com.revrobotics.ColorMatchResult;
 import com.revrobotics.ColorSensorV3;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.Timer;
@@ -54,6 +55,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   private int shootUpperBeamStableCounts = 0;
   private boolean doTimedShoot = false;
   private boolean doOdomVisionReset = false;
+  private boolean shootWhileMove = false;
 
   public MagazineSubsystem(
       TurretSubsystem turretSubsystem,
@@ -97,6 +99,22 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   public void setDoVisionOdometryReset(boolean doReset) {
     doOdomVisionReset = doReset;
     logger.info("DoVisionOdometryReset: {}", doReset);
+  }
+
+  public void setShootWhileMove(boolean move) {
+    shootWhileMove = move;
+  }
+
+  public void toggleShootWhileMove() {
+    shootWhileMove = !shootWhileMove;
+  }
+
+  public void toggleContinuedShoot() {
+    continueToShoot = !continueToShoot;
+  }
+
+  public boolean getShootWhileMove() {
+    return shootWhileMove;
   }
 
   public void enableUpperBeamBreak(boolean enableUpper) {
@@ -523,6 +541,9 @@ public class MagazineSubsystem extends MeasurableSubsystem {
         if (shootTimer.hasElapsed(MagazineConstants.kShootDelay)) {
           logger.info("CARGO_SHOT -> EMPTY");
           currUpperMagazineState = UpperMagazineState.EMPTY;
+          if (turretSubsystem.getState() == TurretState.ODOM_FEED) {
+            turretSubsystem.trackTarget();
+          }
           if (turretSubsystem.getState() == TurretState.GEYSER_AIMED) {
             turretSubsystem.geyserShot(false);
           }
@@ -565,7 +586,8 @@ public class MagazineSubsystem extends MeasurableSubsystem {
         if (shooterSubsystem.getCurrentState() == ShooterState.SHOOT
             && turretSubsystem.getState() == TurretState.TRACKING
             && visionSubsystem.isPixelWidthStable()
-            && driveSubsystem.isVelocityStable()) {
+            && driveSubsystem.isVelocityStable()
+            && !shootWhileMove) {
           shooterSubsystem.logShotSol();
           if (!shooterSubsystem.isLastLookupBeyondTable()) {
             Pose2d calcPose =
@@ -591,6 +613,17 @@ public class MagazineSubsystem extends MeasurableSubsystem {
             timedShootTimer.reset();
             timedShootTimer.start();
           } else {
+            logger.info("PAUSE -> SHOOT");
+            enableUpperBeamBreak(false);
+            upperClosedLoopRotate(MagazineConstants.kUpperMagazineFeedSpeed);
+            currUpperMagazineState = UpperMagazineState.SHOOT;
+          }
+        } else if (shootWhileMove) {
+          Translation2d futureGoal = shooterSubsystem.getFutureGoalPos();
+          turretSubsystem.trackOdom(futureGoal);
+          if (shooterSubsystem.getCurrentState() == ShooterState.SHOOT
+              && turretSubsystem.isTurretAtOdom()) {
+            shooterSubsystem.logShotSol();
             logger.info("PAUSE -> SHOOT");
             enableUpperBeamBreak(false);
             upperClosedLoopRotate(MagazineConstants.kUpperMagazineFeedSpeed);
