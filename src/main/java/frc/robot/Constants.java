@@ -794,6 +794,7 @@ public final class Constants {
     public static final int kKickerFalconID = 41;
     public static final int kHoodTalonID = 42;
     public static final String kLookupTablePath = "/home/lvuser/deploy/LookupTable.csv";
+    public static final String kInchTablePath = "/home/lvuser/deploy/InchToPixel.csv";
 
     // StrykeShot Constants
     public static final double kMiddleClimbY = 6.7;
@@ -809,6 +810,10 @@ public final class Constants {
     public static final double kLookupMaxPixel = 414;
     public static final double kNumRows = 288;
     public static final double kLookupRes = 1.0;
+    public static final double kLookupMinInchChange = 0.5;
+    public static final double kLookupMinInch = 60;
+    public static final double kLookupMaxInch = 292;
+    public static final double kLookupInchMaxIndex = 465;
 
     // Hood Encoder Constants
     public static final int kHoodZeroTicks = 935; // 1800

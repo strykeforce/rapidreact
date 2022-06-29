@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.TurretConstants;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.DriveSubsystem.DriveStates;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -312,10 +313,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
     return swerveDrive.getHeading();
   }
 
-  public int getPixelOdometry(Translation2d hubPose) {
-    double inches =
-        Units.inchesToMeters(hubPose.getDistance(swerveDrive.getPoseMeters().getTranslation()));
-    return (int) Math.round(8685 * Math.pow(inches, -0.738));
+  public double getDistToTranslation2d(Translation2d hubPose) {
+    return Units.metersToInches(
+        hubPose.getDistance(swerveDrive.getPoseMeters().getTranslation())
+            - VisionConstants.kLookupTableToLensOffset);
   }
 
   public void resetOdometry(Pose2d pose) {
@@ -481,7 +482,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure("Timestamp X", () -> timestampedPose.getPose().getX()),
         new Measure("Timestamp Y", () -> timestampedPose.getPose().getY()),
         new Measure("Timestamp Gyro", () -> timestampedPose.getPose().getRotation().getDegrees()),
-        new Measure("Did Use Odometry Update", () -> didUseUpdate));
+        new Measure("Did Use Odometry Update", () -> didUseUpdate),
+        new Measure(
+            "Odometry Distance", () -> getDistToTranslation2d(TurretConstants.kHubPositionMeters)));
   }
 
   public enum DriveStates {
