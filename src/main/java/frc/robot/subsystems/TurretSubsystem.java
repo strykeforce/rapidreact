@@ -42,7 +42,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
   private double cruiseVelocity = kFastCruiseVelocity;
   private boolean lastDoRotate = false;
   private boolean isBallOne = true;
-  private DigitalInput zeroTurretInput = new DigitalInput(9);
+  private DigitalInput zeroTurretInput = new DigitalInput(9); 
 
   private int trackingStableCount;
   private int wrappingCount = 0;

@@ -66,7 +66,7 @@ public class ClimbSubsystem extends MeasurableSubsystem {
     shoulderTalon = new TalonSRX(ClimbConstants.kClimbShoulderId);
     pivotRatchet = new Servo(ClimbConstants.kPivotArmRatchetId);
     fixedRatchet = new Servo(ClimbConstants.kFixedArmRatchetId);
-    leftArmHome = new DigitalInput(ClimbConstants.kLeftFixedHomeId);
+    //leftArmHome = new DigitalInput(ClimbConstants.kLeftFixedHomeId);//FIXME Channel 0: Disabled for time testing
     rightArmHome = new DigitalInput(ClimbConstants.kRightFixedHomeId);
     enablePivotRatchet(false);
     enableFixedRatchet(false);

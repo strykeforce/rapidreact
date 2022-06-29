@@ -13,12 +13,14 @@ import com.revrobotics.ColorSensorV3;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.I2C.Port;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Constants;
 import frc.robot.Constants.MagazineConstants;
 import frc.robot.subsystems.ShooterSubsystem.ShooterState;
 import frc.robot.subsystems.TurretSubsystem.TurretState;
+
 import java.util.List;
 import java.util.Set;
 import org.slf4j.Logger;
@@ -54,6 +56,11 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   private int shootUpperBeamStableCounts = 0;
   private boolean doTimedShoot = false;
   private boolean doOdomVisionReset = false;
+
+  private DigitalInput didCargoHitTarget = new DigitalInput(0); //FIXME TEMP FOR TIME TEST LEFTARMHOME CLIMB DIO
+  private long upperEnableTime = 0;
+  private long cargoHitTargetTime = 0;
+  private long shotTimeSec = 0;
 
   public MagazineSubsystem(
       TurretSubsystem turretSubsystem,
@@ -537,6 +544,11 @@ public class MagazineSubsystem extends MeasurableSubsystem {
           currUpperMagazineState = UpperMagazineState.WAIT_AIM;
           upperClosedLoopRotate(MagazineConstants.kUpperMagazineIndexSpeed);
         }
+        if (didCargoHitTarget.get()) {
+          cargoHitTargetTime = System.currentTimeMillis();
+          long shotTimeMilli = cargoHitTargetTime - upperEnableTime;
+          shotTimeSec = shotTimeMilli / 1000;
+        }
         break;
 
       case WAIT_AIM:
@@ -593,6 +605,9 @@ public class MagazineSubsystem extends MeasurableSubsystem {
           } else {
             logger.info("PAUSE -> SHOOT");
             enableUpperBeamBreak(false);
+
+            upperEnableTime = System.currentTimeMillis(); //UPPERMAGTIME
+
             upperClosedLoopRotate(MagazineConstants.kUpperMagazineFeedSpeed);
             currUpperMagazineState = UpperMagazineState.SHOOT;
           }
@@ -653,7 +668,9 @@ public class MagazineSubsystem extends MeasurableSubsystem {
         new Measure("green", () -> lastColor.green),
         new Measure("Proximity", () -> lastProximity),
         new Measure("Lower Mag State", () -> currLowerMagazineState.ordinal()),
-        new Measure("Upper Mag State", () -> currUpperMagazineState.ordinal()));
+        new Measure("Upper Mag State", () -> currUpperMagazineState.ordinal()),
+        new Measure("Upper Mag Enable Time", () -> upperEnableTime),
+        new Measure("Shot Time Seconds", () -> shotTimeSec));
   }
 
   public enum CargoColor {
