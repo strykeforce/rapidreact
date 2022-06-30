@@ -670,7 +670,8 @@ public class MagazineSubsystem extends MeasurableSubsystem {
         new Measure("Lower Mag State", () -> currLowerMagazineState.ordinal()),
         new Measure("Upper Mag State", () -> currUpperMagazineState.ordinal()),
         new Measure("Upper Mag Enable Time", () -> upperEnableTime),
-        new Measure("Shot Time Seconds", () -> shotTimeSec));
+        new Measure("Shot Time Seconds", () -> shotTimeSec),
+        new Measure("DIO Sound Sensor", () -> didCargoHitTarget));
   }
 
   public enum CargoColor {
