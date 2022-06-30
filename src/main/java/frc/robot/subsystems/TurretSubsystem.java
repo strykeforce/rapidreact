@@ -314,9 +314,14 @@ public class TurretSubsystem extends MeasurableSubsystem {
     logger.info("Started tracking target");
     // currentState = TurretState.SEEK_LEFT;
     // setSeekAngle(true);
-    setCruiseVelocityFast(true); // true
-    seekCenter();
-    currentState = TurretState.SEEK_CENTER; // SEEK_CENTER
+    HubTargetData targetData = visionSubsystem.getTargetData();
+    setCruiseVelocityFast(true);
+    if (targetData.isValid()) {
+      currentState = TurretState.AIMING;
+    } else {
+      seekCenter();
+      currentState = TurretState.SEEK_CENTER; // SEEK_CENTER
+    }
   }
 
   public void odometryAim() {
