@@ -105,6 +105,15 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     shootWhileMove = move;
   }
 
+  public Boolean getContinuedShoot() {
+    return continueToShoot;
+  }
+
+  public void toggleShootMoveContinuedShoot() {
+    shootWhileMove = !shootWhileMove;
+    continueToShoot = !continueToShoot;
+  }
+
   public void toggleShootWhileMove() {
     shootWhileMove = !shootWhileMove;
   }

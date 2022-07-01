@@ -227,11 +227,11 @@ public class DriveSubsystem extends MeasurableSubsystem {
                 didUseUpdate = 0.0;
               }
             } else {
-
               if (distancePose(pose.getPose(), timestampedPose.getPose())
                       < DriveConstants.kResetThreshold
                   && Math.abs(visionSubsystem.getTargetData().getErrorRotation2d().getDegrees())
-                      < DriveConstants.kMaxDegreeReset) {
+                      < DriveConstants.kMaxDegreeReset
+                  && visionSubsystem.isPixelWidthStable()) {
                 resetOdometry(pose.getPose());
                 driveStates = DriveStates.UPDATE_ODOM;
                 logger.info("RESET_ODOM -> UPDATE_ODOM");

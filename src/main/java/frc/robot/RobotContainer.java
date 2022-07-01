@@ -309,7 +309,7 @@ public class RobotContainer {
   private void configureOperatorButtonBindings() {
     // Zero Climb
     new JoystickButton(xboxController, XboxController.Button.kStart.value)
-        .whenReleased(new ZeroClimbCommand(climbSubsystem));
+        .whenReleased(new InstantCommand(magazineSubsystem::toggleShootMoveContinuedShoot));
     // new JoystickButton(xboxController, XboxController.Button.kLeftStick.value)
     //     .whenPressed(new ExtendSailCommand(climbSubsystem));
     // new JoystickButton(xboxController, XboxController.Button.kRightStick.value)
@@ -490,6 +490,11 @@ public class RobotContainer {
         .addBoolean("ShootWhileMove", () -> magazineSubsystem.getShootWhileMove())
         .withSize(1, 1)
         .withPosition(1, 0);
+
+    Shuffleboard.getTab("Match2")
+        .addBoolean("ContinuedShoot", () -> magazineSubsystem.getContinuedShoot())
+        .withSize(1, 1)
+        .withPosition(1, 1);
   }
 
   public void setAllianceColor(Alliance alliance) {

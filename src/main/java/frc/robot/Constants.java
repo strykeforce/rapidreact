@@ -198,7 +198,7 @@ public final class Constants {
     // Increase these numbers to trust global measurements from vision less. This matrix is in the
     // form [x, y, theta]ᵀ, with units in meters and radians.
     public static Matrix<N3, N1> kVisionMeasurementStdDevs =
-        VecBuilder.fill(0.25, 0.25, Units.degreesToRadians(5));
+        VecBuilder.fill(0.1, 0.1, Units.degreesToRadians(5));
   }
 
   public static final class VisionConstants {
@@ -814,6 +814,7 @@ public final class Constants {
     public static final double kLookupMinInch = 60;
     public static final double kLookupMaxInch = 292;
     public static final double kLookupInchMaxIndex = 465;
+    public static final double kLookupToFMultiplier = 1.0;
 
     // Hood Encoder Constants
     public static final int kHoodZeroTicks = 935; // 1800
