@@ -45,6 +45,12 @@ public final class Constants {
     public static final double kUpdateThreshold = 0.08;
     public static final double kResetThreshold = 0.005;
 
+    // shoot while move restraints
+    public static final double kMaxShootMoveVelocity = 2.0;
+    public static final double kMaxShootMoveYaw = 0.5;
+    public static final double kMaxShootMoveAccel = 0.75;
+    public static final double kMaxShootGoalDelta = -35.0;
+
     // velocity stable
     public static final double kForwardThreshold = 0.1; // meters per second
     public static final double kStrafeThreshold = 0.1; // meters per second
@@ -198,7 +204,7 @@ public final class Constants {
     // Increase these numbers to trust global measurements from vision less. This matrix is in the
     // form [x, y, theta]ᵀ, with units in meters and radians.
     public static Matrix<N3, N1> kVisionMeasurementStdDevs =
-        VecBuilder.fill(0.1, 0.1, Units.degreesToRadians(5));
+        VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5));
   }
 
   public static final class VisionConstants {

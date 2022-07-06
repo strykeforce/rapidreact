@@ -47,6 +47,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
   private boolean lastLookupBeyondTable = false;
   private Translation2d newHub = new Translation2d();
   private Translation2d delta = new Translation2d();
+  private double changeInDistanceGoal = 0.0;
 
   public ShooterSubsystem(
       MagazineSubsystem magazineSubsystem,
@@ -293,21 +294,25 @@ public class ShooterSubsystem extends MeasurableSubsystem {
             getShootSolution(inchesToPixelsTable(TurretConstants.kHubPositionMeters));
         double[] velocity = driveSubsystem.getDriveVelocity();
         double dx =
-            -velocity[0]
-                * ((shootSolution[4] - 0.55) * ShooterConstants.kLookupToFMultiplier); // FIX ME
+            -velocity[0] * (shootSolution[4] * ShooterConstants.kLookupToFMultiplier); // FIX ME
         double dy =
-            -velocity[1]
-                * ((shootSolution[4] - 0.55) * ShooterConstants.kLookupToFMultiplier); // FIX ME
+            -velocity[1] * (shootSolution[4] * ShooterConstants.kLookupToFMultiplier); // FIX ME
         delta = new Translation2d(dx, dy);
         newHub = TurretConstants.kHubPositionMeters;
         newHub = newHub.plus(delta);
+        double lastDistance = shootSolution[3];
         shootSolution = getShootSolution(inchesToPixelsTable(newHub));
+        changeInDistanceGoal = shootSolution[3] - lastDistance;
         shooterClosedLoop(shootSolution[0], shootSolution[1]);
         hoodClosedLoop(shootSolution[2]);
         return newHub;
       }
     }
     return TurretConstants.kHubPositionMeters;
+  }
+
+  public double getDeltaGoalDistance() {
+    return changeInDistanceGoal;
   }
 
   public void shoot() {
@@ -493,7 +498,8 @@ public class ShooterSubsystem extends MeasurableSubsystem {
         new Measure("Future Goal X", () -> newHub.getX()),
         new Measure("Future Goal Y", () -> newHub.getY()),
         new Measure("Delta Goal X", () -> delta.getX()),
-        new Measure("Delta Goal Y", () -> delta.getY()));
+        new Measure("Delta Goal Y", () -> delta.getY()),
+        new Measure("Change in Goal", () -> changeInDistanceGoal));
   }
 
   public enum ShooterState {

@@ -56,6 +56,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private double[] desiredAzimuthPositions = new double[4];
   private double didUseUpdate = 0.0;
   private DriveStates driveStates = DriveStates.NONE;
+  private double currYAccel = 0.0;
+  private double currXAccel = 0.0;
+  private double lastTimeStamp = 0.0;
+  private double curTimeStamp = 0.0;
 
   // Grapher Variables
   private ChassisSpeeds holoContOutput = new ChassisSpeeds();
@@ -63,7 +67,13 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private Rotation2d holoContAngle = new Rotation2d();
   private Double trajectoryActive = 0.0;
   private double[] lastVelocity = new double[3];
-  private boolean fwdStable, strStable, yawStable, velStable;
+  private boolean fwdStable,
+      strStable,
+      yawStable,
+      velStable,
+      accelXStable,
+      accelYStable,
+      isGoalDeltaGood;
   private boolean useOdometry = true;
   private TimestampedPose timestampedPose =
       new TimestampedPose(RobotController.getFPGATime(), new Pose2d());
@@ -155,6 +165,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public void drive(
       double forwardMetersPerSec, double strafeMetersPerSec, double yawRadiansPerSec) {
+    lastTimeStamp = curTimeStamp;
+    curTimeStamp = Timer.getFPGATimestamp();
+    currYAccel = Math.abs((lastVelocity[1] - strafeMetersPerSec) / (curTimeStamp - lastTimeStamp));
+    currXAccel = Math.abs((lastVelocity[0] - forwardMetersPerSec) / (curTimeStamp - lastTimeStamp));
     lastVelocity[0] = forwardMetersPerSec;
     lastVelocity[1] = strafeMetersPerSec;
     lastVelocity[2] = yawRadiansPerSec;
@@ -359,6 +373,21 @@ public class DriveSubsystem extends MeasurableSubsystem {
     return stable;
   }
 
+  public boolean isMoveShootStable() {
+    double gyroRate = swerveDrive.getGyroRate();
+    fwdStable = Math.abs(lastVelocity[0]) <= DriveConstants.kMaxShootMoveVelocity;
+    strStable = Math.abs(lastVelocity[1]) <= DriveConstants.kMaxShootMoveVelocity;
+    yawStable = Math.abs(gyroRate) <= DriveConstants.kMaxShootMoveYaw;
+    accelXStable = currXAccel <= DriveConstants.kMaxShootMoveAccel;
+    accelYStable = currYAccel <= DriveConstants.kMaxShootMoveAccel;
+    isGoalDeltaGood = shooterSubsystem.getDeltaGoalDistance() >= DriveConstants.kMaxShootGoalDelta;
+    boolean stable =
+        fwdStable && strStable && yawStable && accelYStable && accelXStable && isGoalDeltaGood;
+    velStable = stable;
+
+    return stable;
+  }
+
   // Trajectory TOML Parsing
   public PathData generateTrajectory(String trajectoryName) {
 
@@ -484,7 +513,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure("Timestamp Gyro", () -> timestampedPose.getPose().getRotation().getDegrees()),
         new Measure("Did Use Odometry Update", () -> didUseUpdate),
         new Measure(
-            "Odometry Distance", () -> getDistToTranslation2d(TurretConstants.kHubPositionMeters)));
+            "Odometry Distance", () -> getDistToTranslation2d(TurretConstants.kHubPositionMeters)),
+        new Measure("X accel", () -> currXAccel),
+        new Measure("Y accel", () -> currYAccel));
   }
 
   public enum DriveStates {

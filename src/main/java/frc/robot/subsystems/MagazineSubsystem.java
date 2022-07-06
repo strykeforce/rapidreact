@@ -111,7 +111,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
 
   public void toggleShootMoveContinuedShoot() {
     shootWhileMove = !shootWhileMove;
-    continueToShoot = !continueToShoot;
+    continueToShoot = shootWhileMove;
   }
 
   public void toggleShootWhileMove() {
@@ -296,7 +296,9 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   }
 
   public void indexCargo() {
-    continueToShoot = false;
+    if (!shootWhileMove) {
+      continueToShoot = false;
+    }
     enableUpperBeamBreak(true);
     enableLowerBeamBreak(true);
     logger.info("Start indexing cargo");
@@ -631,7 +633,9 @@ public class MagazineSubsystem extends MeasurableSubsystem {
           Translation2d futureGoal = shooterSubsystem.getFutureGoalPos();
           turretSubsystem.trackOdom(futureGoal);
           if (shooterSubsystem.getCurrentState() == ShooterState.SHOOT
-              && turretSubsystem.isTurretAtOdom()) {
+              && turretSubsystem.isTurretAtOdom()
+              && driveSubsystem.isMoveShootStable()
+              && turretSubsystem.getState() != TurretState.WRAPPING) {
             shooterSubsystem.logShotSol();
             logger.info("PAUSE -> SHOOT");
             enableUpperBeamBreak(false);
