@@ -157,6 +157,7 @@ public class RobotContainer {
     visionSubsystem.setTurretSubsystem(turretSubsystem);
     driveSubsystem.setShooterSubsystem(shooterSubsystem);
     driveSubsystem.setVisionSubsystem(visionSubsystem);
+    intakeSubsystem.setMagazineSubsystem(magazineSubsystem);
     if (!isEvent) {
       configureTelemetry();
       configurePitDashboard();
