@@ -193,8 +193,9 @@ public final class Constants {
 
     //  Increase these numbers to trust our state estimates less. This matrix is in the form [x, y,
     // theta]ᵀ, with units in meters and radians.
+    // Drive Odometry standard devs
     public static Matrix<N3, N1> kStateStdDevs =
-        VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5));
+        VecBuilder.fill(0.075, 0.075, Units.degreesToRadians(5));
 
     // Increase these numbers to trust sensor readings from encoders and gyros less. This matrix is
     // in the form [theta], with units in radians.
@@ -203,6 +204,7 @@ public final class Constants {
 
     // Increase these numbers to trust global measurements from vision less. This matrix is in the
     // form [x, y, theta]ᵀ, with units in meters and radians.
+    // Vision Odometry Standard devs
     public static Matrix<N3, N1> kVisionMeasurementStdDevs =
         VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5));
   }
