@@ -45,6 +45,12 @@ public final class Constants {
     public static final double kUpdateThreshold = 0.08;
     public static final double kResetThreshold = 0.005;
 
+    // shoot while move restraints
+    public static final double kMaxShootMoveVelocity = 2.0;
+    public static final double kMaxShootMoveYaw = 0.5;
+    public static final double kMaxShootMoveAccel = 0.75;
+    public static final double kMaxShootGoalDelta = -35.0;
+
     // velocity stable
     public static final double kForwardThreshold = 0.1; // meters per second
     public static final double kStrafeThreshold = 0.1; // meters per second
@@ -187,8 +193,9 @@ public final class Constants {
 
     //  Increase these numbers to trust our state estimates less. This matrix is in the form [x, y,
     // theta]ᵀ, with units in meters and radians.
+    // Drive Odometry standard devs
     public static Matrix<N3, N1> kStateStdDevs =
-        VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5));
+        VecBuilder.fill(0.075, 0.075, Units.degreesToRadians(5));
 
     // Increase these numbers to trust sensor readings from encoders and gyros less. This matrix is
     // in the form [theta], with units in radians.
@@ -197,8 +204,9 @@ public final class Constants {
 
     // Increase these numbers to trust global measurements from vision less. This matrix is in the
     // form [x, y, theta]ᵀ, with units in meters and radians.
+    // Vision Odometry Standard devs
     public static Matrix<N3, N1> kVisionMeasurementStdDevs =
-        VecBuilder.fill(0.25, 0.25, Units.degreesToRadians(5));
+        VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5));
   }
 
   public static final class VisionConstants {
@@ -794,6 +802,7 @@ public final class Constants {
     public static final int kKickerFalconID = 41;
     public static final int kHoodTalonID = 42;
     public static final String kLookupTablePath = "/home/lvuser/deploy/LookupTable.csv";
+    public static final String kInchTablePath = "/home/lvuser/deploy/InchToPixel.csv";
 
     // StrykeShot Constants
     public static final double kMiddleClimbY = 6.7;
@@ -809,6 +818,11 @@ public final class Constants {
     public static final double kLookupMaxPixel = 414;
     public static final double kNumRows = 288;
     public static final double kLookupRes = 1.0;
+    public static final double kLookupMinInchChange = 0.5;
+    public static final double kLookupMinInch = 60;
+    public static final double kLookupMaxInch = 292;
+    public static final double kLookupInchMaxIndex = 465;
+    public static final double kLookupToFMultiplier = 1.0;
 
     // Hood Encoder Constants
     public static final int kHoodZeroTicks = 935; // 1800
