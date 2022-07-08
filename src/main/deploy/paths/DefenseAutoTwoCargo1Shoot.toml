@@ -1,0 +1,19 @@
+max_velocity = 2.0 #m/s
+max_acceleration = 2.0 #m/s
+start_velocity = 0.0 #m/s
+end_velocity = 0.0 #m/s
+is_reversed = false
+target_yaw = -111 #degrees -88.5 for 5 ball position
+
+[start_pose]
+    x = 7.62
+    y = 1.76  #Was 2.07
+    angle = -111 #−111 
+[end_pose]
+    x = 7.58
+    y = 0.68
+    angle = -88.5 
+
+[[internal_points]]
+    x = 7.60
+    y = 1.37
