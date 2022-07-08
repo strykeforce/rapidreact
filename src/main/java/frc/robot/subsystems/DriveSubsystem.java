@@ -60,6 +60,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private double currXAccel = 0.0;
   private double lastTimeStamp = 0.0;
   private double curTimeStamp = 0.0;
+  private double odomOffCount = 0;
+  private double numAccelXStable = 0;
+  private double numAccelYStable = 0;
 
   // Grapher Variables
   private ChassisSpeeds holoContOutput = new ChassisSpeeds();
@@ -81,6 +84,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private ShooterSubsystem shooterSubsystem;
   private TimestampedPose lastTimeStampedPose =
       new TimestampedPose(RobotController.getFPGATime(), new Pose2d());
+  private double distanceVisionWheelOdom = 0.0;
 
   public DriveSubsystem() {
 
@@ -169,6 +173,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
     curTimeStamp = Timer.getFPGATimestamp();
     currYAccel = Math.abs((lastVelocity[1] - strafeMetersPerSec) / (curTimeStamp - lastTimeStamp));
     currXAccel = Math.abs((lastVelocity[0] - forwardMetersPerSec) / (curTimeStamp - lastTimeStamp));
+    if (currYAccel < DriveConstants.kMaxShootMoveAccel) numAccelYStable++;
+    else numAccelYStable = 0;
+    if (currXAccel < DriveConstants.kMaxShootMoveAccel) numAccelXStable++;
+    else numAccelXStable = 0;
     lastVelocity[0] = forwardMetersPerSec;
     lastVelocity[1] = strafeMetersPerSec;
     lastVelocity[2] = yawRadiansPerSec;
@@ -233,12 +241,22 @@ public class DriveSubsystem extends MeasurableSubsystem {
             timestampedPose.setTimestamp(pose.getTimestamp());
 
             if (driveStates == DriveStates.UPDATE_ODOM) {
+              distanceVisionWheelOdom = distancePose(pose.getPose(), swerveDrive.getPoseMeters());
               if (distancePose(pose.getPose(), swerveDrive.getPoseMeters())
                   < DriveConstants.kUpdateThreshold) {
                 didUseUpdate = 1.0;
+                odomOffCount = 0;
                 updateOdometryWithVision(pose.getPose(), pose.getTimestamp());
               } else {
                 didUseUpdate = 0.0;
+                if (distancePose(pose.getPose(), swerveDrive.getPoseMeters())
+                    > DriveConstants.kPutOdomResetThreshold) {
+                  odomOffCount++;
+                  if (odomOffCount > DriveConstants.kMaxOdomOffCount) {
+                    driveStates = DriveStates.RESET_ODOM;
+                    logger.info("UPDATE_ODOM -> RESET_ODOM");
+                  }
+                }
               }
             } else {
               if (distancePose(pose.getPose(), timestampedPose.getPose())
@@ -258,6 +276,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
       case NONE:
         break;
     }
+  }
+
+  public boolean doesDriveNeedReset() {
+    return driveStates == DriveStates.RESET_ODOM;
   }
 
   public double distancePose(Pose2d a, Pose2d b) {
@@ -378,11 +400,17 @@ public class DriveSubsystem extends MeasurableSubsystem {
     fwdStable = Math.abs(lastVelocity[0]) <= DriveConstants.kMaxShootMoveVelocity;
     strStable = Math.abs(lastVelocity[1]) <= DriveConstants.kMaxShootMoveVelocity;
     yawStable = Math.abs(gyroRate) <= DriveConstants.kMaxShootMoveYaw;
-    accelXStable = currXAccel <= DriveConstants.kMaxShootMoveAccel;
-    accelYStable = currYAccel <= DriveConstants.kMaxShootMoveAccel;
+    accelXStable = numAccelXStable > DriveConstants.kMaxStableAccelCount;
+    accelYStable = numAccelYStable > DriveConstants.kMaxStableAccelCount;
     isGoalDeltaGood = shooterSubsystem.getDeltaGoalDistance() >= DriveConstants.kMaxShootGoalDelta;
     boolean stable =
-        fwdStable && strStable && yawStable && accelYStable && accelXStable && isGoalDeltaGood;
+        fwdStable
+            && strStable
+            && yawStable
+            && accelYStable
+            && accelXStable
+            && isGoalDeltaGood
+            && driveStates != DriveStates.RESET_ODOM;
     velStable = stable;
 
     return stable;
@@ -515,7 +543,11 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure(
             "Odometry Distance", () -> getDistToTranslation2d(TurretConstants.kHubPositionMeters)),
         new Measure("X accel", () -> currXAccel),
-        new Measure("Y accel", () -> currYAccel));
+        new Measure("Y accel", () -> currYAccel),
+        new Measure("Num Stable Y Accel", () -> numAccelYStable),
+        new Measure("Num Stable X Accel", () -> numAccelXStable),
+        new Measure("Num vision odom off", () -> odomOffCount),
+        new Measure("Delta Wheel Vision", () -> distanceVisionWheelOdom));
   }
 
   public enum DriveStates {
