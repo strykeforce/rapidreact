@@ -835,9 +835,9 @@ public final class Constants {
     public static final double kShooterArmTicksP100ms = 5500;
 
     // Opponent Cargo Constants
-    public static final double kKickerOpTicksP100ms = 4000;
-    public static final double kShooterOpTicksP100ms = 4000;
-    public static final double kHoodOpTicks = 5800;
+    public static final double kKickerOpTicksP100ms = 4000; // 4000
+    public static final double kShooterOpTicksP100ms = 4000; // 4000
+    public static final double kHoodOpTicks = 0; // 5800
 
     // High Fender Shot Constants
     public static final double kKickerFenderHighTicksP100ms = 2_000; // 1900
