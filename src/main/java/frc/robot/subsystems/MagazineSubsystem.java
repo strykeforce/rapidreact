@@ -468,7 +468,9 @@ public class MagazineSubsystem extends MeasurableSubsystem {
             cargoColor = allianceCargoColor;
             storedCargoColors[1] = cargoColor;
           }
-          if (cargoColor != allianceCargoColor && !ignoreColorSensor) {
+          if (cargoColor != allianceCargoColor
+              && !ignoreColorSensor
+              && currUpperMagazineState != UpperMagazineState.EMPTY) {
             logger.info("READ_CARGO -> EJECT_CARGO");
             lowerClosedLoopRotate(MagazineConstants.kLowerMagazineEjectSpeed);
             currLowerMagazineState = LowerMagazineState.EJECT_CARGO;
@@ -550,6 +552,21 @@ public class MagazineSubsystem extends MeasurableSubsystem {
         }
         break;
 
+      case SPIT:
+        shooterSubsystem.shoot();
+        if (turretSubsystem.getState() != TurretState.AIMING
+            && turretSubsystem.getState() != TurretState.TRACKING) {
+          turretSubsystem.odometryAim();
+        }
+        if (shooterSubsystem.getCurrentState() == ShooterState.SHOOT
+            && turretSubsystem.isTurretAtOdom()) {
+          enableUpperBeamBreak(false);
+          upperClosedLoopRotate(Constants.MagazineConstants.kUpperMagazineFeedSpeed);
+          logger.info("SPIT -> SHOOT");
+          currUpperMagazineState = UpperMagazineState.SHOOT;
+        }
+        break;
+
       case CARGO_SHOT:
         if (shootTimer.hasElapsed(MagazineConstants.kShootDelay)) {
           logger.info("CARGO_SHOT -> EMPTY");
@@ -567,9 +584,14 @@ public class MagazineSubsystem extends MeasurableSubsystem {
 
       case EMPTY:
         if (isUpperBeamBroken()) {
-          logger.info("EMPTY -> WAIT_AIM");
-          currUpperMagazineState = UpperMagazineState.WAIT_AIM;
-          upperClosedLoopRotate(MagazineConstants.kUpperMagazineIndexSpeed);
+          if (!isNextCargoAlliance()) {
+            logger.info("EMPTY -> SPIT");
+            currUpperMagazineState = UpperMagazineState.SPIT;
+          } else {
+            logger.info("EMPTY -> WAIT_AIM");
+            currUpperMagazineState = UpperMagazineState.WAIT_AIM;
+            upperClosedLoopRotate(MagazineConstants.kUpperMagazineIndexSpeed);
+          }
         }
         break;
 
@@ -733,6 +755,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     EMPTY,
     WAIT_AIM,
     SHOOT,
+    SPIT,
     CARGO_SHOT,
     PAUSE,
     TIMED_FEED,
