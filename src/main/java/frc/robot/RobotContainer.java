@@ -472,34 +472,34 @@ public class RobotContainer {
         .withPosition(7, 0);
 
     Shuffleboard.getTab("Match")
-        .add("ToggleUseOdometry", new InstantCommand(driveSubsystem::toggleUseOdometry))
+        .addBoolean("ShootWhileMove", () -> magazineSubsystem.getShootWhileMove())
         .withSize(1, 1)
         .withPosition(4, 0);
 
     Shuffleboard.getTab("Match")
-        .addBoolean("UseOdometry", () -> driveSubsystem.getUseOdometry())
+        .addBoolean("STOP FOR ODOM", () -> driveSubsystem.doesDriveNeedReset())
         .withSize(1, 1)
         .withPosition(4, 1);
 
-    Shuffleboard.getTab("Match2")
+    Shuffleboard.getTab("Debug")
         .add("ToggleShootWhileMove", new InstantCommand(magazineSubsystem::toggleShootWhileMove))
         .withSize(1, 1)
         .withPosition(0, 0);
 
-    Shuffleboard.getTab("Match2")
-        .addBoolean("ShootWhileMove", () -> magazineSubsystem.getShootWhileMove())
+    Shuffleboard.getTab("Debug")
+        .add("ToggleFeedForward", new InstantCommand(driveSubsystem::toggleUseOdometry))
         .withSize(1, 1)
         .withPosition(1, 0);
 
-    Shuffleboard.getTab("Match2")
+    Shuffleboard.getTab("Debug")
         .addBoolean("ContinuedShoot", () -> magazineSubsystem.getContinuedShoot())
         .withSize(1, 1)
-        .withPosition(1, 1);
+        .withPosition(0, 1);
 
-    Shuffleboard.getTab("Match2")
-        .addBoolean("STOP FOR ODOM", () -> driveSubsystem.doesDriveNeedReset())
-        .withSize(2, 1)
-        .withPosition(2, 0);
+    Shuffleboard.getTab("Debug")
+        .addBoolean("FeedForward", () -> driveSubsystem.getUseOdometry())
+        .withSize(1, 1)
+        .withPosition(1, 1);
   }
 
   public void setAllianceColor(Alliance alliance) {
