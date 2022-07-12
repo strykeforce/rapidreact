@@ -500,14 +500,14 @@ public class RobotContainer {
         .addBoolean("FeedForward", () -> driveSubsystem.getUseOdometry())
         .withSize(1, 1)
         .withPosition(1, 1);
-    
+
     Shuffleboard.getTab("Debug")
-        .add("ToggleUseRangingValid", new InstantCommand(visionSubsystem::toggleRequireMoreTargets))
+        .add("ToggleUseRangingValid", new InstantCommand(visionSubsystem::toggleUseRangingValid))
         .withSize(1, 1)
         .withPosition(2, 0);
-    
+
     Shuffleboard.getTab("Debug")
-        .addBoolean("UseRangingValid", () -> visionSubsystem.getRequireMoreTargets())
+        .addBoolean("UseRangingValid", () -> visionSubsystem.getUseRangingValid())
         .withSize(1, 1)
         .withPosition(2, 1);
   }
