@@ -39,6 +39,7 @@ public class VisionSubsystem extends MeasurableSubsystem
   private CircularBuffer temp2 = new CircularBuffer(10);
   private CircularBuffer temp3 = new CircularBuffer(10);
   private boolean canFillBuffers = false;
+  private boolean useRangingValid = false;
 
   public VisionSubsystem(DriveSubsystem driveSubsystem) {
     timestampBuffer = new CircularBuffer(VisionConstants.kCircularBufferSize);
@@ -124,6 +125,14 @@ public class VisionSubsystem extends MeasurableSubsystem
     return td.isValid() ? Math.toDegrees(td.getErrorRadians()) : 2767.0;
   }
 
+  public void toggleUseRangingValid() {
+    useRangingValid = !useRangingValid;
+  }
+
+  public boolean getUseRangingValid() {
+    return useRangingValid;
+  }
+
   // not used
   public double getTargetsDistancePixel() {
     var td = targetData;
@@ -141,6 +150,7 @@ public class VisionSubsystem extends MeasurableSubsystem
   }
 
   public boolean isValid() {
+    if (useRangingValid) return targetData.isRangingValid();
     return targetData.isValid();
   }
 
