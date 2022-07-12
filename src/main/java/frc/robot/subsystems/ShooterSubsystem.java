@@ -7,8 +7,10 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.opencsv.CSVReader;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.Constants;
 import frc.robot.Constants.ShooterConstants;
+import frc.robot.Constants.TurretConstants;
 import java.io.FileReader;
 import java.util.List;
 import java.util.Set;
@@ -39,9 +41,13 @@ public class ShooterSubsystem extends MeasurableSubsystem {
       oldWidthPixels,
       oldIndex;
   private String[][] lookupTable;
+  private String[][] inchTable;
   public boolean isOutside = true;
   private double lastLookupDistance = 0.0;
   private boolean lastLookupBeyondTable = false;
+  private Translation2d newHub = new Translation2d();
+  private Translation2d delta = new Translation2d();
+  private double changeInDistanceGoal = 0.0;
 
   public ShooterSubsystem(
       MagazineSubsystem magazineSubsystem,
@@ -51,6 +57,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
     this.visionSubsystem = visionSubsystem;
     this.driveSubsystem = driveSubsystem;
     parseLookupTable();
+    parseInchTable();
     shooterFalcon = new TalonFX(ShooterConstants.kShooterFalconID);
     shooterFalcon.configFactoryDefault(Constants.kTalonConfigTimeout);
     shooterFalcon.configAllSettings(
@@ -102,6 +109,19 @@ public class ShooterSubsystem extends MeasurableSubsystem {
     hoodTalon.clearStickyFaults();
   }
 
+  private void parseInchTable() {
+    try {
+      CSVReader csvReader = new CSVReader(new FileReader(ShooterConstants.kInchTablePath));
+
+      List<String[]> list = csvReader.readAll();
+
+      String[][] strArr = new String[list.size()][];
+      inchTable = list.toArray(strArr);
+    } catch (Exception exception) {
+      logger.error("Could not read table at {}", ShooterConstants.kInchTablePath);
+    }
+  }
+
   private void parseLookupTable() {
     try {
       CSVReader csvReader = new CSVReader(new FileReader(ShooterConstants.kLookupTablePath));
@@ -122,7 +142,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
 
   private double[] getShootSolution(double widthPixels) {
     int index = 0;
-    double[] shootSolution = new double[4];
+    double[] shootSolution = new double[5];
     if (widthPixels < ShooterConstants.kLookupMinPixel) {
       logger.warn(
           "Pixel width {} is less than min pixel in table, using {}",
@@ -157,6 +177,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
     shootSolution[1] = Double.parseDouble(lookupTable[index][3]);
     shootSolution[2] = Double.parseDouble(lookupTable[index][4]);
     shootSolution[3] = Double.parseDouble(lookupTable[index][0]);
+    shootSolution[4] = Double.parseDouble(lookupTable[index][5]);
     return shootSolution;
   }
 
@@ -236,6 +257,60 @@ public class ShooterSubsystem extends MeasurableSubsystem {
     shooterClosedLoop(
         ShooterConstants.kKickerArmTicksP100ms, ShooterConstants.kShooterArmTicksP100ms);
     logger.info("Arming starting");
+  }
+
+  public int inchesToPixelsTable(Translation2d newHub) {
+    double inches = Math.round(driveSubsystem.getDistToTranslation2d(newHub) * 2) / 2;
+    logger.info("inches:  {}", inches);
+    if (inches < ShooterConstants.kLookupMinInch) {
+      return (int) Double.parseDouble(inchTable[1][1]);
+    }
+    if (inches > ShooterConstants.kLookupMaxInch) {
+      return (int) Double.parseDouble(inchTable[(int) ShooterConstants.kLookupInchMaxIndex][1]);
+    }
+    double index = 0;
+    index =
+        (inches - (ShooterConstants.kLookupMinInch - ShooterConstants.kLookupMinInchChange))
+            / ShooterConstants.kLookupMinInchChange;
+    logger.info(
+        "Inches: {} | Pixel: {}",
+        driveSubsystem.getDistToTranslation2d(newHub),
+        Double.parseDouble(inchTable[(int) index][1]));
+    return (int) Double.parseDouble(inchTable[(int) index][1]);
+  }
+
+  public Translation2d getFutureGoalPos() {
+    if (currentState != ShooterState.SHOOT) {
+      logger.info("SHOOT: {} -> ADJUSTING", currentState);
+      currentState = ShooterState.ADJUSTING;
+    }
+    if (!magazineSubsystem.isNextCargoAlliance()) {
+      shooterClosedLoop(
+          ShooterConstants.kKickerOpTicksP100ms, ShooterConstants.kShooterOpTicksP100ms);
+      hoodClosedLoop(ShooterConstants.kHoodOpTicks);
+    } else {
+      if (visionSubsystem.isRangingValid()) {
+        double[] shootSolution =
+            getShootSolution(inchesToPixelsTable(TurretConstants.kHubPositionMeters));
+        double[] velocity = driveSubsystem.getDriveVelocity();
+        double dx = -velocity[0] * (shootSolution[4] * ShooterConstants.kLookupToFMultiplier);
+        double dy = -velocity[1] * (shootSolution[4] * ShooterConstants.kLookupToFMultiplier);
+        delta = new Translation2d(dx, dy);
+        newHub = TurretConstants.kHubPositionMeters;
+        newHub = newHub.plus(delta);
+        double lastDistance = shootSolution[3];
+        shootSolution = getShootSolution(inchesToPixelsTable(newHub));
+        changeInDistanceGoal = shootSolution[3] - lastDistance;
+        shooterClosedLoop(shootSolution[0], shootSolution[1]);
+        hoodClosedLoop(shootSolution[2]);
+        return newHub;
+      }
+    }
+    return TurretConstants.kHubPositionMeters;
+  }
+
+  public double getDeltaGoalDistance() {
+    return changeInDistanceGoal;
   }
 
   public void shoot() {
@@ -416,7 +491,13 @@ public class ShooterSubsystem extends MeasurableSubsystem {
 
   @Override
   public Set<Measure> getMeasures() {
-    return Set.of(new Measure("Shooter State", () -> currentState.ordinal()));
+    return Set.of(
+        new Measure("Shooter State", () -> currentState.ordinal()),
+        new Measure("Future Goal X", () -> newHub.getX()),
+        new Measure("Future Goal Y", () -> newHub.getY()),
+        new Measure("Delta Goal X", () -> delta.getX()),
+        new Measure("Delta Goal Y", () -> delta.getY()),
+        new Measure("Change in Goal", () -> changeInDistanceGoal));
   }
 
   public enum ShooterState {

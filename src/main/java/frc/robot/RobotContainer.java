@@ -75,7 +75,6 @@ import frc.robot.commands.shooter.StopShooterCommand;
 import frc.robot.commands.shooter.SwitchClimbPos;
 import frc.robot.commands.turret.OpenLoopTurretCommand;
 import frc.robot.commands.turret.RotateToCommand;
-import frc.robot.commands.turret.SeekCenterOdometryCommand;
 import frc.robot.commands.turret.TurretAimCommandGroup;
 import frc.robot.commands.vision.EnableVisionCommand;
 import frc.robot.subsystems.AutoSwitch;
@@ -157,6 +156,7 @@ public class RobotContainer {
     visionSubsystem.setTurretSubsystem(turretSubsystem);
     driveSubsystem.setShooterSubsystem(shooterSubsystem);
     driveSubsystem.setVisionSubsystem(visionSubsystem);
+    intakeSubsystem.setMagazineSubsystem(magazineSubsystem);
     if (!isEvent) {
       configureTelemetry();
       configurePitDashboard();
@@ -243,7 +243,7 @@ public class RobotContainer {
         .whenReleased(new OpenLoopTurretCommand(turretSubsystem, 0.0));
 
     new JoystickButton(driveJoystick, Button.HAMBURGER.id)
-        .whenPressed(new SeekCenterOdometryCommand(turretSubsystem));
+        .whenPressed(new DriveAutonCommand(driveSubsystem, "straightPath", true, true));
 
     new JoystickButton(driveJoystick, Trim.LEFT_Y_POS.id)
         .whenPressed(new EnableVisionCommand(visionSubsystem, driveSubsystem));
@@ -309,7 +309,7 @@ public class RobotContainer {
   private void configureOperatorButtonBindings() {
     // Zero Climb
     new JoystickButton(xboxController, XboxController.Button.kStart.value)
-        .whenReleased(new ZeroClimbCommand(climbSubsystem));
+        .whenReleased(new InstantCommand(magazineSubsystem::toggleShootMoveContinuedShoot));
     // new JoystickButton(xboxController, XboxController.Button.kLeftStick.value)
     //     .whenPressed(new ExtendSailCommand(climbSubsystem));
     // new JoystickButton(xboxController, XboxController.Button.kRightStick.value)
@@ -360,6 +360,10 @@ public class RobotContainer {
         .whenPressed(
             new ArmShooterCommandGroup(
                 visionSubsystem, turretSubsystem, shooterSubsystem, driveSubsystem));
+
+    // Toggle don't shoot
+    new JoystickButton(xboxController, XboxController.Button.kLeftStick.value)
+        .whenPressed(new InstantCommand(magazineSubsystem::toggleContinuedShoot));
 
     // Stop Shoot
     new JoystickButton(xboxController, XboxController.Button.kX.value)
@@ -468,14 +472,34 @@ public class RobotContainer {
         .withPosition(7, 0);
 
     Shuffleboard.getTab("Match")
-        .add("ToggleUseOdometry", new InstantCommand(driveSubsystem::toggleUseOdometry))
+        .addBoolean("ShootWhileMove", () -> magazineSubsystem.getShootWhileMove())
         .withSize(1, 1)
         .withPosition(4, 0);
 
     Shuffleboard.getTab("Match")
-        .addBoolean("UseOdometry", () -> driveSubsystem.getUseOdometry())
+        .addBoolean("STOP FOR ODOM", () -> driveSubsystem.doesDriveNeedReset())
         .withSize(1, 1)
         .withPosition(4, 1);
+
+    Shuffleboard.getTab("Debug")
+        .add("ToggleShootWhileMove", new InstantCommand(magazineSubsystem::toggleShootWhileMove))
+        .withSize(1, 1)
+        .withPosition(0, 0);
+
+    Shuffleboard.getTab("Debug")
+        .add("ToggleFeedForward", new InstantCommand(driveSubsystem::toggleUseOdometry))
+        .withSize(1, 1)
+        .withPosition(1, 0);
+
+    Shuffleboard.getTab("Debug")
+        .addBoolean("ContinuedShoot", () -> magazineSubsystem.getContinuedShoot())
+        .withSize(1, 1)
+        .withPosition(0, 1);
+
+    Shuffleboard.getTab("Debug")
+        .addBoolean("FeedForward", () -> driveSubsystem.getUseOdometry())
+        .withSize(1, 1)
+        .withPosition(1, 1);
   }
 
   public void setAllianceColor(Alliance alliance) {

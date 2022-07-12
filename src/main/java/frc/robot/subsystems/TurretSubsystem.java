@@ -212,6 +212,12 @@ public class TurretSubsystem extends MeasurableSubsystem {
     return turretStableCounts >= Constants.ShooterConstants.kStableCounts;
   }
 
+  public boolean isTurretAtOdom() {
+    double currentTurretPosition = turret.getSelectedSensorPosition();
+    return Math.abs(targetTurretPosition - currentTurretPosition)
+        > Constants.TurretConstants.kCloseEnoughTicks;
+  }
+
   public Rotation2d getTurretRotation2d() {
     return new Rotation2d(
         turret.getSelectedSensorPosition() / TurretConstants.kTurretTicksPerRadian);
@@ -280,6 +286,18 @@ public class TurretSubsystem extends MeasurableSubsystem {
     rotateTo(seekAngle);
   }
 
+  public void inputOdomAim(Translation2d aimPosition) {
+    Pose2d pose = driveSubsystem.getPoseMeters();
+    Translation2d deltaPosition = aimPosition.minus(pose.getTranslation());
+    Rotation2d findAngle = new Rotation2d(deltaPosition.getX(), deltaPosition.getY());
+    findAngle = findAngle.minus(pose.getRotation());
+    findAngle = findAngle.plus(TurretConstants.kTurretRobotOffset);
+    double gyroRate = driveSubsystem.getGyroRate();
+    Rotation2d feedForward = Rotation2d.fromDegrees(gyroRate * TurretConstants.kFYaw);
+    findAngle = findAngle.plus(feedForward);
+    rotateTo(findAngle);
+  }
+
   // public void updateOpenLoopFeedFwd() {
   //   currentState = TurretState.IDLE;
   //   double[] driveVel = driveSubsystem.getDriveVelocity();
@@ -322,6 +340,11 @@ public class TurretSubsystem extends MeasurableSubsystem {
       seekCenter();
       currentState = TurretState.SEEK_CENTER; // SEEK_CENTER
     }
+  }
+
+  public void trackOdom(Translation2d target) {
+    inputOdomAim(target);
+    currentState = TurretState.ODOM_FEED;
   }
 
   public void odometryAim() {
@@ -503,6 +526,9 @@ public class TurretSubsystem extends MeasurableSubsystem {
       case FENDER_AIMED:
         // indicator for other subsystems
         break;
+      case ODOM_FEED:
+        // Will feed translation2ds every 20ms from magazine
+        break;
       case ODOM_ADJUSTING:
         // setCruiseVelocityFast(true);
         if (isTurretAtTarget()) {
@@ -570,6 +596,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
     STRYKE_AIMED,
     WRAPPING,
     GEYSER_ADJUSTING,
-    GEYSER_AIMED;
+    GEYSER_AIMED,
+    ODOM_FEED;
   }
 }

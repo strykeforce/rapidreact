@@ -42,15 +42,24 @@ public final class Constants {
   public static final class DriveConstants {
     // Drive Constants
     public static final double kWheelDiameterInches = 3.0 * (571.0 / 500.0); // Actual/Odometry
-    public static final double kUpdateThreshold = 0.08;
+    public static final double kUpdateThreshold = 0.35;
     public static final double kResetThreshold = 0.005;
+    public static final double kPutOdomResetThreshold = 0.35;
+
+    // shoot while move restraints
+    public static final double kMaxShootMoveVelocity = 2.0;
+    public static final double kMaxStableAccelCount = 4;
+    public static final double kMaxShootMoveYaw = 0.5;
+    public static final double kMaxShootMoveAccel = 1.0;
+    public static final double kMaxShootGoalDelta = -35.0;
+    public static final double kMaxOdomOffCount = 15;
 
     // velocity stable
     public static final double kForwardThreshold = 0.1; // meters per second
     public static final double kStrafeThreshold = 0.1; // meters per second
     public static final double kGyroRateThreshold = 0.5; // degrees per second
     public static final double kMaxDegreeError = 5.0;
-    public static final double kMaxDegreeReset = 2.0;
+    public static final double kMaxDegreeReset = 5.0;
 
     // From: https://github.com/strykeforce/axis-config/
     public static final double kMaxSpeedMetersPerSecond = 3.889;
@@ -187,6 +196,7 @@ public final class Constants {
 
     //  Increase these numbers to trust our state estimates less. This matrix is in the form [x, y,
     // theta]ᵀ, with units in meters and radians.
+    // Drive Odometry standard devs
     public static Matrix<N3, N1> kStateStdDevs =
         VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5));
 
@@ -197,8 +207,9 @@ public final class Constants {
 
     // Increase these numbers to trust global measurements from vision less. This matrix is in the
     // form [x, y, theta]ᵀ, with units in meters and radians.
+    // Vision Odometry Standard devs
     public static Matrix<N3, N1> kVisionMeasurementStdDevs =
-        VecBuilder.fill(0.25, 0.25, Units.degreesToRadians(5));
+        VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5));
   }
 
   public static final class VisionConstants {
@@ -794,6 +805,7 @@ public final class Constants {
     public static final int kKickerFalconID = 41;
     public static final int kHoodTalonID = 42;
     public static final String kLookupTablePath = "/home/lvuser/deploy/LookupTable.csv";
+    public static final String kInchTablePath = "/home/lvuser/deploy/InchToPixel.csv";
 
     // StrykeShot Constants
     public static final double kMiddleClimbY = 6.7;
@@ -809,9 +821,14 @@ public final class Constants {
     public static final double kLookupMaxPixel = 414;
     public static final double kNumRows = 288;
     public static final double kLookupRes = 1.0;
+    public static final double kLookupMinInchChange = 0.5;
+    public static final double kLookupMinInch = 60;
+    public static final double kLookupMaxInch = 292;
+    public static final double kLookupInchMaxIndex = 465;
+    public static final double kLookupToFMultiplier = 1.0;
 
     // Hood Encoder Constants
-    public static final int kHoodZeroTicks = 935; // 1800
+    public static final int kHoodZeroTicks = 880; // 935
     public static final int kForwardSoftLimts = 5800;
     public static final int kReverseSoftLimits = -50;
     public static final int kZeroCheckTicks = 2_600; // 500
@@ -821,9 +838,9 @@ public final class Constants {
     public static final double kShooterArmTicksP100ms = 5500;
 
     // Opponent Cargo Constants
-    public static final double kKickerOpTicksP100ms = 4000;
-    public static final double kShooterOpTicksP100ms = 4000;
-    public static final double kHoodOpTicks = 5800;
+    public static final double kKickerOpTicksP100ms = 4000; // 4000
+    public static final double kShooterOpTicksP100ms = 4000; // 4000
+    public static final double kHoodOpTicks = 0; // 5800
 
     // High Fender Shot Constants
     public static final double kKickerFenderHighTicksP100ms = 2_000; // 1900

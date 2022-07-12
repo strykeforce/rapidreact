@@ -179,16 +179,17 @@ public class VisionSubsystem extends MeasurableSubsystem
         Math.abs(
             -TurretConstants.kHubPositionMeters.getX()
                 + distanceMeters * Math.cos(calcAngle.getRadians())); // -8.23
-    logger.info(
-        "VISIONODOM: turretAngle: {}, gyroAngle: {}, calcAngle: {}, errorRadians: {}, distance: {}, X: {}, Y: {}, Odometry: {}",
-        turretAngle,
-        gyroAngle,
-        calcAngle,
-        errorRadians,
-        distanceMeters,
-        x,
-        y,
-        driveSubsystem.getPoseMeters());
+    // logger.info(
+    //     "VISIONODOM: turretAngle: {}, gyroAngle: {}, calcAngle: {}, errorRadians: {}, distance:
+    // {}, X: {}, Y: {}, Odometry: {}",
+    //     turretAngle,
+    //     gyroAngle,
+    //     calcAngle,
+    //     errorRadians,
+    //     distanceMeters,
+    //     x,
+    //     y,
+    //     driveSubsystem.getPoseMeters());
     return new Pose2d(x, y, gyroAngle);
   }
 
