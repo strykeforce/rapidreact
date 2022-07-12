@@ -293,10 +293,8 @@ public class ShooterSubsystem extends MeasurableSubsystem {
         double[] shootSolution =
             getShootSolution(inchesToPixelsTable(TurretConstants.kHubPositionMeters));
         double[] velocity = driveSubsystem.getDriveVelocity();
-        double dx =
-            -velocity[0] * (shootSolution[4] * ShooterConstants.kLookupToFMultiplier); // FIX ME
-        double dy =
-            -velocity[1] * (shootSolution[4] * ShooterConstants.kLookupToFMultiplier); // FIX ME
+        double dx = -velocity[0] * (shootSolution[4] * ShooterConstants.kLookupToFMultiplier);
+        double dy = -velocity[1] * (shootSolution[4] * ShooterConstants.kLookupToFMultiplier);
         delta = new Translation2d(dx, dy);
         newHub = TurretConstants.kHubPositionMeters;
         newHub = newHub.plus(delta);

@@ -393,12 +393,14 @@ public class MagazineSubsystem extends MeasurableSubsystem {
       logger.info("upper {} -> EMPTY", currUpperMagazineState);
       currUpperMagazineState = UpperMagazineState.EMPTY;
     }
+    shootWhileMove = false;
     continueToShoot = true;
     doTimedShoot = false;
     // }
   }
 
   public void timedShoot() {
+    shootWhileMove = false;
     doTimedShoot = true;
     continueToShoot = true;
     enableUpperBeamBreak(true);
@@ -657,7 +659,8 @@ public class MagazineSubsystem extends MeasurableSubsystem {
           if (shooterSubsystem.getCurrentState() == ShooterState.SHOOT
               && turretSubsystem.isTurretAtOdom()
               && driveSubsystem.isMoveShootStable()
-              && turretSubsystem.getState() != TurretState.WRAPPING) {
+              && turretSubsystem.getState() != TurretState.WRAPPING
+              && visionSubsystem.isRangingValid()) {
             shooterSubsystem.logShotSol();
             logger.info("PAUSE -> SHOOT");
             enableUpperBeamBreak(false);
