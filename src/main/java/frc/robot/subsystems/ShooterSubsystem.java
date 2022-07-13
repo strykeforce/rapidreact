@@ -433,9 +433,10 @@ public class ShooterSubsystem extends MeasurableSubsystem {
         hoodClosedLoop(ShooterConstants.kHoodGeyserBallTwoTicks);
       }
     } else {
-      shooterClosedLoop(
-          ShooterConstants.kKickerOppCargoShotTicksP100ms, ShooterConstants.kShooterOppCargoShotTicksP100ms);
-      hoodClosedLoop(ShooterConstants.kHoodOppCargoShotTicksP100ms);
+      double[] shootSol =
+          getShootSolution(inchesToPixelsTable(ShooterConstants.kOpponentCargoShotOdomAimPos));
+      shooterClosedLoop(shootSol[0], shootSol[1]);
+      hoodClosedLoop(shootSol[2]);
     }
   }
 

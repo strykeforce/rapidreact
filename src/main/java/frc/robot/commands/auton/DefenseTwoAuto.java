@@ -12,7 +12,6 @@ import frc.robot.commands.sequences.intaking.AutoIntakeCommand;
 import frc.robot.commands.sequences.shooting.ArmShooterCommandGroup;
 import frc.robot.commands.sequences.shooting.OppCargoShotAutonCommand;
 import frc.robot.commands.sequences.shooting.VisionShootAutoCommand;
-import frc.robot.commands.sequences.shooting.VisionShootNoIsFinishedCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeExtendSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -42,8 +41,7 @@ public class DefenseTwoAuto extends SequentialCommandGroup {
             new PreloadCargoCommand(magazineSubsystem),
             new OffsetGyroCommand(driveSubsystem, gyroOffset)),
         new ParallelCommandGroup(
-            new WaitCommand(delay), 
-            new IgnoreColorSensorCommand(magazineSubsystem, true)),
+            new WaitCommand(delay), new IgnoreColorSensorCommand(magazineSubsystem, true)),
         new ParallelDeadlineGroup(
             new DriveAutonCommand(driveSubsystem, path1Name, true, false), // deadline
             new ArmShooterCommandGroup(
@@ -60,9 +58,11 @@ public class DefenseTwoAuto extends SequentialCommandGroup {
             widthPixels1),
         new ParallelDeadlineGroup(
             new DriveAutonCommand(driveSubsystem, path2Name, false, true),
-            new AutoIntakeCommand(magazineSubsystem, intakeSubsystem, intakeExtendSubsystem, true, true)
-        ),
-        new OppCargoShotAutonCommand(turretSubsystem, shooterSubsystem, magazineSubsystem, intakeSubsystem));
-        //Shoot opponent Ball
+            new AutoIntakeCommand(
+                magazineSubsystem, intakeSubsystem, intakeExtendSubsystem, true, true)),
+        new WaitCommand(0.5),
+        new OppCargoShotAutonCommand(
+            turretSubsystem, shooterSubsystem, magazineSubsystem, intakeSubsystem));
+    // Shoot opponent Ball
   }
 }

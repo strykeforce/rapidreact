@@ -385,6 +385,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
       logger.info("Geyser Shot: Starting Ball Two Sequence");
     }
   }
+
   public void opponentCargoShot(Translation2d aimPosition) {
     logger.info("{} -> GEYSER_ADJUSTING", currentState);
     currentState = TurretState.GEYSER_ADJUSTING;

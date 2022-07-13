@@ -27,7 +27,7 @@ public class GeyserShootCommand extends CommandBase {
   @Override
   public void initialize() {
     turretSubsystem.geyserShot(true);
-    shooterSubsystem.geyserShot(false,true);
+    shooterSubsystem.geyserShot(false, true);
     magazineSubsystem.shoot();
   }
 

@@ -7,17 +7,15 @@ import frc.robot.subsystems.MagazineSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 
-//opponentCargoShot
+// opponentCargoShot
 public class OppCargoShotAutonCommand extends CommandBase {
-    public final TurretSubsystem turretSubsystem;
-    public final ShooterSubsystem shooterSubsystem;
-    public final MagazineSubsystem magazineSubsystem;
-    public final IntakeSubsystem intakeSubsystem;
+  public final TurretSubsystem turretSubsystem;
+  public final ShooterSubsystem shooterSubsystem;
+  public final MagazineSubsystem magazineSubsystem;
+  public final IntakeSubsystem intakeSubsystem;
 
-
-    
-    public OppCargoShotAutonCommand(
-    TurretSubsystem turretSubsystem,
+  public OppCargoShotAutonCommand(
+      TurretSubsystem turretSubsystem,
       ShooterSubsystem shooterSubsystem,
       MagazineSubsystem magazineSubsystem,
       IntakeSubsystem intakeSubsystem) {
@@ -31,7 +29,7 @@ public class OppCargoShotAutonCommand extends CommandBase {
   @Override
   public void initialize() {
     turretSubsystem.opponentCargoShot(ShooterConstants.kOpponentCargoShotOdomAimPos);
-    shooterSubsystem.geyserShot(false,true);
+    shooterSubsystem.geyserShot(true, true);
     magazineSubsystem.shoot();
   }
 
