@@ -332,9 +332,14 @@ public class TurretSubsystem extends MeasurableSubsystem {
     logger.info("Started tracking target");
     // currentState = TurretState.SEEK_LEFT;
     // setSeekAngle(true);
-    setCruiseVelocityFast(true); // true
-    seekCenter();
-    currentState = TurretState.SEEK_CENTER; // SEEK_CENTER
+    // HubTargetData targetData = visionSubsystem.getTargetData();
+    setCruiseVelocityFast(true);
+    if (visionSubsystem.isValid()) {
+      currentState = TurretState.AIMING;
+    } else {
+      seekCenter();
+      currentState = TurretState.SEEK_CENTER; // SEEK_CENTER
+    }
   }
 
   public void trackOdom(Translation2d target) {
@@ -406,7 +411,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
       case SEEK_CENTER:
         if (isTurretAtTarget()) {
           targetData = visionSubsystem.getTargetData();
-          if (targetData.isValid()) {
+          if (visionSubsystem.isValid()) {
             setCruiseVelocityFast(true);
             logger.info("SEEK_CENTER -> AIMING");
             logger.info("target data: {}", targetData);
@@ -426,7 +431,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
       case SEEK_RIGHT:
         targetData = visionSubsystem.getTargetData();
         // setCruiseVelocityFast(false);
-        if (targetData.isValid()) {
+        if (visionSubsystem.isValid()) {
           logger.info("{} -> AIMING", currentState);
           logger.info("targetData: {}", targetData);
           setCruiseVelocityFast(true);
@@ -458,7 +463,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
       case TRACKING:
         // setCruiseVelocityFast(false);
         targetData = visionSubsystem.getTargetData();
-        if (!targetData.isValid()) {
+        if (!visionSubsystem.isValid()) {
           notValidTargetCount++;
           logger.info("notValidTargetCount: {}", notValidTargetCount);
           if (notValidTargetCount > TurretConstants.kNotValidTargetCounts) {
@@ -473,7 +478,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
         } else {
           notValidTargetCount = 0;
         }
-        if (targetData.isValid()) {
+        if (visionSubsystem.isValid()) {
           errorRotation2d = targetData.getErrorRotation2d();
         } else {
           errorRotation2d = Rotation2d.fromDegrees(0);

@@ -42,21 +42,24 @@ public final class Constants {
   public static final class DriveConstants {
     // Drive Constants
     public static final double kWheelDiameterInches = 3.0 * (571.0 / 500.0); // Actual/Odometry
-    public static final double kUpdateThreshold = 0.08;
+    public static final double kUpdateThreshold = 0.35;
     public static final double kResetThreshold = 0.005;
+    public static final double kPutOdomResetThreshold = 0.35;
 
     // shoot while move restraints
     public static final double kMaxShootMoveVelocity = 2.0;
+    public static final double kMaxStableAccelCount = 4;
     public static final double kMaxShootMoveYaw = 0.5;
-    public static final double kMaxShootMoveAccel = 0.75;
+    public static final double kMaxShootMoveAccel = 1.0;
     public static final double kMaxShootGoalDelta = -35.0;
+    public static final double kMaxOdomOffCount = 15;
 
     // velocity stable
     public static final double kForwardThreshold = 0.1; // meters per second
     public static final double kStrafeThreshold = 0.1; // meters per second
     public static final double kGyroRateThreshold = 0.5; // degrees per second
     public static final double kMaxDegreeError = 5.0;
-    public static final double kMaxDegreeReset = 2.0;
+    public static final double kMaxDegreeReset = 5.0;
 
     // From: https://github.com/strykeforce/axis-config/
     public static final double kMaxSpeedMetersPerSecond = 3.889;
@@ -195,7 +198,7 @@ public final class Constants {
     // theta]ᵀ, with units in meters and radians.
     // Drive Odometry standard devs
     public static Matrix<N3, N1> kStateStdDevs =
-        VecBuilder.fill(0.075, 0.075, Units.degreesToRadians(5));
+        VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5));
 
     // Increase these numbers to trust sensor readings from encoders and gyros less. This matrix is
     // in the form [theta], with units in radians.
@@ -263,7 +266,7 @@ public final class Constants {
     public static final double kSlowCruiseVelocity = 7_000; // 2000
     public static final double kFastAccel = 100_000; // 15_000
     public static final double kSlowAccel = 52_500; // 15_000
-    public static final int kTurretZeroTicks = 1350; // 946
+    public static final int kTurretZeroTicks = 830; // 946   1350
     public static final int kForwardLimit = 70_000; // 13_800 14
     public static final int kReverseLimit = -70_000; // 13_800 14
     //    public static final double kMaxStringPotZero = 100; // 2020 Robot
@@ -825,7 +828,7 @@ public final class Constants {
     public static final double kLookupToFMultiplier = 1.0;
 
     // Hood Encoder Constants
-    public static final int kHoodZeroTicks = 935; // 1800
+    public static final int kHoodZeroTicks = 880; // 935
     public static final int kForwardSoftLimts = 5800;
     public static final int kReverseSoftLimits = -50;
     public static final int kZeroCheckTicks = 2_600; // 500
@@ -835,9 +838,9 @@ public final class Constants {
     public static final double kShooterArmTicksP100ms = 5500;
 
     // Opponent Cargo Constants
-    public static final double kKickerOpTicksP100ms = 4000;
-    public static final double kShooterOpTicksP100ms = 4000;
-    public static final double kHoodOpTicks = 5800;
+    public static final double kKickerOpTicksP100ms = 4000; // 4000
+    public static final double kShooterOpTicksP100ms = 4000; // 4000
+    public static final double kHoodOpTicks = 0; // 5800
 
     // High Fender Shot Constants
     public static final double kKickerFenderHighTicksP100ms = 2_000; // 1900
