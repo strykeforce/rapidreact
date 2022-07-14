@@ -72,6 +72,8 @@ public class DefenseAuto extends SequentialCommandGroup {
         new DriveAutonCommand(driveSubsystem, path4Name, false, true),
         new WaitMatchTimeCommand(AutoConstants.kWaitUntilMatchTime),
         new GeyserShootCommand(
-            turretSubsystem, shooterSubsystem, magazineSubsystem, intakeSubsystem));
+            turretSubsystem, shooterSubsystem, magazineSubsystem, intakeSubsystem),
+        new ArmShooterCommandGroup(
+            visionSubsystem, turretSubsystem, shooterSubsystem, driveSubsystem));
   }
 }

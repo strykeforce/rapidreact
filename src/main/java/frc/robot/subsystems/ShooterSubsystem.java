@@ -432,7 +432,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
       }
     } else {
       double[] shootSol =
-          getShootSolution(inchesToPixelsTable(ShooterConstants.kOpponentCargoShotOdomAimPos));
+          getShootSolution(inchesToPixelsTable(ShooterConstants.kOpponentCargoShotSol));
       shooterClosedLoop(shootSol[0], shootSol[1]);
       hoodClosedLoop(shootSol[2]);
     }
