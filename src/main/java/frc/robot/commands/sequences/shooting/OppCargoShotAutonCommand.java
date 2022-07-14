@@ -1,18 +1,20 @@
 package frc.robot.commands.sequences.shooting;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 
-public class GeyserShootCommand extends CommandBase {
+// opponentCargoShot
+public class OppCargoShotAutonCommand extends CommandBase {
   public final TurretSubsystem turretSubsystem;
   public final ShooterSubsystem shooterSubsystem;
   public final MagazineSubsystem magazineSubsystem;
   public final IntakeSubsystem intakeSubsystem;
 
-  public GeyserShootCommand(
+  public OppCargoShotAutonCommand(
       TurretSubsystem turretSubsystem,
       ShooterSubsystem shooterSubsystem,
       MagazineSubsystem magazineSubsystem,
@@ -26,8 +28,8 @@ public class GeyserShootCommand extends CommandBase {
 
   @Override
   public void initialize() {
-    turretSubsystem.geyserShot(true);
-    shooterSubsystem.geyserShot(false, true);
+    turretSubsystem.opponentCargoShot(ShooterConstants.kOpponentCargoShotOdomAimPos);
+    shooterSubsystem.geyserShot(true, true);
     magazineSubsystem.shoot();
   }
 

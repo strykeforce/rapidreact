@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.commands.auton.DefenseAuto;
+import frc.robot.commands.auton.DefenseTwoAuto;
 import frc.robot.commands.auton.FiveCargoAuto;
 import frc.robot.commands.auton.ThreeCargoAuto;
 import frc.robot.commands.auton.TwoCargoAuto;
@@ -235,6 +236,20 @@ public class AutoSwitch {
             248.0,
             247.0,
             138.0);
+      case 0x00:
+        return new DefenseTwoAuto(
+            visionSubsystem,
+            turretSubsystem,
+            shooterSubsystem,
+            magazineSubsystem,
+            intakeSubsystem,
+            intakeExtendSubsystem,
+            driveSubsystem,
+            "DefenseAutoTwoCargo1Shoot",
+            "DefenseTwoOppCargo2CollectShoot",
+            AutoConstants.kDefenseTwoRightStartYaw,
+            5.0,
+            200);
       default:
         String msg = String.format("no auto command assigned for switch position %02X", switchPos);
         DriverStation.reportWarning(msg, false);

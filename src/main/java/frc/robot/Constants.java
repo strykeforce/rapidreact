@@ -858,6 +858,13 @@ public final class Constants {
     public static final double kHoodGeyserBallOneTicks = 0;
     public static final double kHoodGeyserBallTwoTicks = 0;
 
+    // Opponent Cargo Auton Shot Constants
+    public static final double kHoodOppCargoShotTicksP100ms = 0;
+    public static final double kKickerOppCargoShotTicksP100ms = 0;
+    public static final double kShooterOppCargoShotTicksP100ms = 0;
+    public static Translation2d kOpponentCargoShotOdomAimPos = new Translation2d(0, 4);
+    public static Translation2d kOpponentCargoShotSol = new Translation2d(4, 0.65);
+
     public static final double kShooterManualEjectTicksP100ms = -5_000;
     public static final double kKickerManualEjectTicksP100ms = -5_000;
 
@@ -988,6 +995,7 @@ public final class Constants {
     public static final Rotation2d kLeftStartYaw = Rotation2d.fromDegrees(136.5);
     public static final Rotation2d kMidStartYaw = Rotation2d.fromDegrees(-156.0);
     public static final Rotation2d kRightStartYaw = Rotation2d.fromDegrees(-88.5);
+    public static final Rotation2d kDefenseTwoRightStartYaw = Rotation2d.fromDegrees(-111.0);
     public static final double kDefenseBallPickupDelay = 0.2;
     public static final double kWaitUntilMatchTime = 2.0;
   }

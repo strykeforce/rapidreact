@@ -20,6 +20,7 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.DriveConstants;
@@ -231,7 +232,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
       case UPDATE_ODOM:
 
       case RESET_ODOM:
-        if (visionSubsystem.isRangingValid()) {
+        if ((visionSubsystem.isRangingValid()) && !DriverStation.isAutonomous()) {
           if (Math.abs(visionSubsystem.getTargetData().getErrorRotation2d().getDegrees())
               < DriveConstants.kMaxDegreeError) {
             TimestampedPose pose =

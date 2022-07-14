@@ -391,6 +391,12 @@ public class TurretSubsystem extends MeasurableSubsystem {
     }
   }
 
+  public void opponentCargoShot(Translation2d aimPosition) {
+    logger.info("{} -> GEYSER_ADJUSTING", currentState);
+    currentState = TurretState.GEYSER_ADJUSTING;
+    inputOdomAim(aimPosition);
+  }
+
   public void strykeShot(boolean isLeftClimb) {
     logger.info("{} -> STRYKE_ADJUSTING", currentState);
     currentState = TurretState.STRYKE_ADJUSTING;
