@@ -266,7 +266,7 @@ public final class Constants {
     public static final double kSlowCruiseVelocity = 7_000; // 2000
     public static final double kFastAccel = 100_000; // 15_000
     public static final double kSlowAccel = 52_500; // 15_000
-    public static final int kTurretZeroTicks = 1350; // 946
+    public static final int kTurretZeroTicks = 830; // 946   1350
     public static final int kForwardLimit = 70_000; // 13_800 14
     public static final int kReverseLimit = -70_000; // 13_800 14
     //    public static final double kMaxStringPotZero = 100; // 2020 Robot
