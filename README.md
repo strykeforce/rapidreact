@@ -33,7 +33,6 @@
 
 * Lower beam break: lower magazine forward limit
 * Upper beam break: upper magazine forward limit
-* Turret banana sensor : turret forward limit
 * Hood zero sensor : hood forward limit
 
 ## Roborio
@@ -52,10 +51,18 @@
 
 
 ## DIO
-| Subsystem | name        | ID |
-| --------- | ----------- | -- |
+| Subsystem | name         | ID |
+| --------- | ------------ | -- |
 | Climb     | leftArmHome  | 0 |
 | Climb     | rightArmHome | 1 |
+| Auto      | AutoSwitch   | 2 |
+| Auto      | AutoSwitch   | 3 |
+| Auto      | AutoSwitch   | 4 |
+| Auto      | AutoSwitch   | 5 |
+| Auto      | AutoSwitch   | 6 |
+| Auto      | AutoSwitch   | 7 |
+| Robot     | BNC          | 8 |
+| Turret    | zeroSensor   | 9 |
 
 
 ## Deadeye Vision System
