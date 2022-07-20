@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.Trajectory.State;
@@ -86,6 +87,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private TimestampedPose lastTimeStampedPose =
       new TimestampedPose(RobotController.getFPGATime(), new Pose2d());
   private double distanceVisionWheelOdom = 0.0;
+  private double prevFieldRelvx = 0.0;
+  private double prevFieldRelvy = 0.0;
 
   public DriveSubsystem() {
 
@@ -170,14 +173,6 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public void drive(
       double forwardMetersPerSec, double strafeMetersPerSec, double yawRadiansPerSec) {
-    lastTimeStamp = curTimeStamp;
-    curTimeStamp = Timer.getFPGATimestamp();
-    currYAccel = Math.abs((lastVelocity[1] - strafeMetersPerSec) / (curTimeStamp - lastTimeStamp));
-    currXAccel = Math.abs((lastVelocity[0] - forwardMetersPerSec) / (curTimeStamp - lastTimeStamp));
-    if (currYAccel < DriveConstants.kMaxShootMoveAccel) numAccelYStable++;
-    else numAccelYStable = 0;
-    if (currXAccel < DriveConstants.kMaxShootMoveAccel) numAccelXStable++;
-    else numAccelXStable = 0;
     lastVelocity[0] = forwardMetersPerSec;
     lastVelocity[1] = strafeMetersPerSec;
     lastVelocity[2] = yawRadiansPerSec;
@@ -226,6 +221,24 @@ public class DriveSubsystem extends MeasurableSubsystem {
   @Override
   public void periodic() {
     swerveDrive.periodic();
+
+    // Calculate Acceleration
+    lastTimeStamp = curTimeStamp;
+    curTimeStamp = Timer.getFPGATimestamp();
+    currYAccel =
+        Math.abs(
+            (getFieldRelSpeed().vyMetersPerSecond - prevFieldRelvy)
+                / (curTimeStamp - lastTimeStamp));
+    currXAccel =
+        Math.abs(
+            (getFieldRelSpeed().vxMetersPerSecond - prevFieldRelvx)
+                / (curTimeStamp - lastTimeStamp));
+    prevFieldRelvx = getFieldRelSpeed().vxMetersPerSecond;
+    prevFieldRelvy = getFieldRelSpeed().vyMetersPerSecond;
+    if (currYAccel < DriveConstants.kMaxShootMoveAccel) numAccelYStable++;
+    else numAccelYStable = 0;
+    if (currXAccel < DriveConstants.kMaxShootMoveAccel) numAccelXStable++;
+    else numAccelXStable = 0;
 
     // State Machine 1st Update 2nd reset 3rd nothing
     switch (driveStates) {
@@ -396,6 +409,22 @@ public class DriveSubsystem extends MeasurableSubsystem {
     return stable;
   }
 
+  public ChassisSpeeds getFieldRelSpeed() {
+    SwerveDriveKinematics kinematics = swerveDrive.getKinematics();
+    SwerveModule[] swerveModules = swerveDrive.getSwerveModules();
+    SwerveModuleState[] swerveModuleStates = new SwerveModuleState[4];
+    for (int i = 0; i < 4; ++i) {
+      swerveModuleStates[i] = swerveModules[i].getState();
+    }
+    ChassisSpeeds roboRelSpeed = kinematics.toChassisSpeeds(swerveModuleStates);
+    return new ChassisSpeeds(
+        roboRelSpeed.vxMetersPerSecond * swerveDrive.getHeading().unaryMinus().getCos()
+            + roboRelSpeed.vyMetersPerSecond * swerveDrive.getHeading().unaryMinus().getSin(),
+        -roboRelSpeed.vxMetersPerSecond * swerveDrive.getHeading().unaryMinus().getSin()
+            + roboRelSpeed.vyMetersPerSecond * swerveDrive.getHeading().unaryMinus().getCos(),
+        roboRelSpeed.omegaRadiansPerSecond);
+  }
+
   public boolean isMoveShootStable() {
     double gyroRate = swerveDrive.getGyroRate();
     fwdStable = Math.abs(lastVelocity[0]) <= DriveConstants.kMaxShootMoveVelocity;
@@ -548,7 +577,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure("Num Stable Y Accel", () -> numAccelYStable),
         new Measure("Num Stable X Accel", () -> numAccelXStable),
         new Measure("Num vision odom off", () -> odomOffCount),
-        new Measure("Delta Wheel Vision", () -> distanceVisionWheelOdom));
+        new Measure("Delta Wheel Vision", () -> distanceVisionWheelOdom),
+        new Measure("FieldRelXSpeed", () -> getFieldRelSpeed().vxMetersPerSecond),
+        new Measure("FieldRelYSpeed", () -> getFieldRelSpeed().vyMetersPerSecond));
   }
 
   public enum DriveStates {

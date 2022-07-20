@@ -659,8 +659,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
           if (shooterSubsystem.getCurrentState() == ShooterState.SHOOT
               && turretSubsystem.isTurretAtOdom()
               && driveSubsystem.isMoveShootStable()
-              && turretSubsystem.getState() != TurretState.WRAPPING
-              && visionSubsystem.isRangingValid()) {
+              && turretSubsystem.getState() != TurretState.WRAPPING) {
             shooterSubsystem.logShotSol();
             logger.info("PAUSE -> SHOOT");
             enableUpperBeamBreak(false);

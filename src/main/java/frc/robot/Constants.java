@@ -47,7 +47,7 @@ public final class Constants {
     public static final double kPutOdomResetThreshold = 0.35;
 
     // shoot while move restraints
-    public static final double kMaxShootMoveVelocity = 2.0;
+    public static final double kMaxShootMoveVelocity = 3.0;
     public static final double kMaxStableAccelCount = 4;
     public static final double kMaxShootMoveYaw = 0.5;
     public static final double kMaxShootMoveAccel = 1.0;
@@ -828,7 +828,7 @@ public final class Constants {
     public static final double kLookupToFMultiplier = 1.0;
 
     // Hood Encoder Constants
-    public static final int kHoodZeroTicks = 880; // 935
+    public static final int kHoodZeroTicks = 1265; // 935
     public static final int kForwardSoftLimts = 5800;
     public static final int kReverseSoftLimits = -50;
     public static final int kZeroCheckTicks = 2_600; // 500
