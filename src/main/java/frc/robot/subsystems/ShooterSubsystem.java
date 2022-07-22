@@ -279,7 +279,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
     return (int) Double.parseDouble(inchTable[(int) index][1]);
   }
 
-  public Translation2d getFutureGoalPos() {
+  public Translation2d getFutureGoalPos(double time) {
     if (currentState != ShooterState.SHOOT) {
       logger.info("SHOOT: {} -> ADJUSTING", currentState);
       currentState = ShooterState.ADJUSTING;
@@ -293,10 +293,12 @@ public class ShooterSubsystem extends MeasurableSubsystem {
           getShootSolution(inchesToPixelsTable(TurretConstants.kHubPositionMeters));
       double dx =
           -driveSubsystem.getFieldRelSpeed().vxMetersPerSecond
-              * (shootSolution[4] * ShooterConstants.kLookupToFMultiplier);
+              * ((shootSolution[4] - time + ShooterConstants.kLookupTOFOffset)
+                  * ShooterConstants.kLookupToFMultiplier);
       double dy =
           -driveSubsystem.getFieldRelSpeed().vyMetersPerSecond
-              * (shootSolution[4] * ShooterConstants.kLookupToFMultiplier);
+              * ((shootSolution[4] - time + ShooterConstants.kLookupTOFOffset)
+                  * ShooterConstants.kLookupToFMultiplier);
       delta = new Translation2d(dx, dy);
       newHub = TurretConstants.kHubPositionMeters;
       newHub = newHub.plus(delta);

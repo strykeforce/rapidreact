@@ -350,6 +350,11 @@ public final class Constants {
     public static final int kLowerMagazineTalonID = 30;
     public static final int kUpperMagazineTalonID = 31;
 
+    // Pull back ball
+    public static final double kMaxTimeForPullBack = 0.05;
+    public static final double kPullUpperBack = 0.05;
+    public static final double kMaxDistancePull = 1;
+
     // Color Sensor Constants
     public static final Color kBlueCargo =
         new Color(0.15, 0.35, 0.5); // FIXME need to get real color
@@ -817,6 +822,7 @@ public final class Constants {
     public static final double kInsideHoodTickPos = 5700; // 5700
 
     // Lookup Table Constants
+    public static final double kLookupTOFOffset = .13;
     public static final double kLookupMinPixel = 127;
     public static final double kLookupMaxPixel = 414;
     public static final double kNumRows = 288;
