@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.OffsetGyroCommand;
+import frc.robot.commands.magazine.AutoSlowEjectCargoCommand;
 import frc.robot.commands.magazine.IgnoreColorSensorCommand;
 import frc.robot.commands.magazine.PreloadCargoCommand;
 import frc.robot.commands.sequences.intaking.AutoIntakeCommand;
@@ -33,6 +34,8 @@ public class DestageThreeCargoAuto extends SequentialCommandGroup {
       String path1Name,
       String path2Name,
       String path3Name,
+      String path4Name,
+      String path5Name,
       Rotation2d gyroOffset,
       double delay,
       double widthPixels) {
@@ -61,6 +64,13 @@ public class DestageThreeCargoAuto extends SequentialCommandGroup {
             new AutoIntakeCommand(
                 magazineSubsystem, intakeSubsystem, intakeExtendSubsystem, true, true)),
         new WaitCommand(AutoConstants.kDefenseBallPickupDelay),
-        new DriveAutonCommand(driveSubsystem, path3Name, false, true));
+        new DriveAutonCommand(driveSubsystem, path3Name, false, true),
+        new AutoSlowEjectCargoCommand(magazineSubsystem, intakeSubsystem, shooterSubsystem),
+        new ParallelDeadlineGroup(
+            new DriveAutonCommand(driveSubsystem, path4Name, false, true),
+            new AutoIntakeCommand(
+                magazineSubsystem, intakeSubsystem, intakeExtendSubsystem, true, true)),
+        new WaitCommand(AutoConstants.kDefenseBallPickupDelay),
+        new DriveAutonCommand(driveSubsystem, path5Name, false, true));
   }
 }

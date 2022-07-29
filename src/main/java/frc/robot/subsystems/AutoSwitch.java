@@ -146,6 +146,8 @@ public class AutoSwitch {
             "LeftCargo1Collect",
             "OppCargo2Collect",
             "PrepareLeftCargo4",
+            "LeftCargo4Collect",
+            "CrossCenterLine",
             AutoConstants.kLeftStartYaw,
             0.0,
             230.0); // FIXME
