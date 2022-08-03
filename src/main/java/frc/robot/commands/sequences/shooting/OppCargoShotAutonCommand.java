@@ -29,7 +29,7 @@ public class OppCargoShotAutonCommand extends CommandBase {
   @Override
   public void initialize() {
     turretSubsystem.opponentCargoShot(ShooterConstants.kOpponentCargoShotOdomAimPos);
-    shooterSubsystem.geyserShot(true, true);
+    shooterSubsystem.geyserShot(true, true, ShooterConstants.kOpponentCargoShotSol);
     magazineSubsystem.shoot();
   }
 

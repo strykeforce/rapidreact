@@ -18,6 +18,8 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Constants;
 import frc.robot.Constants.MagazineConstants;
+import frc.robot.commands.sequences.shooting.GeyserShootCommand;
+import frc.robot.commands.sequences.shooting.OppCargoShotAutonCommand;
 import frc.robot.subsystems.ShooterSubsystem.ShooterState;
 import frc.robot.subsystems.TurretSubsystem.TurretState;
 import java.util.List;
@@ -56,6 +58,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   private boolean doTimedShoot = false;
   private boolean doOdomVisionReset = false;
   private boolean shootWhileMove = false;
+  private boolean autonIgnoreColorSensor = false;
 
   public MagazineSubsystem(
       TurretSubsystem turretSubsystem,
@@ -224,6 +227,14 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   public void ignoreColorSensor(boolean ignore) {
     ignoreColorSensor = ignore;
     logger.info("set ignoreColorSensor to: {}", ignore);
+  }
+
+  public void setAutonIgnoreColorSensor(boolean autonIgnore) {
+    autonIgnoreColorSensor = autonIgnore;
+  }
+
+  public boolean getAutonIgnoreColorSensor() {
+    return autonIgnoreColorSensor;
   }
 
   public boolean isColorSensorIgnored() {
@@ -470,6 +481,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
           }
           if (cargoColor != allianceCargoColor
               && !ignoreColorSensor
+              && !autonIgnoreColorSensor
               && currUpperMagazineState != UpperMagazineState.EMPTY) {
             logger.info("READ_CARGO -> EJECT_CARGO");
             lowerClosedLoopRotate(MagazineConstants.kLowerMagazineEjectSpeed);
@@ -574,8 +586,10 @@ public class MagazineSubsystem extends MeasurableSubsystem {
           if (turretSubsystem.getState() == TurretState.ODOM_FEED) {
             turretSubsystem.trackTarget();
           }
-          if (turretSubsystem.getState() == TurretState.GEYSER_AIMED) {
+          if (turretSubsystem.getState() == TurretState.GEYSER_AIMED && !autonIgnoreColorSensor) {
             turretSubsystem.geyserShot(false);
+          } else if (turretSubsystem.getState() == TurretState.GEYSER_AIMED) {
+            turretSubsystem.trackTarget();
           }
           if (isMagazineEmpty()) upperClosedLoopRotate(0.0);
           break;
@@ -584,7 +598,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
 
       case EMPTY:
         if (isUpperBeamBroken()) {
-          if (!isNextCargoAlliance()) {
+          if (!isNextCargoAlliance() && !autonIgnoreColorSensor) {
             logger.info("EMPTY -> SPIT");
             currUpperMagazineState = UpperMagazineState.SPIT;
           } else {
