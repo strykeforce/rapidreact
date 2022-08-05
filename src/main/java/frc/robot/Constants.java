@@ -865,6 +865,8 @@ public final class Constants {
     public static final double kShooterOppCargoShotTicksP100ms = 0;
     public static Translation2d kOpponentCargoShotOdomAimPos = new Translation2d(0, 4);
     public static Translation2d kOpponentCargoShotSol = new Translation2d(4, 0.65);
+    public static Translation2d kDestageOpponentCargoShotOdomAimPos = new Translation2d(0, 3);
+    public static Translation2d kDestageOpponentCargoShotSol = new Translation2d(5.52, 2.82);
     public static Translation2d kDummyShotSol = new Translation2d(0, 0);
 
     public static final double kShooterManualEjectTicksP100ms = -5_000;

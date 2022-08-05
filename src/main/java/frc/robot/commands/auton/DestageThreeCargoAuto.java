@@ -4,14 +4,14 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.Constants.AutoConstants;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.OffsetGyroCommand;
 import frc.robot.commands.magazine.AutoSlowEjectCargoCommand;
-import frc.robot.commands.magazine.IgnoreColorSensorCommand;
+import frc.robot.commands.magazine.AutonIgnoreColorSensorCommand;
 import frc.robot.commands.magazine.PreloadCargoCommand;
 import frc.robot.commands.sequences.intaking.AutoIntakeCommand;
 import frc.robot.commands.sequences.shooting.ArmShooterCommandGroup;
+import frc.robot.commands.sequences.shooting.UnknownOrderShotAutonCommand;
 import frc.robot.commands.sequences.shooting.VisionShootAutoCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeExtendSubsystem;
@@ -58,19 +58,19 @@ public class DestageThreeCargoAuto extends SequentialCommandGroup {
             false,
             intakeSubsystem,
             widthPixels),
-        new IgnoreColorSensorCommand(magazineSubsystem, true),
+        new AutonIgnoreColorSensorCommand(magazineSubsystem, true),
         new ParallelDeadlineGroup(
             new DriveAutonCommand(driveSubsystem, path2Name, false, true),
             new AutoIntakeCommand(
                 magazineSubsystem, intakeSubsystem, intakeExtendSubsystem, true, true)),
-        new WaitCommand(AutoConstants.kDefenseBallPickupDelay),
         new DriveAutonCommand(driveSubsystem, path3Name, false, true),
         new AutoSlowEjectCargoCommand(magazineSubsystem, intakeSubsystem, shooterSubsystem),
         new ParallelDeadlineGroup(
             new DriveAutonCommand(driveSubsystem, path4Name, false, true),
             new AutoIntakeCommand(
                 magazineSubsystem, intakeSubsystem, intakeExtendSubsystem, true, true)),
-        new WaitCommand(AutoConstants.kDefenseBallPickupDelay),
-        new DriveAutonCommand(driveSubsystem, path5Name, false, true));
+        new DriveAutonCommand(driveSubsystem, path5Name, false, true),
+        new UnknownOrderShotAutonCommand(
+            turretSubsystem, shooterSubsystem, magazineSubsystem, intakeSubsystem));
   }
 }

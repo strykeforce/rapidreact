@@ -18,8 +18,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Constants;
 import frc.robot.Constants.MagazineConstants;
-import frc.robot.commands.sequences.shooting.GeyserShootCommand;
-import frc.robot.commands.sequences.shooting.OppCargoShotAutonCommand;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.ShooterSubsystem.ShooterState;
 import frc.robot.subsystems.TurretSubsystem.TurretState;
 import java.util.List;
@@ -588,8 +587,12 @@ public class MagazineSubsystem extends MeasurableSubsystem {
           }
           if (turretSubsystem.getState() == TurretState.GEYSER_AIMED && !autonIgnoreColorSensor) {
             turretSubsystem.geyserShot(false);
-          } else if (turretSubsystem.getState() == TurretState.GEYSER_AIMED) {
+          } else if (autonIgnoreColorSensor && isNextCargoAlliance()) {
             turretSubsystem.trackTarget();
+          }
+          if (autonIgnoreColorSensor && !isNextCargoAlliance()) {
+            turretSubsystem.opponentCargoShot(ShooterConstants.kDestageOpponentCargoShotOdomAimPos);
+            shooterSubsystem.geyserShot(true, true, ShooterConstants.kDestageOpponentCargoShotSol);
           }
           if (isMagazineEmpty()) upperClosedLoopRotate(0.0);
           break;

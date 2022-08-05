@@ -431,8 +431,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
         hoodClosedLoop(ShooterConstants.kHoodGeyserBallTwoTicks);
       }
     } else {
-      double[] shootSol =
-          getShootSolution(inchesToPixelsTable(fieldSpot));
+      double[] shootSol = getShootSolution(inchesToPixelsTable(fieldSpot));
       shooterClosedLoop(shootSol[0], shootSol[1]);
       hoodClosedLoop(shootSol[2]);
     }
