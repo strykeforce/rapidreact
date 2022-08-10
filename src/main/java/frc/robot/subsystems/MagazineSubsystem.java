@@ -204,7 +204,10 @@ public class MagazineSubsystem extends MeasurableSubsystem {
 
   public Color getColor() {
     lastColor = colorSensor.getColor();
-    if (lastColor.red == 0 && lastColor.green == 0 && lastColor.blue == 0) {
+    if (lastColor.red == 0
+        && lastColor.green == 0
+        && lastColor.blue == 0
+        && !autonIgnoreColorSensor) {
       ignoreColorSensor = true;
       logger.warn("Color sensor error. Diasbling color sensor.");
       if (allianceCargoColor == CargoColor.BLUE) lastColor = MagazineConstants.kBlueCargo;
@@ -587,10 +590,10 @@ public class MagazineSubsystem extends MeasurableSubsystem {
           }
           if (turretSubsystem.getState() == TurretState.GEYSER_AIMED && !autonIgnoreColorSensor) {
             turretSubsystem.geyserShot(false);
-          } else if (autonIgnoreColorSensor && isNextCargoAlliance()) {
+          } else if (autonIgnoreColorSensor && isFirstCargoAlliance()) {
             turretSubsystem.trackTarget();
           }
-          if (autonIgnoreColorSensor && !isNextCargoAlliance()) {
+          if (autonIgnoreColorSensor && !isFirstCargoAlliance()) {
             turretSubsystem.opponentCargoShot(ShooterConstants.kDestageOpponentCargoShotOdomAimPos);
             shooterSubsystem.geyserShot(true, true, ShooterConstants.kDestageOpponentCargoShotSol);
           }

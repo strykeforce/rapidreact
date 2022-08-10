@@ -721,7 +721,7 @@ public final class Constants {
     public static final int kIntakeExtendTalonID = 21;
 
     public static final double kIntakeEjectSpeed = -0.5;
-    public static final double kIntakeSlowEjectSpeed = -0.25;
+    public static final double kIntakeSlowEjectSpeed = -0.45;
     public static final double kIntakeReverseSpeed = -0.2;
 
     public static final int kIntakeZeroTicks = 2800; // FIXME insert actual value
@@ -1002,6 +1002,6 @@ public final class Constants {
     public static final Rotation2d kDefenseTwoRightStartYaw = Rotation2d.fromDegrees(-111.0);
     public static final double kDefenseBallPickupDelay = 0.2;
     public static final double kWaitUntilMatchTime = 2.0;
-    public static final double kSlowEjectTimerDelay = 1.5;
+    public static final double kSlowEjectTimerDelay = 1.15;
   }
 }
