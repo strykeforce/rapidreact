@@ -596,6 +596,10 @@ public class MagazineSubsystem extends MeasurableSubsystem {
         break;
 
       case CARGO_SHOT:
+        if (shootWhileMove) {
+          newMoveShootTrans = shooterSubsystem.getFutureGoalPos(moveShootCorrect.get());
+          turretSubsystem.trackOdom(newMoveShootTrans);
+        }
         if (shootTimer.hasElapsed(MagazineConstants.kShootDelay)) {
           logger.info("CARGO_SHOT -> EMPTY");
           currUpperMagazineState = UpperMagazineState.EMPTY;

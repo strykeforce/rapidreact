@@ -47,7 +47,7 @@ public final class Constants {
     public static final double kPutOdomResetThreshold = 0.35;
 
     // shoot while move restraints
-    public static final double kMaxShootMoveVelocity = 3.0;
+    public static final double kMaxShootMoveVelocity = 5.0;
     public static final double kMaxStableAccelCount = 4;
     public static final double kMaxShootMoveYaw = 0.5;
     public static final double kMaxShootMoveAccel = 1.0;
@@ -822,7 +822,7 @@ public final class Constants {
     public static final double kInsideHoodTickPos = 5700; // 5700
 
     // Lookup Table Constants
-    public static final double kLookupTOFOffset = .13;
+    public static final double kLookupTOFOffset = 0.1;
     public static final double kLookupMinPixel = 127;
     public static final double kLookupMaxPixel = 414;
     public static final double kNumRows = 288;
