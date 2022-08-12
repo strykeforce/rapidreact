@@ -493,6 +493,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
             break;
           } else if (currUpperMagazineState == UpperMagazineState.EMPTY) {
             logger.info("READ_CARGO -> WAIT_EMPTY");
+            logger.info("stored cargo: {}, {}", storedCargoColors[0], storedCargoColors[1]);
             currLowerMagazineState = LowerMagazineState.WAIT_EMPTY;
             enableLowerBeamBreak(false);
             lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIndexSpeed);
@@ -500,6 +501,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
             break;
           } else {
             logger.info("READ_CARGO -> WAIT_UPPER");
+            logger.info("stored cargo: {}, {}", storedCargoColors[0], storedCargoColors[1]);
             currLowerMagazineState = LowerMagazineState.WAIT_UPPER;
             break;
           }
