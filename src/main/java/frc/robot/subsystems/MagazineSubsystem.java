@@ -545,7 +545,6 @@ public class MagazineSubsystem extends MeasurableSubsystem {
         if (!isUpperBeamBroken()) shootUpperBeamStableCounts++;
         else shootUpperBeamStableCounts = 0;
 
-        // Update during SHOOT aka the about 200ms between shoot and ball leaving robot
         if (shootWhileMove) {
           newMoveShootTrans = shooterSubsystem.getFutureGoalPos(moveShootCorrect.get());
           turretSubsystem.trackOdom(newMoveShootTrans);

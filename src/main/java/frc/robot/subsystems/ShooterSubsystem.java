@@ -305,8 +305,8 @@ public class ShooterSubsystem extends MeasurableSubsystem {
       double lastDistance = shootSolution[3];
       shootSolution = getShootSolution(inchesToPixelsTable(newHub));
       changeInDistanceGoal = shootSolution[3] - lastDistance;
-      shooterClosedLoop(shootSolution[0], shootSolution[1]);
-      hoodClosedLoop(shootSolution[2]);
+        shooterClosedLoop(shootSolution[0], shootSolution[1]);
+        hoodClosedLoop(shootSolution[2]);
       return newHub;
     }
     return TurretConstants.kHubPositionMeters;
