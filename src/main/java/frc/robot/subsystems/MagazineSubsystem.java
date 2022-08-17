@@ -491,7 +491,8 @@ public class MagazineSubsystem extends MeasurableSubsystem {
             ejectTimer.reset();
             ejectTimer.start();
             break;
-          } else if (currUpperMagazineState == UpperMagazineState.EMPTY) {
+          } else if (currUpperMagazineState == UpperMagazineState.EMPTY
+              && storedCargoColors[0] == CargoColor.NONE) {
             logger.info("READ_CARGO -> WAIT_EMPTY");
             logger.info("stored cargo: {}, {}", storedCargoColors[0], storedCargoColors[1]);
             currLowerMagazineState = LowerMagazineState.WAIT_EMPTY;
@@ -518,7 +519,8 @@ public class MagazineSubsystem extends MeasurableSubsystem {
         break;
 
       case WAIT_UPPER:
-        if (currUpperMagazineState == UpperMagazineState.EMPTY
+        if ((currUpperMagazineState == UpperMagazineState.EMPTY
+                && storedCargoColors[0] == CargoColor.NONE)
             || currUpperMagazineState == UpperMagazineState.CARGO_SHOT && !isUpperBeamBroken()) {
           logger.info("WAIT_UPPER -> WAIT_EMPTY");
           enableLowerBeamBreak(false);
