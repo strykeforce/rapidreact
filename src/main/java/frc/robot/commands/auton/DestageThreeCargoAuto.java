@@ -10,6 +10,7 @@ import frc.robot.commands.magazine.AutoSlowEjectCargoCommand;
 import frc.robot.commands.magazine.AutonIgnoreColorSensorCommand;
 import frc.robot.commands.magazine.PreloadCargoCommand;
 import frc.robot.commands.sequences.intaking.AutoIntakeCommand;
+import frc.robot.commands.sequences.intaking.DestageAutoIntakeCommand;
 import frc.robot.commands.sequences.shooting.ArmShooterCommandGroup;
 import frc.robot.commands.sequences.shooting.UnknownOrderShotAutonCommand;
 import frc.robot.commands.sequences.shooting.VisionShootAutoCommand;
@@ -59,9 +60,9 @@ public class DestageThreeCargoAuto extends SequentialCommandGroup {
             intakeSubsystem,
             widthPixels),
         new AutonIgnoreColorSensorCommand(magazineSubsystem, true),
-        new ParallelDeadlineGroup(
+        new ParallelCommandGroup(
             new DriveAutonCommand(driveSubsystem, path2Name, false, true),
-            new AutoIntakeCommand(
+            new DestageAutoIntakeCommand(
                 magazineSubsystem, intakeSubsystem, intakeExtendSubsystem, true, true)),
         new DriveAutonCommand(driveSubsystem, path3Name, false, true),
         new AutoSlowEjectCargoCommand(magazineSubsystem, intakeSubsystem, shooterSubsystem),
