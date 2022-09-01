@@ -58,6 +58,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   private boolean doOdomVisionReset = false;
   private boolean shootWhileMove = false;
   private boolean autonIgnoreColorSensor = false;
+  private boolean autonReadTimerElapsed = false;
 
   public MagazineSubsystem(
       TurretSubsystem turretSubsystem,
@@ -126,6 +127,10 @@ public class MagazineSubsystem extends MeasurableSubsystem {
 
   public boolean getShootWhileMove() {
     return shootWhileMove;
+  }
+
+  public boolean getAutonReadTimerElapsed() {
+    return autonReadTimerElapsed;
   }
 
   public void enableUpperBeamBreak(boolean enableUpper) {
@@ -476,10 +481,13 @@ public class MagazineSubsystem extends MeasurableSubsystem {
         boolean hasReadElapsed = readTimer.hasElapsed(MagazineConstants.kReadTimerDelay);
         if (cargoColor != CargoColor.NONE || hasReadElapsed) {
           // ignoreColorSensor || storedCargoColors[0]
-          if (hasReadElapsed) {
+          if (hasReadElapsed && !autonIgnoreColorSensor) {
             logger.info("ReadTimer Elapsed");
             cargoColor = allianceCargoColor;
             storedCargoColors[1] = cargoColor;
+          } else {
+            logger.info("ReadTimer Elapsed");
+            autonReadTimerElapsed = true;
           }
           if (cargoColor != allianceCargoColor
               && !ignoreColorSensor

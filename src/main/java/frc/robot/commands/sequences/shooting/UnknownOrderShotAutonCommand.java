@@ -27,15 +27,17 @@ public class UnknownOrderShotAutonCommand extends InstantCommand {
 
   @Override
   public void initialize() {
-    if (!magazineSubsystem.isColorSensorIgnored()) {
-      if (magazineSubsystem.isFirstCargoAlliance()) {
-        turretSubsystem.trackTarget();
-        shooterSubsystem.shoot();
-        magazineSubsystem.shoot();
-      } else {
-        turretSubsystem.opponentCargoShot(ShooterConstants.kDestageOpponentCargoShotOdomAimPos);
-        shooterSubsystem.geyserShot(true, true, ShooterConstants.kDestageOpponentCargoShotSol);
-        magazineSubsystem.shoot();
+    if (!magazineSubsystem.getAutonReadTimerElapsed()) {
+      if (!magazineSubsystem.isColorSensorIgnored()) {
+        if (magazineSubsystem.isFirstCargoAlliance()) {
+          turretSubsystem.trackTarget();
+          shooterSubsystem.shoot();
+          magazineSubsystem.shoot();
+        } else {
+          turretSubsystem.opponentCargoShot(ShooterConstants.kDestageOpponentCargoShotOdomAimPos);
+          shooterSubsystem.geyserShot(true, true, ShooterConstants.kDestageOpponentCargoShotSol);
+          magazineSubsystem.shoot();
+        }
       }
     }
   }
