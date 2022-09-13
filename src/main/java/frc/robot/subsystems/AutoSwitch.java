@@ -248,7 +248,7 @@ public class AutoSwitch {
             "DefenseAutoTwoCargo1Shoot",
             "DefenseTwoOppCargo2CollectShoot",
             AutoConstants.kDefenseTwoRightStartYaw,
-            5.0,
+            7.0,
             200);
       default:
         String msg = String.format("no auto command assigned for switch position %02X", switchPos);

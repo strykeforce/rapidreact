@@ -18,6 +18,7 @@ public class InitiateClimbCommand extends CommandBase {
   @Override
   public void initialize() {
     climbSubsystem.initiateClimb();
+    turretSubsystem.stopTrackingTarget();
     turretSubsystem.rotateTo(Rotation2d.fromDegrees(0.0));
   }
 

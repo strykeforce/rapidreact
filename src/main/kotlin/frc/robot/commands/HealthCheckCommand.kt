@@ -222,13 +222,13 @@ class HealthCheckCommand(val driveSubsystem : DriveSubsystem,
                 val volt3_6StatorCurrentRange = -0.25..1.25
 
                 positionTalon {
-                    encoderTarget = -10_000
+                    encoderTarget = -33_792
                     encoderGoodEnough = 100
                 }
 
                 positionTest {
                     percentOutput = 0.3
-                    encoderChangeTarget = 20_000
+                    encoderChangeTarget = 67_584
                     encoderGoodEnough = 500
                     encoderTimeCount = 500
 
@@ -239,7 +239,7 @@ class HealthCheckCommand(val driveSubsystem : DriveSubsystem,
 
                 positionTest {
                     percentOutput = -0.3
-                    encoderChangeTarget = 20_000
+                    encoderChangeTarget = 67_584
                     encoderGoodEnough = 500
                     encoderTimeCount = 500
 

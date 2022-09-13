@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.sequences.SetAllianceCommand;
 import frc.robot.commands.vision.DisableVisionCommand;
+import frc.robot.commands.vision.EnableVisionCommand;
 import frc.robot.commands.vision.TurnOnDeadeyeCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,6 +124,10 @@ public class Robot extends TimedRobot {
     m_robotContainer.zeroClimb();
     m_robotContainer.startAutoIntake();
     m_robotContainer.setDoVisionOdomReset(true);
+    CommandScheduler.getInstance()
+        .schedule(
+            new EnableVisionCommand(
+                m_robotContainer.getVisionSubsystem(), m_robotContainer.getDriveSubsystem()));
   }
 
   /** This function is called periodically during operator control. */
