@@ -309,8 +309,8 @@ public final class Constants {
     public static Rotation2d kGeyserBallTwoPosition = Rotation2d.fromDegrees(95);
 
     // Stryke Shot Constants
-    public static final double kOutsideStrykePos = -8575; // 2450
-    public static final double kInsideStrykePos = -5600; // 1600
+    public static final double kOutsideStrykePos = -9907; // -8575 ->-9007
+    public static final double kInsideStrykePos = -6032; // -5600
 
     // Talon Constants
     public static SupplyCurrentLimitConfiguration getSupplyCurrentLimitConfig() {
@@ -729,7 +729,7 @@ public final class Constants {
 
     public static final double kCloseEnoughTicks = 150;
     public static final double kIntakeExtendPos = 14_000; // FIXME insert actual value
-    public static final double kIntakeRetractPos = 2_000; // FIXME insert actual value
+    public static final double kIntakeRetractPos = -100; // 2_000
 
     public static TalonFXConfiguration getIntakeFalconConfig() {
       TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
@@ -828,7 +828,7 @@ public final class Constants {
     public static final double kLookupToFMultiplier = 1.0;
 
     // Hood Encoder Constants
-    public static final int kHoodZeroTicks = 880; // 935
+    public static final int kHoodZeroTicks = 1265; // 880->1426->1574->2115*
     public static final int kForwardSoftLimts = 5800;
     public static final int kReverseSoftLimits = -50;
     public static final int kZeroCheckTicks = 2_600; // 500

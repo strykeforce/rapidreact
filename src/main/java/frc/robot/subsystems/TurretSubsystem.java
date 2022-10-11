@@ -227,6 +227,10 @@ public class TurretSubsystem extends MeasurableSubsystem {
     return turret.getSelectedSensorPosition() / TurretConstants.kTurretTicksPerRadian;
   }
 
+  public boolean isTurretAtZero() {
+    return zeroTurretInput.get();
+  }
+
   public void zeroTurret() {
     // double stringPotPosition = turret.getSensorCollection().getAnalogInRaw();
     if (zeroTurretInput.get()) {
