@@ -73,6 +73,7 @@ import frc.robot.commands.shooter.HoodClosedLoopCommand;
 import frc.robot.commands.shooter.HoodOpenLoopCommand;
 import frc.robot.commands.shooter.ShooterOpenLoopCommand;
 import frc.robot.commands.shooter.StopShooterCommand;
+import frc.robot.commands.shooter.StrykeShotCommand;
 import frc.robot.commands.shooter.SwitchClimbPos;
 import frc.robot.commands.turret.OpenLoopTurretCommand;
 import frc.robot.commands.turret.RotateToCommand;
@@ -172,6 +173,10 @@ public class RobotContainer {
     return visionSubsystem;
   }
 
+  public DriveSubsystem getDriveSubsystem() {
+    return driveSubsystem;
+  }
+
   public void setDoVisionOdomReset(boolean doReset) {
     magazineSubsystem.setDoVisionOdometryReset(doReset);
   }
@@ -200,6 +205,7 @@ public class RobotContainer {
     intakeSubsystem.registerWith(telemetryService);
     visionSubsystem.registerWith(telemetryService);
     climbSubsystem.registerWith(telemetryService);
+    intakeExtendSubsystem.registerWith(telemetryService);
     odometryTestSubsystem.registerWith(telemetryService);
     telemetryService.start();
   }
@@ -211,6 +217,10 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureDriverButtonBindings() {
+
+    new JoystickButton(driveJoystick, Button.HAMBURGER.id)
+        .whenPressed(new StrykeShotCommand(turretSubsystem, shooterSubsystem, magazineSubsystem));
+
     driveSubsystem.setDefaultCommand(new DriveTeleopCommand(driveJoystick, driveSubsystem));
     new JoystickButton(driveJoystick, Button.RESET.id)
         .whenPressed(new ZeroGyroCommand(driveSubsystem));
@@ -512,6 +522,10 @@ public class RobotContainer {
         .addBoolean("UseRangingValid", () -> visionSubsystem.getUseRangingValid())
         .withSize(1, 1)
         .withPosition(2, 1);
+    Shuffleboard.getTab("Debug")
+        .addBoolean("IsTurretAtZero", () -> turretSubsystem.isTurretAtZero())
+        .withSize(1, 1)
+        .withPosition(3, 0);
   }
 
   public void setAllianceColor(Alliance alliance) {
