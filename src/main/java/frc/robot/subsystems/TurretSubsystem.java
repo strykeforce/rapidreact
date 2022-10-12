@@ -43,6 +43,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
   private boolean lastDoRotate = false;
   private boolean isBallOne = true;
   private DigitalInput zeroTurretInput = new DigitalInput(9);
+  private Rotation2d tempFindAngle = new Rotation2d();
 
   private int trackingStableCount;
   private int wrappingCount = 0;
@@ -298,6 +299,7 @@ public class TurretSubsystem extends MeasurableSubsystem {
     findAngle = findAngle.plus(TurretConstants.kTurretRobotOffset);
     double gyroRate = driveSubsystem.getGyroRate();
     Rotation2d feedForward = Rotation2d.fromDegrees(gyroRate * TurretConstants.kFYaw);
+    tempFindAngle = findAngle;
     findAngle = findAngle.plus(feedForward);
     rotateTo(findAngle);
   }
@@ -582,7 +584,8 @@ public class TurretSubsystem extends MeasurableSubsystem {
         new Measure("TurretAtTarget", () -> isTurretAtTarget() ? 1.0 : 0.0),
         new Measure("rotateKp", this::getRotateByKp),
         new Measure("state", () -> currentState.ordinal()),
-        new Measure("DIO", () -> zeroTurretInput.get() ? 1.0 : 0.0));
+        new Measure("DIO", () -> zeroTurretInput.get() ? 1.0 : 0.0),
+        new Measure("FindAngle", () -> tempFindAngle.getDegrees()));
   }
 
   @Override

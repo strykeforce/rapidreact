@@ -57,6 +57,10 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   private boolean doTimedShoot = false;
   private boolean doOdomVisionReset = false;
   private boolean shootWhileMove = false;
+  private Timer moveShootCorrect = new Timer();
+  private Timer pullBackBall = new Timer();
+  private Translation2d origMoveShootTrans = new Translation2d(0, 0);
+  private Translation2d newMoveShootTrans = new Translation2d(0, 0);
   private boolean autonIgnoreColorSensor = false;
   private boolean autonReadTimerElapsed = false;
 
@@ -567,6 +571,21 @@ public class MagazineSubsystem extends MeasurableSubsystem {
         if (!isUpperBeamBroken()) shootUpperBeamStableCounts++;
         else shootUpperBeamStableCounts = 0;
 
+        if (shootWhileMove) {
+          newMoveShootTrans = shooterSubsystem.getFutureGoalPos(moveShootCorrect.get());
+          turretSubsystem.trackOdom(newMoveShootTrans);
+          if (moveShootCorrect.get() <= MagazineConstants.kMaxTimeForPullBack
+              && (turretSubsystem.getState() == TurretState.WRAPPING
+                  || origMoveShootTrans.getDistance(newMoveShootTrans)
+                      >= MagazineConstants.kMaxDistancePull)) {
+            enableUpperBeamBreak(true);
+            upperClosedLoopRotate(MagazineConstants.kUpperMagazineEjectSpeed);
+            logger.info("SHOOT -> BALL_BACK");
+            currUpperMagazineState = UpperMagazineState.BALL_BACK;
+            pullBackBall.reset();
+            pullBackBall.start();
+          }
+        }
         if (shootUpperBeamStableCounts > MagazineConstants.kShootUpperBeamStableCounts) {
           logger.info("SHOOT -> CARGO_SHOT");
           currUpperMagazineState = UpperMagazineState.CARGO_SHOT;
@@ -575,6 +594,14 @@ public class MagazineSubsystem extends MeasurableSubsystem {
           enableUpperBeamBreak(true);
           upperClosedLoopRotate(MagazineConstants.kUpperMagazineIndexSpeed);
           shotOneCargo();
+        }
+        break;
+
+      case BALL_BACK:
+        if (pullBackBall.get() <= MagazineConstants.kPullUpperBack) {
+          upperClosedLoopRotate(MagazineConstants.kUpperMagazineIndexSpeed);
+          currUpperMagazineState = UpperMagazineState.PAUSE;
+          logger.info("BALL_BACK -> PAUSE");
         }
         break;
 
@@ -594,6 +621,10 @@ public class MagazineSubsystem extends MeasurableSubsystem {
         break;
 
       case CARGO_SHOT:
+        if (shootWhileMove) {
+          newMoveShootTrans = shooterSubsystem.getFutureGoalPos(moveShootCorrect.get());
+          turretSubsystem.trackOdom(newMoveShootTrans);
+        }
         if (shootTimer.hasElapsed(MagazineConstants.kShootDelay)) {
           logger.info("CARGO_SHOT -> EMPTY");
           currUpperMagazineState = UpperMagazineState.EMPTY;
@@ -686,13 +717,15 @@ public class MagazineSubsystem extends MeasurableSubsystem {
             currUpperMagazineState = UpperMagazineState.SHOOT;
           }
         } else if (shootWhileMove) {
-          Translation2d futureGoal = shooterSubsystem.getFutureGoalPos();
+          Translation2d futureGoal = shooterSubsystem.getFutureGoalPos(0.0);
           turretSubsystem.trackOdom(futureGoal);
           if (shooterSubsystem.getCurrentState() == ShooterState.SHOOT
               && turretSubsystem.isTurretAtOdom()
               && driveSubsystem.isMoveShootStable()
-              && turretSubsystem.getState() != TurretState.WRAPPING
-              && visionSubsystem.isRangingValid()) {
+              && turretSubsystem.getState() != TurretState.WRAPPING) {
+            origMoveShootTrans = futureGoal;
+            moveShootCorrect.reset();
+            moveShootCorrect.start();
             shooterSubsystem.logShotSol();
             logger.info("PAUSE -> SHOOT");
             enableUpperBeamBreak(false);
@@ -791,6 +824,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
     CARGO_SHOT,
     PAUSE,
     TIMED_FEED,
-    STOP;
+    STOP,
+    BALL_BACK;
   }
 }

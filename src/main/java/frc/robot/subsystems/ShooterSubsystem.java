@@ -279,7 +279,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
     return (int) Double.parseDouble(inchTable[(int) index][1]);
   }
 
-  public Translation2d getFutureGoalPos() {
+  public Translation2d getFutureGoalPos(double time) {
     if (currentState != ShooterState.SHOOT) {
       logger.info("SHOOT: {} -> ADJUSTING", currentState);
       currentState = ShooterState.ADJUSTING;
@@ -289,22 +289,25 @@ public class ShooterSubsystem extends MeasurableSubsystem {
           ShooterConstants.kKickerOpTicksP100ms, ShooterConstants.kShooterOpTicksP100ms);
       hoodClosedLoop(ShooterConstants.kHoodOpTicks);
     } else {
-      if (visionSubsystem.isRangingValid()) {
-        double[] shootSolution =
-            getShootSolution(inchesToPixelsTable(TurretConstants.kHubPositionMeters));
-        double[] velocity = driveSubsystem.getDriveVelocity();
-        double dx = -velocity[0] * (shootSolution[4] * ShooterConstants.kLookupToFMultiplier);
-        double dy = -velocity[1] * (shootSolution[4] * ShooterConstants.kLookupToFMultiplier);
-        delta = new Translation2d(dx, dy);
-        newHub = TurretConstants.kHubPositionMeters;
-        newHub = newHub.plus(delta);
-        double lastDistance = shootSolution[3];
-        shootSolution = getShootSolution(inchesToPixelsTable(newHub));
-        changeInDistanceGoal = shootSolution[3] - lastDistance;
-        shooterClosedLoop(shootSolution[0], shootSolution[1]);
-        hoodClosedLoop(shootSolution[2]);
-        return newHub;
-      }
+      double[] shootSolution =
+          getShootSolution(inchesToPixelsTable(TurretConstants.kHubPositionMeters));
+      double dx =
+          -driveSubsystem.getFieldRelSpeed().vxMetersPerSecond
+              * ((shootSolution[4] - time + ShooterConstants.kLookupTOFOffset)
+                  * ShooterConstants.kLookupToFMultiplier);
+      double dy =
+          -driveSubsystem.getFieldRelSpeed().vyMetersPerSecond
+              * ((shootSolution[4] - time + ShooterConstants.kLookupTOFOffset)
+                  * ShooterConstants.kLookupToFMultiplier);
+      delta = new Translation2d(dx, dy);
+      newHub = TurretConstants.kHubPositionMeters;
+      newHub = newHub.plus(delta);
+      double lastDistance = shootSolution[3];
+      shootSolution = getShootSolution(inchesToPixelsTable(newHub));
+      changeInDistanceGoal = shootSolution[3] - lastDistance;
+      shooterClosedLoop(shootSolution[0], shootSolution[1]);
+      hoodClosedLoop(shootSolution[2]);
+      return newHub;
     }
     return TurretConstants.kHubPositionMeters;
   }
