@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.commands.auton.DefenseAuto;
 import frc.robot.commands.auton.DefenseTwoAuto;
+import frc.robot.commands.auton.DestageThreeCargoAuto;
 import frc.robot.commands.auton.FiveCargoAuto;
 import frc.robot.commands.auton.ThreeCargoAuto;
 import frc.robot.commands.auton.TwoCargoAuto;
@@ -130,6 +131,23 @@ public class AutoSwitch {
             "OppCargo2Collect",
             "OppCargo3Collect",
             "DefenseMoveOffOppBall",
+            AutoConstants.kLeftStartYaw,
+            0.0,
+            230.0); // FIXME
+      case 0x13:
+        return new DestageThreeCargoAuto(
+            visionSubsystem,
+            turretSubsystem,
+            shooterSubsystem,
+            magazineSubsystem,
+            intakeSubsystem,
+            intakeExtendSubsystem,
+            driveSubsystem,
+            "LeftCargo1Collect",
+            "OppCargo2Collect",
+            "PrepareLeftCargo4",
+            "LeftCargo4Collect",
+            "CrossCenterLine",
             AutoConstants.kLeftStartYaw,
             0.0,
             230.0); // FIXME

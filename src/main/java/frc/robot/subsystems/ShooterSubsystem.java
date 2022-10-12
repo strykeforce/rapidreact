@@ -418,7 +418,7 @@ public class ShooterSubsystem extends MeasurableSubsystem {
     }
   }
 
-  public void geyserShot(boolean isOppCargoShot, boolean isBallOne) {
+  public void geyserShot(boolean isOppCargoShot, boolean isBallOne, Translation2d fieldSpot) {
     this.isBallOne = isBallOne;
     logger.info("GEYSER_SHOT: {} -> ADJUSTING", currentState);
     currentState = ShooterState.ADJUSTING;
@@ -431,15 +431,14 @@ public class ShooterSubsystem extends MeasurableSubsystem {
         hoodClosedLoop(ShooterConstants.kHoodGeyserBallTwoTicks);
       }
     } else {
-      double[] shootSol =
-          getShootSolution(inchesToPixelsTable(ShooterConstants.kOpponentCargoShotSol));
+      double[] shootSol = getShootSolution(inchesToPixelsTable(fieldSpot));
       shooterClosedLoop(shootSol[0], shootSol[1]);
       hoodClosedLoop(shootSol[2]);
     }
   }
 
   public void geyserShot() {
-    geyserShot(false, !isBallOne);
+    geyserShot(false, !isBallOne, ShooterConstants.kOpponentCargoShotSol);
   }
 
   public void stop() {

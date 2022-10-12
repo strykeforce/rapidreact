@@ -1,6 +1,7 @@
 package frc.robot.commands.sequences.shooting;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MagazineSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -27,7 +28,7 @@ public class GeyserShootCommand extends CommandBase {
   @Override
   public void initialize() {
     turretSubsystem.geyserShot(true);
-    shooterSubsystem.geyserShot(false, true);
+    shooterSubsystem.geyserShot(false, true, ShooterConstants.kDummyShotSol);
     magazineSubsystem.shoot();
   }
 

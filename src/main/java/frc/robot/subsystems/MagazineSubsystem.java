@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Constants;
 import frc.robot.Constants.MagazineConstants;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.ShooterSubsystem.ShooterState;
 import frc.robot.subsystems.TurretSubsystem.TurretState;
 import java.util.List;
@@ -56,6 +57,8 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   private boolean doTimedShoot = false;
   private boolean doOdomVisionReset = false;
   private boolean shootWhileMove = false;
+  private boolean autonIgnoreColorSensor = false;
+  private boolean autonReadTimerElapsed = false;
 
   public MagazineSubsystem(
       TurretSubsystem turretSubsystem,
@@ -124,6 +127,10 @@ public class MagazineSubsystem extends MeasurableSubsystem {
 
   public boolean getShootWhileMove() {
     return shootWhileMove;
+  }
+
+  public boolean getAutonReadTimerElapsed() {
+    return autonReadTimerElapsed;
   }
 
   public void enableUpperBeamBreak(boolean enableUpper) {
@@ -202,7 +209,10 @@ public class MagazineSubsystem extends MeasurableSubsystem {
 
   public Color getColor() {
     lastColor = colorSensor.getColor();
-    if (lastColor.red == 0 && lastColor.green == 0 && lastColor.blue == 0) {
+    if (lastColor.red == 0
+        && lastColor.green == 0
+        && lastColor.blue == 0
+        && !autonIgnoreColorSensor) {
       ignoreColorSensor = true;
       logger.warn("Color sensor error. Diasbling color sensor.");
       if (allianceCargoColor == CargoColor.BLUE) lastColor = MagazineConstants.kBlueCargo;
@@ -224,6 +234,14 @@ public class MagazineSubsystem extends MeasurableSubsystem {
   public void ignoreColorSensor(boolean ignore) {
     ignoreColorSensor = ignore;
     logger.info("set ignoreColorSensor to: {}", ignore);
+  }
+
+  public void setAutonIgnoreColorSensor(boolean autonIgnore) {
+    autonIgnoreColorSensor = autonIgnore;
+  }
+
+  public boolean getAutonIgnoreColorSensor() {
+    return autonIgnoreColorSensor;
   }
 
   public boolean isColorSensorIgnored() {
@@ -463,13 +481,17 @@ public class MagazineSubsystem extends MeasurableSubsystem {
         boolean hasReadElapsed = readTimer.hasElapsed(MagazineConstants.kReadTimerDelay);
         if (cargoColor != CargoColor.NONE || hasReadElapsed) {
           // ignoreColorSensor || storedCargoColors[0]
-          if (hasReadElapsed) {
+          if (hasReadElapsed && !autonIgnoreColorSensor) {
             logger.info("ReadTimer Elapsed");
             cargoColor = allianceCargoColor;
             storedCargoColors[1] = cargoColor;
+          } else {
+            logger.info("ReadTimer Elapsed");
+            autonReadTimerElapsed = true;
           }
           if (cargoColor != allianceCargoColor
               && !ignoreColorSensor
+              && !autonIgnoreColorSensor
               && currUpperMagazineState != UpperMagazineState.EMPTY) {
             logger.info("READ_CARGO -> EJECT_CARGO");
             lowerClosedLoopRotate(MagazineConstants.kLowerMagazineEjectSpeed);
@@ -477,8 +499,10 @@ public class MagazineSubsystem extends MeasurableSubsystem {
             ejectTimer.reset();
             ejectTimer.start();
             break;
-          } else if (currUpperMagazineState == UpperMagazineState.EMPTY) {
+          } else if (currUpperMagazineState == UpperMagazineState.EMPTY
+              && storedCargoColors[0] == CargoColor.NONE) {
             logger.info("READ_CARGO -> WAIT_EMPTY");
+            logger.info("stored cargo: {}, {}", storedCargoColors[0], storedCargoColors[1]);
             currLowerMagazineState = LowerMagazineState.WAIT_EMPTY;
             enableLowerBeamBreak(false);
             lowerClosedLoopRotate(MagazineConstants.kLowerMagazineIndexSpeed);
@@ -486,6 +510,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
             break;
           } else {
             logger.info("READ_CARGO -> WAIT_UPPER");
+            logger.info("stored cargo: {}, {}", storedCargoColors[0], storedCargoColors[1]);
             currLowerMagazineState = LowerMagazineState.WAIT_UPPER;
             break;
           }
@@ -502,7 +527,8 @@ public class MagazineSubsystem extends MeasurableSubsystem {
         break;
 
       case WAIT_UPPER:
-        if (currUpperMagazineState == UpperMagazineState.EMPTY
+        if ((currUpperMagazineState == UpperMagazineState.EMPTY
+                && storedCargoColors[0] == CargoColor.NONE)
             || currUpperMagazineState == UpperMagazineState.CARGO_SHOT && !isUpperBeamBroken()) {
           logger.info("WAIT_UPPER -> WAIT_EMPTY");
           enableLowerBeamBreak(false);
@@ -574,8 +600,14 @@ public class MagazineSubsystem extends MeasurableSubsystem {
           if (turretSubsystem.getState() == TurretState.ODOM_FEED) {
             turretSubsystem.trackTarget();
           }
-          if (turretSubsystem.getState() == TurretState.GEYSER_AIMED) {
+          if (turretSubsystem.getState() == TurretState.GEYSER_AIMED && !autonIgnoreColorSensor) {
             turretSubsystem.geyserShot(false);
+          } else if (autonIgnoreColorSensor && isFirstCargoAlliance()) {
+            turretSubsystem.trackTarget();
+          }
+          if (autonIgnoreColorSensor && !isFirstCargoAlliance()) {
+            turretSubsystem.opponentCargoShot(ShooterConstants.kDestageOpponentCargoShotOdomAimPos);
+            shooterSubsystem.geyserShot(true, true, ShooterConstants.kDestageOpponentCargoShotSol);
           }
           if (isMagazineEmpty()) upperClosedLoopRotate(0.0);
           break;
@@ -584,7 +616,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
 
       case EMPTY:
         if (isUpperBeamBroken()) {
-          if (!isNextCargoAlliance()) {
+          if (!isNextCargoAlliance() && !autonIgnoreColorSensor) {
             logger.info("EMPTY -> SPIT");
             currUpperMagazineState = UpperMagazineState.SPIT;
           } else {

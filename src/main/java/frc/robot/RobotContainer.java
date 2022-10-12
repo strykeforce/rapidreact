@@ -47,7 +47,7 @@ import frc.robot.commands.drive.ResetOdometryCommand;
 import frc.robot.commands.drive.XLockCommand;
 import frc.robot.commands.drive.ZeroGyroCommand;
 import frc.robot.commands.intake.IntakeOpenLoopCommand;
-import frc.robot.commands.magazine.IgnoreColorSensorCommand;
+import frc.robot.commands.magazine.AutonIgnoreColorSensorCommand;
 import frc.robot.commands.magazine.LowerMagazineOpenLoopCommand;
 import frc.robot.commands.magazine.ManualEjectCargoReverseCommand;
 import frc.robot.commands.magazine.PitClearCargoColor;
@@ -66,6 +66,7 @@ import frc.robot.commands.sequences.shooting.HighFenderShotCommand;
 import frc.robot.commands.sequences.shooting.LowFenderShotCommand;
 import frc.robot.commands.sequences.shooting.PitShooterTuneCommandGroup;
 import frc.robot.commands.sequences.shooting.StopShooterCommandGroup;
+import frc.robot.commands.sequences.shooting.UnknownOrderShotAutonCommand;
 import frc.robot.commands.sequences.shooting.VisionShootCommandGroup;
 import frc.robot.commands.sequences.shooting.VisionTimedShootCommandGroup;
 import frc.robot.commands.shooter.HoodClosedLoopCommand;
@@ -77,7 +78,6 @@ import frc.robot.commands.shooter.SwitchClimbPos;
 import frc.robot.commands.turret.OpenLoopTurretCommand;
 import frc.robot.commands.turret.RotateToCommand;
 import frc.robot.commands.turret.TurretAimCommandGroup;
-import frc.robot.commands.vision.EnableVisionCommand;
 import frc.robot.subsystems.AutoSwitch;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
@@ -228,9 +228,9 @@ public class RobotContainer {
 
     // Ignore Color Sensor
     new JoystickButton(driveJoystick, Toggle.LEFT_TOGGLE.id)
-        .whenPressed(new IgnoreColorSensorCommand(magazineSubsystem, true));
+        .whenPressed(new AutonIgnoreColorSensorCommand(magazineSubsystem, true));
     new JoystickButton(driveJoystick, Toggle.LEFT_TOGGLE.id)
-        .whenReleased(new IgnoreColorSensorCommand(magazineSubsystem, false));
+        .whenReleased(new AutonIgnoreColorSensorCommand(magazineSubsystem, false));
 
     // Hood Open Loop
     new JoystickButton(driveJoystick, Trim.RIGHT_Y_POS.id)
@@ -256,7 +256,9 @@ public class RobotContainer {
         .whenPressed(new DriveAutonCommand(driveSubsystem, "straightPath", true, true));
 
     new JoystickButton(driveJoystick, Trim.LEFT_Y_POS.id)
-        .whenPressed(new EnableVisionCommand(visionSubsystem, driveSubsystem));
+        .whenPressed(
+            new UnknownOrderShotAutonCommand(
+                turretSubsystem, shooterSubsystem, magazineSubsystem, intakeSubsystem));
 
     // Drive Practice Odometry Reset
     new JoystickButton(driveJoystick, Trim.LEFT_Y_NEG.id)
