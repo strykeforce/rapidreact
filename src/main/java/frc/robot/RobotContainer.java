@@ -197,6 +197,10 @@ public class RobotContainer {
     }
   }
 
+  public void autonIgnoreColorSensor(boolean ignore) {
+    magazineSubsystem.setAutonIgnoreColorSensor(ignore);
+  }
+
   private void configureTelemetry() {
     driveSubsystem.registerWith(telemetryService);
     shooterSubsystem.registerWith(telemetryService);
