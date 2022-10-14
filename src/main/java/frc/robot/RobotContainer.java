@@ -47,7 +47,7 @@ import frc.robot.commands.drive.ResetOdometryCommand;
 import frc.robot.commands.drive.XLockCommand;
 import frc.robot.commands.drive.ZeroGyroCommand;
 import frc.robot.commands.intake.IntakeOpenLoopCommand;
-import frc.robot.commands.magazine.AutonIgnoreColorSensorCommand;
+import frc.robot.commands.magazine.IgnoreColorSensorCommand;
 import frc.robot.commands.magazine.LowerMagazineOpenLoopCommand;
 import frc.robot.commands.magazine.ManualEjectCargoReverseCommand;
 import frc.robot.commands.magazine.PitClearCargoColor;
@@ -232,9 +232,9 @@ public class RobotContainer {
 
     // Ignore Color Sensor
     new JoystickButton(driveJoystick, Toggle.LEFT_TOGGLE.id)
-        .whenPressed(new AutonIgnoreColorSensorCommand(magazineSubsystem, true));
+        .whenPressed(new IgnoreColorSensorCommand(magazineSubsystem, true));
     new JoystickButton(driveJoystick, Toggle.LEFT_TOGGLE.id)
-        .whenReleased(new AutonIgnoreColorSensorCommand(magazineSubsystem, false));
+        .whenReleased(new IgnoreColorSensorCommand(magazineSubsystem, false));
 
     // Hood Open Loop
     new JoystickButton(driveJoystick, Trim.RIGHT_Y_POS.id)
