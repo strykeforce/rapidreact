@@ -489,7 +489,7 @@ public class MagazineSubsystem extends MeasurableSubsystem {
             logger.info("ReadTimer Elapsed");
             cargoColor = allianceCargoColor;
             storedCargoColors[1] = cargoColor;
-          } else {
+          } else if (hasReadElapsed) {
             logger.info("ReadTimer Elapsed");
             autonReadTimerElapsed = true;
           }
