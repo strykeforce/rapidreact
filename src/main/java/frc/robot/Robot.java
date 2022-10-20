@@ -124,6 +124,7 @@ public class Robot extends TimedRobot {
     m_robotContainer.zeroClimb();
     m_robotContainer.startAutoIntake();
     m_robotContainer.setDoVisionOdomReset(true);
+    m_robotContainer.autonIgnoreColorSensor(false);
     CommandScheduler.getInstance()
         .schedule(
             new EnableVisionCommand(
