@@ -2,6 +2,12 @@
 
 [![CI](https://github.com/strykeforce/rapidreact/actions/workflows/main.yml/badge.svg)](https://github.com/strykeforce/rapidreact/actions/workflows/main.yml)
 
+<p align="center">
+  <img alt="skystriker" src="https://live.staticflickr.com/65535/52013666011_a003b55eb0_z.jpg" width="61%">
+&nbsp; &nbsp;
+  <img alt="skystriker-2" src="https://photos.smugmug.com/photos/i-7bt2T5L/0/L/i-7bt2T5L-L.jpg" width="31%">
+</p>
+
 ## Controls
 
 ![driver](docs/driver-controls.png)
